@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yıldız Sınıfı | Yıldız Can AI</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+</head>
+<body>
+
+<div id="start-screen">
+    <img src="avatar.png" id="avatar-img" alt="Yıldız Can">
+    <h1>Merhaba! Ben Yıldız Can 🌟</h1>
+    <p>Seninle sohbet etmek için sabırsızlanıyorum! Adın ne?</p>
+    <input type="text" id="nameInput" placeholder="Adını buraya yaz..." autocomplete="off">
+    <button class="btn-start" onclick="startGame()">Hadi Başlayalım!</button>
+</div>
+<div id="floating-avatar" style="display:none;">
+    <img src="avatar.png" alt="Rehber Yıldız Can">
+</div>
+
+<div id="game-container">
+    <div class="main-card">
+        <div class="media-box"><video id="v" playsinline loop muted autoplay></video></div>
+        <div class="question-bar" id="qBar">Hazırlanıyorum...</div>
+        <div class="btns">
+            <button onclick="rec()" id="micBtn" class="btn-mic" disabled>🎙️</button>
+            <button onclick="loadNext()" id="nextBtn" class="btn-next">➡️</button>
+        </div>
+        <div id="info">Lütfen bekleyin...</div>
+    </div>
+
+    <div class="side-card">
+        <img src="avatar.png" class="side-avatar" alt="Avatar">
+        <div id="chat-bubbles"></div>
+    </div>
+</div>
+
+<div class="footer">© 2026 | Efe Erman tarafından geliştirilmiştir.</div>
+
+<script src="script.js"></script>
+</body>
+</html>
