@@ -246,13 +246,43 @@ function addMessage(text, type) {
     chatDiv.scrollTop = chatDiv.scrollHeight;
 }
 
-// SESLİ KONUŞTURMA
-function speak(t, callback) {
+// WEB SPEECH FALLBACK
+function speakFallback(t, callback) {
     window.speechSynthesis.cancel();
     let u = new SpeechSynthesisUtterance(t);
     u.lang = 'tr-TR';
-    u.pitch = 1.2; 
-    u.rate = 0.7; 
-    if(callback) u.onend = callback;
+    u.pitch = 1.2;
+    u.rate = 0.7;
+    if (callback) u.onend = callback;
     window.speechSynthesis.speak(u);
+}
+
+// SESLİ KONUŞTURMA — önce ElevenLabs, hata alırsa Web Speech
+async function speak(t, callback) {
+    try {
+        const res = await fetch('/api/tts', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text: t })
+        });
+
+        if (!res.ok) throw new Error('ElevenLabs başarısız');
+
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        const audio = new Audio(url);
+        audio.onended = () => {
+            URL.revokeObjectURL(url);
+            if (callback) callback();
+        };
+        audio.onerror = () => {
+            URL.revokeObjectURL(url);
+            speakFallback(t, callback);
+        };
+        audio.play();
+
+    } catch (e) {
+        // Kota bitti veya ağ hatası — Web Speech ile devam
+        speakFallback(t, callback);
+    }
 }
