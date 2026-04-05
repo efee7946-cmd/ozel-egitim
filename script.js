@@ -35,12 +35,21 @@ let idleTimer;
 let turnCount = 0; 
 let childName = "";
 
-function startGame() {
+async function startGame() {
     const nameVal = document.getElementById('nameInput').value.trim();
     if (!nameVal) return;
     childName = nameVal;
 
-    // 🔥 MOBİL SES KİLİDİNİ AÇMAK İÇİN BOŞ BİR SES OYNAT
+    // 🔥 KRİTİK DÜZELTME: Kullanıcı butona bastığı an mikrofon iznini de al
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        // İzin alındıktan sonra stream'i hemen kapatabiliriz, sadece izni onaylatmak amaçlı.
+        stream.getTracks().forEach(track => track.stop());
+    } catch (err) {
+        console.log("Mikrofon izni alınamadı veya reddedildi:", err);
+    }
+
+    // Mevcut ses kilidi açma kodların...
     window.speechSynthesis.getVoices();
     const silentUtterance = new SpeechSynthesisUtterance("");
     window.speechSynthesis.speak(silentUtterance);
