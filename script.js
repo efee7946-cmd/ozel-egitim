@@ -40,6 +40,14 @@ function startGame() {
     if (!nameVal) return;
     childName = nameVal;
 
+    // iOS Chrome uyarısı
+    const isIOS = /iP(hone|ad|od)/.test(navigator.userAgent);
+    const isChrome = /CriOS/.test(navigator.userAgent);
+    if (isIOS && isChrome) {
+        alert("⚠️ Mikrofon özelliği iOS Chrome'da çalışmıyor.\nLütfen bu sayfayı Safari ile aç.");
+        return;
+    }
+
     // 🔥 MOBİL SES KİLİDİNİ AÇMAK İÇİN BOŞ BİR SES OYNAT
     window.speechSynthesis.getVoices();
     const silentUtterance = new SpeechSynthesisUtterance("");
@@ -105,6 +113,18 @@ async function loadNext() {
 // SES KAYIT (MİKROFON) İŞLEMLERİ
 async function rec() {
     clearTimeout(idleTimer);
+
+    // iOS Chrome tespiti — Apple SpeechRecognition'ı yalnızca Safari'ye açıyor
+    const isIOS = /iP(hone|ad|od)/.test(navigator.userAgent);
+    const isChrome = /CriOS/.test(navigator.userAgent);
+    if (isIOS && isChrome) {
+        document.getElementById('info').innerText = "Bu özellik iOS Chrome'da çalışmıyor. Lütfen Safari ile aç.";
+        if (confirm("Mikrofon özelliği iOS Chrome'da desteklenmiyor.\n\nSafari'de açmak ister misin?")) {
+            window.location.href = window.location.href.replace("googlechrome://", "https://");
+            setTimeout(() => { window.open(window.location.href); }, 300);
+        }
+        return;
+    }
 
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) { alert("Tarayıcı ses tanımayı desteklemiyor."); return; }
