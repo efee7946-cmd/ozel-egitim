@@ -35,18 +35,20 @@ let idleTimer;
 let turnCount = 0; 
 let childName = "";
 
-async function startGame() {
+function startGame() {
     const nameVal = document.getElementById('nameInput').value.trim();
     if (!nameVal) return;
     childName = nameVal;
 
-    // 🔥 MOBİL İÇİN KRİTİK: Kullanıcı butona bastığı an mikrofon iznini "ısıt"
-    try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        stream.getTracks().forEach(track => track.stop()); // İzni aldık, şimdilik kapattık
-    } catch (e) {
-        console.log("Mikrofon izni reddedildi:", e);
-    }
+    // 🔥 MOBİL SES KİLİDİNİ AÇMAK İÇİN BOŞ BİR SES OYNAT
+    window.speechSynthesis.getVoices();
+    const silentUtterance = new SpeechSynthesisUtterance("");
+    window.speechSynthesis.speak(silentUtterance);
+
+    document.getElementById('start-screen').style.display = 'none';
+    document.getElementById('game-container').style.display = 'flex';
+    loadNext();
+}
 
     // Ses kilidini aç
     window.speechSynthesis.getVoices();
