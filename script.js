@@ -50,26 +50,6 @@ function startGame() {
     loadNext();
 }
 
-    // Ses kilidini aç
-    window.speechSynthesis.getVoices();
-    const silentUtterance = new SpeechSynthesisUtterance("");
-    window.speechSynthesis.speak(silentUtterance);
-
-    document.getElementById('start-screen').style.display = 'none';
-    document.getElementById('game-container').style.display = 'flex';
-    loadNext();
-}
-
-    // Mevcut ses kilidi açma kodların...
-    window.speechSynthesis.getVoices();
-    const silentUtterance = new SpeechSynthesisUtterance("");
-    window.speechSynthesis.speak(silentUtterance);
-
-    document.getElementById('start-screen').style.display = 'none';
-    document.getElementById('game-container').style.display = 'flex';
-    loadNext();
-}
-
 // BEKLEME SÜRESİ DOLUNCA BUTONU PARLAT
 function resetIdleTimer() {
     clearTimeout(idleTimer);
