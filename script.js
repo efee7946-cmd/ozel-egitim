@@ -26,7 +26,7 @@ const pool = [
     { q: "Ormanda bir gezintiye çıksak neler görürüz?", query: "kids in forest" },
     { q: "Uçan bir araban olsa nereye gitmek istersin?", query: "flying car dream" }
 ];
- 
+
 let unaskedQuestions = [...pool]; 
 let currentObj = null;
 let isWaiting = false;
@@ -34,22 +34,22 @@ let chatHistory = [];
 let idleTimer;
 let turnCount = 0; 
 let childName = "";
- 
+
 function startGame() {
     const nameVal = document.getElementById('nameInput').value.trim();
     if (!nameVal) return;
     childName = nameVal;
- 
+
     // 🔥 MOBİL SES KİLİDİNİ AÇMAK İÇİN BOŞ BİR SES OYNAT
     window.speechSynthesis.getVoices();
     const silentUtterance = new SpeechSynthesisUtterance("");
     window.speechSynthesis.speak(silentUtterance);
- 
+
     document.getElementById('start-screen').style.display = 'none';
     document.getElementById('game-container').style.display = 'flex';
     loadNext();
 }
- 
+
 // BEKLEME SÜRESİ DOLUNCA BUTONU PARLAT
 function resetIdleTimer() {
     clearTimeout(idleTimer);
@@ -60,24 +60,24 @@ function resetIdleTimer() {
         document.getElementById('info').innerText = "Hadi yeni soruya geçelim! ➡️";
     }, 15000); 
 }
- 
+
 // SIRADAKİ VİDEO VE SORUYU YÜKLE
 async function loadNext() {
     if(isWaiting) return;
     clearTimeout(idleTimer);
     document.getElementById('nextBtn').classList.remove('pulse-anim');
     document.getElementById('micBtn').disabled = true;
- 
+
     if (unaskedQuestions.length === 0) unaskedQuestions = [...pool];
     const rIndex = Math.floor(Math.random() * unaskedQuestions.length);
     currentObj = unaskedQuestions[rIndex]; 
     unaskedQuestions.splice(rIndex, 1); 
- 
+
     const vEl = document.getElementById('v');
     chatHistory = []; 
     turnCount = 0; 
     document.getElementById('chat-bubbles').innerHTML = ""; 
- 
+
     try {
         // 🔥 Backend'deki video servisine gidiyoruz (Güvenli yol)
         const r = await fetch(`/api/video?query=${currentObj.query}`);
@@ -101,14 +101,14 @@ async function loadNext() {
         }
     } catch(e) { console.error("Video hatası:", e); }
 }
- 
+
 // SES KAYIT (MİKROFON) İŞLEMLERİ
 async function rec() {
     clearTimeout(idleTimer);
- 
+
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) { alert("Tarayıcı ses tanımayı desteklemiyor."); return; }
- 
+
     // Mobil Chrome için önce mikrofon iznini açıkça al
     let permStream = null;
     try {
@@ -117,9 +117,9 @@ async function rec() {
         document.getElementById('info').innerText = "Mikrofon izni verilmedi. Lütfen tarayıcı ayarlarından izin ver.";
         return;
     }
- 
+
     document.getElementById('micBtn').disabled = true;
- 
+
     const r = new SpeechRecognition();
     r.lang = "tr-TR";
     r.onstart = () => {
@@ -135,7 +135,7 @@ async function rec() {
         const speech = e.results[0][0].transcript;
         addMessage(speech, "user");
         turnCount++;
- 
+
         if (turnCount >= 7) {
             const final = `Seninle konuşmak harikaydı ${childName}! Hadi şimdi yeni bir videoya bakalım!`;
             addMessage(final, "ai");
@@ -146,7 +146,7 @@ async function rec() {
             isWaiting = false;
             return;
         }
- 
+
         document.getElementById('info').innerText = "Düşünüyorum...";
         const aiRes = await getGemmaResponse(speech);
         addMessage(aiRes, "ai");
@@ -160,6 +160,7 @@ async function rec() {
         });
     };
     r.onerror = (err) => { 
+        alert("HATA: " + err.error);
         if (permStream) { permStream.getTracks().forEach(t => t.stop()); permStream = null; }
         document.getElementById('micBtn').disabled = false;
         document.getElementById('micBtn').classList.remove('listening');
@@ -177,13 +178,13 @@ async function rec() {
     };
     r.start();
 }
- 
+
 // YAPAY ZEKA CEVABI (BACKEND ÜZERİNDEN)
 async function getGemmaResponse(text) {
     const url = "/api/chat"; // 🔥 Backend'deki chat servisine gidiyoruz
     
     chatHistory.push({ role: "user", parts: [{ text: text }] });
- 
+
     const instructions = `Sen 5-8 yaş arası çocuklarla konuşan neşeli Yıldız Can'sın. Karşındaki çocuğun adı ${childName}. 
     KRİTİK KURALLAR:
     1. KONU BÜTÜNLÜĞÜ: Çocuk neyden bahsediyorsa o konuda kal. 
@@ -191,7 +192,7 @@ async function getGemmaResponse(text) {
     3. CÜMLE SINIRI: MAX 2 KISA CÜMLE (Toplam 8-10 kelime).
     4. SORUYLA BİTİR: Konuyu derinleştiren çok basit bir soru sor.
     5. DOĞAL DÜZELTME: Çocuk hata yaparsa nazikçe doğrusunu kendi cümlende kullan.`;
- 
+
     const payload = {
         contents: [
             { role: "user", parts: [{ text: "GÖREV: " + instructions }] },
@@ -199,7 +200,7 @@ async function getGemmaResponse(text) {
             ...chatHistory
         ]
     };
- 
+
     try {
         const res = await fetch(url, {
             method: 'POST',
@@ -214,7 +215,7 @@ async function getGemmaResponse(text) {
         return `Çok güzel anlattın ${childName}! Başka neler var?`;
     }
 }
- 
+
 // MESAJLARI BALONCUK OLARAK EKLE
 function addMessage(text, type) {
     const chatDiv = document.getElementById('chat-bubbles');
@@ -224,7 +225,7 @@ function addMessage(text, type) {
     chatDiv.appendChild(b);
     chatDiv.scrollTop = chatDiv.scrollHeight;
 }
- 
+
 // SESLİ KONUŞTURMA
 function speak(t, callback) {
     window.speechSynthesis.cancel();
