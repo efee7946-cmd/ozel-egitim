@@ -40,14 +40,23 @@ async function startGame() {
     if (!nameVal) return;
     childName = nameVal;
 
-    // 🔥 KRİTİK DÜZELTME: Kullanıcı butona bastığı an mikrofon iznini de al
+    // 🔥 MOBİL İÇİN KRİTİK: Kullanıcı butona bastığı an mikrofon iznini "ısıt"
     try {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        // İzin alındıktan sonra stream'i hemen kapatabiliriz, sadece izni onaylatmak amaçlı.
-        stream.getTracks().forEach(track => track.stop());
-    } catch (err) {
-        console.log("Mikrofon izni alınamadı veya reddedildi:", err);
+        stream.getTracks().forEach(track => track.stop()); // İzni aldık, şimdilik kapattık
+    } catch (e) {
+        console.log("Mikrofon izni reddedildi:", e);
     }
+
+    // Ses kilidini aç
+    window.speechSynthesis.getVoices();
+    const silentUtterance = new SpeechSynthesisUtterance("");
+    window.speechSynthesis.speak(silentUtterance);
+
+    document.getElementById('start-screen').style.display = 'none';
+    document.getElementById('game-container').style.display = 'flex';
+    loadNext();
+}
 
     // Mevcut ses kilidi açma kodların...
     window.speechSynthesis.getVoices();
