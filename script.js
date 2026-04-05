@@ -110,9 +110,9 @@ async function rec() {
     if (!SpeechRecognition) { alert("Tarayıcı ses tanımayı desteklemiyor."); return; }
  
     // Mobil Chrome için önce mikrofon iznini açıkça al
+    let permStream = null;
     try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        stream.getTracks().forEach(track => track.stop()); // izin alındı, stream'i kapat
+        permStream = await navigator.mediaDevices.getUserMedia({ audio: true });
     } catch (permErr) {
         document.getElementById('info').innerText = "Mikrofon izni verilmedi. Lütfen tarayıcı ayarlarından izin ver.";
         return;
@@ -123,6 +123,11 @@ async function rec() {
     const r = new SpeechRecognition();
     r.lang = "tr-TR";
     r.onstart = () => {
+        // İzin stream'ini recognition başladıktan sonra kapat
+        if (permStream) {
+            permStream.getTracks().forEach(track => track.stop());
+            permStream = null;
+        }
         document.getElementById('micBtn').classList.add('listening');
         document.getElementById('info').innerText = "Seni dinliyorum...";
     };
@@ -155,6 +160,7 @@ async function rec() {
         });
     };
     r.onerror = (err) => { 
+        if (permStream) { permStream.getTracks().forEach(t => t.stop()); permStream = null; }
         document.getElementById('micBtn').disabled = false;
         document.getElementById('micBtn').classList.remove('listening');
         if (err.error === 'not-allowed') {
@@ -165,7 +171,10 @@ async function rec() {
             document.getElementById('info').innerText = "Duyamadım, tekrar eder misin?";
         }
     };
-    r.onend = () => document.getElementById('micBtn').classList.remove('listening');
+    r.onend = () => {
+        if (permStream) { permStream.getTracks().forEach(t => t.stop()); permStream = null; }
+        document.getElementById('micBtn').classList.remove('listening');
+    };
     r.start();
 }
  
