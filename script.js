@@ -862,6 +862,8 @@ let authMode = 'login';
 
 function switchAuth(mode) {
     authMode = mode;
+    const nameField = document.getElementById('nameField');
+    const forgotLink = document.getElementById('forgot-link');
     const loginTab = document.getElementById('tab-login');
     const registerTab = document.getElementById('tab-register');
     const btnText = document.getElementById('btnText');
@@ -869,12 +871,16 @@ function switchAuth(mode) {
     const subTitle = document.querySelector('.auth-sub');
 
     if (mode === 'login') {
+        nameField.style.display = 'none';    // İsmi gizle
+        forgotLink.style.display = 'block';  // Şifremi unuttumu göster
         loginTab.classList.add('active');
         registerTab.classList.remove('active');
         title.innerText = "Hoş Geldin!";
         subTitle.innerText = "Öğrenme yolculuğuna başlamak için giriş yap.";
         btnText.innerText = "Giriş Yap";
     } else {
+        nameField.style.display = 'block';   // İsmi göster
+        forgotLink.style.display = 'none';   // Şifremi unuttumu gizle
         registerTab.classList.add('active');
         loginTab.classList.remove('active');
         title.innerText = "Yeni Hesap";
@@ -891,53 +897,96 @@ function showStatus(msg, type) {
     else status.style.color = '#555';
 }
 
+// ozel-egitim-main/script.js
+
+// --- AUTH FONKSİYONLARI ---
 async function handleAuth() {
     const email = document.getElementById('emailInput').value.trim();
     const password = document.getElementById('passwordInput').value;
+    const authBtn = document.getElementById('mainAuthBtn');
+
+    // script.js handleAuth içinde:
+const { data, error } = await supabaseClient.auth.signUp({ 
+    email, 
+    password,
+    options: { 
+        data: { display_name: document.getElementById('nameInput').value }, // HTML'e eklediğin isim inputu
+        emailRedirectTo: window.location.origin 
+    }
+});
 
     if (!email || !password) {
         showStatus("Lütfen tüm alanları doldur! ⚠️", "error");
         return;
     }
 
-    if (password.length < 6) {
-        showStatus("Şifre en az 6 karakter olmalı! 🔒", "error");
-        return;
-    }
-
     showStatus("İşlem yapılıyor... ⏳", "info");
-    document.getElementById('mainAuthBtn').disabled = true;
+    authBtn.disabled = true;
 
     try {
         if (authMode === 'register') {
-            const { data, error } = await supabaseClient.auth.signUp({ email, password });
-            document.getElementById('mainAuthBtn').disabled = false;
-            if (error) {
-                const msg = turkishAuthError(error.message);
-                showStatus("❌ " + msg, "error");
-            } else {
-                showStatus("🎉 Kayıt başarılı! E-postanı kontrol et ve doğrula.", "success");
-            }
+            const { data, error } = await supabaseClient.auth.signUp({ 
+                email, 
+                password,
+                options: { emailRedirectTo: window.location.origin }
+            });
+            
+            authBtn.disabled = false;
+            if (error) throw error;
+            
+            // Kayıt başarılı mesajı
+            showStatus("🎉 Kayıt başarılı! Lütfen e-posta kutunu kontrol et ve onay linkine tıkla.", "success");
         } else {
             const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-            document.getElementById('mainAuthBtn').disabled = false;
-            if (error) {
-                const msg = turkishAuthError(error.message);
-                showStatus("❌ " + msg, "error");
-            } else {
-                childName = data.user.email.split('@')[0];
-                showStatus("✅ Giriş başarılı! Yükleniyor...", "success");
-                document.getElementById('start-screen').style.transition = 'opacity 0.4s';
-                document.getElementById('start-screen').style.opacity = '0';
-                setTimeout(() => startApp(), 500);
-            }
+            
+            authBtn.disabled = false;
+            if (error) throw error;
+            
+            // Giriş başarılı mesajı
+            showStatus("✅ Giriş başarılı! Yükleniyor...", "success");
+            
+            // Eğer metadata'da isim varsa onu al, yoksa maili kullan
+            childName = data.user.user_metadata.display_name || data.user.email.split('@')[0];
+            
+            setTimeout(() => startApp(), 800);
         }
     } catch (e) {
-        document.getElementById('mainAuthBtn').disabled = false;
-        showStatus("❌ Bağlantı hatası: " + e.message, "error");
+        authBtn.disabled = false;
+        // Hata mesajlarını kullanıcıya Türkçe ve net gösteriyoruz
+        showStatus("❌ " + turkishAuthError(e.message), "error");
     }
 }
 
+// Şifremi Unuttum Fonksiyonu
+async function resetPassword() {
+    const email = document.getElementById('emailInput').value.trim();
+    if (!email) {
+        showStatus("Lütfen şifre sıfırlama linki için e-posta adresini yaz! 📧", "error");
+        return;
+    }
+    
+    showStatus("Sıfırlama linki gönderiliyor... ⏳", "info");
+    const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+        redirectTo: window.location.origin,
+    });
+    
+    if (error) {
+        showStatus("❌ Hata: " + turkishAuthError(error.message), "error");
+    } else {
+        showStatus("📧 Şifre sıfırlama maili gönderildi! Kutunu kontrol et.", "success");
+    }
+}
+
+function turkishAuthError(msg) {
+    if (msg.includes('Invalid login credentials')) return 'E-posta veya şifre yanlış! Lütfen tekrar dene.';
+    if (msg.includes('Email not confirmed')) return 'E-posta adresin henüz onaylanmamış! Lütfen mailini kontrol et.';
+    if (msg.includes('already registered')) return 'Bu e-posta zaten kayıtlı! Giriş yapmayı deneyebilirsin.';
+    if (msg.includes('Password should be')) return 'Şifre çok kısa! En az 6 karakter olmalı.';
+    return "Bir hata oluştu: " + msg;
+}
+
+// window exportlarına ekle
+window.resetPassword = resetPassword;
 function turkishAuthError(msg) {
     if (msg.includes('Invalid login credentials')) return 'E-posta veya şifre yanlış!';
     if (msg.includes('Email not confirmed')) return 'E-posta adresin henüz doğrulanmamış. Gelen kutunu kontrol et!';
@@ -964,6 +1013,7 @@ async function saveSessionToDatabase(type, turns, evaluation) {
         if (error) console.error("Veri saklanamadı:", error);
     }
 }
+
 
 // =============================================
 // WINDOW EXPORT (HTML onclick için)

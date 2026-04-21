@@ -11,7 +11,6 @@
 </head>
 <body>
 
-<!-- ===================== GİRİŞ EKRANI ===================== -->
 <div id="start-screen" class="auth-portal">
     <div class="auth-container">
         <div class="auth-visual">
@@ -28,11 +27,16 @@
             <p class="auth-sub">Öğrenme yolculuğuna başlamak için giriş yap.</p>
             
             <div class="auth-tabs">
-    <button type="button" class="tab-btn active" id="tab-login" onclick="switchAuth('login')">Giriş Yap</button>
-    <button type="button" class="tab-btn" id="tab-register" onclick="switchAuth('register')">Kayıt Ol</button>
+                <button type="button" class="tab-btn active" id="tab-login" onclick="switchAuth('login')">Giriş Yap</button>
+                <button type="button" class="tab-btn" id="tab-register" onclick="switchAuth('register')">Kayıt Ol</button>
             </div>
 
             <div class="input-group">
+                <div class="field" id="nameField" style="display: none;">
+                    <label>Çocuğun Adı</label>
+                    <input type="text" id="nameInput" placeholder="Örn: Efe">
+                </div>
+
                 <div class="field">
                     <label>E-posta</label>
                     <input type="email" id="emailInput" placeholder="ornek@mail.com" autocomplete="email">
@@ -47,10 +51,16 @@
                 <span id="btnText">Giriş Yap</span>
             </button>
             
+            <p id="forgot-link" style="text-align: center; margin-top: 15px;">
+                <a href="javascript:void(0)" onclick="resetPassword()" style="color: #6C63FF; font-size: 0.85rem; text-decoration: none; font-weight: bold;">Şifremi Unuttum ❓</a>
+            </p>
+            
             <p id="auth-status"></p>
         </div>
     </div>
 </div>
+
+
 
 <!-- ===================== ANA MENÜ ===================== -->
 <div id="menu-screen">
