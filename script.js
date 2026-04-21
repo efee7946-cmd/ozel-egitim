@@ -194,10 +194,6 @@ function exitStory() {
     showOnly('story-select-screen');
 }
 
-function getHistoryStorageKey() {
-    return currentUserEmail ? `report_history_${currentUserEmail}` : '';
-}
-
 function getDateKey(date) {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -214,43 +210,62 @@ function formatHistoryDate(dateKey) {
     return date.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' });
 }
 
-function loadReportHistory() {
-    const storageKey = getHistoryStorageKey();
-    if (!storageKey) return [];
-
-    try {
-        const raw = localStorage.getItem(storageKey);
-        return raw ? JSON.parse(raw) : [];
-    } catch (error) {
-        console.error('Rapor geçmişi okunamadı:', error);
-        return [];
+function createSessionHistoryId() {
+    if (window.crypto && window.crypto.randomUUID) {
+        return window.crypto.randomUUID();
     }
+
+    return 'xxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(ch) {
+        const rand = Math.random() * 16 | 0;
+        const val = ch === 'x' ? rand : (rand & 0x3 | 0x8);
+        return val.toString(16);
+    });
 }
 
-function saveReportHistory(history) {
-    const storageKey = getHistoryStorageKey();
-    if (!storageKey) return;
-    localStorage.setItem(storageKey, JSON.stringify(history));
-}
-
-function buildSessionSnapshot(durationMin, totalMic, storyPct, totalTurns) {
+function mapHistoryRow(row) {
     return {
-        id: sessionData.reportEntryId || `${Date.now()}`,
-        createdAt: new Date().toISOString(),
-        dateKey: getDateKey(new Date()),
-        childName: childName,
-        durationMin: durationMin,
-        totalMic: totalMic,
-        storyPct: storyPct,
-        totalTurns: totalTurns,
-        storyCompleted: sessionData.storyCompleted,
-        storyName: sessionData.storyName,
-        totalScenesReached: sessionData.totalScenesReached,
-        totalScenes: sessionData.totalScenes,
-        micUsedInStory: sessionData.micUsedInStory,
-        micUsedInTherapy: sessionData.micUsedInTherapy,
-        therapyTurns: sessionData.therapyTurns.slice(),
-        storyChoices: sessionData.storyChoices.slice(),
+        id: row.id,
+        createdAt: row.created_at,
+        dateKey: row.session_date,
+        childName: row.child_name || '',
+        durationMin: row.duration_min || 0,
+        totalMic: row.total_mic || 0,
+        storyPct: row.story_pct || '-',
+        totalTurns: row.total_turns || 0,
+        storyCompleted: !!row.story_completed,
+        storyName: row.story_name || '',
+        totalScenesReached: row.total_scenes_reached || 0,
+        totalScenes: row.total_scenes || 0,
+        micUsedInStory: row.mic_used_in_story || 0,
+        micUsedInTherapy: row.mic_used_in_therapy || 0,
+        therapyTurns: Array.isArray(row.therapy_turns) ? row.therapy_turns : [],
+        storyChoices: Array.isArray(row.story_choices) ? row.story_choices : [],
+    };
+}
+
+async function getCurrentUserId() {
+    const result = await supabaseClient.auth.getUser();
+    return result && result.data && result.data.user ? result.data.user.id : null;
+}
+
+function buildSessionSnapshot(userId, durationMin, totalMic, storyPct, totalTurns) {
+    return {
+        id: sessionData.reportEntryId || createSessionHistoryId(),
+        user_id: userId,
+        session_date: getDateKey(new Date()),
+        child_name: childName,
+        duration_min: durationMin,
+        total_mic: totalMic,
+        story_pct: storyPct,
+        total_turns: totalTurns,
+        story_completed: sessionData.storyCompleted,
+        story_name: sessionData.storyName,
+        total_scenes_reached: sessionData.totalScenesReached,
+        total_scenes: sessionData.totalScenes,
+        mic_used_in_story: sessionData.micUsedInStory,
+        mic_used_in_therapy: sessionData.micUsedInTherapy,
+        therapy_turns: sessionData.therapyTurns.slice(),
+        story_choices: sessionData.storyChoices.slice(),
     };
 }
 
@@ -264,8 +279,30 @@ function hasSessionActivity() {
     );
 }
 
-function persistSessionSnapshot() {
+async function loadReportHistory() {
+    const userId = await getCurrentUserId();
+    if (!userId) return [];
+
+    const { data, error } = await supabaseClient
+        .from('session_history')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false })
+        .limit(180);
+
+    if (error) {
+        console.error('Supabase rapor geçmişi okunamadı:', error);
+        return [];
+    }
+
+    return (data || []).map(mapHistoryRow);
+}
+
+async function persistSessionSnapshot() {
     if (!currentUserEmail || !hasSessionActivity()) return loadReportHistory();
+
+    const userId = await getCurrentUserId();
+    if (!userId) return [];
 
     const durationMs = sessionData.startTime ? Date.now() - sessionData.startTime : 0;
     const durationMin = Math.max(1, Math.round(durationMs / 60000));
@@ -274,21 +311,19 @@ function persistSessionSnapshot() {
         ? Math.round((sessionData.totalScenesReached / sessionData.totalScenes) * 100) + '%'
         : '-';
     const totalTurns = sessionData.therapyTurns.length + sessionData.storyChoices.length + sessionData.micUsedInStory;
-    const snapshot = buildSessionSnapshot(durationMin, totalMic, storyPct, totalTurns);
+    const snapshot = buildSessionSnapshot(userId, durationMin, totalMic, storyPct, totalTurns);
 
-    let history = loadReportHistory();
-    const existingIndex = history.findIndex(entry => entry.id === snapshot.id);
+    const { error } = await supabaseClient
+        .from('session_history')
+        .upsert(snapshot, { onConflict: 'id' });
 
-    if (existingIndex >= 0) history[existingIndex] = snapshot;
-    else history.unshift(snapshot);
+    if (error) {
+        console.error('Supabase rapor geçmişi kaydedilemedi:', error);
+        return [];
+    }
 
     sessionData.reportEntryId = snapshot.id;
-    history = history
-        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-        .slice(0, 180);
-
-    saveReportHistory(history);
-    return history;
+    return loadReportHistory();
 }
 
 function getEntriesForDate(history, dateKey) {
@@ -402,10 +437,10 @@ function renderReportHistory(history) {
     renderHistoryDetails(history, selectedHistoryDateKey);
 }
 
-function changeHistoryMonth(offset) {
+async function changeHistoryMonth(offset) {
     historyCalendarMonth = historyCalendarMonth || new Date();
     historyCalendarMonth = new Date(historyCalendarMonth.getFullYear(), historyCalendarMonth.getMonth() + offset, 1);
-    const history = loadReportHistory();
+    const history = await loadReportHistory();
     const currentMonthKey = getMonthKey(historyCalendarMonth);
     const firstMatch = history.find(entry => entry.dateKey.startsWith(currentMonthKey));
     selectedHistoryDateKey = firstMatch ? firstMatch.dateKey : getDateKey(historyCalendarMonth);
@@ -446,7 +481,7 @@ async function goToReport() {
     const totalTurns = sessionData.therapyTurns.length + sessionData.storyChoices.length + sessionData.micUsedInStory;
     document.getElementById('statTotalTurns').textContent = totalTurns;
 
-    const history = persistSessionSnapshot();
+    const history = await persistSessionSnapshot();
     renderReportHistory(history);
 
     // Seçim analizi
