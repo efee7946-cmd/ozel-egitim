@@ -60,7 +60,9 @@ function updateMenuIdentity() {
 
 function openOnboarding() {
     const panel = document.getElementById('onboarding-panel');
-    if (panel) panel.style.display = 'block';
+    if (!panel) return;
+
+    panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
 }
 
 function dismissOnboarding(persistPreference) {
@@ -71,22 +73,6 @@ function dismissOnboarding(persistPreference) {
         const storageKey = getOnboardingStorageKey();
         if (storageKey) localStorage.setItem(storageKey, '1');
     }
-}
-
-function maybeShowOnboarding(forceOpen) {
-    const storageKey = getOnboardingStorageKey();
-    const alreadySeen = storageKey ? localStorage.getItem(storageKey) === '1' : false;
-
-    if (forceOpen || !alreadySeen) {
-        openOnboarding();
-    } else {
-        dismissOnboarding(false);
-    }
-}
-
-function beginRecommendedFlow() {
-    dismissOnboarding(true);
-    goToTherapy();
 }
 
 async function logout() {
@@ -135,7 +121,7 @@ function startApp(resetSession) {
     appStarted = true;
     updateMenuIdentity();
     showOnly('menu-screen');
-    maybeShowOnboarding(!!resetSession);
+    dismissOnboarding(false);
 }
 
 async function initializeAuth() {
@@ -1140,8 +1126,6 @@ window.loadNext = loadNext;
 window.storyRec = storyRec;
 window.logout = logout;
 window.openOnboarding = openOnboarding;
-window.dismissOnboarding = function() { dismissOnboarding(true); };
-window.beginRecommendedFlow = beginRecommendedFlow;
 
 
 

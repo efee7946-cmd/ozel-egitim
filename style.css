@@ -232,21 +232,6 @@ body {
     font-size: 0.9rem;
 }
 
-.onboarding-actions {
-    display: flex;
-    gap: 12px;
-    margin-top: 20px;
-    position: relative;
-    z-index: 3;
-}
-
-.onboarding-actions .menu-ghost-btn,
-.onboarding-actions .menu-cta-btn {
-    position: relative;
-    z-index: 4;
-    pointer-events: auto;
-}
-
 .menu-cta-btn {
     background: linear-gradient(135deg, #10998d 0%, #2d7ff9 100%);
     color: white;
@@ -932,7 +917,6 @@ video { width: 100%; height: 100%; object-fit: cover; }
     .menu-card { padding: 22px 16px; }
     .onboarding-panel { padding: 18px; }
     .onboarding-steps { grid-template-columns: 1fr; }
-    .onboarding-actions { flex-direction: column; }
 
     #game-container { flex-direction: column; height: auto; width: 100%; gap: 15px; margin-top: 0; }
     .main-card, .side-card { flex: none; width: 100%; border-radius: 20px; padding: 15px; box-sizing: border-box; }
