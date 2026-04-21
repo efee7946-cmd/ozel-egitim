@@ -8,8 +8,6 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <!-- Supabase CDN (bundler olmadan çalışmak için) -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
 </head>
 <body>
 
@@ -19,10 +17,7 @@
             <div class="visual-orb visual-orb-one"></div>
             <div class="visual-orb visual-orb-two"></div>
             <div class="visual-badge">Çocuklar için güvenli deneyim</div>
-            <div class="avatar-3d-shell avatar-3d-shell--hero" data-avatar-3d="hero">
-                <div id="avatar-3d-container" class="avatar-3d-stage" aria-hidden="true"></div>
-                <img src="avatar.png" id="avatar-img" alt="Yıldız Can">
-            </div>
+            <img src="avatar.png" id="avatar-img" alt="Yıldız Can">
             <div class="visual-glow"></div>
             <div class="visual-text">
                 <h2>Yıldız Can</h2>
@@ -85,10 +80,7 @@
         </div>
     </div>
     <div class="menu-header">
-        <div class="avatar-3d-shell avatar-3d-shell--menu" data-avatar-3d="menu">
-            <div class="avatar-3d-stage" aria-hidden="true"></div>
-            <img src="avatar.png" class="menu-avatar" alt="Yıldız Can">
-        </div>
+        <img src="avatar.png" class="menu-avatar" alt="Yıldız Can">
         <div>
             <h2 id="menu-greeting">Merhaba! 🌟</h2>
             <p class="menu-subtitle">Ne yapmak istersin?</p>
@@ -168,10 +160,7 @@
 <div id="story-select-screen">
     <button class="btn-back" onclick="goToMenu()">← Menü</button>
     <div class="story-select-header">
-        <div class="avatar-3d-shell avatar-3d-shell--menu" data-avatar-3d="menu">
-            <div class="avatar-3d-stage" aria-hidden="true"></div>
-            <img src="avatar.png" class="menu-avatar" alt="Yıldız Can">
-        </div>
+        <img src="avatar.png" class="menu-avatar" alt="Yıldız Can">
         <div>
             <h2>Hikaye Dünyası 📖</h2>
             <p>Hangi masalı okumak istersin?</p>
