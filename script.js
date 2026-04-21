@@ -7,6 +7,7 @@ var supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
 // GENEL DEĞİŞKENLER
 // =============================================
 let childName = "";
+let appStarted = false;
 
 // Oturum verisi — tüm modüller buraya yazar
 const sessionData = {
@@ -34,7 +35,22 @@ function showOnly(id) {
     if (target) target.style.display = 'flex';
 }
 
-function startApp() {
+function getChildNameFromUser(user) {
+    if (!user) return "";
+
+    const displayName = user.user_metadata && user.user_metadata.display_name;
+    if (displayName && displayName.trim()) return displayName.trim();
+
+    if (user.email) return user.email.split('@')[0];
+
+    return "Arkadaşım";
+}
+
+function startApp(resetSession) {
+    if (appStarted && !resetSession) {
+        showOnly('menu-screen');
+        return;
+    }
     const isIOS = /iP(hone|ad|od)/.test(navigator.userAgent);
     const isChrome = /CriOS/.test(navigator.userAgent);
     if (isIOS && isChrome) {
@@ -51,16 +67,55 @@ function startApp() {
     } catch(e) {}
 
     // Oturumu başlat
-    sessionData.startTime = Date.now();
-    sessionData.therapyTurns = [];
-    sessionData.storyChoices = [];
-    sessionData.storyCompleted = false;
-    sessionData.micUsedInStory = 0;
-    sessionData.micUsedInTherapy = 0;
+    if (!appStarted || resetSession) {
+        sessionData.startTime = Date.now();
+        sessionData.therapyTurns = [];
+        sessionData.storyChoices = [];
+        sessionData.storyCompleted = false;
+        sessionData.storyName = '';
+        sessionData.totalScenesReached = 0;
+        sessionData.totalScenes = 0;
+        sessionData.micUsedInStory = 0;
+        sessionData.micUsedInTherapy = 0;
+    }
 
     document.getElementById('menu-greeting').textContent = `Merhaba, ${childName}! 🌟`;
+    appStarted = true;
     showOnly('menu-screen');
 }
+
+async function initializeAuth() {
+    try {
+        const { data, error } = await supabaseClient.auth.getSession();
+        if (error) throw error;
+
+        const user = data.session && data.session.user;
+        if (user) {
+            childName = getChildNameFromUser(user);
+            startApp(false);
+            return;
+        }
+    } catch (error) {
+        console.error('Oturum kontrol edilemedi:', error);
+    }
+
+    showOnly('start-screen');
+}
+
+supabaseClient.auth.onAuthStateChange(function(event, session) {
+    if (event === 'SIGNED_IN' && session && session.user) {
+        childName = getChildNameFromUser(session.user);
+        startApp(false);
+    }
+
+    if (event === 'SIGNED_OUT') {
+        appStarted = false;
+        childName = "";
+        showOnly('start-screen');
+    }
+});
+
+document.addEventListener('DOMContentLoaded', initializeAuth);
 
 function goToMenu() {
     window.speechSynthesis.cancel();
@@ -946,9 +1001,9 @@ const { data, error } = await supabaseClient.auth.signUp({
             showStatus("✅ Giriş başarılı! Yükleniyor...", "success");
             
             // Eğer metadata'da isim varsa onu al, yoksa maili kullan
-            childName = data.user.user_metadata.display_name || data.user.email.split('@')[0];
+            childName = getChildNameFromUser(data.user);
             
-            setTimeout(() => startApp(), 800);
+            setTimeout(() => startApp(true), 800);
         }
     } catch (e) {
         authBtn.disabled = false;
