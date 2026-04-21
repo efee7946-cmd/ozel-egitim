@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yıldız Sınıfı | Yıldız Can AI</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- Supabase CDN (bundler olmadan çalışmak için) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+</head>
+<body>
+
+<!-- ===================== GİRİŞ EKRANI ===================== -->
+<div id="start-screen" class="auth-portal">
+    <div class="auth-container">
+        <div class="auth-visual">
+            <img src="avatar.png" id="avatar-img" alt="Yıldız Can">
+            <div class="visual-glow"></div>
+            <div class="visual-text">
+                <h2>Yıldız Can</h2>
+                <p>Eğlenerek Öğrenelim!</p>
+            </div>
+        </div>
+        
+        <div class="auth-content">
+            <h1 id="auth-main-title">Hoş Geldin!</h1>
+            <p class="auth-sub">Öğrenme yolculuğuna başlamak için giriş yap.</p>
+            
+            <div class="auth-tabs">
+    <button type="button" class="tab-btn active" id="tab-login" onclick="switchAuth('login')">Giriş Yap</button>
+    <button type="button" class="tab-btn" id="tab-register" onclick="switchAuth('register')">Kayıt Ol</button>
+            </div>
+
+            <div class="input-group">
+                <div class="field">
+                    <label>E-posta</label>
+                    <input type="email" id="emailInput" placeholder="ornek@mail.com" autocomplete="email">
+                </div>
+                <div class="field">
+                    <label>Şifre</label>
+                    <input type="password" id="passwordInput" placeholder="••••••••">
+                </div>
+            </div>
+
+            <button class="btn-primary-gradient" id="mainAuthBtn" onclick="handleAuth()">
+                <span id="btnText">Giriş Yap</span>
+            </button>
+            
+            <p id="auth-status"></p>
+        </div>
+    </div>
+</div>
+
+<!-- ===================== ANA MENÜ ===================== -->
+<div id="menu-screen">
+    <div class="menu-header">
+        <img src="avatar.png" class="menu-avatar" alt="Yıldız Can">
+        <div>
+            <h2 id="menu-greeting">Merhaba! 🌟</h2>
+            <p class="menu-subtitle">Ne yapmak istersin?</p>
+        </div>
+    </div>
+    <div class="menu-cards">
+        <div class="menu-card therapy-card" onclick="goToTherapy()">
+            <div class="menu-card-icon">🎙️</div>
+            <h3>Konuşma Terapisti</h3>
+            <p>Yıldız Can ile sohbet et, soruları cevapla!</p>
+            <span class="menu-card-badge">Sohbet</span>
+        </div>
+        <div class="menu-card story-card" onclick="goToStories()">
+            <div class="menu-card-icon">📖</div>
+            <h3>Hikaye Dünyası</h3>
+            <p>Masalların içine gir, kararlar ver, maceraya atıl!</p>
+            <span class="menu-card-badge new-badge">Yeni!</span>
+        </div>
+        <div class="menu-card report-card" onclick="goToReport()">
+            <div class="menu-card-icon">📋</div>
+            <h3>Veli Raporu</h3>
+            <p>Çocuğunuzun gelişim verilerini ve AI değerlendirmesini görün.</p>
+            <span class="menu-card-badge report-badge">Rapor</span>
+        </div>
+    </div>
+    <div class="footer">© 2026 | Efe Erman tarafından geliştirilmiştir.</div>
+</div>
+
+<!-- ===================== KONUŞMA TERAPİSTİ ===================== -->
+<div id="game-container">
+    <div class="main-card">
+        <button class="btn-back" onclick="goToMenu()">← Menü</button>
+        <div class="media-box"><video id="v" playsinline loop muted autoplay></video></div>
+        <div class="question-bar" id="qBar">Hazırlanıyorum...</div>
+        <div class="btns">
+            <button onclick="rec()" id="micBtn" class="btn-mic" disabled>🎙️</button>
+            <button onclick="loadNext()" id="nextBtn" class="btn-next">➡️</button>
+        </div>
+        <div id="info">Lütfen bekleyin...</div>
+    </div>
+    <div class="side-card">
+        <img src="avatar.png" class="side-avatar" alt="Avatar">
+        <div id="chat-bubbles"></div>
+    </div>
+</div>
+
+<!-- ===================== HİKAYE SEÇİM EKRANI ===================== -->
+<div id="story-select-screen">
+    <button class="btn-back" onclick="goToMenu()">← Menü</button>
+    <div class="story-select-header">
+        <img src="avatar.png" class="menu-avatar" alt="Yıldız Can">
+        <div>
+            <h2>Hikaye Dünyası 📖</h2>
+            <p>Hangi masalı okumak istersin?</p>
+        </div>
+    </div>
+    <div class="story-grid">
+        <div class="story-thumb active-story" onclick="startStory('redhood')">
+            <div class="story-thumb-img">🧣</div>
+            <h4>Kırmızı Başlıklı Kız</h4>
+            <p>Ormanda macera seni bekliyor!</p>
+            <span class="story-difficulty">⭐ Kolay</span>
+        </div>
+        <div class="story-thumb locked-story">
+            <div class="story-thumb-img">🐷</div>
+            <h4>Üç Küçük Domuz</h4>
+            <p>Yakında geliyor...</p>
+            <span class="story-difficulty">🔒 Kilitli</span>
+        </div>
+        <div class="story-thumb locked-story">
+            <div class="story-thumb-img">🍎</div>
+            <h4>Pamuk Prenses</h4>
+            <p>Yakında geliyor...</p>
+            <span class="story-difficulty">🔒 Kilitli</span>
+        </div>
+    </div>
+</div>
+
+<!-- ===================== HİKAYE OYUN EKRANI ===================== -->
+<div id="story-screen">
+    <!-- Tam ekran arka plan video -->
+    <video id="storyBgVideo" playsinline loop muted autoplay></video>
+    <div id="storyBgFallback"></div>
+
+    <button class="btn-back" onclick="exitStory()">← Hikayeler</button>
+    <div class="story-layout">
+        <div class="story-main">
+            <div class="story-scene-img" id="storySceneImg">
+                <div class="scene-emoji" id="sceneEmoji">🌲</div>
+            </div>
+            <div class="story-narrator">
+                <img src="avatar.png" class="narrator-avatar" alt="Yıldız Can">
+                <div class="narrator-bubble" id="narratorBubble">Hazırlanıyorum...</div>
+            </div>
+            <div class="story-progress">
+                <div class="progress-dots" id="progressDots"></div>
+            </div>
+        </div>
+        <div class="story-side">
+            <div class="story-task-label" id="storyTaskLabel">🎯 Görevin:</div>
+            <div class="story-task" id="storyTask">Hikaye başlıyor...</div>
+            <div class="story-choices" id="storyChoices"></div>
+            <div class="story-mic-area" id="storyMicArea" style="display:none">
+                <button onclick="storyRec()" id="storyMicBtn" class="btn-mic story-mic-btn">🎙️</button>
+                <div class="story-mic-info" id="storyMicInfo">Söylemek istiyorsan mikrofona bas!</div>
+            </div>
+            <button class="story-next-btn" id="storyNextBtn" onclick="nextScene()" style="display:none">
+                Devam Et ➡️
+            </button>
+            <div class="story-chat" id="storyChatBubbles"></div>
+        </div>
+    </div>
+</div>
+
+<!-- ===================== VELİ RAPORU EKRANI ===================== -->
+<div id="report-screen">
+    <button class="btn-back" onclick="goToMenu()">← Menü</button>
+
+    <div class="report-wrapper" id="reportWrapper">
+        <!-- Başlık -->
+        <div class="report-header">
+            <img src="avatar.png" class="report-avatar" alt="Yıldız Can">
+            <div class="report-title-block">
+                <h2>Veli Gelişim Raporu</h2>
+                <p id="reportSubtitle">Hazırlanıyor...</p>
+            </div>
+            <button class="btn-print" onclick="window.print()">🖨️ Yazdır</button>
+        </div>
+
+        <!-- Özet kartları -->
+        <div class="report-stats">
+            <div class="stat-card">
+                <div class="stat-icon">🎙️</div>
+                <div class="stat-value" id="statMicCount">0</div>
+                <div class="stat-label">Mikrofon Kullanımı</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">⏱️</div>
+                <div class="stat-value" id="statDuration">0 dk</div>
+                <div class="stat-label">Toplam Süre</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">📖</div>
+                <div class="stat-value" id="statStoryProgress">-</div>
+                <div class="stat-label">Hikaye İlerlemesi</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">💬</div>
+                <div class="stat-value" id="statTotalTurns">0</div>
+                <div class="stat-label">Toplam Yanıt</div>
+            </div>
+        </div>
+
+        <!-- Seçim Analizi -->
+        <div class="report-section">
+            <h3>🔍 Seçim Analizi</h3>
+            <div id="choiceAnalysis" class="choice-analysis-list">
+                <p class="report-empty">Henüz hikaye oturumu yapılmadı.</p>
+            </div>
+        </div>
+
+        <!-- Konuşma Terapisi Özeti -->
+        <div class="report-section">
+            <h3>🎙️ Konuşma Terapisi Özeti</h3>
+            <div id="therapyLog" class="therapy-log">
+                <p class="report-empty">Henüz terapist oturumu yapılmadı.</p>
+            </div>
+        </div>
+
+        <!-- AI Değerlendirmesi -->
+        <div class="report-section ai-section">
+            <h3>🤖 Yıldız Can'ın Değerlendirmesi</h3>
+            <div id="aiEvaluation" class="ai-evaluation">
+                <div class="ai-eval-loading" id="aiEvalLoading">
+                    <div class="eval-spinner"></div>
+                    <span>Yapay zeka değerlendirme yazıyor...</span>
+                </div>
+                <p id="aiEvalText" class="ai-eval-text" style="display:none"></p>
+            </div>
+        </div>
+
+        <!-- Tarih -->
+        <div class="report-footer-note" id="reportDate"></div>
+    </div>
+</div>
+
+<script src="script.js" defer></script>
+</body>
+</html>
