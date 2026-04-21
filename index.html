@@ -107,6 +107,14 @@
             </div>
         </div>
     </div>
+    <div class="parent-goal-bar" id="parentGoalBar">
+        <div class="goal-bar-label">🎯 Bugünün hedefi</div>
+        <input type="text" id="goalInput"
+               placeholder="örn: arkadaşıyla oyuncak paylaşma..."
+               maxlength="80">
+        <button onclick="saveParentGoal()" class="goal-save-btn">Kaydet</button>
+        <span id="goalSaved" class="goal-saved-badge" style="display:none">✓ Kaydedildi</span>
+    </div>
     <div class="menu-cards">
         <div class="menu-card therapy-card" onclick="goToTherapy()">
             <div class="menu-card-icon">🎙️</div>
@@ -143,7 +151,17 @@
         <div id="info">Lütfen bekleyin...</div>
     </div>
     <div class="side-card">
-        <img src="avatar.png" class="side-avatar" alt="Avatar">
+        <div class="avatar-lipsync-wrap">
+            <img src="avatar.png" class="side-avatar" alt="Yıldız Can" id="mainAvatar">
+            <svg class="lipsync-overlay" id="lipsyncSvg" viewBox="0 0 100 100"
+                 xmlns="http://www.w3.org/2000/svg">
+                <ellipse id="lipOuter" cx="50" cy="72" rx="10" ry="3"
+                         fill="#c0645a" />
+                <ellipse id="lipInner" cx="50" cy="73" rx="7" ry="1.5"
+                         fill="#8b2020" opacity="0"/>
+            </svg>
+            <div class="emotion-overlay" id="emotionOverlay"></div>
+        </div>
         <div id="chat-bubbles"></div>
     </div>
 </div>
@@ -212,7 +230,9 @@
                 <div class="scene-emoji" id="sceneEmoji">🌲</div>
             </div>
             <div class="story-narrator">
-                <img src="avatar.png" class="narrator-avatar" alt="Yıldız Can">
+                <div class="avatar-lipsync-wrap narrator-avatar-wrap">
+                    <img src="avatar.png" class="narrator-avatar" alt="Yıldız Can">
+                </div>
                 <div class="narrator-bubble" id="narratorBubble">Hazırlanıyorum...</div>
             </div>
             <div class="story-progress">
@@ -271,6 +291,11 @@
                 <div class="stat-icon">💬</div>
                 <div class="stat-value" id="statTotalTurns">0</div>
                 <div class="stat-label">Toplam Yanıt</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🧠</div>
+                <div class="stat-value" id="statInterventions">0 / 0</div>
+                <div class="stat-label">Müdahale / Prososyal</div>
             </div>
         </div>
 

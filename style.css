@@ -245,6 +245,49 @@ body {
     align-items: stretch;
 }
 
+.parent-goal-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0 0 18px;
+    padding: 12px 14px;
+    border-radius: 16px;
+    background: #f8fbff;
+    border: 1px solid #d8e7f8;
+}
+
+.goal-bar-label {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #2b4a73;
+    white-space: nowrap;
+}
+
+#goalInput {
+    flex: 1;
+    min-width: 160px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    border: 1px solid #cfe0f2;
+    font-size: 0.9rem;
+}
+
+.goal-save-btn {
+    border: none;
+    border-radius: 12px;
+    padding: 10px 14px;
+    background: #2d7ff9;
+    color: white;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.goal-saved-badge {
+    font-size: 0.85rem;
+    color: #15803d;
+    font-weight: 700;
+}
+
 .menu-card {
     flex: 1;
     border-radius: 28px;
@@ -325,6 +368,42 @@ body {
     width: 120px; height: 120px; border-radius: 50%; 
     margin-bottom: 15px; border: 4px solid var(--soft-purple); object-fit: cover; 
 }
+
+.avatar-lipsync-wrap {
+    position: relative;
+    display: inline-block;
+}
+
+.narrator-avatar-wrap {
+    width: 55px;
+    height: 55px;
+    flex-shrink: 0;
+}
+
+.lipsync-overlay {
+    position: absolute;
+    bottom: 22%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40%;
+    pointer-events: none;
+}
+
+.emotion-overlay {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    pointer-events: none;
+    transition: box-shadow 0.4s ease;
+}
+
+.emotion-happy { box-shadow: 0 0 20px 4px rgba(255, 220, 0, 0.35); }
+.emotion-excited {
+    box-shadow: 0 0 30px 8px rgba(255, 170, 0, 0.5);
+    animation: excitedPulse 0.5s ease-in-out infinite alternate;
+}
+.emotion-sad { box-shadow: 0 0 20px 4px rgba(100, 150, 255, 0.3); }
+.emotion-thinking { box-shadow: 0 0 15px 3px rgba(180, 100, 255, 0.25); }
 
 .media-box { 
     width: 100%; aspect-ratio: 16/9; background: #000; 
@@ -874,7 +953,7 @@ video { width: 100%; height: 100%; object-fit: cover; }
 /* Özet istatistik kartları */
 .report-stats {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(5, 1fr);
     gap: 14px;
 }
 .stat-card {
@@ -1159,6 +1238,10 @@ video { width: 100%; height: 100%; object-fit: cover; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes floatAnim { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
 @keyframes spin { to { transform: rotate(360deg); } }
+@keyframes excitedPulse {
+    from { transform: scale(1); }
+    to { transform: scale(1.04); }
+}
 
 /* ========== MOBİL ========== */
 @media (max-width: 768px) {
@@ -1170,6 +1253,7 @@ video { width: 100%; height: 100%; object-fit: cover; }
     .menu-ghost-btn, .menu-cta-btn { width: 100%; }
     .menu-header { flex-direction: column; text-align: center; }
     .menu-cards { flex-direction: column; }
+    .parent-goal-bar { flex-direction: column; align-items: stretch; }
     .menu-card { padding: 22px 16px; }
     .onboarding-panel { padding: 18px; }
     .onboarding-steps { grid-template-columns: 1fr; }

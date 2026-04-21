@@ -1,4 +1,4 @@
-﻿var supabaseUrl = 'https://mtmskfyufuxahdctwuay.supabase.co';
+var supabaseUrl = 'https://mtmskfyufuxahdctwuay.supabase.co';
 var supabaseKey = 'sb_publishable_kYPbSRUpyPe6tsQZOCcY0g_U1brYQ6U';
 
 // Değişken ismini 'supabaseClient' olarak değiştirerek çakışmayı önleyelim
@@ -9,6 +9,7 @@ var supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
 let childName = "";
 let appStarted = false;
 let currentUserEmail = "";
+let currentParentGoal = '';
 
 // Oturum verisi — tüm modüller buraya yazar
 const sessionData = {
@@ -26,6 +27,113 @@ const sessionData = {
 
 let selectedHistoryDateKey = null;
 let historyCalendarMonth = null;
+
+// =============================================
+// LIPSYNC + KARAKTER MOTORU
+// =============================================
+const CharacterEmotion = {
+    NEUTRAL: 'neutral',
+    HAPPY: 'happy',
+    THINKING: 'thinking',
+    SAD: 'sad',
+    EXCITED: 'excited'
+};
+
+let audioCtx = null;
+let analyserNode = null;
+let lipsyncRaf = null;
+let currentEmotion = CharacterEmotion.NEUTRAL;
+
+function initAudioContext() {
+    if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        analyserNode = audioCtx.createAnalyser();
+        analyserNode.fftSize = 256;
+        analyserNode.smoothingTimeConstant = 0.6;
+    }
+}
+
+function startLipsync() {
+    const lipOuter = document.getElementById('lipOuter');
+    const lipInner = document.getElementById('lipInner');
+    if (!lipOuter || !analyserNode) return;
+
+    const dataArray = new Uint8Array(analyserNode.frequencyBinCount);
+
+    function animate() {
+        lipsyncRaf = requestAnimationFrame(animate);
+        analyserNode.getByteFrequencyData(dataArray);
+        const speechBins = dataArray.slice(2, 25);
+        const avg = speechBins.reduce((a, b) => a + b, 0) / speechBins.length;
+        const openAmount = Math.min(8, (avg / 255) * 14);
+        const rx = 10 + openAmount * 0.3;
+        const ry = 3 + openAmount;
+
+        lipOuter.setAttribute('ry', ry.toFixed(1));
+        lipOuter.setAttribute('rx', rx.toFixed(1));
+        lipInner.setAttribute('ry', Math.max(0, openAmount - 1).toFixed(1));
+        lipInner.style.opacity = openAmount > 1.5 ? '1' : '0';
+    }
+    animate();
+}
+
+function stopLipsync() {
+    if (lipsyncRaf) cancelAnimationFrame(lipsyncRaf);
+    const lipOuter = document.getElementById('lipOuter');
+    const lipInner = document.getElementById('lipInner');
+    if (lipOuter) { lipOuter.setAttribute('ry', '3'); lipOuter.setAttribute('rx', '10'); }
+    if (lipInner) lipInner.style.opacity = '0';
+}
+
+function setCharacterEmotion(emotion) {
+    currentEmotion = emotion;
+    const overlay = document.getElementById('emotionOverlay');
+    if (!overlay) return;
+    overlay.className = `emotion-overlay emotion-${emotion}`;
+}
+
+function celebrateCorrectAnswer() {
+    setCharacterEmotion(CharacterEmotion.EXCITED);
+    confetti({ particleCount: 60, spread: 70 });
+    setTimeout(() => setCharacterEmotion(CharacterEmotion.NEUTRAL), 3000);
+}
+
+// =============================================
+// VELI HEDEFI
+// =============================================
+async function loadParentGoal() {
+    const userId = await getCurrentUserId();
+    if (!userId) return;
+    const today = getDateKey(new Date());
+    const { data } = await supabaseClient
+        .from('parent_goals')
+        .select('goal_text')
+        .eq('user_id', userId)
+        .gte('created_at', today)
+        .order('created_at', { ascending: false })
+        .limit(1);
+    if (data && data[0]) {
+        currentParentGoal = data[0].goal_text;
+        const inp = document.getElementById('goalInput');
+        if (inp) inp.value = currentParentGoal;
+    }
+}
+
+async function saveParentGoal() {
+    const goalEl = document.getElementById('goalInput');
+    if (!goalEl) return;
+    const text = goalEl.value.trim();
+    if (!text) return;
+    currentParentGoal = text;
+    const userId = await getCurrentUserId();
+    if (!userId) return;
+    await supabaseClient.from('parent_goals').insert({ user_id: userId, goal_text: text });
+    const badge = document.getElementById('goalSaved');
+    if (badge) {
+        badge.style.display = 'inline';
+        setTimeout(() => { badge.style.display = 'none'; }, 2000);
+    }
+}
 
 // =============================================
 // EKRAN YÖNETİMİ
@@ -127,6 +235,7 @@ function startApp(resetSession) {
     updateMenuIdentity();
     showOnly('menu-screen');
     dismissOnboarding(false);
+    loadParentGoal();
 }
 
 async function initializeAuth() {
@@ -490,6 +599,10 @@ async function goToReport() {
     // Toplam yanıt
     const totalTurns = sessionData.therapyTurns.length + sessionData.storyChoices.length + sessionData.micUsedInStory;
     document.getElementById('statTotalTurns').textContent = totalTurns;
+    const interventions = sessionData.storyChoices.filter(c => c.needsIntervention).length;
+    const prosocials = sessionData.storyChoices.filter(c => c.ethicsScore > 0).length;
+    const interventionEl = document.getElementById('statInterventions');
+    if (interventionEl) interventionEl.textContent = `${interventions} / ${prosocials}`;
 
     const history = await persistSessionSnapshot();
     renderReportHistory(history);
@@ -812,17 +925,49 @@ function speakFallback(t, callback) {
 }
 
 async function speak(t, callback) {
+    return speakWithLipsync(t, callback, CharacterEmotion.NEUTRAL);
+}
+
+async function speakWithLipsync(text, onEnd, emotion = CharacterEmotion.NEUTRAL) {
+    setCharacterEmotion(emotion);
+
     try {
-        var res = await fetch('/api/tts', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text: t }) });
-        if (!res.ok) throw new Error('TTS başarısız');
-        var blob = await res.blob();
-        var url = URL.createObjectURL(blob);
-        var audio = new Audio(url);
-        audio.onended = function() { URL.revokeObjectURL(url); if (callback) callback(); };
-        audio.onerror = function() { URL.revokeObjectURL(url); speakFallback(t, callback); };
-        var pp = audio.play();
-        if (pp !== undefined) pp.catch(function() { speakFallback(t, callback); });
-    } catch (e) { speakFallback(t, callback); }
+        const res = await fetch('/api/tts', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text })
+        });
+
+        if (!res.ok) {
+            setCharacterEmotion(CharacterEmotion.NEUTRAL);
+            return speakFallback(text, onEnd);
+        }
+
+        initAudioContext();
+        if (audioCtx.state === 'suspended') await audioCtx.resume();
+
+        const arrayBuf = await res.arrayBuffer();
+        const audioBuf = await audioCtx.decodeAudioData(arrayBuf);
+
+        const source = audioCtx.createBufferSource();
+        const gainNode = audioCtx.createGain();
+        source.buffer = audioBuf;
+        source.connect(analyserNode);
+        analyserNode.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+
+        startLipsync();
+        source.start(0);
+        source.onended = () => {
+            stopLipsync();
+            setCharacterEmotion(CharacterEmotion.NEUTRAL);
+            if (onEnd) onEnd();
+        };
+    } catch (e) {
+        console.warn('Lipsync TTS hatasi, fallback:', e);
+        setCharacterEmotion(CharacterEmotion.NEUTRAL);
+        speakFallback(text, onEnd);
+    }
 }
 
 // =============================================
@@ -1184,6 +1329,10 @@ function startStory(storyKey, resumeProgress) {
     sessionData.totalScenesReached = resumeProgress ? (resumeProgress.totalScenesReached || currentSceneIdx + 1) : 0;
     sessionData.storyCompleted = false;
     sessionData.storyChoices = resumeProgress ? (resumeProgress.storyChoices || []).slice() : [];
+    const goalInjection = currentParentGoal
+        ? `\n\nBU OTURUM ICIN VELI HEDEFI: "${currentParentGoal}". Lütfen hikayenin secim anlarini bu hedefle ilgili durumlar uzerine kur. Cocugun bu durumda ne yapacagina karar verecegi sahneler olustur.`
+        : '';
+    sessionData.storyGoalInjection = goalInjection;
 
     showOnly('story-screen');
     buildProgressDots();
@@ -1335,41 +1484,95 @@ function renderChoices(scene) {
         const btn = document.createElement('button');
         btn.className = 'choice-btn';
         btn.textContent = choice.text;
-        btn.onclick = () => handleChoice(choice, btn, scene);
+        btn.onclick = () => { handleChoice(choice, btn, scene); };
         container.appendChild(btn);
     });
 }
 
-function handleChoice(choice, btn, scene) {
+const PROSOCIAL_KEYWORDS = ['yardim', 'paylas', 'birlikte', 'ozur', 'tesekkur', 'sor', 'bekle'];
+const ANTISOCIAL_KEYWORDS = ['bencil', 'almak', 'kacmak', 'yalan', 'saklamak', 'kirmak'];
+
+function choiceEthicsScore(choiceText) {
+    const lower = choiceText.toLowerCase();
+    let score = 0;
+    PROSOCIAL_KEYWORDS.forEach(k => { if (lower.includes(k)) score += 1; });
+    ANTISOCIAL_KEYWORDS.forEach(k => { if (lower.includes(k)) score -= 1; });
+    return score;
+}
+
+async function getTherapeuticResponse(choiceText, sceneContext, childGoal) {
+    const score = choiceEthicsScore(choiceText);
+    const needsIntervention = score < 0;
+
+    const systemPrompt = needsIntervention
+        ? `Sen Yildiz Can adli sicak, sabirli bir cocuk gelisim uzmansin.
+           "${childName}" adli cocuk hikayede "${choiceText}" secimini yapti.
+           ${childGoal ? `Velinin bugunku hedefi: "${childGoal}".` : ''}
+           Bu secim sonuclari hakkinda empatiyle konus, ardindan
+           "Sence baska ne yapabilirdik?" veya "Arkadasin nasil hisseder?"
+           gibi SADECE BIR soru sor. Cok kisa tut (2-3 cumle).`
+        : `Sen Yildiz Can adli neseli bir AI arkadassin.
+           "${childName}" harika bir secim yapti: "${choiceText}".
+           Onu 1-2 cumleyle ictenlikle tebrik et ve bu secimin neden guzel oldugunu soyle.`;
+
+    const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            contents: [{ role: 'user', parts: [{ text: systemPrompt }] }]
+        })
+    });
+    const data = await res.json();
+    const reply = data.candidates[0].content.parts[0].text;
+
+    sessionData.storyChoices.push({
+        scene: sceneContext.id,
+        sceneLabel: sceneContext.label,
+        sceneEmoji: sceneContext.emoji,
+        choice: choiceText,
+        response: reply,
+        ethicsScore: score,
+        needsIntervention
+    });
+
+    const emotion = needsIntervention ? CharacterEmotion.THINKING : CharacterEmotion.HAPPY;
+    await speakWithLipsync(reply, null, emotion);
+    return { reply, needsIntervention };
+}
+
+async function handleChoice(choice, btn, scene) {
     if (storyChoiceMade) return;
     storyChoiceMade = true;
 
     document.querySelectorAll('.choice-btn').forEach(b => b.disabled = true);
     btn.classList.add('chosen');
 
-    // Seçimi kaydet
-    sessionData.storyChoices.push({
-        sceneLabel: scene.bgLabel || `Sahne ${scene.id + 1}`,
-        sceneEmoji: scene.emoji,
-        choice: choice.text,
-        response: choice.response
-    });
-
     addStoryBubble(choice.text, 'user');
-    addStoryBubble(choice.response, 'ai');
+    let therapeuticReply = choice.response;
+    let needsIntervention = false;
+    try {
+        const result = await getTherapeuticResponse(
+            choice.text,
+            { id: scene.id, label: scene.bgLabel || `Sahne ${scene.id + 1}`, emoji: scene.emoji },
+            currentParentGoal
+        );
+        therapeuticReply = result.reply;
+        needsIntervention = result.needsIntervention;
+    } catch (error) {
+        addStoryBubble(choice.response, 'ai');
+        await speak(choice.response, () => {});
+    }
 
-    // Seslendir + devam et butonu göster
-    speak(choice.response, () => {
-        if (choice.next === -1) {
-            // Son sahne
-            showStoryEnd();
-        } else {
-            const nextBtn = document.getElementById('storyNextBtn');
-            nextBtn.style.display = 'block';
-            confetti({ particleCount: 60, spread: 70 });
-            saveStoryProgress();
-        }
-    });
+    if (therapeuticReply) addStoryBubble(therapeuticReply, 'ai');
+    if (!needsIntervention) celebrateCorrectAnswer();
+
+    if (choice.next === -1) {
+        showStoryEnd();
+    } else {
+        const nextBtn = document.getElementById('storyNextBtn');
+        nextBtn.style.display = 'block';
+        saveStoryProgress();
+    }
 }
 
 function nextScene() {
@@ -1680,6 +1883,7 @@ window.changeHistoryMonth = changeHistoryMonth;
 window.updateStoryFilters = updateStoryFilters;
 window.resumeSavedStory = resumeSavedStory;
 window.restartSavedStory = restartSavedStory;
+window.saveParentGoal = saveParentGoal;
 
 
 
