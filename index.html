@@ -14,6 +14,9 @@
 <div id="start-screen" class="auth-portal">
     <div class="auth-container">
         <div class="auth-visual">
+            <div class="visual-orb visual-orb-one"></div>
+            <div class="visual-orb visual-orb-two"></div>
+            <div class="visual-badge">Çocuklar için güvenli deneyim</div>
             <img src="avatar.png" id="avatar-img" alt="Yıldız Can">
             <div class="visual-glow"></div>
             <div class="visual-text">
@@ -23,6 +26,7 @@
         </div>
         
         <div class="auth-content">
+            <p class="auth-eyebrow">Yıldız Sınıfı</p>
             <h1 id="auth-main-title">Hoş Geldin!</h1>
             <p class="auth-sub">Öğrenme yolculuğuna başlamak için giriş yap.</p>
             
@@ -51,11 +55,12 @@
                 <span id="btnText">Giriş Yap</span>
             </button>
             
-            <p id="forgot-link" style="text-align: center; margin-top: 15px;">
-                <a href="javascript:void(0)" onclick="resetPassword()" style="color: #6C63FF; font-size: 0.85rem; text-decoration: none; font-weight: bold;">Şifremi Unuttum ❓</a>
+            <p id="forgot-link" class="forgot-link">
+                <a href="javascript:void(0)" onclick="resetPassword()">Şifremi Unuttum</a>
             </p>
             
             <p id="auth-status"></p>
+            <p class="auth-note">Veli kontrolünde kullanıma uygun, sade ve yönlendirmesi güçlü bir giriş alanı.</p>
         </div>
     </div>
 </div>
