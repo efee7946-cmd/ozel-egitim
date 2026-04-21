@@ -43,6 +43,67 @@ let audioCtx = null;
 let analyserNode = null;
 let lipsyncRaf = null;
 let currentEmotion = CharacterEmotion.NEUTRAL;
+let eyeTrackInitialized = false;
+let eyeTrackRaf = null;
+let mouseTarget = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+let eyeState = { x: 0, y: 0 };
+
+function getActiveLipsyncElements() {
+    const wrappers = Array.from(document.querySelectorAll('.avatar-lipsync-wrap'));
+    for (const wrap of wrappers) {
+        const container = wrap.closest('#game-container, #story-screen');
+        if (!container || container.style.display === 'none') continue;
+        const lipOuter = wrap.querySelector('.lip-outer');
+        const lipInner = wrap.querySelector('.lip-inner');
+        const overlay = wrap.querySelector('.emotion-overlay');
+        if (lipOuter && lipInner) return { wrapper: wrap, lipOuter, lipInner, overlay };
+    }
+    return { wrapper: null, lipOuter: null, lipInner: null, overlay: null };
+}
+
+function triggerBlink(eyeLayer) {
+    if (!eyeLayer) return;
+    eyeLayer.classList.add('is-blinking');
+    setTimeout(function() {
+        eyeLayer.classList.remove('is-blinking');
+    }, 140);
+}
+
+function scheduleRandomBlink() {
+    const delay = 2200 + Math.random() * 3600;
+    setTimeout(function() {
+        document.querySelectorAll('.eye-layer').forEach(triggerBlink);
+        scheduleRandomBlink();
+    }, delay);
+}
+
+function initEyeTracking() {
+    if (eyeTrackInitialized) return;
+    eyeTrackInitialized = true;
+    document.addEventListener('mousemove', function(event) {
+        mouseTarget.x = event.clientX;
+        mouseTarget.y = event.clientY;
+    });
+
+    const tick = function() {
+        eyeTrackRaf = requestAnimationFrame(tick);
+        const centerX = window.innerWidth / 2;
+        const centerY = window.innerHeight / 2;
+        const targetX = centerX + (mouseTarget.x - centerX) * 0.82;
+        const targetY = centerY + (mouseTarget.y - centerY) * 0.82;
+        const easedX = eyeState.x + ((targetX - centerX) * 0.018 - eyeState.x) * 0.18;
+        const easedY = eyeState.y + ((targetY - centerY) * 0.018 - eyeState.y) * 0.18;
+        eyeState.x = Math.max(-3.2, Math.min(3.2, easedX));
+        eyeState.y = Math.max(-2.4, Math.min(2.4, easedY));
+
+        const eyes = document.querySelectorAll('.eye');
+        eyes.forEach(function(eye) {
+            eye.style.transform = `translate(${eyeState.x.toFixed(2)}px, ${eyeState.y.toFixed(2)}px)`;
+        });
+    };
+    tick();
+    scheduleRandomBlink();
+}
 
 function initAudioContext() {
     if (!audioCtx) {
@@ -54,8 +115,7 @@ function initAudioContext() {
 }
 
 function startLipsync() {
-    const lipOuter = document.getElementById('lipOuter');
-    const lipInner = document.getElementById('lipInner');
+    const { wrapper, lipOuter, lipInner } = getActiveLipsyncElements();
     if (!lipOuter || !analyserNode) return;
 
     const dataArray = new Uint8Array(analyserNode.frequencyBinCount);
@@ -66,28 +126,33 @@ function startLipsync() {
         const speechBins = dataArray.slice(2, 25);
         const avg = speechBins.reduce((a, b) => a + b, 0) / speechBins.length;
         const openAmount = Math.min(8, (avg / 255) * 14);
-        const rx = 10 + openAmount * 0.3;
-        const ry = 3 + openAmount;
+        let viseme = 'closed';
+        if (openAmount > 5.3) viseme = 'open';
+        else if (openAmount > 2.2) viseme = 'mid';
+        if (wrapper) wrapper.dataset.viseme = viseme;
+
+        const rx = viseme === 'open' ? 13 : (viseme === 'mid' ? 11.2 : 10);
+        const ry = viseme === 'open' ? 10.5 : (viseme === 'mid' ? 6 : 3.2);
 
         lipOuter.setAttribute('ry', ry.toFixed(1));
         lipOuter.setAttribute('rx', rx.toFixed(1));
-        lipInner.setAttribute('ry', Math.max(0, openAmount - 1).toFixed(1));
-        lipInner.style.opacity = openAmount > 1.5 ? '1' : '0';
+        lipInner.setAttribute('ry', viseme === 'open' ? '6.8' : (viseme === 'mid' ? '3.2' : '0.8'));
+        lipInner.style.opacity = viseme === 'closed' ? '0' : '1';
     }
     animate();
 }
 
 function stopLipsync() {
     if (lipsyncRaf) cancelAnimationFrame(lipsyncRaf);
-    const lipOuter = document.getElementById('lipOuter');
-    const lipInner = document.getElementById('lipInner');
+    const { wrapper, lipOuter, lipInner } = getActiveLipsyncElements();
+    if (wrapper) wrapper.dataset.viseme = 'closed';
     if (lipOuter) { lipOuter.setAttribute('ry', '3'); lipOuter.setAttribute('rx', '10'); }
     if (lipInner) lipInner.style.opacity = '0';
 }
 
 function setCharacterEmotion(emotion) {
     currentEmotion = emotion;
-    const overlay = document.getElementById('emotionOverlay');
+    const { overlay } = getActiveLipsyncElements();
     if (!overlay) return;
     overlay.className = `emotion-overlay emotion-${emotion}`;
 }
@@ -281,6 +346,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (side) defaultStorySideMarkup = side.innerHTML;
     renderStoryLibrary();
     renderStoryResumeCard();
+    initEyeTracking();
 });
 
 function goToMenu() {
@@ -1489,28 +1555,45 @@ function renderChoices(scene) {
     });
 }
 
-const PROSOCIAL_KEYWORDS = ['yardim', 'paylas', 'birlikte', 'ozur', 'tesekkur', 'sor', 'bekle'];
-const ANTISOCIAL_KEYWORDS = ['bencil', 'almak', 'kacmak', 'yalan', 'saklamak', 'kirmak'];
+const PROSOCIAL_KEYWORDS = ['yardim', 'yardım', 'paylas', 'paylaş', 'birlikte', 'ozur', 'özür', 'tesekkur', 'teşekkür', 'sor', 'bekle'];
+const ANTISOCIAL_KEYWORDS = ['bencil', 'yalan', 'saklamak', 'kirmak', 'kırmak', 'itmek', 'bagirmak', 'bağırmak', 'zorla', 'almak'];
 
-function choiceEthicsScore(choiceText) {
-    const lower = choiceText.toLowerCase();
+function normalizeTr(text) {
+    return (text || '')
+        .toLowerCase()
+        .replace(/ı/g, 'i')
+        .replace(/ğ/g, 'g')
+        .replace(/ü/g, 'u')
+        .replace(/ş/g, 's')
+        .replace(/ö/g, 'o')
+        .replace(/ç/g, 'c');
+}
+
+function choiceEthicsScore(choiceText, sceneResponse) {
+    const lower = normalizeTr(choiceText);
+    const responseLower = normalizeTr(sceneResponse || '');
     let score = 0;
     PROSOCIAL_KEYWORDS.forEach(k => { if (lower.includes(k)) score += 1; });
     ANTISOCIAL_KEYWORDS.forEach(k => { if (lower.includes(k)) score -= 1; });
+    // Hikaye metni "riskli/dikkat" sinyali veriyorsa müdahaleyi tetikle.
+    if (responseLower.includes('riskli') || responseLower.includes('dikkat') || responseLower.includes('supheli')) {
+        score -= 1;
+    }
     return score;
 }
 
-async function getTherapeuticResponse(choiceText, sceneContext, childGoal) {
-    const score = choiceEthicsScore(choiceText);
+async function getTherapeuticResponse(choiceText, sceneResponse, sceneContext, childGoal) {
+    const score = choiceEthicsScore(choiceText, sceneResponse);
     const needsIntervention = score < 0;
 
     const systemPrompt = needsIntervention
         ? `Sen Yildiz Can adli sicak, sabirli bir cocuk gelisim uzmansin.
            "${childName}" adli cocuk hikayede "${choiceText}" secimini yapti.
+           Sahne geri bildirimi: "${sceneResponse}".
            ${childGoal ? `Velinin bugunku hedefi: "${childGoal}".` : ''}
-           Bu secim sonuclari hakkinda empatiyle konus, ardindan
-           "Sence baska ne yapabilirdik?" veya "Arkadasin nasil hisseder?"
-           gibi SADECE BIR soru sor. Cok kisa tut (2-3 cumle).`
+           Bu secimin bir arkadasi uzebilecegini nazikce belirt.
+           "Bunu yaparsan arkadasin uzulebilir, sence baska ne yapabiliriz?" tarzinda
+           rehberlik eden SADECE BIR soru sor. Cok kisa tut (2-3 cumle).`
         : `Sen Yildiz Can adli neseli bir AI arkadassin.
            "${childName}" harika bir secim yapti: "${choiceText}".
            Onu 1-2 cumleyle ictenlikle tebrik et ve bu secimin neden guzel oldugunu soyle.`;
@@ -1535,7 +1618,7 @@ async function getTherapeuticResponse(choiceText, sceneContext, childGoal) {
         needsIntervention
     });
 
-    const emotion = needsIntervention ? CharacterEmotion.THINKING : CharacterEmotion.HAPPY;
+    const emotion = needsIntervention ? CharacterEmotion.SAD : CharacterEmotion.HAPPY;
     await speakWithLipsync(reply, null, emotion);
     return { reply, needsIntervention };
 }
@@ -1553,6 +1636,7 @@ async function handleChoice(choice, btn, scene) {
     try {
         const result = await getTherapeuticResponse(
             choice.text,
+            choice.response,
             { id: scene.id, label: scene.bgLabel || `Sahne ${scene.id + 1}`, emoji: scene.emoji },
             currentParentGoal
         );
