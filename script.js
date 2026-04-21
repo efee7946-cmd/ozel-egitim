@@ -43,10 +43,6 @@ let audioCtx = null;
 let analyserNode = null;
 let lipsyncRaf = null;
 let currentEmotion = CharacterEmotion.NEUTRAL;
-let eyeTrackInitialized = false;
-let eyeTrackRaf = null;
-let mouseTarget = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
-let eyeState = { x: 0, y: 0 };
 
 function getActiveLipsyncElements() {
     const wrappers = Array.from(document.querySelectorAll('.avatar-lipsync-wrap'));
@@ -59,50 +55,6 @@ function getActiveLipsyncElements() {
         if (lipOuter && lipInner) return { wrapper: wrap, lipOuter, lipInner, overlay };
     }
     return { wrapper: null, lipOuter: null, lipInner: null, overlay: null };
-}
-
-function triggerBlink(eyeLayer) {
-    if (!eyeLayer) return;
-    eyeLayer.classList.add('is-blinking');
-    setTimeout(function() {
-        eyeLayer.classList.remove('is-blinking');
-    }, 140);
-}
-
-function scheduleRandomBlink() {
-    const delay = 2200 + Math.random() * 3600;
-    setTimeout(function() {
-        document.querySelectorAll('.eye-layer').forEach(triggerBlink);
-        scheduleRandomBlink();
-    }, delay);
-}
-
-function initEyeTracking() {
-    if (eyeTrackInitialized) return;
-    eyeTrackInitialized = true;
-    document.addEventListener('mousemove', function(event) {
-        mouseTarget.x = event.clientX;
-        mouseTarget.y = event.clientY;
-    });
-
-    const tick = function() {
-        eyeTrackRaf = requestAnimationFrame(tick);
-        const centerX = window.innerWidth / 2;
-        const centerY = window.innerHeight / 2;
-        const targetX = centerX + (mouseTarget.x - centerX) * 0.82;
-        const targetY = centerY + (mouseTarget.y - centerY) * 0.82;
-        const easedX = eyeState.x + ((targetX - centerX) * 0.018 - eyeState.x) * 0.18;
-        const easedY = eyeState.y + ((targetY - centerY) * 0.018 - eyeState.y) * 0.18;
-        eyeState.x = Math.max(-3.2, Math.min(3.2, easedX));
-        eyeState.y = Math.max(-2.4, Math.min(2.4, easedY));
-
-        const eyes = document.querySelectorAll('.eye');
-        eyes.forEach(function(eye) {
-            eye.style.transform = `translate(${eyeState.x.toFixed(2)}px, ${eyeState.y.toFixed(2)}px)`;
-        });
-    };
-    tick();
-    scheduleRandomBlink();
 }
 
 function initAudioContext() {
@@ -346,7 +298,6 @@ document.addEventListener('DOMContentLoaded', function() {
     if (side) defaultStorySideMarkup = side.innerHTML;
     renderStoryLibrary();
     renderStoryResumeCard();
-    initEyeTracking();
 });
 
 function goToMenu() {
@@ -951,7 +902,7 @@ async function rec() {
 async function getGemmaResponse(text) {
     var url = "/api/chat";
     chatHistory.push({ role: "user", parts: [{ text: text }] });
-    var instructions = "Sen 5-8 yaş arası çocuklarla konuşan neşeli Yıldız Can'sın. Karşındaki çocuğun adı " + childName + ". KRİTİK KURALLAR: 1. KONU BÜTÜNLÜĞÜ: Çocuk neyden bahsediyorsa o konuda kal. 2. EMOJİ YASAĞI: Emoji kullanma. 3. CÜMLE SINIRI: MAX 2 KISA CÜMLE (Toplam 8-10 kelime). 4. SORUYLA BİTİR: Konuyu derinleştiren çok basit bir soru sor. 5. DOĞAL DÜZELTME: Çocuk hata yaparsa nazikçe doğrusunu kendi cümlenle kullan.";
+    var instructions = "Sen 5-8 yas arasi ve ozel egitim destegi alan cocuklarla konusan sabirli Yildiz Can'sin. Karsindaki cocugun adi " + childName + ". KRITIK KURALLAR: 1. SORUYA BAGLILIK: Yanit mevcut soru ve cocugun son cumlesinden kopmasin. 2. BASIT VE GUVENLI DIL: Kisa, somut ve anlasilir kelimeler kullan. 3. EMOJI KULLANMA. 4. MAKS 2 KISA CUMLE (yaklasik 8-12 kelime). 5. SONDA SADECE KONUYLA ILGILI TEK KISA SORU SOR. 6. YANLISI YARGILAMA, NAZIKCE DOGRU ORNEKLE DESTEKLE.";
     var payload = {
         contents: [
             { role: "user", parts: [{ text: "GÖREV: " + instructions }] },
@@ -1591,11 +1542,15 @@ async function getTherapeuticResponse(choiceText, sceneResponse, sceneContext, c
            "${childName}" adli cocuk hikayede "${choiceText}" secimini yapti.
            Sahne geri bildirimi: "${sceneResponse}".
            ${childGoal ? `Velinin bugunku hedefi: "${childGoal}".` : ''}
+           Ozel egitim destegi alan cocuklara uygun, sade ve net dil kullan.
+           Konudan sapma; sadece bu secim ve bu sahneye odaklan.
            Bu secimin bir arkadasi uzebilecegini nazikce belirt.
            "Bunu yaparsan arkadasin uzulebilir, sence baska ne yapabiliriz?" tarzinda
            rehberlik eden SADECE BIR soru sor. Cok kisa tut (2-3 cumle).`
         : `Sen Yildiz Can adli neseli bir AI arkadassin.
            "${childName}" harika bir secim yapti: "${choiceText}".
+           Ozel egitim destegi alan cocuklara uygun, sade ve net dil kullan.
+           Sadece bu secime ve sahneye bagli kal.
            Onu 1-2 cumleyle ictenlikle tebrik et ve bu secimin neden guzel oldugunu soyle.`;
 
     const res = await fetch('/api/chat', {
@@ -1731,10 +1686,12 @@ function storyRec() {
 
         // AI'dan kısa geri bildirim al
         const scene = currentStory.scenes[currentSceneIdx];
-        const prompt = `Sen Yıldız Can'sın, 5-8 yaş çocuklarla konuşan neşeli bir arkadaş. Çocuğun adı ${childName}. 
+        const prompt = `Sen Yildiz Can'sin, 5-8 yas ve ozel egitim destegi alan cocuklarla konusan sabirli bir arkadassin. Cocugun adi ${childName}. 
 Hikayedeki sahne: "${scene.narration}"
 Çocuğun cevabı: "${speech}"
-Çok kısa (max 2 cümle, 10 kelime) ve sevecen bir geri bildirim ver. Sonra devam etmelerini söyle. Emoji kullanma.`;
+KURAL: Sahneden ve cocugun verdigi bu cevaptan kopma.
+Cok kisa (max 2 cumle, 8-12 kelime) sevecen geri bildirim ver.
+Gereksiz yeni konu acma. Emoji kullanma.`;
 
         try {
             const res = await fetch('/api/chat', {
