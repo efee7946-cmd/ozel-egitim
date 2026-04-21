@@ -158,7 +158,26 @@
             <p>Hangi masalı okumak istersin?</p>
         </div>
     </div>
-    <div class="story-grid">
+    <div id="storyResumeCard" class="story-resume-card" style="display:none"></div>
+    <div class="story-filter-row">
+        <select id="storyThemeFilter" onchange="updateStoryFilters()">
+            <option value="all">Tüm Temalar</option>
+            <option value="macera">Macera</option>
+            <option value="dostluk">Dostluk</option>
+            <option value="hayal-gucu">Hayal Gücü</option>
+        </select>
+        <select id="storyLevelFilter" onchange="updateStoryFilters()">
+            <option value="all">Tüm Seviyeler</option>
+            <option value="Kolay">Kolay</option>
+            <option value="Orta">Orta</option>
+        </select>
+        <select id="storyAgeFilter" onchange="updateStoryFilters()">
+            <option value="all">Tüm Yaşlar</option>
+            <option value="5-6">5-6 yaş</option>
+            <option value="7-8">7-8 yaş</option>
+        </select>
+    </div>
+    <div class="story-grid" id="storyGrid">
         <div class="story-thumb active-story" onclick="startStory('redhood')">
             <div class="story-thumb-img">🧣</div>
             <h4>Kırmızı Başlıklı Kız</h4>

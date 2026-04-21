@@ -167,6 +167,12 @@ supabaseClient.auth.onAuthStateChange(function(event, session) {
 
 document.addEventListener('DOMContentLoaded', initializeAuth);
 window.addEventListener('pagehide', persistSessionSnapshot);
+document.addEventListener('DOMContentLoaded', function() {
+    const side = document.querySelector('.story-side');
+    if (side) defaultStorySideMarkup = side.innerHTML;
+    renderStoryLibrary();
+    renderStoryResumeCard();
+});
 
 function goToMenu() {
     window.speechSynthesis.cancel();
@@ -183,6 +189,8 @@ function goToTherapy() {
 }
 
 function goToStories() {
+    renderStoryLibrary();
+    renderStoryResumeCard();
     showOnly('story-select-screen');
 }
 
@@ -191,6 +199,8 @@ function exitStory() {
     const v = document.getElementById('storyBgVideo');
     v.pause();
     v.src = '';
+    saveStoryProgress();
+    renderStoryResumeCard();
     showOnly('story-select-screen');
 }
 
@@ -819,10 +829,14 @@ async function speak(t, callback) {
 // HİKAYE SİSTEMİ
 // =============================================
 
-// Kırmızı Başlıklı Kız sahneleri
 const STORIES = {
     redhood: {
         title: "Kırmızı Başlıklı Kız",
+        emoji: "🧺",
+        description: "Ormanda dikkatli seçimler yap ve güvenli yolu bul.",
+        difficulty: "Kolay",
+        ageRange: "5-6",
+        theme: "macera",
         scenes: [
             {
                 id: 0,
@@ -835,9 +849,9 @@ const STORIES = {
                 taskText: "Sepette ne olduğunu söyle! 🧺",
                 micPrompt: "Sepette ne var sence?",
                 choices: [
-                    { text: "🍰 Pasta ve meyve!", next: 1, response: "Harika! Neyse ki annesi pastayı koymuş, büyükanne çok sevecek!" },
-                    { text: "🌸 Çiçekler ve bal!", next: 1, response: "Ne güzel düşündün! Çiçekler büyükanneyi mutlu eder!" },
-                    { text: "📚 Kitaplar!", next: 1, response: "Kitaplar mı? Büyükanne okumayı seviyor olabilir, çok düşünceli bir seçim!" }
+                    { text: "🍰 Pasta ve meyve!", next: 1, response: "Harika! Annesi çok güzel bir sepet hazırlamış." },
+                    { text: "🌸 Çiçekler ve bal!", next: 1, response: "Ne güzel düşündün! Büyükanne buna çok sevinir." },
+                    { text: "📚 Kitaplar!", next: 1, response: "Kitaplar çok düşünceli bir hediye olurdu!" }
                 ]
             },
             {
@@ -846,12 +860,12 @@ const STORIES = {
                 bg: "linear-gradient(135deg, #a8edea, #c8f7c5)",
                 bgLabel: "Geniş orman",
                 videoQuery: "magical green forest sunlight path flowers",
-                narration: "Kırmızı Başlıklı Kız ormana girdi. Annesi ne demişti hatırlıyor musun? 'Yoldan çıkma!' demişti. Ama karşısına güzel çiçekler çıktı. Ne yapmalı?",
+                narration: "Kırmızı Başlıklı Kız ormana girdi. Karşısına güzel çiçekler çıktı. Sence ne yapmalı?",
                 taskType: "choice",
-                taskText: "Kırmızı Başlıklı Kız ne yapmalı?",
+                taskText: "Sence doğru seçim hangisi?",
                 choices: [
-                    { text: "💐 Çiçek toplamak için yoldan çıksın", next: 2, response: "Ama dikkatli olalım! Annesi yoldan çıkmamasını söylemişti...", warn: true },
-                    { text: "🚶 Yolda kalmaya devam etsin", next: 2, response: "Çok akıllıca! Annesi ne dedi hatırlıyor, hep yolda kalmalı!" }
+                    { text: "💐 Çiçek toplamak için yoldan çıksın", next: 2, response: "Dikkatli olmalı! Yoldan çıkmak riskli olabilir." },
+                    { text: "🚶 Yolda kalmaya devam etsin", next: 2, response: "Çok akıllıca! Güvenli yolda kalmak daha doğru." }
                 ]
             },
             {
@@ -860,14 +874,14 @@ const STORIES = {
                 bg: "linear-gradient(135deg, #667eea, #764ba2)",
                 bgLabel: "Ormanın içi",
                 videoQuery: "mysterious dark forest trees fog",
-                narration: "Bir de ne görsün... Büyük, kocaman bir kurt karşısına çıktı! Kurt çok tatlı davrandı ve büyükannenin evine giden yolu sordu. Sen olsaydın ne yapardın?",
+                narration: "Karşısına bir kurt çıktı ve büyükannenin evini sordu. Sen olsaydın ne yapardın?",
                 taskType: "both",
-                taskText: "Kurt ile konuşulur mu? Seçimini yap ya da söyle!",
-                micPrompt: "Sen olsaydın kurda ne söylerdin?",
+                taskText: "Kurt ile konuşulur mu? Seç ya da söyle!",
+                micPrompt: "Sen olsaydın kurda ne derdin?",
                 choices: [
-                    { text: "🏃 Kaçar, kimseye söylemezdim!", next: 3, response: "Akıllıca! Yabancılara her şeyi söylememek çok önemli." },
-                    { text: "🤐 Hiçbir şey söylemezdim", next: 3, response: "Sessiz kalmak bazen en doğrusu! Güvende olmak her şeyden önemli." },
-                    { text: "📢 Bağırır yardım isterdim", next: 3, response: "Çok cesur! Yardım istemek her zaman doğru şey." }
+                    { text: "🏃 Uzaklaşırdım", next: 3, response: "Akıllıca! Yabancılara dikkat etmek önemli." },
+                    { text: "🤐 Sessiz kalırdım", next: 3, response: "Bazen sessiz kalmak en güvenli seçimdir." },
+                    { text: "📢 Yardım isterdim", next: 3, response: "Çok cesur! Yardım istemek iyi bir fikirdir." }
                 ]
             },
             {
@@ -876,51 +890,319 @@ const STORIES = {
                 bg: "linear-gradient(135deg, #f093fb, #f5576c)",
                 bgLabel: "Büyükannenin evi",
                 videoQuery: "small cottage house door garden autumn",
-                narration: "Kırmızı Başlıklı Kız büyükannenin evine geldi. Kapıyı çaldı. İçeriden değişik bir ses geldi! Sence kim açacak kapıyı?",
+                narration: "Büyükannenin evinden garip bir ses geldi. İçeride kim olabilir sence?",
                 taskType: "speak",
-                taskText: "İçeriden gelen sesi nasıl buldu? Söyle!",
-                micPrompt: "Sence kim var içeride?",
+                taskText: "İçeride kimin olduğunu tahmin et!",
+                micPrompt: "Sence içeride kim var?",
                 choices: [
-                    { text: "😨 Kurt gibi bir ses! Girmemeli!", next: 4, response: "Haklısın! O ses gerçekten garip. Dikkatli olmak lazım!" },
-                    { text: "👵 Büyükanne hasta, sesi değişmiş", next: 4, response: "Belki... Ama yine de dikkatli olmak lazım!" }
+                    { text: "😨 Kurt olabilir!", next: 4, response: "Evet, ses gerçekten biraz şüpheli geliyor." },
+                    { text: "👵 Büyükanne olabilir", next: 4, response: "Olabilir ama yine de dikkatli olmak gerekir." }
                 ]
             },
             {
                 id: 4,
                 emoji: "🎉",
                 bg: "linear-gradient(135deg, #43e97b, #38f9d7)",
-                bgLabel: "Mutlu son!",
+                bgLabel: "Mutlu son",
                 videoQuery: "happy children celebrating confetti colorful",
-                narration: "Tam o anda bir avcı geldi ve herkesi kurtardı! Büyükanne, Kırmızı Başlıklı Kız ve avcı hep birlikte pasta yediler. Hikayelerin sonu hep mutlu biter! Sen bu hikayede en çok neyi sevdin?",
+                narration: "Neyse ki sonunda herkes kurtuldu ve mutlu bir gün geçirdi. En sevdiğin bölüm hangisiydi?",
                 taskType: "both",
-                taskText: "Hikayenin en güzel yerini anlat! 🎉",
+                taskText: "En sevdiğin kısmı anlat! 🎉",
                 micPrompt: "En sevdiğin bölümü söyle!",
                 choices: [
-                    { text: "🐺 Kurt sahnesi!", next: -1, response: "Kurt çok korkutucuydu ama sonunda her şey yoluna girdi!" },
-                    { text: "🏡 Büyükannenin evi!", next: -1, response: "Büyükannenin evi sıcak ve güzeldi, haklısın!" },
-                    { text: "🎉 Mutlu son!", next: -1, response: "En güzel kısım tabii ki mutlu son! Hep böyle olsun!" }
+                    { text: "🐺 Kurt sahnesi!", next: -1, response: "Biraz heyecanlıydı ama çok öğreticiydi." },
+                    { text: "🏡 Büyükannenin evi!", next: -1, response: "O sahne gerçekten çok merak uyandırıcıydı." },
+                    { text: "🎉 Mutlu son!", next: -1, response: "Mutlu son her zaman çok güzeldir!" }
+                ]
+            }
+        ]
+    },
+    piggies: {
+        title: "Üç Küçük Domuz",
+        emoji: "🐷",
+        description: "Evini akıllıca kur, plan yap ve fırtınaya hazırlan.",
+        difficulty: "Kolay",
+        ageRange: "5-6",
+        theme: "dostluk",
+        scenes: [
+            {
+                id: 0,
+                emoji: "🌤️",
+                bg: "linear-gradient(135deg, #fff1c1, #ffd5a0)",
+                bgLabel: "Yeni bir sabah",
+                videoQuery: "happy piglet meadow storybook",
+                narration: "Üç küçük domuz kendi evlerini yapmaya karar verdi. Sence ilk domuz hangi malzemeyi seçmeli?",
+                taskType: "choice",
+                taskText: "İlk evi seç!",
+                choices: [
+                    { text: "🌾 Saman", next: 1, response: "Saman hızlı olur ama biraz zayıf olabilir." },
+                    { text: "🪵 Tahta", next: 1, response: "Tahta biraz daha sağlam bir seçim gibi." },
+                    { text: "🧱 Tuğla", next: 1, response: "Tuğla çok sağlamdır ama biraz zaman ister." }
+                ]
+            },
+            {
+                id: 1,
+                emoji: "🏗️",
+                bg: "linear-gradient(135deg, #d4fc79, #96e6a1)",
+                bgLabel: "Ev yapımı",
+                videoQuery: "children building house teamwork story",
+                narration: "İkinci domuz kardeşine yardım etmek istiyor. Sence birlikte çalışmak neden iyi olabilir?",
+                taskType: "speak",
+                taskText: "Birlikte çalışmanın faydasını söyle!",
+                micPrompt: "Birlikte çalışınca ne olur?",
+                choices: [
+                    { text: "🤝 Daha hızlı biter", next: 2, response: "Evet, birlikte olunca işler daha kolay olur." },
+                    { text: "💪 Ev daha sağlam olur", next: 2, response: "Harika! Güçler birleşince sonuç daha iyi olur." }
+                ]
+            },
+            {
+                id: 2,
+                emoji: "🌬️",
+                bg: "linear-gradient(135deg, #89f7fe, #66a6ff)",
+                bgLabel: "Rüzgarlı gün",
+                videoQuery: "windy day cottage storybook",
+                narration: "Kurt geldi ve üflemeye başladı. Sence hangi ev dayanır?",
+                taskType: "choice",
+                taskText: "En sağlam evi seç!",
+                choices: [
+                    { text: "🌾 Saman ev", next: 3, response: "Saman ev kolayca dağılabilir." },
+                    { text: "🧱 Tuğla ev", next: 3, response: "Doğru! Tuğla ev çok daha sağlam olur." }
+                ]
+            },
+            {
+                id: 3,
+                emoji: "🏠",
+                bg: "linear-gradient(135deg, #cfd9df, #e2ebf0)",
+                bgLabel: "Güvenli ev",
+                videoQuery: "cozy brick house family safe",
+                narration: "Domuzlar tuğla evde güvende kaldı. Bu hikayenin verdiği en önemli ders ne olabilir?",
+                taskType: "both",
+                taskText: "Dersi anlat! 🏠",
+                micPrompt: "Sence bu hikaye bize ne öğretiyor?",
+                choices: [
+                    { text: "🧠 Plan yapmak önemli", next: -1, response: "Evet! Acele etmeden düşünmek çok önemli." },
+                    { text: "🤝 Kardeşler birlikte olmalı", next: -1, response: "Ne güzel! Birlikte olmak insana güç verir." }
+                ]
+            }
+        ]
+    },
+    moonseed: {
+        title: "Ay Tohumu Bahçesi",
+        emoji: "🌙",
+        description: "Ay ışığında parlayan bir tohumla hayal gücü dolu bir macera yaşa.",
+        difficulty: "Orta",
+        ageRange: "7-8",
+        theme: "hayal-gucu",
+        scenes: [
+            {
+                id: 0,
+                emoji: "🌌",
+                bg: "linear-gradient(135deg, #1f2a63, #6a5acd)",
+                bgLabel: "Gece bahçesi",
+                videoQuery: "fantasy garden moonlight children",
+                narration: "Efe gece bahçede parlayan bir tohum buldu. Sence bu tohumdan ne çıkabilir?",
+                taskType: "both",
+                taskText: "Hayal gücünü kullan ve söyle!",
+                micPrompt: "Bu tohumdan ne çıkabilir sence?",
+                choices: [
+                    { text: "🌠 Işık saçan bir ağaç", next: 1, response: "Harika bir fikir! Bahçe ışıl ışıl olurdu." },
+                    { text: "🦋 Uçan çiçekler", next: 1, response: "Ne kadar yaratıcı! Bahçe rengarenk olurdu." }
+                ]
+            },
+            {
+                id: 1,
+                emoji: "💧",
+                bg: "linear-gradient(135deg, #89f7fe, #66a6ff)",
+                bgLabel: "Sihirli sulama",
+                videoQuery: "watering magical plant child",
+                narration: "Tohumun büyümesi için doğru şeyi seçmek gerekiyor. Sence ona ne vermeli?",
+                taskType: "choice",
+                taskText: "Tohum nasıl büyüsün?",
+                choices: [
+                    { text: "💧 Ay damlası suyu", next: 2, response: "Evet, sihirli bir tohum sihirli su ister!" },
+                    { text: "🎵 Güzel bir şarkı", next: 2, response: "Şarkılar da büyümeye cesaret verebilir." }
+                ]
+            },
+            {
+                id: 2,
+                emoji: "🚀",
+                bg: "linear-gradient(135deg, #c471ed, #f64f59)",
+                bgLabel: "Gökyüzü yolu",
+                videoQuery: "child imaginary sky bridge stars",
+                narration: "Tohum büyüdü ve gökyüzüne uzanan bir yol açtı. Efe sence yukarı çıkmalı mı?",
+                taskType: "choice",
+                taskText: "Yukarı çıkmak güvenli mi?",
+                choices: [
+                    { text: "🪢 Önce hazırlık yapmalı", next: 3, response: "Doğru! Macera öncesi hazırlık çok önemlidir." },
+                    { text: "✨ Hemen çıkmalı", next: 3, response: "Heyecanlı olurdu ama biraz hazırlık daha iyi olur." }
+                ]
+            },
+            {
+                id: 3,
+                emoji: "🌟",
+                bg: "linear-gradient(135deg, #43cea2, #185a9d)",
+                bgLabel: "Yıldız serası",
+                videoQuery: "fantasy greenhouse stars children",
+                narration: "Yukarıda yıldızlardan yapılmış bir sera vardı. Efe oradan ne öğrenmiş olabilir?",
+                taskType: "speak",
+                taskText: "Efe'nin ne öğrendiğini söyle!",
+                micPrompt: "Sence Efe ne öğrendi?",
+                choices: [
+                    { text: "🌱 Sabırla büyümeyi", next: -1, response: "Evet! Güzel şeyler biraz zaman ister." },
+                    { text: "💡 Hayal kurmayı", next: -1, response: "Harika! Hayal kurmak yeni yollar açar." }
                 ]
             }
         ]
     }
 };
 
-// Hikaye durumu
 let currentStory = null;
+let currentStoryKey = null;
 let currentSceneIdx = 0;
 let storyChoiceMade = false;
+let defaultStorySideMarkup = '';
 
-function startStory(storyKey) {
+function getStoryProgressStorageKey() {
+    return currentUserEmail ? `story_progress_${currentUserEmail}` : 'story_progress_guest';
+}
+
+function loadSavedStoryProgress() {
+    try {
+        const raw = localStorage.getItem(getStoryProgressStorageKey());
+        return raw ? JSON.parse(raw) : null;
+    } catch (error) {
+        console.error('Hikaye ilerlemesi okunamadı:', error);
+        return null;
+    }
+}
+
+function saveStoryProgress() {
+    if (!currentStory || sessionData.storyCompleted) return;
+
+    const payload = {
+        storyKey: currentStoryKey,
+        sceneIndex: currentSceneIdx,
+        totalScenesReached: sessionData.totalScenesReached,
+        storyChoices: sessionData.storyChoices.slice(),
+        storyName: sessionData.storyName,
+        updatedAt: new Date().toISOString()
+    };
+
+    localStorage.setItem(getStoryProgressStorageKey(), JSON.stringify(payload));
+}
+
+function clearStoryProgress() {
+    localStorage.removeItem(getStoryProgressStorageKey());
+}
+
+function restoreStorySideMarkup() {
+    const side = document.querySelector('.story-side');
+    if (side && defaultStorySideMarkup) {
+        side.innerHTML = defaultStorySideMarkup;
+    }
+}
+
+function getStoryThemeLabel(theme) {
+    if (theme === 'macera') return 'Macera';
+    if (theme === 'dostluk') return 'Dostluk';
+    if (theme === 'hayal-gucu') return 'Hayal Gücü';
+    return theme;
+}
+
+function renderStoryLibrary() {
+    const grid = document.getElementById('storyGrid');
+    if (!grid) return;
+
+    const theme = document.getElementById('storyThemeFilter').value;
+    const level = document.getElementById('storyLevelFilter').value;
+    const age = document.getElementById('storyAgeFilter').value;
+
+    const items = Object.entries(STORIES).filter(([, story]) => {
+        const themeOk = theme === 'all' || story.theme === theme;
+        const levelOk = level === 'all' || story.difficulty === level;
+        const ageOk = age === 'all' || story.ageRange === age;
+        return themeOk && levelOk && ageOk;
+    });
+
+    if (!items.length) {
+        grid.innerHTML = '<div class="story-empty-state">Bu filtrelere uygun hikaye bulunamadı. Başka bir tema veya seviye seçebilirsin.</div>';
+        return;
+    }
+
+    grid.innerHTML = items.map(([key, story]) => `
+        <div class="story-thumb active-story" onclick="startStory('${key}')">
+            <div class="story-thumb-img">${story.emoji}</div>
+            <h4>${story.title}</h4>
+            <p>${story.description}</p>
+            <span class="story-difficulty">${story.difficulty}</span>
+            <div class="story-thumb-meta">
+                <span class="story-meta-pill">${getStoryThemeLabel(story.theme)}</span>
+                <span class="story-meta-pill">${story.ageRange} yaş</span>
+                <span class="story-meta-pill">${story.scenes.length} sahne</span>
+            </div>
+        </div>
+    `).join('');
+}
+
+function updateStoryFilters() {
+    renderStoryLibrary();
+}
+
+function renderStoryResumeCard() {
+    const card = document.getElementById('storyResumeCard');
+    if (!card) return;
+
+    const saved = loadSavedStoryProgress();
+    if (!saved || !saved.storyKey || !STORIES[saved.storyKey]) {
+        card.style.display = 'none';
+        card.innerHTML = '';
+        return;
+    }
+
+    const story = STORIES[saved.storyKey];
+    card.style.display = 'flex';
+    card.innerHTML = `
+        <div class="story-resume-copy">
+            <h3>Kaldığın yerden devam et</h3>
+            <p>${story.title} hikayesinde ${saved.sceneIndex + 1}. sahneye kadar geldin. İstersen tek dokunuşla devam edebilirsin.</p>
+        </div>
+        <div class="story-resume-actions">
+            <button class="menu-cta-btn" type="button" onclick="resumeSavedStory()">Devam Et</button>
+            <button class="menu-ghost-btn" type="button" onclick="restartSavedStory()">Baştan Başlat</button>
+        </div>
+    `;
+}
+
+function startStory(storyKey, resumeProgress) {
+    currentStoryKey = storyKey;
     currentStory = STORIES[storyKey];
-    currentSceneIdx = 0;
-    // Rapor için meta
+    restoreStorySideMarkup();
+
+    currentSceneIdx = resumeProgress ? resumeProgress.sceneIndex || 0 : 0;
     sessionData.storyName = currentStory.title;
     sessionData.totalScenes = currentStory.scenes.length;
-    sessionData.totalScenesReached = 0;
+    sessionData.totalScenesReached = resumeProgress ? (resumeProgress.totalScenesReached || currentSceneIdx + 1) : 0;
     sessionData.storyCompleted = false;
+    sessionData.storyChoices = resumeProgress ? (resumeProgress.storyChoices || []).slice() : [];
+
     showOnly('story-screen');
     buildProgressDots();
-    renderScene(0);
+    renderScene(currentSceneIdx);
+    saveStoryProgress();
+}
+
+function resumeSavedStory() {
+    const saved = loadSavedStoryProgress();
+    if (!saved || !saved.storyKey) return;
+    startStory(saved.storyKey, saved);
+}
+
+function restartSavedStory() {
+    const saved = loadSavedStoryProgress();
+    if (!saved || !saved.storyKey) return;
+    clearStoryProgress();
+    renderStoryResumeCard();
+    startStory(saved.storyKey);
 }
 
 function buildProgressDots() {
@@ -1002,6 +1284,7 @@ function renderScene(idx) {
 
     // Anlatıyı seslendir
     speak(scene.narration, () => {});
+    saveStoryProgress();
 }
 
 // Sahneye uygun Pexels videosu yükle
@@ -1084,6 +1367,7 @@ function handleChoice(choice, btn, scene) {
             const nextBtn = document.getElementById('storyNextBtn');
             nextBtn.style.display = 'block';
             confetti({ particleCount: 60, spread: 70 });
+            saveStoryProgress();
         }
     });
 }
@@ -1100,6 +1384,8 @@ function nextScene() {
 function showStoryEnd() {
     window.speechSynthesis.cancel();
     sessionData.storyCompleted = true;
+    clearStoryProgress();
+    renderStoryResumeCard();
 
     confetti({ particleCount: 150, spread: 100, origin: { y: 0.6 } });
     setTimeout(() => confetti({ particleCount: 100, spread: 120, origin: { y: 0.4 } }), 500);
@@ -1112,7 +1398,7 @@ function showStoryEnd() {
             <p>Hikayeyi tamamladın! Çok başarıldın, harikasın!</p>
             <div style="font-size:2.5rem; margin:16px 0">⭐⭐⭐</div>
             <button class="btn-restart" onclick="exitStory()">Başka Hikayeye Git 📖</button>
-            <button class="btn-restart" style="background:#6C63FF; margin-top:10px" onclick="startStory('redhood')">Tekrar Oyna 🔄</button>
+            <button class="btn-restart" style="background:#6C63FF; margin-top:10px" onclick="startStory('${currentStoryKey}')">Tekrar Oyna 🔄</button>
         </div>
     `;
 
@@ -1391,6 +1677,9 @@ window.storyRec = storyRec;
 window.logout = logout;
 window.openOnboarding = openOnboarding;
 window.changeHistoryMonth = changeHistoryMonth;
+window.updateStoryFilters = updateStoryFilters;
+window.resumeSavedStory = resumeSavedStory;
+window.restartSavedStory = restartSavedStory;
 
 
 
