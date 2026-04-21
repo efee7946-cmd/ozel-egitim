@@ -4,6 +4,155 @@ var supabaseKey = 'sb_publishable_kYPbSRUpyPe6tsQZOCcY0g_U1brYQ6U';
 // Değişken ismini 'supabaseClient' olarak değiştirerek çakışmayı önleyelim
 var supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
 // =============================================
+// 3D AVATAR
+// =============================================
+const avatar3DState = {
+    instances: [],
+    gltf: null,
+    rafId: null,
+    resizeBound: false
+};
+
+function init3DAvatars() {
+    if (!window.THREE || !window.THREE.GLTFLoader) return;
+
+    const hosts = Array.from(document.querySelectorAll('[data-avatar-3d]'));
+    if (!hosts.length || avatar3DState.instances.length) return;
+
+    hosts.forEach((host) => {
+        const stage = host.querySelector('.avatar-3d-stage');
+        const fallbackImg = host.querySelector('img');
+        if (!stage || !fallbackImg) return;
+
+        const instance = createAvatar3DInstance(host, stage, fallbackImg);
+        if (instance) avatar3DState.instances.push(instance);
+    });
+
+    if (!avatar3DState.instances.length) return;
+
+    const loader = new THREE.GLTFLoader();
+    loader.load(
+        'models/yildiz-can.glb',
+        (gltf) => {
+            avatar3DState.gltf = gltf;
+            avatar3DState.instances.forEach((instance) => attachAvatarModel(instance, gltf));
+            startAvatar3DLoop();
+        },
+        undefined,
+        (error) => {
+            console.error('3D avatar modeli yuklenemedi:', error);
+        }
+    );
+
+    if (!avatar3DState.resizeBound) {
+        avatar3DState.resizeBound = true;
+        window.addEventListener('resize', handleAvatar3DResize);
+    }
+}
+
+function createAvatar3DInstance(host, stage, fallbackImg) {
+    const width = Math.round(stage.clientWidth || host.clientWidth || fallbackImg.clientWidth || 180);
+    const height = Math.round(stage.clientHeight || host.clientHeight || fallbackImg.clientHeight || width);
+    if (!width || !height) return null;
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(34, width / height, 0.1, 100);
+    camera.position.set(0, 0.45, 4.15);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setSize(width, height);
+    renderer.outputEncoding = THREE.sRGBEncoding;
+    renderer.domElement.setAttribute('aria-hidden', 'true');
+    stage.appendChild(renderer.domElement);
+
+    const ambientLight = new THREE.AmbientLight(0xffffff, 1.45);
+    scene.add(ambientLight);
+
+    const keyLight = new THREE.DirectionalLight(0xffffff, 1.6);
+    keyLight.position.set(2.8, 4.2, 5.6);
+    scene.add(keyLight);
+
+    const rimLight = new THREE.DirectionalLight(0x9cc7ff, 0.8);
+    rimLight.position.set(-3.4, 2.2, -2.4);
+    scene.add(rimLight);
+
+    const fillLight = new THREE.PointLight(0xfff2d6, 0.7, 12);
+    fillLight.position.set(0, 1.8, 2.8);
+    scene.add(fillLight);
+
+    return {
+        host,
+        stage,
+        fallbackImg,
+        scene,
+        camera,
+        renderer,
+        model: null,
+        rotationOffset: Math.random() * Math.PI * 2,
+        bobOffset: Math.random() * Math.PI * 2,
+        width,
+        height
+    };
+}
+
+function attachAvatarModel(instance, gltf) {
+    if (instance.model) return;
+
+    const model = gltf.scene.clone(true);
+    instance.model = model;
+    instance.scene.add(model);
+    frameAvatarModel(instance);
+    instance.host.classList.add('is-enhanced');
+}
+
+function frameAvatarModel(instance) {
+    if (!instance.model) return;
+
+    const box = new THREE.Box3().setFromObject(instance.model);
+    const size = box.getSize(new THREE.Vector3());
+    const center = box.getCenter(new THREE.Vector3());
+    const maxDim = Math.max(size.x, size.y, size.z) || 1;
+    const scale = 2 / maxDim;
+
+    instance.model.scale.setScalar(scale);
+    instance.model.position.set(-center.x * scale, -center.y * scale - 0.9, -center.z * scale);
+    instance.model.rotation.y = 0.12 + instance.rotationOffset * 0.08;
+    instance.camera.lookAt(0, 0.2, 0);
+}
+
+function handleAvatar3DResize() {
+    avatar3DState.instances.forEach((instance) => {
+        const width = Math.round(instance.stage.clientWidth || instance.host.clientWidth || instance.width);
+        const height = Math.round(instance.stage.clientHeight || instance.host.clientHeight || instance.height);
+        if (!width || !height) return;
+        instance.width = width;
+        instance.height = height;
+        instance.camera.aspect = width / height;
+        instance.camera.updateProjectionMatrix();
+        instance.renderer.setSize(width, height);
+        instance.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    });
+}
+
+function startAvatar3DLoop() {
+    if (avatar3DState.rafId) return;
+
+    const tick = (time) => {
+        avatar3DState.rafId = requestAnimationFrame(tick);
+        const t = time * 0.001;
+
+        avatar3DState.instances.forEach((instance) => {
+            if (!instance.model) return;
+            instance.model.rotation.y += 0.0038;
+            instance.model.position.y = Math.sin(t * 1.2 + instance.bobOffset) * 0.03 - 0.9;
+            instance.renderer.render(instance.scene, instance.camera);
+        });
+    };
+
+    avatar3DState.rafId = requestAnimationFrame(tick);
+}
+// =============================================
 // GENEL DEĞİŞKENLER
 // =============================================
 let childName = "";
@@ -298,6 +447,7 @@ supabaseClient.auth.onAuthStateChange(function(event, session) {
 });
 
 document.addEventListener('DOMContentLoaded', initializeAuth);
+document.addEventListener('DOMContentLoaded', init3DAvatars);
 window.addEventListener('pagehide', persistSessionSnapshot);
 document.addEventListener('DOMContentLoaded', function() {
     const side = document.querySelector('.story-side');
