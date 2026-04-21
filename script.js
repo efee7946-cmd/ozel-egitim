@@ -21,7 +21,11 @@ const sessionData = {
     totalScenes: 0,
     micUsedInStory: 0,
     micUsedInTherapy: 0,
+    reportEntryId: null,
 };
+
+let selectedHistoryDateKey = null;
+let historyCalendarMonth = null;
 
 // =============================================
 // EKRAN YÖNETİMİ
@@ -115,6 +119,7 @@ function startApp(resetSession) {
         sessionData.totalScenes = 0;
         sessionData.micUsedInStory = 0;
         sessionData.micUsedInTherapy = 0;
+        sessionData.reportEntryId = null;
     }
 
     document.getElementById('menu-greeting').textContent = `Merhaba, ${childName}! 🌟`;
@@ -151,6 +156,7 @@ supabaseClient.auth.onAuthStateChange(function(event, session) {
     }
 
     if (event === 'SIGNED_OUT') {
+        persistSessionSnapshot();
         appStarted = false;
         childName = "";
         currentUserEmail = "";
@@ -160,6 +166,7 @@ supabaseClient.auth.onAuthStateChange(function(event, session) {
 });
 
 document.addEventListener('DOMContentLoaded', initializeAuth);
+window.addEventListener('pagehide', persistSessionSnapshot);
 
 function goToMenu() {
     window.speechSynthesis.cancel();
@@ -185,6 +192,225 @@ function exitStory() {
     v.pause();
     v.src = '';
     showOnly('story-select-screen');
+}
+
+function getHistoryStorageKey() {
+    return currentUserEmail ? `report_history_${currentUserEmail}` : '';
+}
+
+function getDateKey(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
+function getMonthKey(date) {
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+}
+
+function formatHistoryDate(dateKey) {
+    const date = new Date(`${dateKey}T12:00:00`);
+    return date.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' });
+}
+
+function loadReportHistory() {
+    const storageKey = getHistoryStorageKey();
+    if (!storageKey) return [];
+
+    try {
+        const raw = localStorage.getItem(storageKey);
+        return raw ? JSON.parse(raw) : [];
+    } catch (error) {
+        console.error('Rapor geçmişi okunamadı:', error);
+        return [];
+    }
+}
+
+function saveReportHistory(history) {
+    const storageKey = getHistoryStorageKey();
+    if (!storageKey) return;
+    localStorage.setItem(storageKey, JSON.stringify(history));
+}
+
+function buildSessionSnapshot(durationMin, totalMic, storyPct, totalTurns) {
+    return {
+        id: sessionData.reportEntryId || `${Date.now()}`,
+        createdAt: new Date().toISOString(),
+        dateKey: getDateKey(new Date()),
+        childName: childName,
+        durationMin: durationMin,
+        totalMic: totalMic,
+        storyPct: storyPct,
+        totalTurns: totalTurns,
+        storyCompleted: sessionData.storyCompleted,
+        storyName: sessionData.storyName,
+        totalScenesReached: sessionData.totalScenesReached,
+        totalScenes: sessionData.totalScenes,
+        micUsedInStory: sessionData.micUsedInStory,
+        micUsedInTherapy: sessionData.micUsedInTherapy,
+        therapyTurns: sessionData.therapyTurns.slice(),
+        storyChoices: sessionData.storyChoices.slice(),
+    };
+}
+
+function hasSessionActivity() {
+    return Boolean(
+        sessionData.startTime ||
+        sessionData.therapyTurns.length ||
+        sessionData.storyChoices.length ||
+        sessionData.micUsedInStory ||
+        sessionData.micUsedInTherapy
+    );
+}
+
+function persistSessionSnapshot() {
+    if (!currentUserEmail || !hasSessionActivity()) return loadReportHistory();
+
+    const durationMs = sessionData.startTime ? Date.now() - sessionData.startTime : 0;
+    const durationMin = Math.max(1, Math.round(durationMs / 60000));
+    const totalMic = sessionData.micUsedInTherapy + sessionData.micUsedInStory;
+    const storyPct = sessionData.totalScenes > 0
+        ? Math.round((sessionData.totalScenesReached / sessionData.totalScenes) * 100) + '%'
+        : '-';
+    const totalTurns = sessionData.therapyTurns.length + sessionData.storyChoices.length + sessionData.micUsedInStory;
+    const snapshot = buildSessionSnapshot(durationMin, totalMic, storyPct, totalTurns);
+
+    let history = loadReportHistory();
+    const existingIndex = history.findIndex(entry => entry.id === snapshot.id);
+
+    if (existingIndex >= 0) history[existingIndex] = snapshot;
+    else history.unshift(snapshot);
+
+    sessionData.reportEntryId = snapshot.id;
+    history = history
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+        .slice(0, 180);
+
+    saveReportHistory(history);
+    return history;
+}
+
+function getEntriesForDate(history, dateKey) {
+    return history.filter(entry => entry.dateKey === dateKey);
+}
+
+function renderHistoryDetails(history, dateKey) {
+    const detailEl = document.getElementById('historyDayDetails');
+    if (!detailEl) return;
+
+    const entries = getEntriesForDate(history, dateKey);
+    if (!entries.length) {
+        detailEl.innerHTML = '<p class="report-empty">Bu gün için kayıtlı bir oturum yok.</p>';
+        return;
+    }
+
+    const totalMinutes = entries.reduce((sum, entry) => sum + (entry.durationMin || 0), 0);
+    const totalTurns = entries.reduce((sum, entry) => sum + (entry.totalTurns || 0), 0);
+    const totalMic = entries.reduce((sum, entry) => sum + (entry.totalMic || 0), 0);
+
+    detailEl.innerHTML = `
+        <div class="history-detail-card">
+            <h4>${formatHistoryDate(dateKey)}</h4>
+            <div class="history-detail-meta">
+                ${entries.length} oturum kaydı • ${totalMinutes} dk toplam süre • ${totalTurns} toplam yanıt • ${totalMic} mikrofon kullanımı
+            </div>
+        </div>
+        <div class="history-session-list">
+            ${entries.map(entry => `
+                <div class="history-session-item">
+                    <div class="history-session-top">
+                        <strong>${entry.storyName ? `${entry.storyName} + konuşma çalışması` : 'Konuşma çalışması'}</strong>
+                        <span class="history-session-time">${new Date(entry.createdAt).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}</span>
+                    </div>
+                    <div class="history-session-summary">
+                        ${entry.durationMin} dk • ${entry.totalTurns} yanıt • ${entry.totalMic} mikrofon • Hikaye ilerleme: ${entry.storyCompleted ? 'Tamamlandı' : entry.storyPct}
+                    </div>
+                </div>
+            `).join('')}
+        </div>
+    `;
+}
+
+function renderHistoryCalendar(history) {
+    const monthDate = historyCalendarMonth || new Date();
+    const gridEl = document.getElementById('historyCalendarGrid');
+    const monthLabel = document.getElementById('historyMonthLabel');
+    if (!gridEl || !monthLabel) return;
+
+    const firstDay = new Date(monthDate.getFullYear(), monthDate.getMonth(), 1);
+    const lastDay = new Date(monthDate.getFullYear(), monthDate.getMonth() + 1, 0);
+    const startOffset = (firstDay.getDay() + 6) % 7;
+    const daysInMonth = lastDay.getDate();
+    const historyByDate = history.reduce((acc, entry) => {
+        acc[entry.dateKey] = (acc[entry.dateKey] || 0) + 1;
+        return acc;
+    }, {});
+
+    monthLabel.textContent = monthDate.toLocaleDateString('tr-TR', { month: 'long', year: 'numeric' });
+    gridEl.innerHTML = '';
+
+    for (let i = 0; i < startOffset; i++) {
+        const empty = document.createElement('div');
+        empty.className = 'calendar-day-empty';
+        gridEl.appendChild(empty);
+    }
+
+    for (let day = 1; day <= daysInMonth; day++) {
+        const date = new Date(monthDate.getFullYear(), monthDate.getMonth(), day);
+        const dateKey = getDateKey(date);
+        const useCount = historyByDate[dateKey] || 0;
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'calendar-day';
+        if (useCount) btn.classList.add('used');
+        if (selectedHistoryDateKey === dateKey) btn.classList.add('selected');
+        btn.onclick = function() {
+            selectedHistoryDateKey = dateKey;
+            renderHistoryCalendar(history);
+            renderHistoryDetails(history, dateKey);
+        };
+        btn.innerHTML = `
+            <span class="calendar-day-number">${day}</span>
+            <span class="calendar-day-meta">${useCount ? `${useCount} kayıt` : ''}</span>
+        `;
+        gridEl.appendChild(btn);
+    }
+}
+
+function renderReportHistory(history) {
+    if (!history.length) {
+        const gridEl = document.getElementById('historyCalendarGrid');
+        const detailEl = document.getElementById('historyDayDetails');
+        const monthLabel = document.getElementById('historyMonthLabel');
+        if (gridEl) gridEl.innerHTML = '';
+        if (monthLabel) monthLabel.textContent = 'Kayıt yok';
+        if (detailEl) detailEl.innerHTML = '<p class="report-empty">Henüz kayıtlı bir kullanım günü yok.</p>';
+        return;
+    }
+
+    if (!selectedHistoryDateKey || !getEntriesForDate(history, selectedHistoryDateKey).length) {
+        selectedHistoryDateKey = history[0].dateKey;
+    }
+
+    if (!historyCalendarMonth) {
+        const selectedDate = new Date(`${selectedHistoryDateKey}T12:00:00`);
+        historyCalendarMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
+    }
+
+    renderHistoryCalendar(history);
+    renderHistoryDetails(history, selectedHistoryDateKey);
+}
+
+function changeHistoryMonth(offset) {
+    historyCalendarMonth = historyCalendarMonth || new Date();
+    historyCalendarMonth = new Date(historyCalendarMonth.getFullYear(), historyCalendarMonth.getMonth() + offset, 1);
+    const history = loadReportHistory();
+    const currentMonthKey = getMonthKey(historyCalendarMonth);
+    const firstMatch = history.find(entry => entry.dateKey.startsWith(currentMonthKey));
+    selectedHistoryDateKey = firstMatch ? firstMatch.dateKey : getDateKey(historyCalendarMonth);
+    renderHistoryCalendar(history);
+    renderHistoryDetails(history, selectedHistoryDateKey);
 }
 
 // =============================================
@@ -219,6 +445,9 @@ async function goToReport() {
     // Toplam yanıt
     const totalTurns = sessionData.therapyTurns.length + sessionData.storyChoices.length + sessionData.micUsedInStory;
     document.getElementById('statTotalTurns').textContent = totalTurns;
+
+    const history = persistSessionSnapshot();
+    renderReportHistory(history);
 
     // Seçim analizi
     const choiceEl = document.getElementById('choiceAnalysis');
@@ -1126,6 +1355,7 @@ window.loadNext = loadNext;
 window.storyRec = storyRec;
 window.logout = logout;
 window.openOnboarding = openOnboarding;
+window.changeHistoryMonth = changeHistoryMonth;
 
 
 

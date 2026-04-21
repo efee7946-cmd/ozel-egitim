@@ -255,6 +255,33 @@
             </div>
         </div>
 
+        <div class="report-section report-history-section">
+            <div class="report-history-header">
+                <h3>Takvimli Kullanım Geçmişi</h3>
+                <p>Hangi günlerde kullanıldığını ve her güne ait oturum detaylarını buradan inceleyebilirsin.</p>
+            </div>
+            <div class="history-calendar-card">
+                <div class="history-calendar-top">
+                    <button class="calendar-nav-btn" type="button" onclick="changeHistoryMonth(-1)">←</button>
+                    <strong id="historyMonthLabel">Bu Ay</strong>
+                    <button class="calendar-nav-btn" type="button" onclick="changeHistoryMonth(1)">→</button>
+                </div>
+                <div class="history-weekdays">
+                    <span>Pzt</span>
+                    <span>Sal</span>
+                    <span>Çar</span>
+                    <span>Per</span>
+                    <span>Cum</span>
+                    <span>Cmt</span>
+                    <span>Paz</span>
+                </div>
+                <div class="history-calendar-grid" id="historyCalendarGrid"></div>
+            </div>
+            <div class="history-day-details" id="historyDayDetails">
+                <p class="report-empty">Henüz kayıtlı bir kullanım günü yok.</p>
+            </div>
+        </div>
+
         <!-- Seçim Analizi -->
         <div class="report-section">
             <h3>🔍 Seçim Analizi</h3>
