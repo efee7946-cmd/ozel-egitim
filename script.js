@@ -1,7 +1,8 @@
-// Supabase - CDN UMD versiyonu index.html'de yükleniyor (window.supabase)
-const supabaseUrl = 'https://mtmskfyufuxahdctwuay.supabase.co'
-const supabaseKey = 'sb_publishable_kYPbSRUpyPe6tsQZOCcY0g_U1brYQ6U'
-const supabase = window.supabase.createClient(supabaseUrl, supabaseKey)
+var supabaseUrl = 'https://mtmskfyufuxahdctwuay.supabase.co';
+var supabaseKey = 'sb_publishable_kYPbSRUpyPe6tsQZOCcY0g_U1brYQ6U';
+
+// Değişken ismini 'supabaseClient' olarak değiştirerek çakışmayı önleyelim
+var supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
 // =============================================
 // GENEL DEĞİŞKENLER
 // =============================================
@@ -909,7 +910,7 @@ async function handleAuth() {
 
     try {
         if (authMode === 'register') {
-            const { data, error } = await supabase.auth.signUp({ email, password });
+            const { data, error } = await supabaseClient.auth.signUp({ email, password });
             document.getElementById('mainAuthBtn').disabled = false;
             if (error) {
                 const msg = turkishAuthError(error.message);
@@ -918,7 +919,7 @@ async function handleAuth() {
                 showStatus("🎉 Kayıt başarılı! E-postanı kontrol et ve doğrula.", "success");
             }
         } else {
-            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+            const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
             document.getElementById('mainAuthBtn').disabled = false;
             if (error) {
                 const msg = turkishAuthError(error.message);
