@@ -73,6 +73,75 @@ body {
     position: relative;
 }
 
+.menu-topbar {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 18px;
+}
+
+.account-chip {
+    display: inline-flex;
+    flex-direction: column;
+    gap: 3px;
+    padding: 12px 16px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, #f3fbf8 0%, #eef4ff 100%);
+    border: 1px solid #d8e6ef;
+    color: #27425f;
+    min-width: 0;
+}
+
+.account-chip-label {
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #5a7490;
+}
+
+#account-email {
+    font-size: 0.96rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 220px;
+}
+
+.menu-topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.menu-ghost-btn,
+.menu-cta-btn {
+    border: none;
+    border-radius: 16px;
+    padding: 12px 16px;
+    font-size: 0.92rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, color 0.2s ease;
+}
+
+.menu-ghost-btn {
+    background: #eef3fb;
+    color: #47607d;
+}
+
+.menu-ghost-btn:hover,
+.menu-cta-btn:hover {
+    transform: translateY(-1px);
+}
+
+.logout-btn {
+    background: #fff1f1;
+    color: #c14444;
+}
+
 .menu-header {
     display: flex;
     align-items: center;
@@ -90,6 +159,83 @@ body {
 
 .menu-header h2 { margin: 0; font-size: 1.8rem; color: #333; }
 .menu-subtitle { margin: 5px 0 0; color: #888; font-size: 1rem; }
+
+.onboarding-panel {
+    width: 100%;
+    margin: 0 0 24px;
+    padding: 24px;
+    border-radius: 28px;
+    background:
+        radial-gradient(circle at top right, rgba(45,127,249,0.12) 0, rgba(45,127,249,0) 30%),
+        linear-gradient(135deg, #ffffff 0%, #f6fbff 52%, #f4fbf7 100%);
+    border: 1px solid #dce8f2;
+    box-shadow: 0 18px 40px rgba(30, 61, 114, 0.08);
+}
+
+.onboarding-copy h3 {
+    margin: 10px 0 10px;
+    font-size: 1.45rem;
+    color: #223a58;
+}
+
+.onboarding-copy p {
+    margin: 0;
+    color: #60708a;
+    line-height: 1.7;
+}
+
+.onboarding-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 7px 12px;
+    border-radius: 999px;
+    background: #e7f6ef;
+    color: #16805e;
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.onboarding-steps {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+    margin-top: 18px;
+}
+
+.onboarding-step {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 16px;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.88);
+    border: 1px solid #e3edf7;
+}
+
+.onboarding-step strong {
+    color: #23405f;
+    font-size: 0.95rem;
+}
+
+.onboarding-step span {
+    color: #6f7e95;
+    line-height: 1.5;
+    font-size: 0.9rem;
+}
+
+.onboarding-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.menu-cta-btn {
+    background: linear-gradient(135deg, #10998d 0%, #2d7ff9 100%);
+    color: white;
+    box-shadow: 0 14px 28px rgba(45, 127, 249, 0.24);
+}
 
 .menu-cards {
     display: flex;
@@ -761,8 +907,14 @@ video { width: 100%; height: 100%; object-fit: cover; }
     body { overflow-y: auto; align-items: flex-start; padding: 10px; min-height: 100vh; }
 
     #menu-screen { padding: 25px 20px; margin-top: 10px; }
+    .menu-topbar { flex-direction: column; align-items: stretch; }
+    .menu-topbar-actions { width: 100%; flex-direction: column; }
+    .menu-ghost-btn, .menu-cta-btn { width: 100%; }
     .menu-cards { flex-direction: column; }
     .menu-card { padding: 22px 16px; }
+    .onboarding-panel { padding: 18px; }
+    .onboarding-steps { grid-template-columns: 1fr; }
+    .onboarding-actions { flex-direction: column; }
 
     #game-container { flex-direction: column; height: auto; width: 100%; gap: 15px; margin-top: 0; }
     .main-card, .side-card { flex: none; width: 100%; border-radius: 20px; padding: 15px; box-sizing: border-box; }

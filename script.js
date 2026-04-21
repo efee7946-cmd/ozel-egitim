@@ -1,4 +1,4 @@
-var supabaseUrl = 'https://mtmskfyufuxahdctwuay.supabase.co';
+﻿var supabaseUrl = 'https://mtmskfyufuxahdctwuay.supabase.co';
 var supabaseKey = 'sb_publishable_kYPbSRUpyPe6tsQZOCcY0g_U1brYQ6U';
 
 // Değişken ismini 'supabaseClient' olarak değiştirerek çakışmayı önleyelim
@@ -8,6 +8,7 @@ var supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
 // =============================================
 let childName = "";
 let appStarted = false;
+let currentUserEmail = "";
 
 // Oturum verisi — tüm modüller buraya yazar
 const sessionData = {
@@ -46,6 +47,57 @@ function getChildNameFromUser(user) {
     return "Arkadaşım";
 }
 
+function getOnboardingStorageKey() {
+    return currentUserEmail ? `onboarding_seen_${currentUserEmail}` : '';
+}
+
+function updateMenuIdentity() {
+    const emailEl = document.getElementById('account-email');
+    if (emailEl) {
+        emailEl.textContent = currentUserEmail || 'Misafir';
+    }
+}
+
+function openOnboarding() {
+    const panel = document.getElementById('onboarding-panel');
+    if (panel) panel.style.display = 'block';
+}
+
+function dismissOnboarding(persistPreference) {
+    const panel = document.getElementById('onboarding-panel');
+    if (panel) panel.style.display = 'none';
+
+    if (persistPreference) {
+        const storageKey = getOnboardingStorageKey();
+        if (storageKey) localStorage.setItem(storageKey, '1');
+    }
+}
+
+function maybeShowOnboarding(forceOpen) {
+    const storageKey = getOnboardingStorageKey();
+    const alreadySeen = storageKey ? localStorage.getItem(storageKey) === '1' : false;
+
+    if (forceOpen || !alreadySeen) {
+        openOnboarding();
+    } else {
+        dismissOnboarding(false);
+    }
+}
+
+function beginRecommendedFlow() {
+    dismissOnboarding(true);
+    goToTherapy();
+}
+
+async function logout() {
+    const confirmed = window.confirm('Çıkış yapmak istiyor musun? Bu cihazda tekrar giriş yapman gerekecek.');
+    if (!confirmed) return;
+
+    const { error } = await supabaseClient.auth.signOut();
+    if (error) {
+        alert('Çıkış yapılırken bir hata oluştu. Lütfen tekrar dene.');
+    }
+}
 function startApp(resetSession) {
     if (appStarted && !resetSession) {
         showOnly('menu-screen');
@@ -81,7 +133,9 @@ function startApp(resetSession) {
 
     document.getElementById('menu-greeting').textContent = `Merhaba, ${childName}! 🌟`;
     appStarted = true;
+    updateMenuIdentity();
     showOnly('menu-screen');
+    maybeShowOnboarding(!!resetSession);
 }
 
 async function initializeAuth() {
@@ -92,6 +146,7 @@ async function initializeAuth() {
         const user = data.session && data.session.user;
         if (user) {
             childName = getChildNameFromUser(user);
+            currentUserEmail = user.email || '';
             startApp(false);
             return;
         }
@@ -105,12 +160,15 @@ async function initializeAuth() {
 supabaseClient.auth.onAuthStateChange(function(event, session) {
     if (event === 'SIGNED_IN' && session && session.user) {
         childName = getChildNameFromUser(session.user);
+        currentUserEmail = session.user.email || '';
         startApp(false);
     }
 
     if (event === 'SIGNED_OUT') {
         appStarted = false;
         childName = "";
+        currentUserEmail = "";
+        dismissOnboarding(false);
         showOnly('start-screen');
     }
 });
@@ -958,57 +1016,52 @@ function showStatus(msg, type) {
 async function handleAuth() {
     const email = document.getElementById('emailInput').value.trim();
     const password = document.getElementById('passwordInput').value;
+    const displayName = document.getElementById('nameInput').value.trim();
     const authBtn = document.getElementById('mainAuthBtn');
 
-    // script.js handleAuth içinde:
-const { data, error } = await supabaseClient.auth.signUp({ 
-    email, 
-    password,
-    options: { 
-        data: { display_name: document.getElementById('nameInput').value }, // HTML'e eklediğin isim inputu
-        emailRedirectTo: window.location.origin 
-    }
-});
-
     if (!email || !password) {
-        showStatus("Lütfen tüm alanları doldur! ⚠️", "error");
+        showStatus("Lütfen tüm alanları doldur!", "error");
         return;
     }
 
-    showStatus("İşlem yapılıyor... ⏳", "info");
+    if (authMode === 'register' && !displayName) {
+        showStatus("Lütfen çocuğun adını da yaz!", "error");
+        return;
+    }
+
+    showStatus("İşlem yapılıyor...", "info");
     authBtn.disabled = true;
 
     try {
         if (authMode === 'register') {
-            const { data, error } = await supabaseClient.auth.signUp({ 
-                email, 
+            const { error } = await supabaseClient.auth.signUp({
+                email,
                 password,
-                options: { emailRedirectTo: window.location.origin }
+                options: {
+                    data: { display_name: displayName },
+                    emailRedirectTo: window.location.origin
+                }
             });
             
             authBtn.disabled = false;
             if (error) throw error;
             
-            // Kayıt başarılı mesajı
-            showStatus("🎉 Kayıt başarılı! Lütfen e-posta kutunu kontrol et ve onay linkine tıkla.", "success");
+            showStatus("Kayıt başarılı! Lütfen e-posta kutunu kontrol et ve onay linkine tıkla.", "success");
         } else {
             const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
             
             authBtn.disabled = false;
             if (error) throw error;
             
-            // Giriş başarılı mesajı
-            showStatus("✅ Giriş başarılı! Yükleniyor...", "success");
-            
-            // Eğer metadata'da isim varsa onu al, yoksa maili kullan
+            showStatus("Giriş başarılı! Yükleniyor...", "success");
             childName = getChildNameFromUser(data.user);
+            currentUserEmail = data.user.email || '';
             
             setTimeout(() => startApp(true), 800);
         }
     } catch (e) {
         authBtn.disabled = false;
-        // Hata mesajlarını kullanıcıya Türkçe ve net gösteriyoruz
-        showStatus("❌ " + turkishAuthError(e.message), "error");
+        showStatus(turkishAuthError(e.message), "error");
     }
 }
 
@@ -1085,3 +1138,13 @@ window.nextScene = nextScene;
 window.rec = rec;
 window.loadNext = loadNext;
 window.storyRec = storyRec;
+window.logout = logout;
+window.openOnboarding = openOnboarding;
+window.dismissOnboarding = function() { dismissOnboarding(true); };
+window.beginRecommendedFlow = beginRecommendedFlow;
+
+
+
+
+
+

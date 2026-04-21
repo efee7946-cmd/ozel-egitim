@@ -69,11 +69,46 @@
 
 <!-- ===================== ANA MENÜ ===================== -->
 <div id="menu-screen">
+    <div class="menu-topbar">
+        <div class="account-chip">
+            <span class="account-chip-label">Hesap</span>
+            <strong id="account-email">-</strong>
+        </div>
+        <div class="menu-topbar-actions">
+            <button class="menu-ghost-btn" type="button" onclick="openOnboarding()">Nasıl Kullanılır?</button>
+            <button class="menu-ghost-btn logout-btn" type="button" onclick="logout()">Çıkış Yap</button>
+        </div>
+    </div>
     <div class="menu-header">
         <img src="avatar.png" class="menu-avatar" alt="Yıldız Can">
         <div>
             <h2 id="menu-greeting">Merhaba! 🌟</h2>
             <p class="menu-subtitle">Ne yapmak istersin?</p>
+        </div>
+    </div>
+    <div id="onboarding-panel" class="onboarding-panel" style="display: none;">
+        <div class="onboarding-copy">
+            <span class="onboarding-badge">İlk kullanım rehberi</span>
+            <h3>Başlamak için en kolay yol burada</h3>
+            <p>Önce konuşma terapistiyle kısa bir oturum yap, sonra istersen hikaye bölümüne geç. En sonda veli raporunda bugünkü katılımı görebilirsin.</p>
+        </div>
+        <div class="onboarding-steps">
+            <div class="onboarding-step">
+                <strong>1. Konuşma Terapisti</strong>
+                <span>Kısa cevaplarla ısın ve mikrofonu dene.</span>
+            </div>
+            <div class="onboarding-step">
+                <strong>2. Hikaye Dünyası</strong>
+                <span>Karar vererek ilerle, eğlenirken ifade becerini kullan.</span>
+            </div>
+            <div class="onboarding-step">
+                <strong>3. Veli Raporu</strong>
+                <span>Oturum sonunda katılım ve özet değerlendirmeyi incele.</span>
+            </div>
+        </div>
+        <div class="onboarding-actions">
+            <button class="menu-cta-btn" type="button" onclick="beginRecommendedFlow()">Önce Konuşma ile Başla</button>
+            <button class="menu-ghost-btn" type="button" onclick="dismissOnboarding()">Tamam, Anladım</button>
         </div>
     </div>
     <div class="menu-cards">
