@@ -10,6 +10,7 @@ let childName = "";
 let appStarted = false;
 let currentUserEmail = "";
 let currentParentGoal = '';
+let currentScreenId = 'start-screen';
 
 // Oturum verisi — tüm modüller buraya yazar
 const sessionData = {
@@ -163,6 +164,7 @@ function showOnly(id) {
     });
     const target = document.getElementById(id);
     if (target) target.style.display = 'flex';
+    currentScreenId = id;
 }
 
 function getChildNameFromUser(user) {
@@ -215,7 +217,11 @@ async function logout() {
 }
 function startApp(resetSession) {
     if (appStarted && !resetSession) {
-        showOnly('menu-screen');
+        if (currentScreenId && currentScreenId !== 'start-screen') {
+            showOnly(currentScreenId);
+        } else {
+            showOnly('menu-screen');
+        }
         return;
     }
     const isIOS = /iP(hone|ad|od)/.test(navigator.userAgent);
