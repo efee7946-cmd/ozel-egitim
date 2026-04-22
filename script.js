@@ -519,11 +519,74 @@ function ensureStudentEnhancements() {
 function ensureMenuWorkspace() {
     const menuScreen = document.getElementById('menu-screen');
     const menuHeader = document.querySelector('.menu-header');
+    const menuTopbar = document.querySelector('.menu-topbar');
     const onboardingPanel = document.getElementById('onboarding-panel');
     const goalBar = document.getElementById('parentGoalBar');
     const cards = document.querySelector('.menu-cards');
     const insights = document.querySelector('.menu-insights');
-    if (!menuScreen || !menuHeader || !onboardingPanel || !goalBar || !cards || !insights) return;
+    if (!menuScreen || !menuHeader || !menuTopbar || !onboardingPanel || !goalBar || !cards || !insights) return;
+
+    let shell = document.getElementById('menu-app-shell');
+    let sidebar = document.getElementById('menu-sidebar');
+    let mainPane = document.getElementById('menu-main-pane');
+    if (!shell) {
+        shell = document.createElement('div');
+        shell.id = 'menu-app-shell';
+        shell.className = 'menu-app-shell';
+
+        sidebar = document.createElement('aside');
+        sidebar.id = 'menu-sidebar';
+        sidebar.className = 'menu-sidebar';
+        sidebar.innerHTML = `
+            <div class="sidebar-brand">
+                <img src="avatar.png" class="sidebar-brand-avatar" alt="Yildiz Can">
+                <div>
+                    <strong>Yildiz Sinifi</strong>
+                    <span>Cocuk destek paneli</span>
+                </div>
+            </div>
+            <div class="sidebar-section">
+                <span class="sidebar-label">Calisma Alanlari</span>
+                <button type="button" class="sidebar-nav-btn active" data-section="overview">Genel Bakis</button>
+                <button type="button" class="sidebar-nav-btn" data-section="goals">Hedefler</button>
+                <button type="button" class="sidebar-nav-btn" data-section="activities">Oturumlar</button>
+            </div>
+            <div class="sidebar-section">
+                <span class="sidebar-label">Hizli Erisim</span>
+                <button type="button" class="sidebar-link-btn" onclick="goToTherapy()">Konusma Terapisti</button>
+                <button type="button" class="sidebar-link-btn" onclick="goToStories()">Hikaye Dunyasi</button>
+                <button type="button" class="sidebar-link-btn" onclick="goToReport()">Veli Raporu</button>
+                <button type="button" class="sidebar-link-btn" onclick="openStudentSetup()">Ogrenci Yonetimi</button>
+            </div>
+        `;
+
+        mainPane = document.createElement('div');
+        mainPane.id = 'menu-main-pane';
+        mainPane.className = 'menu-main-pane';
+
+        shell.appendChild(sidebar);
+        shell.appendChild(mainPane);
+        menuScreen.appendChild(shell);
+    } else {
+        sidebar = document.getElementById('menu-sidebar');
+        mainPane = document.getElementById('menu-main-pane');
+    }
+
+    if (mainPane && menuTopbar.parentNode !== mainPane) {
+        mainPane.appendChild(menuTopbar);
+    }
+    if (mainPane && menuHeader.parentNode !== mainPane) {
+        mainPane.appendChild(menuHeader);
+    }
+
+    if (sidebar) {
+        sidebar.querySelectorAll('.sidebar-nav-btn').forEach(btn => {
+            if (!btn.dataset.bound) {
+                btn.dataset.bound = '1';
+                btn.addEventListener('click', () => switchMenuSection(btn.dataset.section));
+            }
+        });
+    }
 
     let nav = document.getElementById('menu-workspace-nav');
     if (!nav) {
@@ -535,7 +598,7 @@ function ensureMenuWorkspace() {
             <button type="button" class="workspace-tab" data-section="goals">Hedefler</button>
             <button type="button" class="workspace-tab" data-section="activities">Oturumlar</button>
         `;
-        menuHeader.insertAdjacentElement('afterend', nav);
+        mainPane.appendChild(nav);
         nav.querySelectorAll('.workspace-tab').forEach(btn => {
             btn.addEventListener('click', () => switchMenuSection(btn.dataset.section));
         });
@@ -545,7 +608,7 @@ function ensureMenuWorkspace() {
         const overview = document.createElement('section');
         overview.id = 'menu-overview-section';
         overview.className = 'menu-workspace-section';
-        insights.parentNode.insertBefore(overview, insights);
+        mainPane.appendChild(overview);
         overview.innerHTML = `
             <div class="workspace-section-head">
                 <span class="workspace-section-kicker">Genel Bakis</span>
@@ -561,7 +624,7 @@ function ensureMenuWorkspace() {
         const goals = document.createElement('section');
         goals.id = 'menu-goals-section';
         goals.className = 'menu-workspace-section';
-        goalBar.parentNode.insertBefore(goals, goalBar);
+        mainPane.appendChild(goals);
         goals.innerHTML = `
             <div class="workspace-section-head">
                 <span class="workspace-section-kicker">Hedefler</span>
@@ -576,7 +639,7 @@ function ensureMenuWorkspace() {
         const activities = document.createElement('section');
         activities.id = 'menu-activities-section';
         activities.className = 'menu-workspace-section';
-        cards.parentNode.insertBefore(activities, cards);
+        mainPane.appendChild(activities);
         activities.innerHTML = `
             <div class="workspace-section-head">
                 <span class="workspace-section-kicker">Oturumlar</span>
@@ -606,6 +669,13 @@ function switchMenuSection(section) {
     const nav = document.getElementById('menu-workspace-nav');
     if (nav) {
         nav.querySelectorAll('.workspace-tab').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.section === section);
+        });
+    }
+
+    const sidebar = document.getElementById('menu-sidebar');
+    if (sidebar) {
+        sidebar.querySelectorAll('.sidebar-nav-btn').forEach(btn => {
             btn.classList.toggle('active', btn.dataset.section === section);
         });
     }
