@@ -548,6 +548,7 @@ function ensureMenuWorkspace() {
             <div class="sidebar-section">
                 <span class="sidebar-label">Calisma Alanlari</span>
                 <button type="button" class="sidebar-nav-btn active" data-section="overview">Genel Bakis</button>
+                <button type="button" class="sidebar-nav-btn" data-section="students">Ogrenciler</button>
                 <button type="button" class="sidebar-nav-btn" data-section="goals">Hedefler</button>
                 <button type="button" class="sidebar-nav-btn" data-section="activities">Oturumlar</button>
             </div>
@@ -595,6 +596,7 @@ function ensureMenuWorkspace() {
         nav.className = 'menu-workspace-nav';
         nav.innerHTML = `
             <button type="button" class="workspace-tab active" data-section="overview">Genel Bakis</button>
+            <button type="button" class="workspace-tab" data-section="students">Ogrenciler</button>
             <button type="button" class="workspace-tab" data-section="goals">Hedefler</button>
             <button type="button" class="workspace-tab" data-section="activities">Oturumlar</button>
         `;
@@ -618,6 +620,24 @@ function ensureMenuWorkspace() {
         `;
         overview.appendChild(insights);
         overview.appendChild(onboardingPanel);
+    }
+
+    if (!document.getElementById('menu-students-section')) {
+        const students = document.createElement('section');
+        students.id = 'menu-students-section';
+        students.className = 'menu-workspace-section';
+        mainPane.appendChild(students);
+        students.innerHTML = `
+            <div class="workspace-section-head">
+                <span class="workspace-section-kicker">Ogrenciler</span>
+                <h3>Ogrenci yonetimi</h3>
+                <p>Secili ogrenciyi incele, bilgileri guncelle veya baska bir ogrenciye gec.</p>
+            </div>
+            <div class="students-section-actions">
+                <button type="button" class="menu-ghost-btn" onclick="openStudentSetup()">Ogrenci sec veya ekle</button>
+                <button type="button" class="menu-ghost-btn" onclick="openOnboarding()">Kullanim rehberini ac</button>
+            </div>
+        `;
     }
 
     if (!document.getElementById('menu-goals-section')) {
@@ -650,6 +670,12 @@ function ensureMenuWorkspace() {
         activities.appendChild(cards);
     }
 
+    const studentsSection = document.getElementById('menu-students-section');
+    const detailPanel = document.getElementById('student-detail-panel');
+    if (studentsSection && detailPanel && detailPanel.parentNode !== studentsSection) {
+        studentsSection.appendChild(detailPanel);
+    }
+
     switchMenuSection(currentMenuSection);
 }
 
@@ -657,6 +683,7 @@ function switchMenuSection(section) {
     currentMenuSection = section;
     const sections = {
         overview: document.getElementById('menu-overview-section'),
+        students: document.getElementById('menu-students-section'),
         goals: document.getElementById('menu-goals-section'),
         activities: document.getElementById('menu-activities-section')
     };
