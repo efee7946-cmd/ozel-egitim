@@ -10,7 +10,6 @@ let childName = "";
 let appStarted = false;
 let currentUserEmail = "";
 let currentUserRole = "parent";
-let currentParentGoal = '';
 let currentScreenId = 'start-screen';
 let currentMenuSection = 'overview';
 let activeStudentId = '';
@@ -124,45 +123,6 @@ function celebrateCorrectAnswer() {
     setCharacterEmotion(CharacterEmotion.EXCITED);
     confetti({ particleCount: 60, spread: 70 });
     setTimeout(() => setCharacterEmotion(CharacterEmotion.NEUTRAL), 3000);
-}
-
-// =============================================
-// VELI HEDEFI
-// =============================================
-async function loadParentGoal() {
-    const userId = await getCurrentUserId();
-    if (!userId) return;
-    const today = getDateKey(new Date());
-    let query = supabaseClient
-        .from('parent_goals')
-        .select('goal_text')
-        .eq('user_id', userId)
-        .gte('created_at', today)
-        .order('created_at', { ascending: false })
-        .limit(1);
-    if (activeStudentId) query = query.eq('student_id', activeStudentId);
-    const { data } = await query;
-    if (data && data[0]) {
-        currentParentGoal = data[0].goal_text;
-        const inp = document.getElementById('goalInput');
-        if (inp) inp.value = currentParentGoal;
-    }
-}
-
-async function saveParentGoal() {
-    const goalEl = document.getElementById('goalInput');
-    if (!goalEl) return;
-    const text = goalEl.value.trim();
-    if (!text) return;
-    currentParentGoal = text;
-    const userId = await getCurrentUserId();
-    if (!userId) return;
-    await supabaseClient.from('parent_goals').insert({ user_id: userId, student_id: activeStudentId || null, goal_text: text });
-    const badge = document.getElementById('goalSaved');
-    if (badge) {
-        badge.style.display = 'inline';
-        setTimeout(() => { badge.style.display = 'none'; }, 2000);
-    }
 }
 
 // =============================================
@@ -280,7 +240,6 @@ async function startApp(resetSession) {
     updateMenuIdentity();
     showOnly('menu-screen');
     dismissOnboarding(false);
-    loadParentGoal();
 }
 
 async function initializeAuth() {
@@ -452,7 +411,7 @@ function ensureStudentEnhancements() {
             <div class="menu-insight-card">
                 <span class="menu-insight-label">Panel Modu</span>
                 <strong id="role-mode-title">Veli Paneli</strong>
-                <p id="role-mode-copy">Secili ogrencinin hedeflerini belirleyip oturumlari takip edebilirsin.</p>
+                <p id="role-mode-copy">Secili ogrenci icin dogru akisi secip oturumlari tek panelden takip edebilirsin.</p>
             </div>
             <div class="menu-insight-card">
                 <span class="menu-insight-label">Ogrenci Ozeti</span>
@@ -477,7 +436,7 @@ function ensureStudentEnhancements() {
                 <div>
                     <span class="student-detail-kicker">Secili Ogrenci</span>
                     <h3 id="student-detail-title">Ogrenci secilmedi</h3>
-                    <p id="student-detail-subtitle">Bir ogrenci sectiginde son hedefler ve oturum ozeti burada gorunur.</p>
+                    <p id="student-detail-subtitle">Bir ogrenci sectiginde guclu yonler, destek notlari ve oturum ozeti burada gorunur.</p>
                 </div>
                 <button type="button" class="menu-ghost-btn" onclick="openStudentSetup()">Ogrenci Yonet</button>
             </div>
@@ -487,8 +446,8 @@ function ensureStudentEnhancements() {
                     <p id="student-detail-notes">Henuz destek notu eklenmedi.</p>
                 </div>
                 <div class="student-detail-card">
-                    <span class="student-detail-label">Son Hedef</span>
-                    <p id="student-detail-goal">Henuz kayitli hedef yok.</p>
+                    <span class="student-detail-label">Ogrenme Odagi</span>
+                    <p id="student-detail-goal">Destek notlarina gore odak alani burada ozetlenir.</p>
                 </div>
                 <div class="student-detail-card">
                     <span class="student-detail-label">Son Oturum</span>
@@ -521,10 +480,9 @@ function ensureMenuWorkspace() {
     const menuHeader = document.querySelector('.menu-header');
     const menuTopbar = document.querySelector('.menu-topbar');
     const onboardingPanel = document.getElementById('onboarding-panel');
-    const goalBar = document.getElementById('parentGoalBar');
     const cards = document.querySelector('.menu-cards');
     const insights = document.querySelector('.menu-insights');
-    if (!menuScreen || !menuHeader || !menuTopbar || !onboardingPanel || !goalBar || !cards || !insights) return;
+    if (!menuScreen || !menuHeader || !menuTopbar || !onboardingPanel || !cards || !insights) return;
 
     let shell = document.getElementById('menu-app-shell');
     let sidebar = document.getElementById('menu-sidebar');
@@ -549,7 +507,7 @@ function ensureMenuWorkspace() {
                 <span class="sidebar-label">Calisma Alanlari</span>
                 <button type="button" class="sidebar-nav-btn active" data-section="overview">Genel Bakis</button>
                 <button type="button" class="sidebar-nav-btn" data-section="students">Ogrenciler</button>
-                <button type="button" class="sidebar-nav-btn" data-section="goals">Hedefler</button>
+                <button type="button" class="sidebar-nav-btn" data-section="guide">Rehber</button>
                 <button type="button" class="sidebar-nav-btn" data-section="activities">Oturumlar</button>
             </div>
             <div class="sidebar-section">
@@ -597,7 +555,7 @@ function ensureMenuWorkspace() {
         nav.innerHTML = `
             <button type="button" class="workspace-tab active" data-section="overview">Genel Bakis</button>
             <button type="button" class="workspace-tab" data-section="students">Ogrenciler</button>
-            <button type="button" class="workspace-tab" data-section="goals">Hedefler</button>
+            <button type="button" class="workspace-tab" data-section="guide">Rehber</button>
             <button type="button" class="workspace-tab" data-section="activities">Oturumlar</button>
         `;
         mainPane.appendChild(nav);
@@ -615,7 +573,7 @@ function ensureMenuWorkspace() {
             <div class="workspace-section-head">
                 <span class="workspace-section-kicker">Genel Bakis</span>
                 <h3>Bugunku genel durum</h3>
-                <p>Rolune ve secili ogrenciye gore hizli bir ozet gor.</p>
+                <p>Rolune ve secili ogrenciye gore hizli bir ozet, yonlendirme ve bir sonraki adimi gor.</p>
             </div>
         `;
         overview.appendChild(insights);
@@ -631,7 +589,7 @@ function ensureMenuWorkspace() {
             <div class="workspace-section-head">
                 <span class="workspace-section-kicker">Ogrenciler</span>
                 <h3>Ogrenci yonetimi</h3>
-                <p>Secili ogrenciyi incele, bilgileri guncelle veya baska bir ogrenciye gec.</p>
+                <p>Secili ogrenciyi incele, destek notlarini guncelle ve hangi calismaya ihtiyaci oldugunu gor.</p>
             </div>
             <div class="students-section-actions">
                 <button type="button" class="menu-ghost-btn" onclick="openStudentSetup()">Ogrenci sec veya ekle</button>
@@ -640,19 +598,40 @@ function ensureMenuWorkspace() {
         `;
     }
 
-    if (!document.getElementById('menu-goals-section')) {
-        const goals = document.createElement('section');
-        goals.id = 'menu-goals-section';
-        goals.className = 'menu-workspace-section';
-        mainPane.appendChild(goals);
-        goals.innerHTML = `
+    if (!document.getElementById('menu-guide-section')) {
+        const guide = document.createElement('section');
+        guide.id = 'menu-guide-section';
+        guide.className = 'menu-workspace-section';
+        mainPane.appendChild(guide);
+        guide.innerHTML = `
             <div class="workspace-section-head">
-                <span class="workspace-section-kicker">Hedefler</span>
-                <h3>Bugunun hedefini netlestir</h3>
-                <p>Secili ogrenci icin odagi belirle ve oturumu buna gore yonet.</p>
+                <span class="workspace-section-kicker">Rehber</span>
+                <h3>Ogretici kullanim akisi</h3>
+                <p>Karmasayi azaltmak icin her oturum once neye bakacagini, sonra hangi alana gececegini net gosteriyoruz.</p>
+            </div>
+            <div class="guide-grid">
+                <article class="guide-card">
+                    <span class="guide-card-step">1. Hazirlik</span>
+                    <h4>Ogrenci notlarini oku</h4>
+                    <p>Destek notlari cocugun ilgisini, zorlandigi alanlari ve dili nasil sade tutman gerektigini hatirlatir.</p>
+                </article>
+                <article class="guide-card">
+                    <span class="guide-card-step">2. Uygulama</span>
+                    <h4>Kisa terapiyle basla</h4>
+                    <p>Ilk olarak konusma terapisti acilip mikrofon, dikkat ve kisa cevap akisi denenebilir.</p>
+                </article>
+                <article class="guide-card">
+                    <span class="guide-card-step">3. Pekistirme</span>
+                    <h4>Hikaye ile genislet</h4>
+                    <p>Terapi sonrasi hikaye dunyasinda secim yaptirarak sosyal ipuclari ve ifade becerisi pekistirilir.</p>
+                </article>
+                <article class="guide-card guide-card-accent">
+                    <span class="guide-card-step">4. Gozlem</span>
+                    <h4>Raporla kapat</h4>
+                    <p>Son adimda veli raporundan sure, katilim ve ilerleme ozetini inceleyip bir sonraki oturuma not cikar.</p>
+                </article>
             </div>
         `;
-        goals.appendChild(goalBar);
     }
 
     if (!document.getElementById('menu-activities-section')) {
@@ -665,6 +644,20 @@ function ensureMenuWorkspace() {
                 <span class="workspace-section-kicker">Oturumlar</span>
                 <h3>Calisma alanini sec</h3>
                 <p>Terapi, hikaye ve rapor akislari arasindan ihtiyacina uygun olani ac.</p>
+            </div>
+            <div class="activity-playbook">
+                <div class="activity-playbook-card">
+                    <strong>Hizli baslangic</strong>
+                    <p>Dikkat daginiksa once terapiyi acip 3-4 kisa yanitla isin.</p>
+                </div>
+                <div class="activity-playbook-card">
+                    <strong>Dil ve ifade</strong>
+                    <p>Secenekli kararlar icin hikaye dunyasi sosyal dil ve anlatim calismasi icin daha uygundur.</p>
+                </div>
+                <div class="activity-playbook-card">
+                    <strong>Takip</strong>
+                    <p>Oturum bitince veli raporuna gecip hangi alanda daha iyi katilim oldugunu kontrol et.</p>
+                </div>
             </div>
         `;
         activities.appendChild(cards);
@@ -680,30 +673,30 @@ function ensureMenuWorkspace() {
 }
 
 function switchMenuSection(section) {
-    currentMenuSection = section;
     const sections = {
         overview: document.getElementById('menu-overview-section'),
         students: document.getElementById('menu-students-section'),
-        goals: document.getElementById('menu-goals-section'),
+        guide: document.getElementById('menu-guide-section'),
         activities: document.getElementById('menu-activities-section')
     };
+    currentMenuSection = sections[section] ? section : 'overview';
 
     Object.entries(sections).forEach(([key, el]) => {
         if (!el) return;
-        el.style.display = key === section ? 'block' : 'none';
+        el.style.display = key === currentMenuSection ? 'block' : 'none';
     });
 
     const nav = document.getElementById('menu-workspace-nav');
     if (nav) {
         nav.querySelectorAll('.workspace-tab').forEach(btn => {
-            btn.classList.toggle('active', btn.dataset.section === section);
+            btn.classList.toggle('active', btn.dataset.section === currentMenuSection);
         });
     }
 
     const sidebar = document.getElementById('menu-sidebar');
     if (sidebar) {
         sidebar.querySelectorAll('.sidebar-nav-btn').forEach(btn => {
-            btn.classList.toggle('active', btn.dataset.section === section);
+            btn.classList.toggle('active', btn.dataset.section === currentMenuSection);
         });
     }
 }
@@ -742,7 +735,7 @@ function renderRoleDashboard() {
     if (roleCopyEl) {
         roleCopyEl.textContent = currentUserRole === 'specialist'
             ? 'Birden fazla ogrenciyi takip edip secili ogrenci icin seanslari yonetebilirsin.'
-            : 'Secili ogrencinin hedeflerini belirleyip gelisimini tek panelden izleyebilirsin.';
+            : 'Secili ogrenci icin uygun calismayi secip gelisimini tek panelden izleyebilirsin.';
     }
 
     if (studentSummaryNameEl) studentSummaryNameEl.textContent = activeStudentName || 'Henuz secilmedi';
@@ -762,23 +755,6 @@ function renderRoleDashboard() {
             ? 'Bu uzman hesabina bagli aktif ogrenci sayisi.'
             : 'Bu veli hesabinda takip edilen aktif ogrenci sayisi.';
     }
-}
-
-async function loadLatestGoalForStudent(userId, studentId) {
-    if (!userId || !studentId) return null;
-    const { data, error } = await supabaseClient
-        .from('parent_goals')
-        .select('goal_text, created_at')
-        .eq('user_id', userId)
-        .eq('student_id', studentId)
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .maybeSingle();
-    if (error) {
-        console.error('Son hedef okunamadi:', error);
-        return null;
-    }
-    return data || null;
 }
 
 async function loadStudentDetailMetrics(userId, studentId) {
@@ -821,9 +797,9 @@ async function renderStudentDetailPanel() {
     const student = studentsCache.find(item => item.id === activeStudentId);
     if (!student) {
         titleEl.textContent = 'Ogrenci secilmedi';
-        subtitleEl.textContent = 'Bir ogrenci sectiginde son hedefler ve oturum ozeti burada gorunur.';
+        subtitleEl.textContent = 'Bir ogrenci sectiginde guclu yonler, destek notlari ve oturum ozeti burada gorunur.';
         notesEl.textContent = 'Henuz destek notu eklenmedi.';
-        goalEl.textContent = 'Henuz kayitli hedef yok.';
+        goalEl.textContent = 'Destek notlarina gore odak alani burada ozetlenir.';
         sessionEl.textContent = 'Henuz kayitli oturum yok.';
         totalSessionsEl.textContent = '0';
         totalMinutesEl.textContent = '0 dk';
@@ -833,19 +809,17 @@ async function renderStudentDetailPanel() {
 
     titleEl.textContent = student.full_name || 'Isimsiz ogrenci';
     subtitleEl.textContent = student.birth_year
-        ? `Dogum yili ${student.birth_year}. Secili ogrenci icin en guncel hedef ve oturum ozeti burada.`
-        : 'Secili ogrenci icin en guncel hedef ve oturum ozeti burada.';
+        ? `Dogum yili ${student.birth_year}. Secili ogrenci icin destek notlari ve oturum ozeti burada.`
+        : 'Secili ogrenci icin destek notlari ve oturum ozeti burada.';
     notesEl.textContent = student.support_notes || 'Henuz destek notu eklenmedi.';
 
     const userId = await getCurrentUserId();
-    const [latestGoal, metrics] = await Promise.all([
-        loadLatestGoalForStudent(userId, student.id),
-        loadStudentDetailMetrics(userId, student.id)
-    ]);
-
-    goalEl.textContent = latestGoal
-        ? `${latestGoal.goal_text} (${new Date(latestGoal.created_at).toLocaleDateString('tr-TR')})`
-        : 'Henuz kayitli hedef yok.';
+    const metrics = await loadStudentDetailMetrics(userId, student.id);
+    goalEl.textContent = student.support_notes
+        ? `Odak: ${student.support_notes}`
+        : (currentUserRole === 'specialist'
+            ? 'Oturumdan once destek notu ekleyerek yonlendirmeyi guclendirebilirsin.'
+            : 'Destek notu ekleyerek hangi beceriye odaklanacagini netlestirebilirsin.');
 
     if (metrics.latestSession) {
         const sessionDate = new Date(metrics.latestSession.created_at).toLocaleDateString('tr-TR');
@@ -939,7 +913,6 @@ async function selectStudent(studentId) {
     const storageKey = getStudentStorageKey(userId);
     if (storageKey) localStorage.setItem(storageKey, student.id);
     renderStudentList();
-    loadParentGoal();
     renderStudentDetailPanel();
     showOnly('menu-screen');
 }
@@ -2012,10 +1985,7 @@ function startStory(storyKey, resumeProgress) {
     sessionData.totalScenesReached = resumeProgress ? (resumeProgress.totalScenesReached || currentSceneIdx + 1) : 0;
     sessionData.storyCompleted = false;
     sessionData.storyChoices = resumeProgress ? (resumeProgress.storyChoices || []).slice() : [];
-    const goalInjection = currentParentGoal
-        ? `\n\nBU OTURUM ICIN VELI HEDEFI: "${currentParentGoal}". Lütfen hikayenin secim anlarini bu hedefle ilgili durumlar uzerine kur. Cocugun bu durumda ne yapacagina karar verecegi sahneler olustur.`
-        : '';
-    sessionData.storyGoalInjection = goalInjection;
+    sessionData.storyGoalInjection = '';
 
     showOnly('story-screen');
     buildProgressDots();
@@ -2199,7 +2169,7 @@ function choiceEthicsScore(choiceText, sceneResponse) {
     return score;
 }
 
-async function getTherapeuticResponse(choiceText, sceneResponse, sceneContext, childGoal) {
+async function getTherapeuticResponse(choiceText, sceneResponse, sceneContext) {
     const score = choiceEthicsScore(choiceText, sceneResponse);
     const needsIntervention = score < 0;
 
@@ -2207,7 +2177,6 @@ async function getTherapeuticResponse(choiceText, sceneResponse, sceneContext, c
         ? `Sen Yildiz Can adli sicak, sabirli bir cocuk gelisim uzmansin.
            "${childName}" adli cocuk hikayede "${choiceText}" secimini yapti.
            Sahne geri bildirimi: "${sceneResponse}".
-           ${childGoal ? `Velinin bugunku hedefi: "${childGoal}".` : ''}
            Ozel egitim destegi alan cocuklara uygun, sade ve net dil kullan.
            Konudan sapma; sadece bu secim ve bu sahneye odaklan.
            Bu secimin bir arkadasi uzebilecegini nazikce belirt.
@@ -2258,8 +2227,7 @@ async function handleChoice(choice, btn, scene) {
         const result = await getTherapeuticResponse(
             choice.text,
             choice.response,
-            { id: scene.id, label: scene.bgLabel || `Sahne ${scene.id + 1}`, emoji: scene.emoji },
-            currentParentGoal
+            { id: scene.id, label: scene.bgLabel || `Sahne ${scene.id + 1}`, emoji: scene.emoji }
         );
         therapeuticReply = result.reply;
         needsIntervention = result.needsIntervention;
@@ -2599,8 +2567,6 @@ window.changeHistoryMonth = changeHistoryMonth;
 window.updateStoryFilters = updateStoryFilters;
 window.resumeSavedStory = resumeSavedStory;
 window.restartSavedStory = restartSavedStory;
-window.saveParentGoal = saveParentGoal;
-
 
 
 
