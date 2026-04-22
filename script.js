@@ -12,6 +12,7 @@ let currentUserEmail = "";
 let currentUserRole = "parent";
 let currentParentGoal = '';
 let currentScreenId = 'start-screen';
+let currentMenuSection = 'overview';
 let activeStudentId = '';
 let activeStudentName = '';
 let studentsCache = [];
@@ -464,6 +465,81 @@ function ensureStudentEnhancements() {
             </div>
         `;
         menuHeader.insertAdjacentElement('afterend', insights);
+    }
+
+    ensureMenuWorkspace();
+}
+
+function ensureMenuWorkspace() {
+    const menuScreen = document.getElementById('menu-screen');
+    const onboardingPanel = document.getElementById('onboarding-panel');
+    const goalBar = document.getElementById('parentGoalBar');
+    const cards = document.querySelector('.menu-cards');
+    const insights = document.querySelector('.menu-insights');
+    if (!menuScreen || !onboardingPanel || !goalBar || !cards || !insights) return;
+
+    let nav = document.getElementById('menu-workspace-nav');
+    if (!nav) {
+        nav = document.createElement('div');
+        nav.id = 'menu-workspace-nav';
+        nav.className = 'menu-workspace-nav';
+        nav.innerHTML = `
+            <button type="button" class="workspace-tab active" data-section="overview">Genel Bakis</button>
+            <button type="button" class="workspace-tab" data-section="goals">Hedefler</button>
+            <button type="button" class="workspace-tab" data-section="activities">Oturumlar</button>
+        `;
+        menuHeader.insertAdjacentElement('afterend', nav);
+        nav.querySelectorAll('.workspace-tab').forEach(btn => {
+            btn.addEventListener('click', () => switchMenuSection(btn.dataset.section));
+        });
+    }
+
+    if (!document.getElementById('menu-overview-section')) {
+        const overview = document.createElement('section');
+        overview.id = 'menu-overview-section';
+        overview.className = 'menu-workspace-section';
+        insights.parentNode.insertBefore(overview, insights);
+        overview.appendChild(insights);
+        overview.appendChild(onboardingPanel);
+    }
+
+    if (!document.getElementById('menu-goals-section')) {
+        const goals = document.createElement('section');
+        goals.id = 'menu-goals-section';
+        goals.className = 'menu-workspace-section';
+        goalBar.parentNode.insertBefore(goals, goalBar);
+        goals.appendChild(goalBar);
+    }
+
+    if (!document.getElementById('menu-activities-section')) {
+        const activities = document.createElement('section');
+        activities.id = 'menu-activities-section';
+        activities.className = 'menu-workspace-section';
+        cards.parentNode.insertBefore(activities, cards);
+        activities.appendChild(cards);
+    }
+
+    switchMenuSection(currentMenuSection);
+}
+
+function switchMenuSection(section) {
+    currentMenuSection = section;
+    const sections = {
+        overview: document.getElementById('menu-overview-section'),
+        goals: document.getElementById('menu-goals-section'),
+        activities: document.getElementById('menu-activities-section')
+    };
+
+    Object.entries(sections).forEach(([key, el]) => {
+        if (!el) return;
+        el.style.display = key === section ? 'block' : 'none';
+    });
+
+    const nav = document.getElementById('menu-workspace-nav');
+    if (nav) {
+        nav.querySelectorAll('.workspace-tab').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.section === section);
+        });
     }
 }
 

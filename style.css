@@ -201,6 +201,41 @@ body {
     font-size: 0.9rem;
 }
 
+.menu-workspace-nav {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin: 0 0 20px;
+}
+
+.workspace-tab {
+    border: 1px solid #d7e3f2;
+    background: #f4f8fd;
+    color: #4e6280;
+    border-radius: 999px;
+    padding: 11px 16px;
+    font-size: 0.9rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.workspace-tab:hover {
+    transform: translateY(-1px);
+    border-color: #b8cdef;
+}
+
+.workspace-tab.active {
+    background: linear-gradient(135deg, #10998d 0%, #2d7ff9 100%);
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 12px 26px rgba(45, 127, 249, 0.18);
+}
+
+.menu-workspace-section {
+    margin: 0 0 22px;
+}
+
 .onboarding-panel {
     position: relative;
     z-index: 2;
@@ -1343,6 +1378,8 @@ video { width: 100%; height: 100%; object-fit: cover; }
     .menu-topbar-actions { width: 100%; flex-direction: column; }
     .menu-ghost-btn, .menu-cta-btn { width: 100%; }
     .menu-header { flex-direction: column; text-align: center; }
+    .menu-workspace-nav { flex-direction: column; }
+    .workspace-tab { width: 100%; }
     .menu-insights { grid-template-columns: 1fr; }
     .menu-cards { flex-direction: column; }
     .parent-goal-bar { flex-direction: column; align-items: stretch; }
