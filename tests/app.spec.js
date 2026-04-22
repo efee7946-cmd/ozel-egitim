@@ -32,6 +32,7 @@ test.describe('Yıldız Can AI App Tests', () => {
     await expect(menuScreen).toBeVisible();
 
     // Take a screenshot of the menu screen
+    await expect(page.locator('.menu-card')).toHaveCount(3);
     await page.screenshot({ path: testInfo.outputPath('menu-screen.png') });
 
     // Verify greeting contains "Test Çocuğu"
@@ -45,6 +46,8 @@ test.describe('Yıldız Can AI App Tests', () => {
 
     const gameContainer = page.locator('#game-container');
     await expect(gameContainer).toBeVisible();
+    await expect(page.locator('#qBar')).not.toHaveText('Hazırlanıyorum...');
+    await expect(page.locator('#info')).not.toHaveText('Video yükleniyor...');
     await page.screenshot({ path: testInfo.outputPath('therapy-screen.png') });
 
     // Go back to menu
@@ -59,6 +62,7 @@ test.describe('Yıldız Can AI App Tests', () => {
 
     const storySelectScreen = page.locator('#story-select-screen');
     await expect(storySelectScreen).toBeVisible();
+    await expect(page.locator('#storyGrid .story-thumb')).toHaveCount(3);
     await page.screenshot({ path: testInfo.outputPath('story-select-screen.png') });
 
     // Select a story
@@ -68,6 +72,8 @@ test.describe('Yıldız Can AI App Tests', () => {
 
     const storyScreen = page.locator('#story-screen');
     await expect(storyScreen).toBeVisible();
+    await expect(page.locator('#narratorBubble')).not.toHaveText('Hazırlanıyorum...');
+    await expect(page.locator('#storyChoices .choice-btn').first()).toBeVisible();
     await page.screenshot({ path: testInfo.outputPath('story-screen.png') });
 
   });

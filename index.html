@@ -37,8 +37,15 @@
 
             <div class="input-group">
                 <div class="field" id="nameField" style="display: none;">
-                    <label>Çocuğun Adı</label>
+                    <label>Öğrenci Adı</label>
                     <input type="text" id="nameInput" placeholder="Örn: Efe">
+                </div>
+                <div class="field" id="roleField" style="display: none;">
+                    <label>Hesap Türü</label>
+                    <select id="roleInput">
+                        <option value="parent">Veli</option>
+                        <option value="specialist">Uzman</option>
+                    </select>
                 </div>
 
                 <div class="field">
@@ -68,13 +75,54 @@
 
 
 <!-- ===================== ANA MENÜ ===================== -->
+<div id="student-setup-screen">
+    <div class="student-shell">
+        <div class="student-panel">
+            <div class="student-panel-head">
+                <span class="student-eyebrow">Öğrenci Alanı</span>
+                <h2>Devam etmek için bir öğrenci seç</h2>
+                <p>Oturumlar, hedefler ve raporlar seçtiğin öğrenciye bağlanır.</p>
+            </div>
+
+            <div class="student-status" id="studentStatus">Öğrenciler yükleniyor...</div>
+            <div class="student-list" id="studentList"></div>
+
+            <div class="student-form-card">
+                <h3>Yeni öğrenci ekle</h3>
+                <div class="student-form-grid">
+                    <div class="field">
+                        <label>Öğrenci Adı</label>
+                        <input type="text" id="studentNameInput" placeholder="Örn: Efe">
+                    </div>
+                    <div class="field">
+                        <label>Doğum Yılı</label>
+                        <input type="number" id="studentBirthYearInput" placeholder="Örn: 2019" min="2000" max="2099">
+                    </div>
+                </div>
+                <div class="field">
+                    <label>Destek Notu</label>
+                    <textarea id="studentNotesInput" rows="3" placeholder="Kısa notlar, ilgi alanları veya destek ihtiyacı..."></textarea>
+                </div>
+                <button type="button" class="btn-primary-gradient" id="createStudentBtn" onclick="createStudent()">
+                    Öğrenci Oluştur
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div id="menu-screen">
     <div class="menu-topbar">
         <div class="account-chip">
             <span class="account-chip-label">Hesap</span>
             <strong id="account-email">-</strong>
         </div>
+        <div class="account-chip student-chip">
+            <span class="account-chip-label">Aktif Öğrenci</span>
+            <strong id="active-student-name">Henüz seçilmedi</strong>
+        </div>
         <div class="menu-topbar-actions">
+            <button class="menu-ghost-btn" type="button" onclick="openStudentSetup()">Öğrenci Değiştir</button>
             <button class="menu-ghost-btn" type="button" onclick="openOnboarding()">Nasıl Kullanılır?</button>
             <button class="menu-ghost-btn logout-btn" type="button" onclick="logout()">Çıkış Yap</button>
         </div>

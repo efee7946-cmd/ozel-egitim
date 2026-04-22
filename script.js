@@ -9,8 +9,17 @@ var supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
 let childName = "";
 let appStarted = false;
 let currentUserEmail = "";
+let currentUserRole = "parent";
 let currentParentGoal = '';
 let currentScreenId = 'start-screen';
+let activeStudentId = '';
+let activeStudentName = '';
+let studentsCache = [];
+
+function getUserRoleFromUser(user) {
+    if (!user || !user.user_metadata || !user.user_metadata.role) return 'parent';
+    return user.user_metadata.role === 'specialist' ? 'specialist' : 'parent';
+}
 
 // Oturum verisi — tüm modüller buraya yazar
 const sessionData = {
@@ -123,13 +132,15 @@ async function loadParentGoal() {
     const userId = await getCurrentUserId();
     if (!userId) return;
     const today = getDateKey(new Date());
-    const { data } = await supabaseClient
+    let query = supabaseClient
         .from('parent_goals')
         .select('goal_text')
         .eq('user_id', userId)
         .gte('created_at', today)
         .order('created_at', { ascending: false })
         .limit(1);
+    if (activeStudentId) query = query.eq('student_id', activeStudentId);
+    const { data } = await query;
     if (data && data[0]) {
         currentParentGoal = data[0].goal_text;
         const inp = document.getElementById('goalInput');
@@ -145,7 +156,7 @@ async function saveParentGoal() {
     currentParentGoal = text;
     const userId = await getCurrentUserId();
     if (!userId) return;
-    await supabaseClient.from('parent_goals').insert({ user_id: userId, goal_text: text });
+    await supabaseClient.from('parent_goals').insert({ user_id: userId, student_id: activeStudentId || null, goal_text: text });
     const badge = document.getElementById('goalSaved');
     if (badge) {
         badge.style.display = 'inline';
@@ -157,7 +168,7 @@ async function saveParentGoal() {
 // EKRAN YÖNETİMİ
 // =============================================
 function showOnly(id) {
-    const screens = ['start-screen','menu-screen','game-container','story-select-screen','story-screen','report-screen'];
+    const screens = ['start-screen','student-setup-screen','menu-screen','game-container','story-select-screen','story-screen','report-screen'];
     screens.forEach(s => {
         const el = document.getElementById(s);
         if (el) el.style.display = 'none';
@@ -184,8 +195,13 @@ function getOnboardingStorageKey() {
 
 function updateMenuIdentity() {
     const emailEl = document.getElementById('account-email');
+    const studentEl = document.getElementById('active-student-name');
     if (emailEl) {
-        emailEl.textContent = currentUserEmail || 'Misafir';
+        const roleLabel = currentUserRole === 'specialist' ? 'Uzman' : 'Veli';
+        emailEl.textContent = currentUserEmail ? `${currentUserEmail} • ${roleLabel}` : 'Misafir';
+    }
+    if (studentEl) {
+        studentEl.textContent = activeStudentName || 'Henüz seçilmedi';
     }
 }
 
@@ -215,7 +231,7 @@ async function logout() {
         alert('Çıkış yapılırken bir hata oluştu. Lütfen tekrar dene.');
     }
 }
-function startApp(resetSession) {
+async function startApp(resetSession) {
     if (appStarted && !resetSession) {
         if (currentScreenId && currentScreenId !== 'start-screen') {
             showOnly(currentScreenId);
@@ -254,6 +270,11 @@ function startApp(resetSession) {
     }
 
     document.getElementById('menu-greeting').textContent = `Merhaba, ${childName}! 🌟`;
+    const hasStudentContext = await ensureActiveStudent();
+    if (!hasStudentContext) return;
+
+    document.getElementById('menu-greeting').textContent = `Merhaba, ${activeStudentName || childName}! ğŸŒŸ`;
+    document.getElementById('menu-greeting').textContent = `Merhaba, ${activeStudentName || childName}!`;
     appStarted = true;
     updateMenuIdentity();
     showOnly('menu-screen');
@@ -270,6 +291,7 @@ async function initializeAuth() {
         if (user) {
             childName = getChildNameFromUser(user);
             currentUserEmail = user.email || '';
+            currentUserRole = getUserRoleFromUser(user);
             startApp(false);
             return;
         }
@@ -284,6 +306,7 @@ supabaseClient.auth.onAuthStateChange(function(event, session) {
     if (event === 'SIGNED_IN' && session && session.user) {
         childName = getChildNameFromUser(session.user);
         currentUserEmail = session.user.email || '';
+        currentUserRole = getUserRoleFromUser(session.user);
         startApp(false);
     }
 
@@ -292,6 +315,7 @@ supabaseClient.auth.onAuthStateChange(function(event, session) {
         appStarted = false;
         childName = "";
         currentUserEmail = "";
+        currentUserRole = "parent";
         dismissOnboarding(false);
         showOnly('start-screen');
     }
@@ -390,12 +414,164 @@ async function getCurrentUserId() {
     return result && result.data && result.data.user ? result.data.user.id : null;
 }
 
+function getStudentStorageKey(userId) {
+    return userId ? `active_student_${userId}` : '';
+}
+
+function setActiveStudent(student) {
+    activeStudentId = student && student.id ? student.id : '';
+    activeStudentName = student && student.full_name ? student.full_name : '';
+    if (activeStudentName) childName = activeStudentName;
+    updateMenuIdentity();
+}
+
+function renderStudentList() {
+    const listEl = document.getElementById('studentList');
+    const statusEl = document.getElementById('studentStatus');
+    if (!listEl || !statusEl) return;
+
+    if (!studentsCache.length) {
+        listEl.innerHTML = '';
+        statusEl.textContent = 'Henüz öğrenci eklenmemiş. Devam etmek için ilk öğrencini oluştur.';
+        return;
+    }
+
+    statusEl.textContent = 'Bir öğrenciyi seçebilir ya da yeni öğrenci ekleyebilirsin.';
+    listEl.innerHTML = studentsCache.map(student => `
+        <button type="button" class="student-card ${student.id === activeStudentId ? 'active' : ''}" onclick="selectStudent('${student.id}')">
+            <h4>${student.full_name || 'İsimsiz öğrenci'}</h4>
+            <p>${student.support_notes || 'Henüz destek notu eklenmedi.'}</p>
+            <span class="student-card-meta">${student.birth_year ? `Doğum yılı: ${student.birth_year}` : 'Doğum yılı girilmedi'}</span>
+        </button>
+    `).join('');
+}
+
+async function loadStudentsForCurrentUser() {
+    const userId = await getCurrentUserId();
+    if (!userId) {
+        studentsCache = [];
+        return [];
+    }
+
+    const { data, error } = await supabaseClient
+        .from('students')
+        .select('id, full_name, birth_year, support_notes, active, created_at')
+        .eq('active', true)
+        .order('created_at', { ascending: false });
+
+    if (error) {
+        console.error('Öğrenciler yüklenemedi:', error);
+        studentsCache = [];
+        return [];
+    }
+
+    studentsCache = data || [];
+    return studentsCache;
+}
+
+async function ensureActiveStudent() {
+    const userId = await getCurrentUserId();
+    if (!userId) return true;
+
+    const students = await loadStudentsForCurrentUser();
+    if (!students.length) {
+        setActiveStudent(null);
+        renderStudentList();
+        showOnly('student-setup-screen');
+        return false;
+    }
+
+    const storageKey = getStudentStorageKey(userId);
+    const storedStudentId = storageKey ? localStorage.getItem(storageKey) : '';
+    const matchedStudent = students.find(student => student.id === activeStudentId)
+        || students.find(student => student.id === storedStudentId)
+        || students[0];
+
+    setActiveStudent(matchedStudent);
+    if (storageKey && matchedStudent) localStorage.setItem(storageKey, matchedStudent.id);
+    renderStudentList();
+    return true;
+}
+
+async function selectStudent(studentId) {
+    const userId = await getCurrentUserId();
+    const student = studentsCache.find(item => item.id === studentId);
+    if (!student) return;
+
+    setActiveStudent(student);
+    const storageKey = getStudentStorageKey(userId);
+    if (storageKey) localStorage.setItem(storageKey, student.id);
+    renderStudentList();
+    loadParentGoal();
+    showOnly('menu-screen');
+}
+
+async function createStudent() {
+    const nameEl = document.getElementById('studentNameInput');
+    const yearEl = document.getElementById('studentBirthYearInput');
+    const notesEl = document.getElementById('studentNotesInput');
+    const statusEl = document.getElementById('studentStatus');
+    const createBtn = document.getElementById('createStudentBtn');
+    const userId = await getCurrentUserId();
+    if (!nameEl || !yearEl || !notesEl || !statusEl || !createBtn || !userId) return;
+
+    const fullName = nameEl.value.trim();
+    const birthYearRaw = yearEl.value.trim();
+    const supportNotes = notesEl.value.trim();
+    if (!fullName) {
+        statusEl.textContent = 'Öğrenci adı zorunlu.';
+        return;
+    }
+
+    createBtn.disabled = true;
+    statusEl.textContent = 'Öğrenci oluşturuluyor...';
+    const birthYear = birthYearRaw ? Number(birthYearRaw) : null;
+
+    const { data, error } = await supabaseClient
+        .from('students')
+        .insert({
+            created_by: userId,
+            full_name: fullName,
+            birth_year: Number.isFinite(birthYear) ? birthYear : null,
+            support_notes: supportNotes
+        })
+        .select('id, full_name, birth_year, support_notes, active, created_at')
+        .single();
+
+    if (error) {
+        console.error('Öğrenci oluşturulamadı:', error);
+        statusEl.textContent = 'Öğrenci oluşturulamadı. Lütfen tekrar dene.';
+        createBtn.disabled = false;
+        return;
+    }
+
+    const linkTable = currentUserRole === 'specialist' ? 'specialist_student_links' : 'parent_student_links';
+    const linkPayload = currentUserRole === 'specialist'
+        ? { specialist_id: userId, student_id: data.id }
+        : { parent_id: userId, student_id: data.id, relationship_label: 'parent' };
+    await supabaseClient.from(linkTable).upsert(linkPayload, { onConflict: currentUserRole === 'specialist' ? 'specialist_id,student_id' : 'parent_id,student_id' });
+
+    nameEl.value = '';
+    yearEl.value = '';
+    notesEl.value = '';
+    createBtn.disabled = false;
+    await ensureActiveStudent();
+    await selectStudent(data.id);
+}
+
+async function openStudentSetup() {
+    await ensureActiveStudent();
+    showOnly('student-setup-screen');
+}
+
 function buildSessionSnapshot(userId, durationMin, totalMic, storyPct, totalTurns) {
     return {
         id: sessionData.reportEntryId || createSessionHistoryId(),
         user_id: userId,
+        created_by: userId,
+        student_id: activeStudentId || null,
         session_date: getDateKey(new Date()),
-        child_name: childName,
+        child_name: activeStudentName || childName,
         duration_min: durationMin,
         total_mic: totalMic,
         story_pct: storyPct,
@@ -425,12 +601,14 @@ async function loadReportHistory() {
     const userId = await getCurrentUserId();
     if (!userId) return [];
 
-    const { data, error } = await supabaseClient
+    let query = supabaseClient
         .from('session_history')
         .select('*')
         .eq('user_id', userId)
         .order('created_at', { ascending: false })
         .limit(180);
+    if (activeStudentId) query = query.eq('student_id', activeStudentId);
+    const { data, error } = await query;
 
     if (error) {
         console.error('Supabase rapor geçmişi okunamadı:', error);
@@ -1762,6 +1940,7 @@ let authMode = 'login';
 function switchAuth(mode) {
     authMode = mode;
     const nameField = document.getElementById('nameField');
+    const roleField = document.getElementById('roleField');
     const forgotLink = document.getElementById('forgot-link');
     const loginTab = document.getElementById('tab-login');
     const registerTab = document.getElementById('tab-register');
@@ -1770,6 +1949,7 @@ function switchAuth(mode) {
     const subTitle = document.querySelector('.auth-sub');
 
     if (mode === 'login') {
+        roleField.style.display = 'none';
         nameField.style.display = 'none';    // İsmi gizle
         forgotLink.style.display = 'block';  // Şifremi unuttumu göster
         loginTab.classList.add('active');
@@ -1778,6 +1958,7 @@ function switchAuth(mode) {
         subTitle.innerText = "Öğrenme yolculuğuna başlamak için giriş yap.";
         btnText.innerText = "Giriş Yap";
     } else {
+        roleField.style.display = 'block';
         nameField.style.display = 'block';   // İsmi göster
         forgotLink.style.display = 'none';   // Şifremi unuttumu gizle
         registerTab.classList.add('active');
@@ -1803,6 +1984,7 @@ async function handleAuth() {
     const email = document.getElementById('emailInput').value.trim();
     const password = document.getElementById('passwordInput').value;
     const displayName = document.getElementById('nameInput').value.trim();
+    const role = document.getElementById('roleInput').value;
     const authBtn = document.getElementById('mainAuthBtn');
 
     if (!email || !password) {
@@ -1824,7 +2006,7 @@ async function handleAuth() {
                 email,
                 password,
                 options: {
-                    data: { display_name: displayName },
+                    data: { display_name: displayName, role: role },
                     emailRedirectTo: window.location.origin
                 }
             });
@@ -1842,7 +2024,8 @@ async function handleAuth() {
             showStatus("Giriş başarılı! Yükleniyor...", "success");
             childName = getChildNameFromUser(data.user);
             currentUserEmail = data.user.email || '';
-            
+            currentUserRole = getUserRoleFromUser(data.user);
+
             setTimeout(() => startApp(true), 800);
         }
     } catch (e) {
@@ -1926,6 +2109,9 @@ window.loadNext = loadNext;
 window.storyRec = storyRec;
 window.logout = logout;
 window.openOnboarding = openOnboarding;
+window.openStudentSetup = openStudentSetup;
+window.createStudent = createStudent;
+window.selectStudent = selectStudent;
 window.changeHistoryMonth = changeHistoryMonth;
 window.updateStoryFilters = updateStoryFilters;
 window.resumeSavedStory = resumeSavedStory;
