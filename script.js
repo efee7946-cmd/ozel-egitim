@@ -427,6 +427,7 @@ function setActiveStudent(student) {
     updateMenuIdentity();
     syncStudentForm(student);
     renderRoleDashboard();
+    renderStudentDetailPanel();
 }
 
 function ensureStudentEnhancements() {
@@ -465,6 +466,51 @@ function ensureStudentEnhancements() {
             </div>
         `;
         menuHeader.insertAdjacentElement('afterend', insights);
+    }
+
+    if (menuHeader && !document.getElementById('student-detail-panel')) {
+        const detailPanel = document.createElement('section');
+        detailPanel.id = 'student-detail-panel';
+        detailPanel.className = 'student-detail-panel';
+        detailPanel.innerHTML = `
+            <div class="student-detail-head">
+                <div>
+                    <span class="student-detail-kicker">Secili Ogrenci</span>
+                    <h3 id="student-detail-title">Ogrenci secilmedi</h3>
+                    <p id="student-detail-subtitle">Bir ogrenci sectiginde son hedefler ve oturum ozeti burada gorunur.</p>
+                </div>
+                <button type="button" class="menu-ghost-btn" onclick="openStudentSetup()">Ogrenci Yonet</button>
+            </div>
+            <div class="student-detail-grid">
+                <div class="student-detail-card">
+                    <span class="student-detail-label">Destek Notu</span>
+                    <p id="student-detail-notes">Henuz destek notu eklenmedi.</p>
+                </div>
+                <div class="student-detail-card">
+                    <span class="student-detail-label">Son Hedef</span>
+                    <p id="student-detail-goal">Henuz kayitli hedef yok.</p>
+                </div>
+                <div class="student-detail-card">
+                    <span class="student-detail-label">Son Oturum</span>
+                    <p id="student-detail-session">Henuz kayitli oturum yok.</p>
+                </div>
+            </div>
+            <div class="student-detail-meta-row">
+                <div class="student-mini-stat">
+                    <span>Toplam Oturum</span>
+                    <strong id="student-detail-total-sessions">0</strong>
+                </div>
+                <div class="student-mini-stat">
+                    <span>Toplam Dakika</span>
+                    <strong id="student-detail-total-minutes">0 dk</strong>
+                </div>
+                <div class="student-mini-stat">
+                    <span>Son Hikaye Ilerlemesi</span>
+                    <strong id="student-detail-story-progress">-</strong>
+                </div>
+            </div>
+        `;
+        menuHeader.insertAdjacentElement('afterend', detailPanel);
     }
 
     ensureMenuWorkspace();
@@ -621,6 +667,102 @@ function renderRoleDashboard() {
     }
 }
 
+async function loadLatestGoalForStudent(userId, studentId) {
+    if (!userId || !studentId) return null;
+    const { data, error } = await supabaseClient
+        .from('parent_goals')
+        .select('goal_text, created_at')
+        .eq('user_id', userId)
+        .eq('student_id', studentId)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+    if (error) {
+        console.error('Son hedef okunamadi:', error);
+        return null;
+    }
+    return data || null;
+}
+
+async function loadStudentDetailMetrics(userId, studentId) {
+    if (!userId || !studentId) {
+        return { totalSessions: 0, totalMinutes: 0, latestSession: null };
+    }
+
+    const { data, error } = await supabaseClient
+        .from('session_history')
+        .select('created_at, duration_min, story_pct, story_completed, total_turns')
+        .eq('user_id', userId)
+        .eq('student_id', studentId)
+        .order('created_at', { ascending: false })
+        .limit(20);
+
+    if (error) {
+        console.error('Ogrenci oturum ozetleri okunamadi:', error);
+        return { totalSessions: 0, totalMinutes: 0, latestSession: null };
+    }
+
+    const rows = data || [];
+    return {
+        totalSessions: rows.length,
+        totalMinutes: rows.reduce((sum, row) => sum + (row.duration_min || 0), 0),
+        latestSession: rows[0] || null
+    };
+}
+
+async function renderStudentDetailPanel() {
+    const titleEl = document.getElementById('student-detail-title');
+    const subtitleEl = document.getElementById('student-detail-subtitle');
+    const notesEl = document.getElementById('student-detail-notes');
+    const goalEl = document.getElementById('student-detail-goal');
+    const sessionEl = document.getElementById('student-detail-session');
+    const totalSessionsEl = document.getElementById('student-detail-total-sessions');
+    const totalMinutesEl = document.getElementById('student-detail-total-minutes');
+    const storyProgressEl = document.getElementById('student-detail-story-progress');
+    if (!titleEl || !subtitleEl || !notesEl || !goalEl || !sessionEl || !totalSessionsEl || !totalMinutesEl || !storyProgressEl) return;
+
+    const student = studentsCache.find(item => item.id === activeStudentId);
+    if (!student) {
+        titleEl.textContent = 'Ogrenci secilmedi';
+        subtitleEl.textContent = 'Bir ogrenci sectiginde son hedefler ve oturum ozeti burada gorunur.';
+        notesEl.textContent = 'Henuz destek notu eklenmedi.';
+        goalEl.textContent = 'Henuz kayitli hedef yok.';
+        sessionEl.textContent = 'Henuz kayitli oturum yok.';
+        totalSessionsEl.textContent = '0';
+        totalMinutesEl.textContent = '0 dk';
+        storyProgressEl.textContent = '-';
+        return;
+    }
+
+    titleEl.textContent = student.full_name || 'Isimsiz ogrenci';
+    subtitleEl.textContent = student.birth_year
+        ? `Dogum yili ${student.birth_year}. Secili ogrenci icin en guncel hedef ve oturum ozeti burada.`
+        : 'Secili ogrenci icin en guncel hedef ve oturum ozeti burada.';
+    notesEl.textContent = student.support_notes || 'Henuz destek notu eklenmedi.';
+
+    const userId = await getCurrentUserId();
+    const [latestGoal, metrics] = await Promise.all([
+        loadLatestGoalForStudent(userId, student.id),
+        loadStudentDetailMetrics(userId, student.id)
+    ]);
+
+    goalEl.textContent = latestGoal
+        ? `${latestGoal.goal_text} (${new Date(latestGoal.created_at).toLocaleDateString('tr-TR')})`
+        : 'Henuz kayitli hedef yok.';
+
+    if (metrics.latestSession) {
+        const sessionDate = new Date(metrics.latestSession.created_at).toLocaleDateString('tr-TR');
+        sessionEl.textContent = `${sessionDate} tarihinde ${metrics.latestSession.duration_min || 0} dk, ${metrics.latestSession.total_turns || 0} yanit`;
+        storyProgressEl.textContent = metrics.latestSession.story_completed ? 'Tamamlandi' : (metrics.latestSession.story_pct || '-');
+    } else {
+        sessionEl.textContent = 'Henuz kayitli oturum yok.';
+        storyProgressEl.textContent = '-';
+    }
+
+    totalSessionsEl.textContent = String(metrics.totalSessions);
+    totalMinutesEl.textContent = `${metrics.totalMinutes} dk`;
+}
+
 function renderStudentList() {
     const listEl = document.getElementById('studentList');
     const statusEl = document.getElementById('studentStatus');
@@ -641,6 +783,7 @@ function renderStudentList() {
         </button>
     `).join('');
     renderRoleDashboard();
+    renderStudentDetailPanel();
 }
 
 async function loadStudentsForCurrentUser() {
@@ -700,6 +843,7 @@ async function selectStudent(studentId) {
     if (storageKey) localStorage.setItem(storageKey, student.id);
     renderStudentList();
     loadParentGoal();
+    renderStudentDetailPanel();
     showOnly('menu-screen');
 }
 
@@ -802,6 +946,7 @@ async function updateStudent() {
 
     statusEl.textContent = 'Ogrenci bilgileri guncellendi.';
     await ensureActiveStudent();
+    await renderStudentDetailPanel();
 }
 
 function buildSessionSnapshot(userId, durationMin, totalMic, storyPct, totalTurns) {
