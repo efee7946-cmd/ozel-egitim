@@ -2,8 +2,8 @@ const { test, expect } = require('@playwright/test');
 
 test.describe('Yıldız Can AI App Tests', () => {
 
-  test('should load the start screen and allow guest login simulation', async ({ page }) => {
-    await page.goto('http://127.0.0.1:3000');
+  test('should load the start screen and allow guest login simulation', async ({ page }, testInfo) => {
+    await page.goto('/');
 
     // Check if the title is correct
     await expect(page).toHaveTitle(/Yıldız Sınıfı/);
@@ -17,7 +17,7 @@ test.describe('Yıldız Can AI App Tests', () => {
     await expect(mainTitle).toHaveText('Hoş Geldin!');
 
     // Take a screenshot of the start screen
-    await page.screenshot({ path: 'screenshot_start_screen.png' });
+    await page.screenshot({ path: testInfo.outputPath('start-screen.png') });
 
     // Test that the app start works despite global variable scope issues by letting UI buttons do the work if we can,
     // or by overriding variables correctly inside the evaluate function.
@@ -32,7 +32,7 @@ test.describe('Yıldız Can AI App Tests', () => {
     await expect(menuScreen).toBeVisible();
 
     // Take a screenshot of the menu screen
-    await page.screenshot({ path: 'screenshot_menu_screen.png' });
+    await page.screenshot({ path: testInfo.outputPath('menu-screen.png') });
 
     // Verify greeting contains "Test Çocuğu"
     const greeting = page.locator('#menu-greeting');
@@ -45,7 +45,7 @@ test.describe('Yıldız Can AI App Tests', () => {
 
     const gameContainer = page.locator('#game-container');
     await expect(gameContainer).toBeVisible();
-    await page.screenshot({ path: 'screenshot_therapy_screen.png' });
+    await page.screenshot({ path: testInfo.outputPath('therapy-screen.png') });
 
     // Go back to menu
     await page.evaluate(() => {
@@ -59,7 +59,7 @@ test.describe('Yıldız Can AI App Tests', () => {
 
     const storySelectScreen = page.locator('#story-select-screen');
     await expect(storySelectScreen).toBeVisible();
-    await page.screenshot({ path: 'screenshot_story_select_screen.png' });
+    await page.screenshot({ path: testInfo.outputPath('story-select-screen.png') });
 
     // Select a story
     await page.evaluate(() => {
@@ -68,7 +68,7 @@ test.describe('Yıldız Can AI App Tests', () => {
 
     const storyScreen = page.locator('#story-screen');
     await expect(storyScreen).toBeVisible();
-    await page.screenshot({ path: 'screenshot_story_screen.png' });
+    await page.screenshot({ path: testInfo.outputPath('story-screen.png') });
 
   });
 });
