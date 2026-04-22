@@ -234,6 +234,40 @@ body {
 
 .menu-workspace-section {
     margin: 0 0 22px;
+    padding: 22px;
+    border-radius: 28px;
+    background: linear-gradient(180deg, #ffffff 0%, #f9fbff 100%);
+    border: 1px solid #dbe7f3;
+    box-shadow: 0 16px 30px rgba(34, 72, 122, 0.08);
+}
+
+.workspace-section-head {
+    margin: 0 0 18px;
+}
+
+.workspace-section-kicker {
+    display: inline-flex;
+    margin-bottom: 10px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: #e9f5f2;
+    color: #0f8a73;
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.workspace-section-head h3 {
+    margin: 0;
+    color: #1f3653;
+    font-size: 1.28rem;
+}
+
+.workspace-section-head p {
+    margin: 8px 0 0;
+    color: #6b7b93;
+    line-height: 1.6;
 }
 
 .onboarding-panel {

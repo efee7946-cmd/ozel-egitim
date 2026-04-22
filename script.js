@@ -472,11 +472,12 @@ function ensureStudentEnhancements() {
 
 function ensureMenuWorkspace() {
     const menuScreen = document.getElementById('menu-screen');
+    const menuHeader = document.querySelector('.menu-header');
     const onboardingPanel = document.getElementById('onboarding-panel');
     const goalBar = document.getElementById('parentGoalBar');
     const cards = document.querySelector('.menu-cards');
     const insights = document.querySelector('.menu-insights');
-    if (!menuScreen || !onboardingPanel || !goalBar || !cards || !insights) return;
+    if (!menuScreen || !menuHeader || !onboardingPanel || !goalBar || !cards || !insights) return;
 
     let nav = document.getElementById('menu-workspace-nav');
     if (!nav) {
@@ -499,6 +500,13 @@ function ensureMenuWorkspace() {
         overview.id = 'menu-overview-section';
         overview.className = 'menu-workspace-section';
         insights.parentNode.insertBefore(overview, insights);
+        overview.innerHTML = `
+            <div class="workspace-section-head">
+                <span class="workspace-section-kicker">Genel Bakis</span>
+                <h3>Bugunku genel durum</h3>
+                <p>Rolune ve secili ogrenciye gore hizli bir ozet gor.</p>
+            </div>
+        `;
         overview.appendChild(insights);
         overview.appendChild(onboardingPanel);
     }
@@ -508,6 +516,13 @@ function ensureMenuWorkspace() {
         goals.id = 'menu-goals-section';
         goals.className = 'menu-workspace-section';
         goalBar.parentNode.insertBefore(goals, goalBar);
+        goals.innerHTML = `
+            <div class="workspace-section-head">
+                <span class="workspace-section-kicker">Hedefler</span>
+                <h3>Bugunun hedefini netlestir</h3>
+                <p>Secili ogrenci icin odagi belirle ve oturumu buna gore yonet.</p>
+            </div>
+        `;
         goals.appendChild(goalBar);
     }
 
@@ -516,6 +531,13 @@ function ensureMenuWorkspace() {
         activities.id = 'menu-activities-section';
         activities.className = 'menu-workspace-section';
         cards.parentNode.insertBefore(activities, cards);
+        activities.innerHTML = `
+            <div class="workspace-section-head">
+                <span class="workspace-section-kicker">Oturumlar</span>
+                <h3>Calisma alanini sec</h3>
+                <p>Terapi, hikaye ve rapor akislari arasindan ihtiyacina uygun olani ac.</p>
+            </div>
+        `;
         activities.appendChild(cards);
     }
 
