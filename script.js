@@ -1632,225 +1632,210 @@ async function speakWithLipsync(text, onEnd, emotion = CharacterEmotion.NEUTRAL)
 
 const STORIES = {
     redhood: {
-        title: "Kırmızı Başlıklı Kız",
-        emoji: "🧺",
-        description: "Ormanda dikkatli seçimler yap ve güvenli yolu bul.",
+        title: "Yardim Istiyorum",
+        emoji: "??",
+        description: "Gercek hayatta yardim isteme, dogru kisiyi bulma ve net cumle kurma gorevi.",
         difficulty: "Kolay",
         ageRange: "5-6",
-        theme: "macera",
+        theme: "yardim",
         scenes: [
             {
                 id: 0,
-                emoji: "🏠",
-                bg: "linear-gradient(135deg, #ffecd2, #fcb69f)",
-                bgLabel: "Sıcak bir ev",
-                videoQuery: "cozy cottage kitchen sunlight children",
-                narration: "Bir varmış bir yokmuş... Kırmızı başlıklı güzel bir kız varmış! Annesi ona bir sepet hazırlamış. Sepette neler varmış sence?",
-                taskType: "speak",
-                taskText: "Sepette ne olduğunu söyle! 🧺",
-                micPrompt: "Sepette ne var sence?",
+                emoji: "??",
+                bg: "linear-gradient(135deg, #ffe29f, #ffa99f)",
+                bgLabel: "Sinif girisi",
+                videoQuery: "school hallway child teacher warm light",
+                narration: "Defterin yere dustu ve fermuarin sikisti. Ogretmenin yakininda. Simdi yardim istemen gerekiyor.",
+                taskType: "both",
+                taskText: "Yardim istemek icin en iyi cumleyi sec ya da soyle.",
+                micPrompt: "Yardim isterken ne soylersin?",
                 choices: [
-                    { text: "🍰 Pasta ve meyve!", next: 1, response: "Harika! Annesi çok güzel bir sepet hazırlamış." },
-                    { text: "🌸 Çiçekler ve bal!", next: 1, response: "Ne güzel düşündün! Büyükanne buna çok sevinir." },
-                    { text: "📚 Kitaplar!", next: 1, response: "Kitaplar çok düşünceli bir hediye olurdu!" }
+                    { text: "Ogretmenim, yardim eder misiniz?", next: 1, response: "Bu cok iyi bir baslangic. Nazik ve net bir sekilde yardim istedin." },
+                    { text: "Bunu yapamiyorum, bana yardim lazim.", next: 1, response: "Ihtiyacini soylemen cok degerli. Boylece karsindaki seni daha iyi anlar." },
+                    { text: "Bekleyip hicbir sey soylemem.", next: 1, response: "Sessiz kalmak zor gelebilir. Yardim istemek seni guclu yapar." }
                 ]
             },
             {
                 id: 1,
-                emoji: "🌲",
+                emoji: "??",
                 bg: "linear-gradient(135deg, #a8edea, #c8f7c5)",
-                bgLabel: "Geniş orman",
-                videoQuery: "magical green forest sunlight path flowers",
-                narration: "Kırmızı Başlıklı Kız ormana girdi. Karşısına güzel çiçekler çıktı. Sence ne yapmalı?",
+                bgLabel: "El kaldirma ani",
+                videoQuery: "classroom child raising hand teacher smiling",
+                narration: "Ogretmen baska biriyle konusuyor. Yardim istemek istiyorsun ama sirani da beklemen gerekiyor.",
                 taskType: "choice",
-                taskText: "Sence doğru seçim hangisi?",
+                taskText: "Simdi hangi davranis daha uygun?",
                 choices: [
-                    { text: "💐 Çiçek toplamak için yoldan çıksın", next: 2, response: "Dikkatli olmalı! Yoldan çıkmak riskli olabilir." },
-                    { text: "🚶 Yolda kalmaya devam etsin", next: 2, response: "Çok akıllıca! Güvenli yolda kalmak daha doğru." }
+                    { text: "Elimi kaldirip ogretmenin bana donmesini beklerim.", next: 2, response: "Harika. Bu hem seni gorunur yapar hem de sirayi korur." },
+                    { text: "Ogretmenin sozunu keserim.", next: 2, response: "Acil hissettirebilir ama sirayi bozmak karsindakini sasirtabilir." },
+                    { text: "Arkadasima bagirarak yardim isterim.", next: 2, response: "Bagirmak bazen karisiklik yaratir. Daha sakin bir yol bulabiliriz." }
                 ]
             },
             {
                 id: 2,
-                emoji: "🐺",
+                emoji: "???",
                 bg: "linear-gradient(135deg, #667eea, #764ba2)",
-                bgLabel: "Ormanın içi",
-                videoQuery: "mysterious dark forest trees fog",
-                narration: "Karşısına bir kurt çıktı ve büyükannenin evini sordu. Sen olsaydın ne yapardın?",
+                bgLabel: "Net cumle kurma",
+                videoQuery: "child speaking calmly in classroom support",
+                narration: "Ogretmenin sana dondu. Simdi yardimi tam olarak ne icin istedigini soylemelisin.",
                 taskType: "both",
-                taskText: "Kurt ile konuşulur mu? Seç ya da söyle!",
-                micPrompt: "Sen olsaydın kurda ne derdin?",
+                taskText: "Ihtiyacini acik bir cumleyle anlat.",
+                micPrompt: "Neye yardim lazim oldugunu soyle.",
                 choices: [
-                    { text: "🏃 Uzaklaşırdım", next: 3, response: "Akıllıca! Yabancılara dikkat etmek önemli." },
-                    { text: "🤐 Sessiz kalırdım", next: 3, response: "Bazen sessiz kalmak en güvenli seçimdir." },
-                    { text: "📢 Yardım isterdim", next: 3, response: "Çok cesur! Yardım istemek iyi bir fikirdir." }
+                    { text: "Defterimin fermuari sikisti, acar misiniz?", next: 3, response: "Mukemmel. Sorunu da ne istedigini de acikca soyledin." },
+                    { text: "Bir sey oldu...", next: 3, response: "Baslamak iyi ama biraz daha net olursan yardim daha kolay gelir." },
+                    { text: "Ben yapamam!", next: 3, response: "Duygunu anlattin, simdi bir adim daha atip nasil yardim istedigini soyleyebilirsin." }
                 ]
             },
             {
                 id: 3,
-                emoji: "🏡",
+                emoji: "??",
                 bg: "linear-gradient(135deg, #f093fb, #f5576c)",
-                bgLabel: "Büyükannenin evi",
-                videoQuery: "small cottage house door garden autumn",
-                narration: "Büyükannenin evinden garip bir ses geldi. İçeride kim olabilir sence?",
-                taskType: "speak",
-                taskText: "İçeride kimin olduğunu tahmin et!",
-                micPrompt: "Sence içeride kim var?",
+                bgLabel: "Rahatlama ani",
+                videoQuery: "child feeling relieved after help classroom",
+                narration: "Ogretmenin yardim etti. Simdi tesekkur ederek durumu kapatabilirsin.",
+                taskType: "choice",
+                taskText: "Hangi kapanis cumlesi daha uygun?",
                 choices: [
-                    { text: "😨 Kurt olabilir!", next: 4, response: "Evet, ses gerçekten biraz şüpheli geliyor." },
-                    { text: "👵 Büyükanne olabilir", next: 4, response: "Olabilir ama yine de dikkatli olmak gerekir." }
-                ]
-            },
-            {
-                id: 4,
-                emoji: "🎉",
-                bg: "linear-gradient(135deg, #43e97b, #38f9d7)",
-                bgLabel: "Mutlu son",
-                videoQuery: "happy children celebrating confetti colorful",
-                narration: "Neyse ki sonunda herkes kurtuldu ve mutlu bir gün geçirdi. En sevdiğin bölüm hangisiydi?",
-                taskType: "both",
-                taskText: "En sevdiğin kısmı anlat! 🎉",
-                micPrompt: "En sevdiğin bölümü söyle!",
-                choices: [
-                    { text: "🐺 Kurt sahnesi!", next: -1, response: "Biraz heyecanlıydı ama çok öğreticiydi." },
-                    { text: "🏡 Büyükannenin evi!", next: -1, response: "O sahne gerçekten çok merak uyandırıcıydı." },
-                    { text: "🎉 Mutlu son!", next: -1, response: "Mutlu son her zaman çok güzeldir!" }
+                    { text: "Tesekkur ederim ogretmenim.", next: -1, response: "Harika kapanis. Hem nazik hem kendinden emin." },
+                    { text: "Tamam oldu.", next: -1, response: "Ise yarar ama tesekkur etmek iliskiyi daha guclu hale getirir." }
                 ]
             }
         ]
     },
     piggies: {
-        title: "Üç Küçük Domuz",
-        emoji: "🐷",
-        description: "Evini akıllıca kur, plan yap ve fırtınaya hazırlan.",
+        title: "Sirami Bekliyorum",
+        emoji: "?",
+        description: "Bekleme, siraya uyma ve heyecanlaninca sakin kalma gorevi.",
         difficulty: "Kolay",
         ageRange: "5-6",
-        theme: "dostluk",
+        theme: "bekleme",
         scenes: [
             {
                 id: 0,
-                emoji: "🌤️",
+                emoji: "??",
                 bg: "linear-gradient(135deg, #fff1c1, #ffd5a0)",
-                bgLabel: "Yeni bir sabah",
-                videoQuery: "happy piglet meadow storybook",
-                narration: "Üç küçük domuz kendi evlerini yapmaya karar verdi. Sence ilk domuz hangi malzemeyi seçmeli?",
+                bgLabel: "Park sirasi",
+                videoQuery: "playground children waiting slide sunny day",
+                narration: "Parkta kaydirak icin sira var. Sen de cok heyecanlisin ama once beklemen gerekiyor.",
                 taskType: "choice",
-                taskText: "İlk evi seç!",
+                taskText: "Beklerken ilk ne yapmak daha iyi olur?",
                 choices: [
-                    { text: "🌾 Saman", next: 1, response: "Saman hızlı olur ama biraz zayıf olabilir." },
-                    { text: "🪵 Tahta", next: 1, response: "Tahta biraz daha sağlam bir seçim gibi." },
-                    { text: "🧱 Tuğla", next: 1, response: "Tuğla çok sağlamdır ama biraz zaman ister." }
+                    { text: "Ayaklarimi yerde tutup derin nefes alirim.", next: 1, response: "Bu cok iyi bir baslangic. Bedenin sakinlesince beklemek kolaylasir." },
+                    { text: "Hemen one gecmeye calisirim.", next: 1, response: "Bu seni hizlandirir gibi gorunur ama diger cocuklarla sorun yaratabilir." },
+                    { text: "Ofkelenip siradan cikarim.", next: 1, response: "Zorlandigini anliyorum. Simdi daha guvenli bir bekleme yolu bulalim." }
                 ]
             },
             {
                 id: 1,
-                emoji: "🏗️",
+                emoji: "??",
                 bg: "linear-gradient(135deg, #d4fc79, #96e6a1)",
-                bgLabel: "Ev yapımı",
-                videoQuery: "children building house teamwork story",
-                narration: "İkinci domuz kardeşine yardım etmek istiyor. Sence birlikte çalışmak neden iyi olabilir?",
+                bgLabel: "Beklerken odak",
+                videoQuery: "child waiting calmly playground observing turn",
+                narration: "Sira beklerken ellerin ve gozlerin ne yapacak? Bunlar da beklemeyi kolaylastirir.",
                 taskType: "speak",
-                taskText: "Birlikte çalışmanın faydasını söyle!",
-                micPrompt: "Birlikte çalışınca ne olur?",
+                taskText: "Beklerken kendine hangi sakin gorevi verebilirsin?",
+                micPrompt: "Beklerken ne yaparsin?",
                 choices: [
-                    { text: "🤝 Daha hızlı biter", next: 2, response: "Evet, birlikte olunca işler daha kolay olur." },
-                    { text: "💪 Ev daha sağlam olur", next: 2, response: "Harika! Güçler birleşince sonuç daha iyi olur." }
+                    { text: "Icerimden bire kadar sayarim.", next: 2, response: "Saymak cok iyi bir bekleme aracidir." },
+                    { text: "Onumdeki cocugu izlerim ve sirami takip ederim.", next: 2, response: "Harika. Sirani takip etmek ne zaman hareket edecegini anlamani saglar." }
                 ]
             },
             {
                 id: 2,
-                emoji: "🌬️",
+                emoji: "??",
                 bg: "linear-gradient(135deg, #89f7fe, #66a6ff)",
-                bgLabel: "Rüzgarlı gün",
-                videoQuery: "windy day cottage storybook",
-                narration: "Kurt geldi ve üflemeye başladı. Sence hangi ev dayanır?",
+                bgLabel: "Siran geldi",
+                videoQuery: "playground children taking turns smiling",
+                narration: "Sira sana geldi ama arkandaki cocuk da sabirsiz. Simdi hem kendi siranin tadini cikarip hem de baskasina saygi gostermen gerekiyor.",
                 taskType: "choice",
-                taskText: "En sağlam evi seç!",
+                taskText: "Hangi davranis en dengeli olur?",
                 choices: [
-                    { text: "🌾 Saman ev", next: 3, response: "Saman ev kolayca dağılabilir." },
-                    { text: "🧱 Tuğla ev", next: 3, response: "Doğru! Tuğla ev çok daha sağlam olur." }
+                    { text: "Bir kere kayip sonra arkadaki cocuga alan acmak.", next: 3, response: "Bu cok dengeli bir secim. Hem sen oynadin hem sira akisini korudun." },
+                    { text: "Uzun sure ayrilmadan kalmak.", next: 3, response: "Eglenceli gelebilir ama baskalarinin sirasini uzatir." }
                 ]
             },
             {
                 id: 3,
-                emoji: "🏠",
+                emoji: "?",
                 bg: "linear-gradient(135deg, #cfd9df, #e2ebf0)",
-                bgLabel: "Güvenli ev",
-                videoQuery: "cozy brick house family safe",
-                narration: "Domuzlar tuğla evde güvende kaldı. Bu hikayenin verdiği en önemli ders ne olabilir?",
+                bgLabel: "Bekleme tamam",
+                videoQuery: "child proud after waiting turn playground",
+                narration: "Bekledin, sirani kullandin ve baskalarina da alan actin. Simdi bu beceriyi baska nerede kullanabilecegini dusun.",
                 taskType: "both",
-                taskText: "Dersi anlat! 🏠",
-                micPrompt: "Sence bu hikaye bize ne öğretiyor?",
+                taskText: "Sira beklemeyi baska hangi yerde kullanirsin?",
+                micPrompt: "Sira beklemeyi nerede kullanirsin?",
                 choices: [
-                    { text: "🧠 Plan yapmak önemli", next: -1, response: "Evet! Acele etmeden düşünmek çok önemli." },
-                    { text: "🤝 Kardeşler birlikte olmalı", next: -1, response: "Ne güzel! Birlikte olmak insana güç verir." }
+                    { text: "Yemek sirasinda.", next: -1, response: "Evet. Sira bekleme yemekte de cok ise yarar." },
+                    { text: "Sinifta ogretmenle konusurken.", next: -1, response: "Harika. Sinifta da sirayi takip etmek herkesin rahat etmesini saglar." }
                 ]
             }
         ]
     },
     moonseed: {
-        title: "Ay Tohumu Bahçesi",
-        emoji: "🌙",
-        description: "Ay ışığında parlayan bir tohumla hayal gücü dolu bir macera yaşa.",
+        title: "Paylasiyorum ve Konusuyorum",
+        emoji: "??",
+        description: "Oyuncak paylasma, arkadasa donup konusma ve birlikte oyun kurma gorevi.",
         difficulty: "Orta",
         ageRange: "7-8",
-        theme: "hayal-gucu",
+        theme: "iletisim",
         scenes: [
             {
                 id: 0,
-                emoji: "🌌",
+                emoji: "??",
                 bg: "linear-gradient(135deg, #1f2a63, #6a5acd)",
-                bgLabel: "Gece bahçesi",
-                videoQuery: "fantasy garden moonlight children",
-                narration: "Efe gece bahçede parlayan bir tohum buldu. Sence bu tohumdan ne çıkabilir?",
+                bgLabel: "Oyun kosesi",
+                videoQuery: "children playing with toys classroom sharing",
+                narration: "Sen bloklarla oynuyorsun. Yanindaki cocuk da ayni bloklari istiyor ve sana bakiyor.",
                 taskType: "both",
-                taskText: "Hayal gücünü kullan ve söyle!",
-                micPrompt: "Bu tohumdan ne çıkabilir sence?",
+                taskText: "Oyunu bozmadan nasil cevap verirsin?",
+                micPrompt: "Arkadasina ne soylersin?",
                 choices: [
-                    { text: "🌠 Işık saçan bir ağaç", next: 1, response: "Harika bir fikir! Bahçe ışıl ışıl olurdu." },
-                    { text: "🦋 Uçan çiçekler", next: 1, response: "Ne kadar yaratıcı! Bahçe rengarenk olurdu." }
+                    { text: "Birazdan sana da vereyim, once kulemi bitireyim.", next: 1, response: "Bu harika bir paylasma dili. Hem kendini anlattin hem cozum sundun." },
+                    { text: "Hayir, vermem!", next: 1, response: "Duygunu anliyorum ama daha yumusak bir yol kurabiliriz." },
+                    { text: "Gel birlikte yapalim.", next: 1, response: "Cok guzel bir ortak oyun daveti sundun." }
                 ]
             },
             {
                 id: 1,
-                emoji: "💧",
+                emoji: "??",
                 bg: "linear-gradient(135deg, #89f7fe, #66a6ff)",
-                bgLabel: "Sihirli sulama",
-                videoQuery: "watering magical plant child",
-                narration: "Tohumun büyümesi için doğru şeyi seçmek gerekiyor. Sence ona ne vermeli?",
+                bgLabel: "Konusma kurma",
+                videoQuery: "children talking together toy negotiation",
+                narration: "Arkadasin biraz uzuldu. Simdi onun da kendini iyi hissetmesi icin bir cumle daha ekleyebilirsin.",
                 taskType: "choice",
-                taskText: "Tohum nasıl büyüsün?",
+                taskText: "Hangi ek cumle daha iyi gelir?",
                 choices: [
-                    { text: "💧 Ay damlası suyu", next: 2, response: "Evet, sihirli bir tohum sihirli su ister!" },
-                    { text: "🎵 Güzel bir şarkı", next: 2, response: "Şarkılar da büyümeye cesaret verebilir." }
+                    { text: "Sen de istersen mavi bloklari secebilirsin.", next: 2, response: "Secenek sunman cok iyi. Oyun beraber devam edebilir." },
+                    { text: "Biraz beklemek zor olabilir biliyorum.", next: 2, response: "Bu cumle empati kuruyor. Karsindaki anlasildigini hisseder." }
                 ]
             },
             {
                 id: 2,
-                emoji: "🚀",
+                emoji: "??",
                 bg: "linear-gradient(135deg, #c471ed, #f64f59)",
-                bgLabel: "Gökyüzü yolu",
-                videoQuery: "child imaginary sky bridge stars",
-                narration: "Tohum büyüdü ve gökyüzüne uzanan bir yol açtı. Efe sence yukarı çıkmalı mı?",
+                bgLabel: "Paylasma ani",
+                videoQuery: "two children sharing blocks smiling teamwork",
+                narration: "Kulen bitti. Simdi paylasma zamani. Oyunun devam etmesi icin ne yaparsin?",
                 taskType: "choice",
-                taskText: "Yukarı çıkmak güvenli mi?",
+                taskText: "En guclu paylasma davranisini sec.",
                 choices: [
-                    { text: "🪢 Önce hazırlık yapmalı", next: 3, response: "Doğru! Macera öncesi hazırlık çok önemlidir." },
-                    { text: "✨ Hemen çıkmalı", next: 3, response: "Heyecanlı olurdu ama biraz hazırlık daha iyi olur." }
+                    { text: "Sari bloklari sana vereyim, birlikte kopru yapalim.", next: 3, response: "Mukemmel. Hem paylastin hem ortak oyun kurdun." },
+                    { text: "Hepsini birden verip oyundan cikayim.", next: 3, response: "Paylasmak guzel ama oyunda kalman da onemli. Denge kurabiliriz." }
                 ]
             },
             {
                 id: 3,
-                emoji: "🌟",
+                emoji: "??",
                 bg: "linear-gradient(135deg, #43cea2, #185a9d)",
-                bgLabel: "Yıldız serası",
-                videoQuery: "fantasy greenhouse stars children",
-                narration: "Yukarıda yıldızlardan yapılmış bir sera vardı. Efe oradan ne öğrenmiş olabilir?",
+                bgLabel: "Ortak oyun",
+                videoQuery: "children celebrating finished block tower teamwork",
+                narration: "Artik ikiniz de oyundasiniz. Simdi bu guzel oyunu bitirirken nasil bir kapanis yaparsin?",
                 taskType: "speak",
-                taskText: "Efe'nin ne öğrendiğini söyle!",
-                micPrompt: "Sence Efe ne öğrendi?",
+                taskText: "Arkadasina oyun sonunda ne soylemek istersin?",
+                micPrompt: "Oyun sonunda ne dersin?",
                 choices: [
-                    { text: "🌱 Sabırla büyümeyi", next: -1, response: "Evet! Güzel şeyler biraz zaman ister." },
-                    { text: "💡 Hayal kurmayı", next: -1, response: "Harika! Hayal kurmak yeni yollar açar." }
+                    { text: "Beraber yapmak guzeldi.", next: -1, response: "Bu sicak bir kapanis. Arkadaslik icin cok iyi." },
+                    { text: "Yarin yine oynayalim.", next: -1, response: "Harika. Gelecek oyuna kapi acan cok guzel bir cumle." }
                 ]
             }
         ]
@@ -1904,9 +1889,9 @@ function restoreStorySideMarkup() {
 }
 
 function getStoryThemeLabel(theme) {
-    if (theme === 'macera') return 'Macera';
-    if (theme === 'dostluk') return 'Dostluk';
-    if (theme === 'hayal-gucu') return 'Hayal Gücü';
+    if (theme === 'yardim') return 'Yardim Isteme';
+    if (theme === 'bekleme') return 'Sira Bekleme';
+    if (theme === 'iletisim') return 'Paylasma';
     return theme;
 }
 
@@ -2567,6 +2552,7 @@ window.changeHistoryMonth = changeHistoryMonth;
 window.updateStoryFilters = updateStoryFilters;
 window.resumeSavedStory = resumeSavedStory;
 window.restartSavedStory = restartSavedStory;
+
 
 
 
