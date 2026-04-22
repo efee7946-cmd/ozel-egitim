@@ -324,6 +324,7 @@ supabaseClient.auth.onAuthStateChange(function(event, session) {
 document.addEventListener('DOMContentLoaded', initializeAuth);
 window.addEventListener('pagehide', persistSessionSnapshot);
 document.addEventListener('DOMContentLoaded', function() {
+    ensureStudentEnhancements();
     const side = document.querySelector('.story-side');
     if (side) defaultStorySideMarkup = side.innerHTML;
     renderStoryLibrary();
@@ -423,6 +424,103 @@ function setActiveStudent(student) {
     activeStudentName = student && student.full_name ? student.full_name : '';
     if (activeStudentName) childName = activeStudentName;
     updateMenuIdentity();
+    syncStudentForm(student);
+    renderRoleDashboard();
+}
+
+function ensureStudentEnhancements() {
+    const createBtn = document.getElementById('createStudentBtn');
+    const existingUpdateBtn = document.getElementById('updateStudentBtn');
+    if (createBtn && !existingUpdateBtn) {
+        const updateBtn = document.createElement('button');
+        updateBtn.type = 'button';
+        updateBtn.id = 'updateStudentBtn';
+        updateBtn.className = 'menu-ghost-btn student-secondary-btn';
+        updateBtn.textContent = 'Bilgileri Guncelle';
+        updateBtn.style.display = 'none';
+        updateBtn.onclick = updateStudent;
+        createBtn.insertAdjacentElement('afterend', updateBtn);
+    }
+
+    const menuHeader = document.querySelector('.menu-header');
+    if (menuHeader && !document.querySelector('.menu-insights')) {
+        const insights = document.createElement('div');
+        insights.className = 'menu-insights';
+        insights.innerHTML = `
+            <div class="menu-insight-card">
+                <span class="menu-insight-label">Panel Modu</span>
+                <strong id="role-mode-title">Veli Paneli</strong>
+                <p id="role-mode-copy">Secili ogrencinin hedeflerini belirleyip oturumlari takip edebilirsin.</p>
+            </div>
+            <div class="menu-insight-card">
+                <span class="menu-insight-label">Ogrenci Ozeti</span>
+                <strong id="student-summary-name">Henuz secilmedi</strong>
+                <p id="student-summary-copy">Ogrenci secince notlari ve temel bilgileri burada goreceksin.</p>
+            </div>
+            <div class="menu-insight-card">
+                <span class="menu-insight-label">Toplam Ogrenci</span>
+                <strong id="student-count-value">0</strong>
+                <p id="student-count-copy">Bu hesap icin takip edilen aktif ogrenci sayisi.</p>
+            </div>
+        `;
+        menuHeader.insertAdjacentElement('afterend', insights);
+    }
+}
+
+function syncStudentForm(student) {
+    const nameEl = document.getElementById('studentNameInput');
+    const yearEl = document.getElementById('studentBirthYearInput');
+    const notesEl = document.getElementById('studentNotesInput');
+    const updateBtn = document.getElementById('updateStudentBtn');
+    if (!nameEl || !yearEl || !notesEl) return;
+
+    if (!student) {
+        nameEl.value = '';
+        yearEl.value = '';
+        notesEl.value = '';
+        if (updateBtn) updateBtn.style.display = 'none';
+        return;
+    }
+
+    nameEl.value = student.full_name || '';
+    yearEl.value = student.birth_year || '';
+    notesEl.value = student.support_notes || '';
+    if (updateBtn) updateBtn.style.display = 'inline-flex';
+}
+
+function renderRoleDashboard() {
+    const roleTitleEl = document.getElementById('role-mode-title');
+    const roleCopyEl = document.getElementById('role-mode-copy');
+    const studentSummaryNameEl = document.getElementById('student-summary-name');
+    const studentSummaryCopyEl = document.getElementById('student-summary-copy');
+    const studentCountEl = document.getElementById('student-count-value');
+    const studentCountCopyEl = document.getElementById('student-count-copy');
+    const student = studentsCache.find(item => item.id === activeStudentId);
+
+    if (roleTitleEl) roleTitleEl.textContent = currentUserRole === 'specialist' ? 'Uzman Paneli' : 'Veli Paneli';
+    if (roleCopyEl) {
+        roleCopyEl.textContent = currentUserRole === 'specialist'
+            ? 'Birden fazla ogrenciyi takip edip secili ogrenci icin seanslari yonetebilirsin.'
+            : 'Secili ogrencinin hedeflerini belirleyip gelisimini tek panelden izleyebilirsin.';
+    }
+
+    if (studentSummaryNameEl) studentSummaryNameEl.textContent = activeStudentName || 'Henuz secilmedi';
+    if (studentSummaryCopyEl) {
+        if (student) {
+            const note = student.support_notes ? student.support_notes : 'Destek notu henuz eklenmedi.';
+            const yearText = student.birth_year ? `Dogum yili: ${student.birth_year}. ` : '';
+            studentSummaryCopyEl.textContent = `${yearText}${note}`;
+        } else {
+            studentSummaryCopyEl.textContent = 'Ogrenci secince notlari ve temel bilgileri burada goreceksin.';
+        }
+    }
+
+    if (studentCountEl) studentCountEl.textContent = String(studentsCache.length);
+    if (studentCountCopyEl) {
+        studentCountCopyEl.textContent = currentUserRole === 'specialist'
+            ? 'Bu uzman hesabina bagli aktif ogrenci sayisi.'
+            : 'Bu veli hesabinda takip edilen aktif ogrenci sayisi.';
+    }
 }
 
 function renderStudentList() {
@@ -444,6 +542,7 @@ function renderStudentList() {
             <span class="student-card-meta">${student.birth_year ? `Doğum yılı: ${student.birth_year}` : 'Doğum yılı girilmedi'}</span>
         </button>
     `).join('');
+    renderRoleDashboard();
 }
 
 async function loadStudentsForCurrentUser() {
@@ -562,6 +661,49 @@ async function createStudent() {
 async function openStudentSetup() {
     await ensureActiveStudent();
     showOnly('student-setup-screen');
+}
+
+async function updateStudent() {
+    if (!activeStudentId) return;
+
+    const nameEl = document.getElementById('studentNameInput');
+    const yearEl = document.getElementById('studentBirthYearInput');
+    const notesEl = document.getElementById('studentNotesInput');
+    const statusEl = document.getElementById('studentStatus');
+    const updateBtn = document.getElementById('updateStudentBtn');
+    if (!nameEl || !yearEl || !notesEl || !statusEl || !updateBtn) return;
+
+    const fullName = nameEl.value.trim();
+    const birthYearRaw = yearEl.value.trim();
+    const supportNotes = notesEl.value.trim();
+    if (!fullName) {
+        statusEl.textContent = 'Guncelleme icin ogrenci adi zorunlu.';
+        return;
+    }
+
+    updateBtn.disabled = true;
+    statusEl.textContent = 'Ogrenci bilgileri guncelleniyor...';
+    const birthYear = birthYearRaw ? Number(birthYearRaw) : null;
+
+    const { error } = await supabaseClient
+        .from('students')
+        .update({
+            full_name: fullName,
+            birth_year: Number.isFinite(birthYear) ? birthYear : null,
+            support_notes: supportNotes,
+            updated_at: new Date().toISOString()
+        })
+        .eq('id', activeStudentId);
+
+    updateBtn.disabled = false;
+    if (error) {
+        console.error('Ogrenci guncellenemedi:', error);
+        statusEl.textContent = 'Ogrenci bilgileri guncellenemedi. Lutfen tekrar dene.';
+        return;
+    }
+
+    statusEl.textContent = 'Ogrenci bilgileri guncellendi.';
+    await ensureActiveStudent();
 }
 
 function buildSessionSnapshot(userId, durationMin, totalMic, storyPct, totalTurns) {
@@ -2111,6 +2253,7 @@ window.logout = logout;
 window.openOnboarding = openOnboarding;
 window.openStudentSetup = openStudentSetup;
 window.createStudent = createStudent;
+window.updateStudent = updateStudent;
 window.selectStudent = selectStudent;
 window.changeHistoryMonth = changeHistoryMonth;
 window.updateStoryFilters = updateStoryFilters;

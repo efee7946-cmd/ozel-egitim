@@ -164,6 +164,43 @@ body {
 .menu-header h2 { margin: 0; font-size: 1.8rem; color: #333; }
 .menu-subtitle { margin: 5px 0 0; color: #888; font-size: 1rem; }
 
+.menu-insights {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    margin: 0 0 24px;
+}
+
+.menu-insight-card {
+    padding: 18px 20px;
+    border-radius: 22px;
+    border: 1px solid #dbe7f3;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+}
+
+.menu-insight-label {
+    display: inline-block;
+    margin-bottom: 8px;
+    color: #6b7b93;
+    font-size: 0.74rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.menu-insight-card strong {
+    display: block;
+    color: #1f3653;
+    font-size: 1.05rem;
+}
+
+.menu-insight-card p {
+    margin: 8px 0 0;
+    color: #6b7b93;
+    line-height: 1.55;
+    font-size: 0.9rem;
+}
+
 .onboarding-panel {
     position: relative;
     z-index: 2;
@@ -1306,6 +1343,7 @@ video { width: 100%; height: 100%; object-fit: cover; }
     .menu-topbar-actions { width: 100%; flex-direction: column; }
     .menu-ghost-btn, .menu-cta-btn { width: 100%; }
     .menu-header { flex-direction: column; text-align: center; }
+    .menu-insights { grid-template-columns: 1fr; }
     .menu-cards { flex-direction: column; }
     .parent-goal-bar { flex-direction: column; align-items: stretch; }
     .menu-card { padding: 22px 16px; }
@@ -1693,6 +1731,16 @@ video { width: 100%; height: 100%; object-fit: cover; }
     padding: 22px;
 }
 
+.student-form-actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.student-secondary-btn {
+    margin-top: 8px;
+}
+
 .student-form-grid {
     display: grid;
     grid-template-columns: 1.5fr 1fr;
@@ -1899,6 +1947,11 @@ video { width: 100%; height: 100%; object-fit: cover; }
 
     .student-form-grid {
         grid-template-columns: 1fr;
+    }
+
+    .student-form-actions {
+        flex-direction: column;
+        align-items: stretch;
     }
 
     .btn-primary-gradient {
