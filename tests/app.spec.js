@@ -47,7 +47,7 @@ test.describe('Yıldız Can AI App Tests', () => {
     const gameContainer = page.locator('#game-container');
     await expect(gameContainer).toBeVisible();
     await expect(page.locator('#qBar')).not.toHaveText('Hazırlanıyorum...');
-    await expect(page.locator('#info')).not.toHaveText('Video yükleniyor...');
+    await expect(page.locator('#chat-bubbles .ai-bubble').first()).toBeVisible();
     await page.screenshot({ path: testInfo.outputPath('therapy-screen.png') });
 
     // Go back to menu
