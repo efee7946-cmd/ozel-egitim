@@ -162,34 +162,53 @@
             <p>Şehirdeki binalardan birine tıklayınca o mekâna uygun sorular, videolar ve konuşma akışı açılır.</p>
         </div>
         <div class="city-scene" id="cityScene">
-            <button type="button" class="city-building city-home" onclick="openCityLocation('home')">
+            <div class="city-sun"></div>
+            <div class="city-cloud city-cloud-one"></div>
+            <div class="city-cloud city-cloud-two"></div>
+            <div class="city-skyline">
+                <span></span><span></span><span></span><span></span><span></span>
+            </div>
+            <div class="city-road city-road-main"></div>
+            <div class="city-road city-road-side"></div>
+            <button type="button" class="city-building city-home" data-location="home" onclick="focusCityLocation('home')">
                 <span class="city-building-icon">🏠</span>
                 <strong>Ev</strong>
                 <p>Rutinler ve günlük yaşam</p>
+                <span class="city-building-tag">Ev içi konuşma</span>
             </button>
-            <button type="button" class="city-building city-school" onclick="openCityLocation('school')">
+            <button type="button" class="city-building city-school" data-location="school" onclick="focusCityLocation('school')">
                 <span class="city-building-icon">🏫</span>
                 <strong>Okul</strong>
                 <p>Öğretmen, sınıf ve arkadaşlar</p>
+                <span class="city-building-tag">Sınıf dili</span>
             </button>
-            <button type="button" class="city-building city-market" onclick="openCityLocation('market')">
+            <button type="button" class="city-building city-market" data-location="market" onclick="focusCityLocation('market')">
                 <span class="city-building-icon">🏪</span>
                 <strong>Market</strong>
                 <p>İhtiyaç söyleme ve seçim yapma</p>
+                <span class="city-building-tag">Tercih ve rica</span>
             </button>
-            <button type="button" class="city-building city-park" onclick="openCityLocation('park')">
+            <button type="button" class="city-building city-park" data-location="park" onclick="focusCityLocation('park')">
                 <span class="city-building-icon">🌳</span>
                 <strong>Park</strong>
                 <p>Oyun, spor ve arkadaşlık</p>
+                <span class="city-building-tag">Oyun dili</span>
             </button>
-            <button type="button" class="city-building city-hospital" onclick="openCityLocation('hospital')">
+            <button type="button" class="city-building city-hospital" data-location="hospital" onclick="focusCityLocation('hospital')">
                 <span class="city-building-icon">🏥</span>
                 <strong>Hastane</strong>
                 <p>Duygu, beden ve yardım isteme</p>
+                <span class="city-building-tag">Duygu ve ihtiyaç</span>
             </button>
         </div>
+        <div class="city-focus-panel" id="cityFocusPanel">
+            <span class="city-focus-kicker" id="cityFocusKicker">Seçili alan</span>
+            <h4 id="cityFocusTitle">Okul</h4>
+            <p id="cityFocusDescription">Sınıf, öğretmen ve arkadaş iletişimi üzerinden konuşma pratiği.</p>
+            <div class="city-focus-goals" id="cityFocusGoals"></div>
+        </div>
         <div class="city-scene-actions">
-            <button type="button" class="menu-ghost-btn" onclick="openCityLocation('school')">Şehirden konuşmayı başlat</button>
+            <button type="button" class="menu-ghost-btn" id="cityStartBtn" onclick="startFocusedCityLocation()">Seçili alanı aç</button>
             <button type="button" class="menu-ghost-btn" onclick="goToReport()">Veli raporunu aç</button>
         </div>
     </div>
@@ -422,6 +441,13 @@
         <div class="report-section">
             <h3>📚 Gelişim Alanı Planı</h3>
             <div id="learningAreaPlan" class="learning-area-plan"></div>
+        </div>
+
+        <div class="report-section">
+            <h3>🏙️ Şehir Özeti</h3>
+            <div id="citySessionSummary" class="city-session-summary">
+                <p class="report-empty">Henüz şehir temelli terapi oturumu yapılmadı.</p>
+            </div>
         </div>
 
         <!-- Seçim Analizi -->

@@ -438,12 +438,14 @@ document.addEventListener('DOMContentLoaded', function() {
     if (side) defaultStorySideMarkup = side.innerHTML;
     renderStoryLibrary();
     renderStoryResumeCard();
+    renderCityScene();
 });
 
 function goToMenu() {
     window.speechSynthesis.cancel();
     clearTimeout(idleTimer);
     showOnly('menu-screen');
+    renderCityScene();
 }
 
 function goToTherapy() {
@@ -1533,6 +1535,50 @@ function renderReportHistory(history) {
     renderHistoryDetails(history, selectedHistoryDateKey);
 }
 
+function renderCitySessionSummary() {
+    const container = document.getElementById('citySessionSummary');
+    if (!container) return;
+
+    const turns = sessionData.therapyTurns || [];
+    if (!turns.length) {
+        container.innerHTML = '<p class="report-empty">Henüz şehir temelli terapi oturumu yapılmadı.</p>';
+        return;
+    }
+
+    const locationMap = new Map();
+    turns.forEach((turn) => {
+        const key = turn.location || 'Genel alan';
+        const current = locationMap.get(key) || { count: 0, categories: new Set(), sample: '' };
+        current.count += 1;
+        if (turn.category) current.categories.add(turn.category);
+        if (!current.sample && turn.question) current.sample = turn.question;
+        locationMap.set(key, current);
+    });
+
+    const sortedLocations = [...locationMap.entries()].sort((a, b) => b[1].count - a[1].count);
+    const topLocation = sortedLocations[0];
+
+    container.innerHTML = `
+        <div class="city-session-hero">
+            <div>
+                <span class="city-session-kicker">En yoğun alan</span>
+                <strong>${topLocation[0]}</strong>
+                <p>${topLocation[1].count} soru ile bu alan en çok çalışılan konuşma noktası oldu.</p>
+            </div>
+            <div class="city-session-meta">${sortedLocations.length} farklı mekân</div>
+        </div>
+        <div class="city-session-grid">
+            ${sortedLocations.map(([label, data]) => `
+                <article class="city-session-card">
+                    <h4>${label}</h4>
+                    <p>${data.count} soru • ${[...data.categories].join(', ') || 'Genel konuşma'}</p>
+                    <span>${data.sample || 'Bu alanda yeni sorular çalışıldı.'}</span>
+                </article>
+            `).join('')}
+        </div>
+    `;
+}
+
 async function changeHistoryMonth(offset) {
     historyCalendarMonth = historyCalendarMonth || new Date();
     historyCalendarMonth = new Date(historyCalendarMonth.getFullYear(), historyCalendarMonth.getMonth() + offset, 1);
@@ -1583,6 +1629,7 @@ async function goToReport() {
 
     const history = await persistSessionSnapshot();
     renderReportHistory(history);
+    renderCitySessionSummary();
 
     const learningAreaPlanEl = document.getElementById('learningAreaPlan');
     if (learningAreaPlanEl) {
@@ -1766,33 +1813,103 @@ const CITY_LOCATIONS = {
     home: {
         label: 'Ev',
         category: 'daily_life',
-        summary: 'Evdeki rutinler, ihtiyaçlar ve günlük yaşam konuşmaları.'
+        summary: 'Evdeki rutinler, ihtiyaçlar ve günlük yaşam konuşmaları.',
+        description: 'Ev içindeki rutinleri, aileyle iletişimi ve temel ihtiyaç cümlelerini çalışır.',
+        goals: ['rutin anlatma', 'yardım isteme', 'özbakım dili'],
+        questions: [
+            { q: "Sabah evde ilk olarak kiminle konuşursun?", query: "child morning at home with family", goal: "ev içi iletişimi anlatma" },
+            { q: "Karnın acıktığında evde ne söylersin?", query: "child asking for food at home", goal: "ihtiyaç ifade etme" },
+            { q: "Oyuncağını bulamazsan annenden ya da babandan nasıl yardım istersin?", query: "parent helping child find toy at home", goal: "yardım isteme cümlesi kurma" },
+            { q: "Akşam olunca evde en sevdiğin şey nedir?", query: "family evening at home child smiling", goal: "günlük yaşam tercihi anlatma" },
+            { q: "Yatmadan önce hangi hazırlıkları yaparsın?", query: "child bedtime routine brushing teeth", goal: "adım sıralama" },
+            { q: "Eve misafir gelince kapıda ne dersin?", query: "child greeting guest at home", goal: "nazik karşılama dili" },
+            { q: "Üşüdüğünde evde ne istersin?", query: "child asking for blanket at home", goal: "bedensel ihtiyacı söyleme" },
+            { q: "Birlikte yemek yerken senden bir şey uzatmanı isteseler ne dersin?", query: "family dinner child speaking politely", goal: "karşılıklı konuşma" },
+            { q: "Odanı toplarken hangi eşyayı yerine koyduğunu anlatır mısın?", query: "child organizing room toys books", goal: "eylem anlatma" },
+            { q: "Evde mutlu olduğun bir anı kısaca anlatır mısın?", query: "happy child home family moment", goal: "olay anlatma" }
+        ]
     },
     school: {
         label: 'Okul',
         category: 'social_communication',
-        summary: 'Öğretmen, arkadaş ve sınıf içi iletişim soruları.'
+        summary: 'Öğretmen, arkadaş ve sınıf içi iletişim soruları.',
+        description: 'Sınıf içinde kendini ifade etme, öğretmene cevap verme ve arkadaşlarla iletişim kurma çalışılır.',
+        goals: ['öğretmene cevap verme', 'arkadaşla konuşma', 'yardım isteme'],
+        questions: [
+            { q: "Sınıfa girince öğretmenine nasıl günaydın dersin?", query: "child greeting teacher classroom morning", goal: "selamlama" },
+            { q: "Öğretmen defterini açmanı isterse ne yaparsın?", query: "teacher giving instruction to child in classroom", goal: "yönerge anlatma" },
+            { q: "Dersi anlamadığında öğretmeninden nasıl yardım istersin?", query: "child asking teacher for help classroom", goal: "yardım isteme" },
+            { q: "Teneffüste arkadaşına oyuna katılmak için ne söylersin?", query: "children talking in schoolyard", goal: "oyuna katılma dili" },
+            { q: "Kalemini düşüren arkadaşına ne demek güzel olur?", query: "child helping classmate pencil classroom", goal: "destekleyici ifade" },
+            { q: "Sınıfta söz almak istediğinde nasıl davranırsın?", query: "child raising hand in classroom", goal: "sosyal kural anlatma" },
+            { q: "Öğretmenin sana en sevdiğin dersi sorsa ne cevap verirsin?", query: "teacher and child talking about lessons", goal: "tercih belirtme" },
+            { q: "Yeni bir arkadaşla tanışırken kendini nasıl tanıtırsın?", query: "child introducing self at school", goal: "kendini tanıtma" },
+            { q: "Sırada beklerken bir arkadaşın önüne geçerse ne söylersin?", query: "children waiting in line at school", goal: "nazik sınır koyma" },
+            { q: "Okuldan çıkarken öğretmenine nasıl veda edersin?", query: "child saying goodbye to teacher", goal: "konuşmayı uygun kapatma" }
+        ]
     },
     market: {
         label: 'Market',
         category: 'daily_life',
-        summary: 'İhtiyaç söyleme, seçim yapma ve rica etme çalışmaları.'
+        summary: 'İhtiyaç söyleme, seçim yapma ve rica etme çalışmaları.',
+        description: 'Market içinde ürün isteme, seçim yapma ve kısa rica cümleleri kullanma becerileri desteklenir.',
+        goals: ['ürün isteme', 'tercih belirtme', 'kısa rica cümlesi'],
+        questions: [
+            { q: "Markete girince almak istediğin ilk şeyi nasıl söylersin?", query: "child in grocery store asking for item", goal: "ürün isteme" },
+            { q: "Meyve bölümünde elma mı muz mu istediğini nasıl anlatırsın?", query: "child choosing fruit in market", goal: "tercih belirtme" },
+            { q: "Sepete koymak için annenden bir şey uzatmasını nasıl istersin?", query: "parent and child shopping together", goal: "rica etme" },
+            { q: "Kasada beklerken sıranı nasıl korursun?", query: "family waiting at grocery checkout", goal: "sosyal kural anlatma" },
+            { q: "Bir ürün çok yukarıdaysa market görevlisine ne dersin?", query: "store worker helping child in supermarket", goal: "yardım isteme" },
+            { q: "Canın atıştırmalık istediğinde bunu nasıl anlatırsın?", query: "child asking snack at market", goal: "ihtiyaç ifade etme" },
+            { q: "Süt ile meyve suyu arasında seçim yaparken ne söylersin?", query: "child deciding drink in market aisle", goal: "karşılaştırma" },
+            { q: "Aldığın şey için teşekkür etmek istesen ne dersin?", query: "child saying thank you cashier store", goal: "nazik kapanış" },
+            { q: "Poşeti taşımakta zorlanırsan nasıl yardım istersin?", query: "child asking help carrying grocery bag", goal: "yardım talebi" },
+            { q: "Marketten eve götürmek istediğin üç şeyi söyler misin?", query: "shopping basket groceries child speaking", goal: "listeleme" }
+        ]
     },
     park: {
         label: 'Park',
         category: 'play_sports',
-        summary: 'Oyun, spor, takım olma ve arkadaşlık konuşmaları.'
+        summary: 'Oyun, spor, takım olma ve arkadaşlık konuşmaları.',
+        description: 'Parkta oyun başlatma, spor tercihi yapma ve arkadaşlarla konuşma cümleleri öne çıkar.',
+        goals: ['oyun başlatma', 'spor tercihi', 'arkadaşla konuşma'],
+        questions: [
+            { q: "Parka gidince ilk hangi oyunu oynamak istersin?", query: "children choosing game in park", goal: "tercih belirtme" },
+            { q: "Bir arkadaşını salıncağa çağırmak için ne söylersin?", query: "children at playground talking", goal: "oyuna davet etme" },
+            { q: "Top oynamak istersen arkadaşından nasıl pas istersin?", query: "kids passing ball in park", goal: "oyun içi iletişim" },
+            { q: "Parkta sıra beklerken nasıl davranırsın?", query: "children waiting for slide in park", goal: "sıra alma becerisi" },
+            { q: "Koşunca ya da zıplayınca bedeninde nasıl bir his olur?", query: "active child running in park", goal: "bedensel farkındalık" },
+            { q: "Arkadaşın oyunu bırakmak isterse ona ne dersin?", query: "children talking after game in park", goal: "karşılıklı konuşma" },
+            { q: "Futbol mu saklambaç mı sana daha eğlenceli geliyor?", query: "children playing football and hide and seek", goal: "karşılaştırma yapma" },
+            { q: "Yeni bir oyun öğretmek istersen önce ne söylersin?", query: "child explaining game rules to friend", goal: "yönerge verme" },
+            { q: "Parkta düşen bir arkadaşını görünce ne yaparsın?", query: "child helping friend who fell at park", goal: "empatik ifade" },
+            { q: "Parktan ayrılırken arkadaşlarına nasıl veda edersin?", query: "children leaving park saying goodbye", goal: "uygun kapanış cümlesi" }
+        ]
     },
     hospital: {
         label: 'Hastane',
         category: 'emotions',
-        summary: 'Duygu, beden farkındalığı ve yardım isteme konuşmaları.'
+        summary: 'Duygu, beden farkındalığı ve yardım isteme konuşmaları.',
+        description: 'Kendini iyi hissetmediğinde duygunu, bedenindeki rahatsızlığı ve ihtiyacını söyleme çalışılır.',
+        goals: ['duygu söyleme', 'beden farkındalığı', 'yardım isteme'],
+        questions: [
+            { q: "Hastaneye geldiğinde kendini nasıl hissediyorsun?", query: "child at hospital waiting room calm", goal: "duygu ifade etme" },
+            { q: "Karnın ağrıyorsa bunu doktora nasıl anlatırsın?", query: "doctor listening to child patient", goal: "bedensel durumu söyleme" },
+            { q: "İğneden korkarsan yanında ne olmasını istersin?", query: "child seeking comfort hospital", goal: "duygusal ihtiyaç belirtme" },
+            { q: "Doktor sana bir soru sorunca nasıl cevap verirsin?", query: "doctor and child talking gently", goal: "soruya uygun yanıt verme" },
+            { q: "Canın acıyınca hemşireden nasıl yardım istersin?", query: "nurse helping child in hospital", goal: "yardım isteme" },
+            { q: "Muayeneden sonra rahatladığında ne söylersin?", query: "child relieved after doctor visit", goal: "duyguyu güncelleme" },
+            { q: "Beklerken sıkıldıysan annene ya da babana ne dersin?", query: "family in hospital waiting room", goal: "ihtiyaç ifade etme" },
+            { q: "Üşüdüğünde battaniye istemek için ne söylersin?", query: "child asking for blanket hospital", goal: "kısa rica kurma" },
+            { q: "Doktor sana iyi misin diye sorarsa ne dersin?", query: "doctor checking child wellness", goal: "durumu değerlendirme" },
+            { q: "Hastaneden çıkarken doktora nasıl teşekkür edersin?", query: "child thanking doctor after appointment", goal: "nazik kapanış" }
+        ]
     }
 };
 
 let currentTherapyCategoryKey = 'daily_life';
-let currentCityLocationKey = 'home';
-let unaskedQuestions = [...THERAPY_CATEGORIES[currentTherapyCategoryKey].questions];
+let currentCityLocationKey = 'school';
+let unaskedQuestions = [...CITY_LOCATIONS[currentCityLocationKey].questions];
 let currentObj = null;
 let isWaiting = false;
 let chatHistory = [];
@@ -1803,8 +1920,20 @@ function getCurrentTherapyCategory() {
     return THERAPY_CATEGORIES[currentTherapyCategoryKey] || THERAPY_CATEGORIES.daily_life;
 }
 
+function getCurrentCityLocation() {
+    return CITY_LOCATIONS[currentCityLocationKey] || CITY_LOCATIONS.school;
+}
+
+function getActiveTherapyQuestions() {
+    const location = getCurrentCityLocation();
+    if (location && Array.isArray(location.questions) && location.questions.length) {
+        return location.questions;
+    }
+    return getCurrentTherapyCategory().questions;
+}
+
 function resetTherapyQuestionPool() {
-    unaskedQuestions = [...getCurrentTherapyCategory().questions];
+    unaskedQuestions = [...getActiveTherapyQuestions()];
 }
 
 function renderTherapyCategories() {
@@ -1818,10 +1947,36 @@ function renderTherapyCategories() {
         </button>
     `).join('');
 
-    const location = CITY_LOCATIONS[currentCityLocationKey];
+    const location = getCurrentCityLocation();
     summaryEl.textContent = location
         ? `${location.label}: ${location.summary}`
         : getCurrentTherapyCategory().summary;
+}
+
+function renderCityScene() {
+    const location = getCurrentCityLocation();
+    const sceneEl = document.getElementById('cityScene');
+    const titleEl = document.getElementById('cityFocusTitle');
+    const descEl = document.getElementById('cityFocusDescription');
+    const kickerEl = document.getElementById('cityFocusKicker');
+    const goalsEl = document.getElementById('cityFocusGoals');
+    const startBtn = document.getElementById('cityStartBtn');
+
+    if (sceneEl) {
+        sceneEl.querySelectorAll('.city-building').forEach((button) => {
+            button.classList.toggle('active', button.dataset.location === currentCityLocationKey);
+        });
+    }
+
+    if (titleEl) titleEl.textContent = location.label;
+    if (descEl) descEl.textContent = location.description || location.summary;
+    if (kickerEl) kickerEl.textContent = `${location.label} odakta`;
+    if (goalsEl) {
+        goalsEl.innerHTML = (location.goals || []).map((goal) => `<span>${goal}</span>`).join('');
+    }
+    if (startBtn) {
+        startBtn.textContent = `${location.label} alanını aç`;
+    }
 }
 
 function setTherapyCategory(categoryKey, shouldReload = true) {
@@ -1841,12 +1996,24 @@ function setTherapyCategory(categoryKey, shouldReload = true) {
     }
 }
 
-function openCityLocation(locationKey) {
+function focusCityLocation(locationKey) {
     const location = CITY_LOCATIONS[locationKey];
     if (!location) return;
     currentCityLocationKey = locationKey;
+    currentTherapyCategoryKey = location.category;
+    resetTherapyQuestionPool();
+    renderCityScene();
+}
+
+function startFocusedCityLocation() {
+    const location = getCurrentCityLocation();
     setTherapyCategory(location.category, false);
     goToTherapy();
+}
+
+function openCityLocation(locationKey) {
+    focusCityLocation(locationKey);
+    startFocusedCityLocation();
 }
 
 function resetIdleTimer() {
@@ -3018,6 +3185,9 @@ window.handleAuth = handleAuth;
 window.goToMenu = goToMenu;
 window.goToTherapy = goToTherapy;
 window.setTherapyCategory = setTherapyCategory;
+window.focusCityLocation = focusCityLocation;
+window.startFocusedCityLocation = startFocusedCityLocation;
+window.openCityLocation = openCityLocation;
 window.goToHearingSupport = goToHearingSupport;
 window.goToStories = goToStories;
 window.goToReport = goToReport;
