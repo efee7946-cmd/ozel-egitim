@@ -1952,7 +1952,6 @@ let isWaiting = false;
 let chatHistory = [];
 let idleTimer;
 let turnCount = 0;
-let city3D = null;
 
 function getCurrentTherapyCategory() {
     return THERAPY_CATEGORIES[currentTherapyCategoryKey] || THERAPY_CATEGORIES.daily_life;
@@ -1991,220 +1990,20 @@ function renderTherapyCategories() {
         : getCurrentTherapyCategory().summary;
 }
 
-function buildCityStructure(label, color) {
-    const group = new THREE.Group();
-    group.userData = { locationKey: label };
-
-    const baseMaterial = new THREE.MeshStandardMaterial({ color, roughness: 0.75 });
-    const roofMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.5 });
-    const windowMaterial = new THREE.MeshStandardMaterial({ color: 0xa8d8ff, emissive: 0x1c4b7a, emissiveIntensity: 0.18 });
-
-    const body = new THREE.Mesh(new THREE.BoxGeometry(1.6, 1.25, 1.6), baseMaterial);
-    body.position.y = 0.7;
-    group.add(body);
-
-    const roof = new THREE.Mesh(new THREE.ConeGeometry(1.2, 0.75, 4), roofMaterial);
-    roof.position.y = 1.72;
-    roof.rotation.y = Math.PI / 4;
-    group.add(roof);
-
-    const door = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.6, 0.12), new THREE.MeshStandardMaterial({ color: 0x7b4f2c }));
-    door.position.set(0, 0.3, 0.86);
-    group.add(door);
-
-    [-0.42, 0.42].forEach((x) => {
-        const windowPane = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.28, 0.08), windowMaterial);
-        windowPane.position.set(x, 0.88, 0.85);
-        group.add(windowPane);
-    });
-
-    group.userData.highlightTargets = [body, roof];
-    return group;
-}
-
-function initializeThreeCity() {
-    const container = document.getElementById('citySceneCanvas');
-    if (!container || city3D || !window.THREE) return;
-
-    const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0xdff1ff);
-    scene.fog = new THREE.Fog(0xdff1ff, 16, 34);
-
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-    renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-    container.appendChild(renderer.domElement);
-
-    const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 100);
-    camera.position.set(0, 8.6, 11.8);
-    camera.lookAt(0, 0.8, 0);
-
-    const hemiLight = new THREE.HemisphereLight(0xffffff, 0xb7dbc1, 1.6);
-    scene.add(hemiLight);
-
-    const sunLight = new THREE.DirectionalLight(0xfff4d6, 2.2);
-    sunLight.position.set(6, 10, 4);
-    sunLight.castShadow = true;
-    sunLight.shadow.mapSize.set(1024, 1024);
-    sunLight.shadow.camera.near = 0.5;
-    sunLight.shadow.camera.far = 30;
-    sunLight.shadow.camera.left = -10;
-    sunLight.shadow.camera.right = 10;
-    sunLight.shadow.camera.top = 10;
-    sunLight.shadow.camera.bottom = -10;
-    scene.add(sunLight);
-
-    const ground = new THREE.Mesh(
-        new THREE.CircleGeometry(8.4, 64),
-        new THREE.MeshStandardMaterial({ color: 0xb7ddb1, roughness: 0.96 })
-    );
-    ground.rotation.x = -Math.PI / 2;
-    ground.receiveShadow = true;
-    scene.add(ground);
-
-    const road = new THREE.Mesh(
-        new THREE.RingGeometry(2.2, 3.1, 48),
-        new THREE.MeshStandardMaterial({ color: 0x67788c, roughness: 0.9 })
-    );
-    road.rotation.x = -Math.PI / 2;
-    road.position.y = 0.02;
-    scene.add(road);
-
-    const centerPark = new THREE.Mesh(
-        new THREE.CircleGeometry(1.6, 32),
-        new THREE.MeshStandardMaterial({ color: 0x8ac78d, roughness: 1 })
-    );
-    centerPark.rotation.x = -Math.PI / 2;
-    centerPark.position.y = 0.03;
-    scene.add(centerPark);
-
-    const marker = new THREE.Mesh(
-        new THREE.TorusGeometry(1.15, 0.06, 12, 48),
-        new THREE.MeshStandardMaterial({ color: 0x4d96ff, emissive: 0x4d96ff, emissiveIntensity: 0.4 })
-    );
-    marker.rotation.x = -Math.PI / 2;
-    marker.position.y = 0.08;
-    scene.add(marker);
-
-    const labels = [
-        { key: 'home', color: 0xf4a261, position: [-4.2, 0, 2.6], scale: 1 },
-        { key: 'school', color: 0x5c8ef2, position: [-1.6, 0, -3.5], scale: 1.2 },
-        { key: 'market', color: 0x73c47f, position: [3.9, 0, -1.7], scale: 1.05 },
-        { key: 'park', color: 0x49a36f, position: [2.9, 0, 3.7], scale: 0.95 },
-        { key: 'hospital', color: 0xe87ba2, position: [-3.9, 0, -1.4], scale: 1.1 }
-    ];
-
-    const buildings = {};
-    labels.forEach((item) => {
-        const group = buildCityStructure(item.key, item.color);
-        group.position.set(item.position[0], 0, item.position[2]);
-        group.scale.setScalar(item.scale);
-        group.traverse((child) => {
-            if (child.isMesh) {
-                child.castShadow = true;
-                child.receiveShadow = true;
-                child.userData.locationKey = item.key;
-            }
-        });
-        const plate = new THREE.Mesh(
-            new THREE.CylinderGeometry(1.18 * item.scale, 1.3 * item.scale, 0.12, 32),
-            new THREE.MeshStandardMaterial({ color: 0xd8ead2, roughness: 1 })
-        );
-        plate.position.set(item.position[0], 0.06, item.position[2]);
-        plate.receiveShadow = true;
-        scene.add(plate);
-        scene.add(group);
-        buildings[item.key] = group;
-    });
-
-    for (let i = 0; i < 9; i++) {
-        const tree = new THREE.Group();
-        const trunk = new THREE.Mesh(
-            new THREE.CylinderGeometry(0.08, 0.12, 0.55, 8),
-            new THREE.MeshStandardMaterial({ color: 0x7d5230, roughness: 1 })
-        );
-        trunk.position.y = 0.32;
-        const crown = new THREE.Mesh(
-            new THREE.SphereGeometry(0.34, 18, 18),
-            new THREE.MeshStandardMaterial({ color: 0x5ba96a, roughness: 0.95 })
-        );
-        crown.position.y = 0.78;
-        tree.add(trunk, crown);
-        const angle = (i / 9) * Math.PI * 2;
-        const radius = 5.2 + (i % 2) * 0.6;
-        tree.position.set(Math.cos(angle) * radius, 0, Math.sin(angle) * radius);
-        tree.traverse((child) => {
-            if (child.isMesh) {
-                child.castShadow = true;
-                child.receiveShadow = true;
-            }
-        });
-        scene.add(tree);
-    }
-
-    const raycaster = new THREE.Raycaster();
-    const pointer = new THREE.Vector2();
-
-    function resize() {
-        const width = container.clientWidth || 600;
-        const height = container.clientHeight || 430;
-        renderer.setSize(width, height, false);
-        camera.aspect = width / height;
-        camera.updateProjectionMatrix();
-    }
-
-    function highlightCurrentLocation() {
-        Object.entries(buildings).forEach(([key, group]) => {
-            const active = key === currentCityLocationKey;
-            group.userData.highlightTargets.forEach((mesh) => {
-                mesh.material.emissive = new THREE.Color(active ? 0x5b8dff : 0x000000);
-                mesh.material.emissiveIntensity = active ? 0.28 : 0;
-            });
-            group.position.y = active ? 0.18 : 0;
-            if (active) {
-                marker.position.x = group.position.x;
-                marker.position.z = group.position.z;
-            }
-        });
-    }
-
-    function handlePointer(event) {
-        const rect = renderer.domElement.getBoundingClientRect();
-        pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-        pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-        raycaster.setFromCamera(pointer, camera);
-        const intersects = raycaster.intersectObjects(scene.children, true);
-        const target = intersects.find((entry) => entry.object.userData && entry.object.userData.locationKey);
-        if (target) {
-            focusCityLocation(target.object.userData.locationKey);
-        }
-    }
-
-    function animate() {
-        if (!city3D) return;
-        requestAnimationFrame(animate);
-        marker.rotation.z += 0.01;
-        scene.rotation.y = Math.sin(Date.now() * 0.00015) * 0.06;
-        renderer.render(scene, camera);
-    }
-
-    renderer.domElement.addEventListener('click', handlePointer);
-    window.addEventListener('resize', resize);
-
-    city3D = { scene, renderer, camera, buildings, marker, resize, highlightCurrentLocation };
-    resize();
-    highlightCurrentLocation();
-    animate();
-}
-
 function renderCityScene() {
     const location = getCurrentCityLocation();
+    const sceneEl = document.getElementById('cityScene');
     const titleEl = document.getElementById('cityFocusTitle');
     const descEl = document.getElementById('cityFocusDescription');
     const kickerEl = document.getElementById('cityFocusKicker');
     const goalsEl = document.getElementById('cityFocusGoals');
     const startBtn = document.getElementById('cityStartBtn');
+
+    if (sceneEl) {
+        sceneEl.querySelectorAll('.city-option-card').forEach((card) => {
+            card.classList.toggle('active', card.dataset.location === currentCityLocationKey);
+        });
+    }
 
     if (titleEl) titleEl.textContent = location.label;
     if (descEl) descEl.textContent = location.description || location.summary;
@@ -2216,11 +2015,6 @@ function renderCityScene() {
         startBtn.textContent = currentScreenId === 'game-container'
             ? `${location.label} alanını aç`
             : 'Konuşma Terapisine Git';
-    }
-    if (!city3D) initializeThreeCity();
-    if (city3D) {
-        city3D.highlightCurrentLocation();
-        city3D.resize();
     }
 }
 

@@ -162,7 +162,32 @@
             <h3>Bir yeri seç ve konuşmayı oradan başlat</h3>
             <p>Şehirdeki binalardan birine tıklayınca o mekâna uygun sorular, videolar ve konuşma akışı açılır.</p>
         </div>
-        <div class="city-scene" id="cityScene">
+        <div class="city-scene city-option-grid" id="cityScene">
+            <button type="button" class="city-option-card" data-location="home" onclick="focusCityLocation('home')">
+                <span class="city-option-icon">🏠</span>
+                <strong>Ev</strong>
+                <p>Rutinler ve günlük yaşam</p>
+            </button>
+            <button type="button" class="city-option-card" data-location="school" onclick="focusCityLocation('school')">
+                <span class="city-option-icon">🏫</span>
+                <strong>Okul</strong>
+                <p>Sınıf, öğretmen ve arkadaşlar</p>
+            </button>
+            <button type="button" class="city-option-card" data-location="market" onclick="focusCityLocation('market')">
+                <span class="city-option-icon">🛒</span>
+                <strong>Market</strong>
+                <p>İhtiyaç söyleme ve seçim yapma</p>
+            </button>
+            <button type="button" class="city-option-card" data-location="park" onclick="focusCityLocation('park')">
+                <span class="city-option-icon">🌳</span>
+                <strong>Park</strong>
+                <p>Oyun, spor ve arkadaşlık</p>
+            </button>
+            <button type="button" class="city-option-card" data-location="hospital" onclick="focusCityLocation('hospital')">
+                <span class="city-option-icon">🏥</span>
+                <strong>Hastane</strong>
+                <p>Duygu, beden ve yardım isteme</p>
+            </button>
             <div class="city-scene-canvas" id="citySceneCanvas" aria-label="Konuşma Şehri 3D sahnesi"></div>
             <div class="city-scene-overlay">
                 <span class="city-scene-badge">3D Şehir</span>
@@ -453,7 +478,6 @@
     </div>
 </div>
 
-<script src="https://unpkg.com/three@0.165.0/build/three.min.js"></script>
 <script src="script.js" defer></script>
 </body>
 </html>

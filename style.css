@@ -579,35 +579,69 @@ body {
 .city-scene {
     position: relative;
     min-height: 430px;
-    padding: 0;
+    padding: 24px;
     border-radius: 32px;
-    background: linear-gradient(180deg, #dff1ff 0%, #eef9ff 54%, #d9efdd 54%, #c9e6ce 100%);
+    background: linear-gradient(180deg, #f6fbff 0%, #eef6ff 100%);
     border: 1px solid #d6e6f1;
     overflow: hidden;
 }
 
-.city-scene-canvas {
-    width: 100%;
-    height: 100%;
-    min-height: 430px;
+.city-option-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    align-content: start;
 }
 
-.city-scene-canvas canvas {
+.city-option-card {
+    text-align: left;
+    border: 1px solid #d8e5f3;
+    border-radius: 22px;
+    padding: 18px;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+    color: #234264;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.city-option-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 24px rgba(48, 85, 129, 0.12);
+    border-color: #9ebae2;
+}
+
+.city-option-card.active {
+    border-color: #4c8dff;
+    box-shadow: 0 16px 28px rgba(76, 141, 255, 0.18);
+    background: linear-gradient(180deg, #eef6ff 0%, #f8fbff 100%);
+}
+
+.city-option-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    background: #eef5ff;
+    font-size: 1.4rem;
+    margin-bottom: 12px;
+}
+
+.city-option-card strong {
     display: block;
-    width: 100%;
-    height: 100%;
+    font-size: 1rem;
+    margin-bottom: 6px;
+}
+
+.city-option-card p {
+    margin: 0;
+    color: #617791;
+    line-height: 1.5;
 }
 
 .city-scene-overlay {
-    position: absolute;
-    left: 20px;
-    top: 20px;
-    z-index: 3;
-    padding: 12px 14px;
-    border-radius: 18px;
-    background: rgba(255, 255, 255, 0.82);
-    backdrop-filter: blur(10px);
-    box-shadow: 0 10px 22px rgba(55, 87, 122, 0.12);
+    display: none;
 }
 
 .city-scene-overlay p {
@@ -617,61 +651,8 @@ body {
 }
 
 .city-scene-badge {
-    display: inline-flex;
-    padding: 6px 10px;
-    border-radius: 999px;
-    background: #ebf4ff;
-    color: #2c67af;
-    font-size: 0.74rem;
-    font-weight: 800;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+    display: none;
 }
-
-.city-building {
-    position: absolute;
-    border: 1px solid rgba(80, 108, 142, 0.16);
-    border-radius: 24px;
-    padding: 18px 16px;
-    background: rgba(255,255,255,0.92);
-    box-shadow: 0 14px 28px rgba(39, 71, 109, 0.12);
-    cursor: pointer;
-    text-align: left;
-    width: 170px;
-    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-}
-
-.city-building:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 18px 34px rgba(39, 71, 109, 0.18);
-    border-color: rgba(76, 141, 255, 0.3);
-}
-
-.city-building-icon {
-    display: block;
-    font-size: 2rem;
-    margin-bottom: 10px;
-}
-
-.city-building strong {
-    display: block;
-    color: #223c5d;
-    font-size: 1.02rem;
-    margin-bottom: 6px;
-}
-
-.city-building p {
-    margin: 0;
-    color: #617791;
-    font-size: 0.88rem;
-    line-height: 1.45;
-}
-
-.city-home { left: 26px; bottom: 34px; }
-.city-school { left: 238px; top: 58px; }
-.city-market { left: 250px; bottom: 60px; }
-.city-park { right: 42px; bottom: 36px; }
-.city-hospital { right: 46px; top: 54px; }
 
 .city-scene-actions {
     grid-column: 1 / -1;
@@ -748,125 +729,12 @@ body {
     border: 1px solid #d7e5f3;
 }
 
-.city-sun {
-    position: absolute;
-    top: 28px;
-    right: 46px;
-    width: 78px;
-    height: 78px;
-    border-radius: 50%;
-    background: radial-gradient(circle, #fff6b0 0%, #ffd76d 58%, rgba(255, 215, 109, 0.18) 100%);
-    box-shadow: 0 0 34px rgba(255, 215, 109, 0.38);
-}
-
-.city-cloud {
-    position: absolute;
-    border-radius: 999px;
-    background: rgba(255, 255, 255, 0.86);
-    filter: drop-shadow(0 8px 16px rgba(86, 124, 166, 0.12));
-}
-
-.city-cloud::before,
-.city-cloud::after {
-    content: '';
-    position: absolute;
-    border-radius: 999px;
-    background: inherit;
-}
-
-.city-cloud-one {
-    top: 58px;
-    left: 56px;
-    width: 92px;
-    height: 26px;
-}
-
-.city-cloud-one::before {
-    width: 34px;
-    height: 34px;
-    left: 12px;
-    top: -16px;
-}
-
-.city-cloud-one::after {
-    width: 40px;
-    height: 40px;
-    right: 12px;
-    top: -18px;
-}
-
-.city-cloud-two {
-    top: 118px;
-    right: 140px;
-    width: 78px;
-    height: 22px;
-}
-
-.city-cloud-two::before {
-    width: 30px;
-    height: 30px;
-    left: 10px;
-    top: -14px;
-}
-
-.city-cloud-two::after {
-    width: 34px;
-    height: 34px;
-    right: 8px;
-    top: -16px;
-}
-
-.city-skyline {
-    position: absolute;
-    inset: auto 0 145px;
-    display: flex;
-    align-items: end;
-    gap: 16px;
-    padding: 0 34px;
-    opacity: 0.28;
-}
-
-.city-skyline span {
-    display: block;
-    flex: 1;
-    border-radius: 18px 18px 0 0;
-    background: linear-gradient(180deg, #8eb5d9 0%, #6f94ba 100%);
-}
-
-.city-skyline span:nth-child(1) { height: 72px; }
-.city-skyline span:nth-child(2) { height: 108px; }
-.city-skyline span:nth-child(3) { height: 86px; }
-.city-skyline span:nth-child(4) { height: 124px; }
-.city-skyline span:nth-child(5) { height: 92px; }
-
-.city-road {
-    position: absolute;
-    background: linear-gradient(180deg, rgba(112, 127, 146, 0.75) 0%, rgba(89, 104, 123, 0.8) 100%);
-    border-radius: 999px;
-}
-
-.city-road-main {
-    left: 50%;
-    bottom: -8px;
-    width: 150px;
-    height: 240px;
-    transform: translateX(-50%) perspective(180px) rotateX(70deg);
-    transform-origin: bottom;
-}
-
-.city-road-side {
-    right: 50px;
-    bottom: 102px;
-    width: 200px;
-    height: 50px;
-    opacity: 0.34;
-}
-
-.city-building,
+.city-scene-canvas,
 .city-sun,
 .city-cloud,
 .city-skyline,
-.city-road {
+.city-road,
+.city-building {
     display: none;
 }
 
@@ -2463,8 +2331,8 @@ video { width: 100%; height: 100%; object-fit: cover; }
     .student-detail-meta-row { grid-template-columns: 1fr; }
     .menu-cards { flex-direction: column; }
     .city-scene-shell { grid-template-columns: 1fr; }
-    .city-scene { min-height: 700px; }
-    .city-scene-canvas { min-height: 700px; }
+    .city-scene { min-height: auto; }
+    .city-option-grid { grid-template-columns: 1fr; }
     .city-focus-panel,
     .city-session-hero { padding: 18px; }
     .city-session-hero { flex-direction: column; align-items: flex-start; }
