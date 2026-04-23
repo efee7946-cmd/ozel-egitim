@@ -448,6 +448,8 @@ function goToMenu() {
 
 function goToTherapy() {
     showOnly('game-container');
+    renderTherapyCategories();
+    resetTherapyQuestionPool();
     turnCount = 0;
     const vEl = document.getElementById('v');
     vEl.muted = true;
@@ -1627,7 +1629,7 @@ async function goToReport() {
         sessionData.therapyTurns.forEach(t => {
             const entry = document.createElement('div');
             entry.className = 'therapy-entry';
-            entry.innerHTML = `<div class="therapy-q">🎙️ Soru: ${t.question}</div>${t.answer}`;
+            entry.innerHTML = `<div class="therapy-q">🎙️ ${t.category ? `${t.category} • ` : ''}Soru: ${t.question}</div>${t.answer}`;
             therapyEl.appendChild(entry);
         });
     }
@@ -1693,40 +1695,119 @@ Kesinlikle emoji kullanma. Sıcak, profesyonel ve umut verici bir dil kullan.`;
 // =============================================
 // KONUŞMA TERAPİSTİ (orijinal kod)
 // =============================================
-const pool = [
-    { q: "Bugün okulda neler yaptın?", query: "school kids" },
-    { q: "Hangi oyunları seversin?", query: "children playing" },
-    { q: "En sevdiğin yemek ne?", query: "child eating" },
-    { q: "En sevdiğin hayvan hangisi?", query: "cute puppy" },
-    { q: "Büyüyünce ne olmak istiyorsun?", query: "child dreaming" },
-    { q: "Hafta sonu ne yapmayı seversin?", query: "family park" },
-    { q: "En sevdiğin renk ne?", query: "colorful balloons" },
-    { q: "Arkadaşlarınla neler oynarsınız?", query: "kids running" },
-    { q: "En sevdiğin meyve nedir?", query: "eating fruit" },
-    { q: "Tatillerde nereye gitmek istersin?", query: "beach kids" },
-    { q: "Bugün seni en çok ne mutlu etti?", query: "happy child" },
-    { q: "Sence zürafaların boynu neden uzundur?", query: "giraffe" },
-    { q: "Arkadaşına yardım etmek sence nasıl bir duygu?", query: "kids helping" },
-    { q: "Yağmur yağdığında neler yapmayı seversin?", query: "rainy day kids" },
-    { q: "En sevdiğin kurabiyenin içine ne koyalım?", query: "child baking" },
-    { q: "Yıldızlara dokunabilsen ne hissederdin?", query: "stars night" },
-    { q: "Basketbol mu yoksa koşu mu daha eğlenceli?", query: "kids basketball" },
-    { q: "Yatmadan önce hangi masalı dinlemek istersin?", query: "bedtime story" },
-    { q: "Bugün hangi renk kıyafetini giymek istersin?", query: "kid getting dressed" },
-    { q: "İtfaiyeci olsan ilk kimi kurtarırdın?", query: "firefighter kids" },
-    { q: "Denizin altında hangi hayvanla tanışmak istersin?", query: "underwater fish" },
-    { q: "Kendi robotunu yapsan adı ne olurdu?", query: "kid with robot" },
-    { q: "En sevdiğin dondurma hangisi?", query: "kid eating ice cream" },
-    { q: "Ormanda bir gezintiye çıksak neler görürüz?", query: "kids in forest" },
-    { q: "Uçan bir araban olsa nereye gitmek istersin?", query: "flying car dream" }
-];
+const THERAPY_CATEGORIES = {
+    daily_life: {
+        label: 'Günlük Hayat',
+        summary: 'Rutinler, ihtiyaçlar ve ev-okul yaşamı üzerine kısa konuşmalar.',
+        questions: [
+            { q: "Sabah uyanınca ilk ne yaparsın?", query: "child morning routine home", goal: "günlük rutin anlatma" },
+            { q: "Okula giderken yanına neler alırsın?", query: "child getting ready backpack school", goal: "nesne ve rutin anlatma" },
+            { q: "Acıkınca evde ne söylersin?", query: "family kitchen child asking food", goal: "ihtiyaç ifade etme" },
+            { q: "Markete gidince en çok hangi şeyi almak istersin?", query: "child with parent grocery store", goal: "tercih belirtme" },
+            { q: "Akşam olunca evde en sevdiğin şey nedir?", query: "family evening home child smiling", goal: "günlük yaşamı anlatma" },
+            { q: "Dışarı çıkmadan önce hangi hazırlıkları yaparsın?", query: "child putting on shoes jacket", goal: "adım sıralama" },
+            { q: "Odanda en çok hangi eşyanı kullanırsın?", query: "child room toys books", goal: "eşya tanımlama" },
+            { q: "Yemekten önce ellerin için ne yaparsın?", query: "child washing hands sink", goal: "özbakım rutini anlatma" },
+            { q: "Eve misafir gelince onlara ne dersin?", query: "family visiting child greeting", goal: "günlük sosyal ifade" },
+            { q: "Bugün evde sana en çok kim yardım etti?", query: "parent helping child at home", goal: "olay anlatma" }
+        ]
+    },
+    emotions: {
+        label: 'Duygular',
+        summary: 'Mutlu, üzgün, heyecanlı gibi duyguları fark edip ifade etmeye odaklanır.',
+        questions: [
+            { q: "Bugün kendini en çok nasıl hissediyorsun?", query: "child face expression happy calm", goal: "duygu ifade etme" },
+            { q: "Seni en hızlı ne mutlu eder?", query: "happy child playing family", goal: "neden belirtme" },
+            { q: "Üzüldüğünde yanında ne olsun istersin?", query: "child comfort emotional support", goal: "duygusal ihtiyaç söyleme" },
+            { q: "Heyecanlanınca bedeninde neler olur?", query: "excited child jumping smiling", goal: "bedensel farkındalık" },
+            { q: "Korktuğunda kime haber verirsin?", query: "child seeking comfort parent", goal: "yardım isteme" },
+            { q: "Bir arkadaşın seni sevindirince ne hissedersin?", query: "friends hugging happy child", goal: "duyguyu ilişkilendirme" },
+            { q: "Canın sıkılınca kendini rahatlatmak için ne yaparsın?", query: "child calming down quiet activity", goal: "rahatlama stratejisi" },
+            { q: "Bugün seni şaşırtan bir şey oldu mu?", query: "surprised child classroom", goal: "duygu ve olay anlatma" },
+            { q: "Kızgın olduğunda sesini nasıl kullanman iyi olur?", query: "child taking deep breath calm", goal: "duygu düzenleme" },
+            { q: "Mutlu olduğunda bunu yüzünden nasıl anlarız?", query: "child smiling face close up", goal: "duygu farkındalığı" }
+        ]
+    },
+    social_communication: {
+        label: 'Sosyal İletişim',
+        summary: 'Selamlaşma, yardım isteme ve arkadaşlarla konuşma becerileri.',
+        questions: [
+            { q: "Bir arkadaşına oyun başlarken nasıl selam verirsin?", query: "children greeting playground", goal: "selamlaşma becerisi" },
+            { q: "Bir şeyi anlamazsan öğretmene ne söylersin?", query: "child asking teacher classroom", goal: "yardım isteme" },
+            { q: "Oyuna katılmak istersen arkadaşına nasıl sorarsın?", query: "children inviting to play", goal: "oyuna katılma dili" },
+            { q: "Bir arkadaşın üzgün görünürse ona ne dersin?", query: "child comforting friend school", goal: "empati ifadesi" },
+            { q: "Sıranı beklerken nasıl davranırsın?", query: "children waiting in line school", goal: "sosyal kural anlatma" },
+            { q: "Yanlışlıkla birine çarparsan ne söylersin?", query: "kids apologizing playground", goal: "özür dileme" },
+            { q: "Bir oyuncağı paylaşmak istediğinde nasıl konuşursun?", query: "children sharing toy", goal: "paylaşma dili" },
+            { q: "Bir arkadaşın sana soru sorarsa nasıl cevap verirsin?", query: "children talking together classroom", goal: "karşılıklı konuşma" },
+            { q: "Yeni biriyle tanışınca kendini nasıl tanıtırsın?", query: "child introducing self friendly", goal: "kendini tanıtma" },
+            { q: "Yardım ettiğin birine sonra ne demek güzel olur?", query: "kids helping each other smiling", goal: "sosyal kapanış ifadesi" }
+        ]
+    },
+    play_sports: {
+        label: 'Oyun ve Spor',
+        summary: 'İlgi alanı üzerinden seçim yapma, karşılaştırma ve anlatım becerileri.',
+        questions: [
+            { q: "Parkta en çok hangi oyunu oynamayı seversin?", query: "children playing in park", goal: "tercih belirtme" },
+            { q: "Futbol mu basketbol mu sana daha eğlenceli geliyor?", query: "kids football basketball playground", goal: "karşılaştırma yapma" },
+            { q: "Takım oyunlarında hangi görevi yapmak istersin?", query: "children team game outdoors", goal: "rol seçme" },
+            { q: "Evde oynadığın en sevdiğin oyun hangisi?", query: "child indoor game home", goal: "oyun anlatma" },
+            { q: "Bir oyunu arkadaşınla oynarken en çok neye dikkat edersin?", query: "kids playing together sharing", goal: "oyun kuralı anlatma" },
+            { q: "Bisiklet mi top oyunu mu seni daha çok hareket ettirir?", query: "children cycling and ball game", goal: "karşılaştırmalı ifade" },
+            { q: "Spor yapınca bedeninde nasıl bir his olur?", query: "active child running smiling", goal: "bedensel duygu anlatma" },
+            { q: "Yeni bir oyun öğrenirken önce ne yaparsın?", query: "child learning game rules", goal: "adım anlatma" },
+            { q: "Top oynarken arkadaşına nasıl pas istersin?", query: "children passing ball teamwork", goal: "oyun içi iletişim" },
+            { q: "Bugün dışarı çıksan hangi sporu denemek isterdin?", query: "child trying sports outdoors", goal: "hayal kurma ve tercih" }
+        ]
+    }
+};
 
-let unaskedQuestions = [...pool];
+let currentTherapyCategoryKey = 'daily_life';
+let unaskedQuestions = [...THERAPY_CATEGORIES[currentTherapyCategoryKey].questions];
 let currentObj = null;
 let isWaiting = false;
 let chatHistory = [];
 let idleTimer;
 let turnCount = 0;
+
+function getCurrentTherapyCategory() {
+    return THERAPY_CATEGORIES[currentTherapyCategoryKey] || THERAPY_CATEGORIES.daily_life;
+}
+
+function resetTherapyQuestionPool() {
+    unaskedQuestions = [...getCurrentTherapyCategory().questions];
+}
+
+function renderTherapyCategories() {
+    const barEl = document.getElementById('therapyCategoryBar');
+    const summaryEl = document.getElementById('therapyCategorySummary');
+    if (!barEl || !summaryEl) return;
+
+    barEl.innerHTML = Object.entries(THERAPY_CATEGORIES).map(([key, category]) => `
+        <button type="button" class="therapy-category-btn ${currentTherapyCategoryKey === key ? 'active' : ''}" onclick="setTherapyCategory('${key}')">
+            ${category.label}
+        </button>
+    `).join('');
+
+    summaryEl.textContent = getCurrentTherapyCategory().summary;
+}
+
+function setTherapyCategory(categoryKey, shouldReload = true) {
+    if (!THERAPY_CATEGORIES[categoryKey]) return;
+    currentTherapyCategoryKey = categoryKey;
+    turnCount = 0;
+    currentObj = null;
+    chatHistory = [];
+    resetTherapyQuestionPool();
+    renderTherapyCategories();
+
+    const bubbles = document.getElementById('chat-bubbles');
+    if (bubbles) bubbles.innerHTML = '';
+
+    if (shouldReload && currentScreenId === 'game-container') {
+        loadNext();
+    }
+}
 
 function resetIdleTimer() {
     clearTimeout(idleTimer);
@@ -1754,7 +1835,7 @@ async function loadNext() {
     document.getElementById('qBar').innerText = "Hazırlanıyorum...";
     document.getElementById('info').innerText = "Video yükleniyor...";
 
-    if (unaskedQuestions.length === 0) unaskedQuestions = [...pool];
+    if (unaskedQuestions.length === 0) resetTherapyQuestionPool();
     const rIndex = Math.floor(Math.random() * unaskedQuestions.length);
     currentObj = unaskedQuestions[rIndex];
     unaskedQuestions.splice(rIndex, 1);
@@ -1846,7 +1927,11 @@ async function rec() {
         var aiRes = await getGemmaResponse(speech);
         addMessage(aiRes, "ai");
         // Veriyi kaydet
-        sessionData.therapyTurns.push({ question: currentObj.q, answer: speech });
+        sessionData.therapyTurns.push({
+            category: getCurrentTherapyCategory().label,
+            question: currentObj.q,
+            answer: speech
+        });
         confetti({ particleCount: 50 });
         var vEl = document.getElementById('v');
         var pp = vEl.play();
@@ -1881,7 +1966,21 @@ async function rec() {
 async function getGemmaResponse(text) {
     var url = "/api/chat";
     chatHistory.push({ role: "user", parts: [{ text: text }] });
-    var instructions = "Sen 5-8 yas arasi ve ozel egitim destegi alan cocuklarla konusan sabirli Yildiz Can'sin. Karsindaki cocugun adi " + childName + ". KRITIK KURALLAR: 1. SORUYA BAGLILIK: Yanit mevcut soru ve cocugun son cumlesinden kopmasin. 2. BASIT VE GUVENLI DIL: Kisa, somut ve anlasilir kelimeler kullan. 3. EMOJI KULLANMA. 4. MAKS 2 KISA CUMLE (yaklasik 8-12 kelime). 5. SONDA SADECE KONUYLA ILGILI TEK KISA SORU SOR. 6. YANLISI YARGILAMA, NAZIKCE DOGRU ORNEKLE DESTEKLE.";
+    const currentCategory = getCurrentTherapyCategory();
+    const currentGoal = currentObj && currentObj.goal ? currentObj.goal : 'kısa ve anlaşılır konuşma';
+    var instructions = `Sen, özel eğitim desteği alan 4-8 yaş arası bir çocukla konuşan sabırlı ve pedagojik farkındalığı yüksek Yıldız Can'sın. Çocuğun adı ${childName}.
+Şu an seçili konuşma alanı: ${currentCategory.label}.
+Bu sorunun hedefi: ${currentGoal}.
+
+KRİTİK KURALLAR:
+1. Yalnızca seçili konuşma alanı içinde kal, konu dışına çıkma.
+2. Çocuk farklı bir konuya kayarsa nazikçe mevcut alana geri dön.
+3. Cevabın mevcut soruya ve çocuğun son cümlesine bağlı olsun.
+4. Kısa, somut ve anlaşılır Türkçe kullan.
+5. Emoji kullanma.
+6. En fazla 2 kısa cümle kur.
+7. Sonda sadece seçili alanla ilgili tek kısa takip sorusu sor.
+8. Asla yargılama; gerekirse doğru modeli nazikçe örnekle.`;
     var payload = {
         contents: [
             { role: "user", parts: [{ text: "GÖREV: " + instructions }] },
@@ -1895,7 +1994,7 @@ async function getGemmaResponse(text) {
         chatHistory.push({ role: "model", parts: [{ text: reply }] });
         return reply;
     } catch (e) {
-        return "Çok güzel anlattın " + childName + "! Başka neler var?";
+        return `${childName}, çok güzel anlattın. ${currentCategory.label} ile ilgili başka ne söylemek istersin?`;
     }
 }
 
@@ -2874,6 +2973,7 @@ window.switchAuth = switchAuth;
 window.handleAuth = handleAuth;
 window.goToMenu = goToMenu;
 window.goToTherapy = goToTherapy;
+window.setTherapyCategory = setTherapyCategory;
 window.goToHearingSupport = goToHearingSupport;
 window.goToStories = goToStories;
 window.goToReport = goToReport;
