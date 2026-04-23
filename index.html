@@ -17,22 +17,22 @@
             <div class="visual-orb visual-orb-one"></div>
             <div class="visual-orb visual-orb-two"></div>
             <div class="visual-badge">Çocuklar için güvenli deneyim</div>
-            <img src="avatar.png" id="avatar-img" alt="YÄ±ldÄ±z Can">
+            <img src="avatar.png" id="avatar-img" alt="Yıldız Can">
             <div class="visual-glow"></div>
             <div class="visual-text">
-                <h2>YÄ±ldÄ±z Can</h2>
+                <h2>Yıldız Can</h2>
                 <p>Eğlenerek Öğrenelim!</p>
             </div>
         </div>
         
         <div class="auth-content">
-            <p class="auth-eyebrow">YÄ±ldÄ±z SÄ±nÄ±fÄ±</p>
+            <p class="auth-eyebrow">Yıldız Sınıfı</p>
             <h1 id="auth-main-title">Hoş Geldin!</h1>
             <p class="auth-sub">Öğrenme yolculuğuna başlamak için giriş yap.</p>
             
             <div class="auth-tabs">
                 <button type="button" class="tab-btn active" id="tab-login" onclick="switchAuth('login')">Giriş Yap</button>
-                <button type="button" class="tab-btn" id="tab-register" onclick="switchAuth('register')">KayÄ±t Ol</button>
+                <button type="button" class="tab-btn" id="tab-register" onclick="switchAuth('register')">Kayıt Ol</button>
             </div>
 
             <div class="input-group">
@@ -95,13 +95,13 @@
                         <input type="text" id="studentNameInput" placeholder="Örn: Efe">
                     </div>
                     <div class="field">
-                        <label>DoÄŸum YÄ±lÄ±</label>
+                        <label>Doğum Yılı</label>
                         <input type="number" id="studentBirthYearInput" placeholder="Örn: 2019" min="2000" max="2099">
                     </div>
                 </div>
                 <div class="field">
                     <label>Destek Notu</label>
-                    <textarea id="studentNotesInput" rows="3" placeholder="KÄ±sa notlar, ilgi alanlarÄ± veya destek ihtiyacÄ±..."></textarea>
+                    <textarea id="studentNotesInput" rows="3" placeholder="Kısa notlar, ilgi alanları veya destek ihtiyacı..."></textarea>
                 </div>
                 <button type="button" class="btn-primary-gradient" id="createStudentBtn" onclick="createStudent()">
                     Öğrenci Oluştur
@@ -221,8 +221,26 @@
 <div id="game-container">
     <div class="main-card">
         <button class="btn-back" onclick="goToMenu()">← Menü</button>
+        <div class="therapy-session-bar">
+            <div class="therapy-session-chip">
+                <span class="therapy-chip-label">Aşama</span>
+                <strong id="therapyStageTitle">Hazırlık</strong>
+            </div>
+            <div class="therapy-session-chip">
+                <span class="therapy-chip-label">Odak</span>
+                <strong id="therapyFocusText">İlk soruya hazırlanıyoruz</strong>
+            </div>
+            <div class="therapy-session-chip">
+                <span class="therapy-chip-label">İlerleme</span>
+                <strong id="therapyProgressText">0 / 7</strong>
+            </div>
+        </div>
+        <div class="therapy-progress-track">
+            <div class="therapy-progress-fill" id="therapyProgressFill"></div>
+        </div>
         <div class="media-box"><video id="v" playsinline loop muted autoplay></video></div>
         <div class="question-bar" id="qBar">Hazırlanıyorum...</div>
+        <div class="therapy-brief" id="therapyBrief">Kısa ve anlaşılır cevaplar vererek başlayacağız.</div>
         <div class="btns">
             <button onclick="rec()" id="micBtn" class="btn-mic" disabled>🎙️</button>
             <button onclick="loadNext()" id="nextBtn" class="btn-next">➡️</button>
@@ -230,7 +248,16 @@
         <div id="info">Lütfen bekleyin...</div>
     </div>
     <div class="side-card">
-        <img src="avatar.png" class="side-avatar" alt="YÄ±ldÄ±z Can">
+        <img src="avatar.png" class="side-avatar" alt="Yıldız Can">
+        <div class="therapy-coach-card">
+            <span class="therapy-coach-label">Terapi Rehberi</span>
+            <h3 id="therapyCoachTitle">Sakin başlangıç</h3>
+            <p id="therapyCoachCopy">Önce çocuğun rahat konuşmasını sağlayan kısa ve tanıdık sorularla ilerleyeceğiz.</p>
+        </div>
+        <div class="therapy-response-card">
+            <span class="therapy-coach-label">Son Yanıt Notu</span>
+            <p id="therapyResponseHint">İlk yanıttan sonra burada kısa bir terapist notu göreceksin.</p>
+        </div>
         <div id="chat-bubbles"></div>
     </div>
 </div>
@@ -239,7 +266,7 @@
 <div id="story-select-screen">
     <button class="btn-back" onclick="goToMenu()">← Menü</button>
     <div class="story-select-header">
-        <img src="avatar.png" class="menu-avatar" alt="YÄ±ldÄ±z Can">
+        <img src="avatar.png" class="menu-avatar" alt="Yıldız Can">
         <div>
             <h2>Sosyal Beceri Görevleri</h2>
             <p>Bugün hangi gerçek hayat becerisini çalışmak istersin?</p>
@@ -286,7 +313,7 @@
     </div>
 </div>
 
-<!-- ===================== HÄ°KAYE OYUN EKRANI ===================== -->
+<!-- ===================== HİKÂYE OYUN EKRANI ===================== -->
 <div id="story-screen">
     <!-- Tam ekran arka plan video -->
     <video id="storyBgVideo" playsinline loop muted autoplay></video>
@@ -299,7 +326,7 @@
                 <div class="scene-emoji" id="sceneEmoji">🌲</div>
             </div>
             <div class="story-narrator">
-                <img src="avatar.png" class="narrator-avatar" alt="YÄ±ldÄ±z Can">
+                <img src="avatar.png" class="narrator-avatar" alt="Yıldız Can">
                 <div class="narrator-bubble" id="narratorBubble">Hazırlanıyorum...</div>
             </div>
             <div class="story-progress">
@@ -322,14 +349,14 @@
     </div>
 </div>
 
-<!-- ===================== VELÄ° RAPORU EKRANI ===================== -->
+<!-- ===================== VELİ RAPORU EKRANI ===================== -->
 <div id="report-screen">
     <button class="btn-back" onclick="goToMenu()">← Menü</button>
 
     <div class="report-wrapper" id="reportWrapper">
         <!-- Başlık -->
         <div class="report-header">
-            <img src="avatar.png" class="report-avatar" alt="YÄ±ldÄ±z Can">
+            <img src="avatar.png" class="report-avatar" alt="Yıldız Can">
             <div class="report-title-block">
                 <h2>Veli Gelişim Raporu</h2>
                 <p id="reportSubtitle">Hazırlanıyor...</p>
