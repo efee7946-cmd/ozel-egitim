@@ -155,18 +155,42 @@
             </div>
         </div>
     </div>
-    <div class="menu-cards">
-        <div class="menu-card therapy-card" onclick="goToTherapy()">
-            <div class="menu-card-icon">🎙️</div>
-            <h3>Konuşma Terapisti</h3>
-            <p>Yıldız Can ile sohbet et, soruları cevapla ve ifade becerilerini çalış.</p>
-            <span class="menu-card-badge">Sohbet</span>
+    <div class="menu-cards city-scene-shell">
+        <div class="city-scene-copy">
+            <span class="workspace-section-kicker">Konuşma Şehri</span>
+            <h3>Bir yeri seç ve konuşmayı oradan başlat</h3>
+            <p>Şehirdeki binalardan birine tıklayınca o mekâna uygun sorular, videolar ve konuşma akışı açılır.</p>
         </div>
-        <div class="menu-card report-card" onclick="goToReport()">
-            <div class="menu-card-icon">📋</div>
-            <h3>Veli Raporu</h3>
-            <p>Çocuğunuzun gelişim verilerini, oturum özetini ve AI değerlendirmesini görün.</p>
-            <span class="menu-card-badge report-badge">Rapor</span>
+        <div class="city-scene" id="cityScene">
+            <button type="button" class="city-building city-home" onclick="openCityLocation('home')">
+                <span class="city-building-icon">🏠</span>
+                <strong>Ev</strong>
+                <p>Rutinler ve günlük yaşam</p>
+            </button>
+            <button type="button" class="city-building city-school" onclick="openCityLocation('school')">
+                <span class="city-building-icon">🏫</span>
+                <strong>Okul</strong>
+                <p>Öğretmen, sınıf ve arkadaşlar</p>
+            </button>
+            <button type="button" class="city-building city-market" onclick="openCityLocation('market')">
+                <span class="city-building-icon">🏪</span>
+                <strong>Market</strong>
+                <p>İhtiyaç söyleme ve seçim yapma</p>
+            </button>
+            <button type="button" class="city-building city-park" onclick="openCityLocation('park')">
+                <span class="city-building-icon">🌳</span>
+                <strong>Park</strong>
+                <p>Oyun, spor ve arkadaşlık</p>
+            </button>
+            <button type="button" class="city-building city-hospital" onclick="openCityLocation('hospital')">
+                <span class="city-building-icon">🏥</span>
+                <strong>Hastane</strong>
+                <p>Duygu, beden ve yardım isteme</p>
+            </button>
+        </div>
+        <div class="city-scene-actions">
+            <button type="button" class="menu-ghost-btn" onclick="openCityLocation('school')">Şehirden konuşmayı başlat</button>
+            <button type="button" class="menu-ghost-btn" onclick="goToReport()">Veli raporunu aç</button>
         </div>
     </div>
     <div class="footer">© 2026 | Efe Erman tarafından geliştirilmiştir.</div>

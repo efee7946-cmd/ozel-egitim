@@ -1629,7 +1629,7 @@ async function goToReport() {
         sessionData.therapyTurns.forEach(t => {
             const entry = document.createElement('div');
             entry.className = 'therapy-entry';
-            entry.innerHTML = `<div class="therapy-q">🎙️ ${t.category ? `${t.category} • ` : ''}Soru: ${t.question}</div>${t.answer}`;
+            entry.innerHTML = `<div class="therapy-q">🎙️ ${t.location ? `${t.location} • ` : ''}${t.category ? `${t.category} • ` : ''}Soru: ${t.question}</div>${t.answer}`;
             therapyEl.appendChild(entry);
         });
     }
@@ -1762,7 +1762,36 @@ const THERAPY_CATEGORIES = {
     }
 };
 
+const CITY_LOCATIONS = {
+    home: {
+        label: 'Ev',
+        category: 'daily_life',
+        summary: 'Evdeki rutinler, ihtiyaçlar ve günlük yaşam konuşmaları.'
+    },
+    school: {
+        label: 'Okul',
+        category: 'social_communication',
+        summary: 'Öğretmen, arkadaş ve sınıf içi iletişim soruları.'
+    },
+    market: {
+        label: 'Market',
+        category: 'daily_life',
+        summary: 'İhtiyaç söyleme, seçim yapma ve rica etme çalışmaları.'
+    },
+    park: {
+        label: 'Park',
+        category: 'play_sports',
+        summary: 'Oyun, spor, takım olma ve arkadaşlık konuşmaları.'
+    },
+    hospital: {
+        label: 'Hastane',
+        category: 'emotions',
+        summary: 'Duygu, beden farkındalığı ve yardım isteme konuşmaları.'
+    }
+};
+
 let currentTherapyCategoryKey = 'daily_life';
+let currentCityLocationKey = 'home';
 let unaskedQuestions = [...THERAPY_CATEGORIES[currentTherapyCategoryKey].questions];
 let currentObj = null;
 let isWaiting = false;
@@ -1789,7 +1818,10 @@ function renderTherapyCategories() {
         </button>
     `).join('');
 
-    summaryEl.textContent = getCurrentTherapyCategory().summary;
+    const location = CITY_LOCATIONS[currentCityLocationKey];
+    summaryEl.textContent = location
+        ? `${location.label}: ${location.summary}`
+        : getCurrentTherapyCategory().summary;
 }
 
 function setTherapyCategory(categoryKey, shouldReload = true) {
@@ -1807,6 +1839,14 @@ function setTherapyCategory(categoryKey, shouldReload = true) {
     if (shouldReload && currentScreenId === 'game-container') {
         loadNext();
     }
+}
+
+function openCityLocation(locationKey) {
+    const location = CITY_LOCATIONS[locationKey];
+    if (!location) return;
+    currentCityLocationKey = locationKey;
+    setTherapyCategory(location.category, false);
+    goToTherapy();
 }
 
 function resetIdleTimer() {
@@ -1927,7 +1967,9 @@ async function rec() {
         var aiRes = await getGemmaResponse(speech);
         addMessage(aiRes, "ai");
         // Veriyi kaydet
+        const currentLocation = CITY_LOCATIONS[currentCityLocationKey];
         sessionData.therapyTurns.push({
+            location: currentLocation ? currentLocation.label : '',
             category: getCurrentTherapyCategory().label,
             question: currentObj.q,
             answer: speech
@@ -1968,7 +2010,9 @@ async function getGemmaResponse(text) {
     chatHistory.push({ role: "user", parts: [{ text: text }] });
     const currentCategory = getCurrentTherapyCategory();
     const currentGoal = currentObj && currentObj.goal ? currentObj.goal : 'kısa ve anlaşılır konuşma';
+    const currentLocation = CITY_LOCATIONS[currentCityLocationKey];
     var instructions = `Sen, özel eğitim desteği alan 4-8 yaş arası bir çocukla konuşan sabırlı ve pedagojik farkındalığı yüksek Yıldız Can'sın. Çocuğun adı ${childName}.
+Şu an seçili şehir noktası: ${currentLocation ? currentLocation.label : 'Genel konuşma alanı'}.
 Şu an seçili konuşma alanı: ${currentCategory.label}.
 Bu sorunun hedefi: ${currentGoal}.
 
