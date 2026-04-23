@@ -162,44 +162,11 @@
             <p>Şehirdeki binalardan birine tıklayınca o mekâna uygun sorular, videolar ve konuşma akışı açılır.</p>
         </div>
         <div class="city-scene" id="cityScene">
-            <div class="city-sun"></div>
-            <div class="city-cloud city-cloud-one"></div>
-            <div class="city-cloud city-cloud-two"></div>
-            <div class="city-skyline">
-                <span></span><span></span><span></span><span></span><span></span>
+            <div class="city-scene-canvas" id="citySceneCanvas" aria-label="Konuşma Şehri 3D sahnesi"></div>
+            <div class="city-scene-overlay">
+                <span class="city-scene-badge">3D Şehir</span>
+                <p>Binalara tıklayarak çalışma alanı seç.</p>
             </div>
-            <div class="city-road city-road-main"></div>
-            <div class="city-road city-road-side"></div>
-            <button type="button" class="city-building city-home" data-location="home" onclick="focusCityLocation('home')">
-                <span class="city-building-icon">🏠</span>
-                <strong>Ev</strong>
-                <p>Rutinler ve günlük yaşam</p>
-                <span class="city-building-tag">Ev içi konuşma</span>
-            </button>
-            <button type="button" class="city-building city-school" data-location="school" onclick="focusCityLocation('school')">
-                <span class="city-building-icon">🏫</span>
-                <strong>Okul</strong>
-                <p>Öğretmen, sınıf ve arkadaşlar</p>
-                <span class="city-building-tag">Sınıf dili</span>
-            </button>
-            <button type="button" class="city-building city-market" data-location="market" onclick="focusCityLocation('market')">
-                <span class="city-building-icon">🏪</span>
-                <strong>Market</strong>
-                <p>İhtiyaç söyleme ve seçim yapma</p>
-                <span class="city-building-tag">Tercih ve rica</span>
-            </button>
-            <button type="button" class="city-building city-park" data-location="park" onclick="focusCityLocation('park')">
-                <span class="city-building-icon">🌳</span>
-                <strong>Park</strong>
-                <p>Oyun, spor ve arkadaşlık</p>
-                <span class="city-building-tag">Oyun dili</span>
-            </button>
-            <button type="button" class="city-building city-hospital" data-location="hospital" onclick="focusCityLocation('hospital')">
-                <span class="city-building-icon">🏥</span>
-                <strong>Hastane</strong>
-                <p>Duygu, beden ve yardım isteme</p>
-                <span class="city-building-tag">Duygu ve ihtiyaç</span>
-            </button>
         </div>
         <div class="city-focus-panel" id="cityFocusPanel">
             <span class="city-focus-kicker" id="cityFocusKicker">Seçili alan</span>
@@ -483,6 +450,7 @@
     </div>
 </div>
 
+<script src="https://unpkg.com/three@0.165.0/build/three.min.js"></script>
 <script src="script.js" defer></script>
 </body>
 </html>

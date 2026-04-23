@@ -32,7 +32,6 @@ test.describe('Yıldız Can AI App Tests', () => {
     await expect(menuScreen).toBeVisible();
 
     // Take a screenshot of the menu screen
-    await expect(page.locator('.city-building')).toHaveCount(5);
     await page.screenshot({ path: testInfo.outputPath('menu-screen.png') });
 
     // Verify greeting contains "Test Çocuğu"
