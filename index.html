@@ -17,22 +17,22 @@
             <div class="visual-orb visual-orb-one"></div>
             <div class="visual-orb visual-orb-two"></div>
             <div class="visual-badge">Çocuklar için güvenli deneyim</div>
-            <img src="avatar.png" id="avatar-img" alt="Yıldız Can">
+            <img src="avatar.png" id="avatar-img" alt="YÄ±ldÄ±z Can">
             <div class="visual-glow"></div>
             <div class="visual-text">
-                <h2>Yıldız Can</h2>
+                <h2>YÄ±ldÄ±z Can</h2>
                 <p>Eğlenerek Öğrenelim!</p>
             </div>
         </div>
         
         <div class="auth-content">
-            <p class="auth-eyebrow">Yıldız Sınıfı</p>
+            <p class="auth-eyebrow">YÄ±ldÄ±z SÄ±nÄ±fÄ±</p>
             <h1 id="auth-main-title">Hoş Geldin!</h1>
             <p class="auth-sub">Öğrenme yolculuğuna başlamak için giriş yap.</p>
             
             <div class="auth-tabs">
                 <button type="button" class="tab-btn active" id="tab-login" onclick="switchAuth('login')">Giriş Yap</button>
-                <button type="button" class="tab-btn" id="tab-register" onclick="switchAuth('register')">Kayıt Ol</button>
+                <button type="button" class="tab-btn" id="tab-register" onclick="switchAuth('register')">KayÄ±t Ol</button>
             </div>
 
             <div class="input-group">
@@ -81,7 +81,7 @@
             <div class="student-panel-head">
                 <span class="student-eyebrow">Öğrenci Alanı</span>
                 <h2>Devam etmek için bir öğrenci seç</h2>
-                <p>Oturumlar, hedefler ve raporlar seçtiğin öğrenciye bağlanır.</p>
+                <p>Oturumlar ve raporlar seçtiğin öğrenciye bağlanır.</p>
             </div>
 
             <div class="student-status" id="studentStatus">Öğrenciler yükleniyor...</div>
@@ -95,13 +95,13 @@
                         <input type="text" id="studentNameInput" placeholder="Örn: Efe">
                     </div>
                     <div class="field">
-                        <label>Doğum Yılı</label>
+                        <label>DoÄŸum YÄ±lÄ±</label>
                         <input type="number" id="studentBirthYearInput" placeholder="Örn: 2019" min="2000" max="2099">
                     </div>
                 </div>
                 <div class="field">
                     <label>Destek Notu</label>
-                    <textarea id="studentNotesInput" rows="3" placeholder="Kısa notlar, ilgi alanları veya destek ihtiyacı..."></textarea>
+                    <textarea id="studentNotesInput" rows="3" placeholder="KÄ±sa notlar, ilgi alanlarÄ± veya destek ihtiyacÄ±..."></textarea>
                 </div>
                 <button type="button" class="btn-primary-gradient" id="createStudentBtn" onclick="createStudent()">
                     Öğrenci Oluştur
@@ -123,14 +123,14 @@
         </div>
         <div class="menu-topbar-actions">
             <button class="menu-ghost-btn" type="button" onclick="openStudentSetup()">Öğrenci Değiştir</button>
-            <button class="menu-ghost-btn" type="button" onclick="openOnboarding()">Nasıl Kullanılır?</button>
+            <button class="menu-ghost-btn" type="button" onclick="openOnboarding()">NasÄ±l KullanÄ±lÄ±r?</button>
             <button class="menu-ghost-btn logout-btn" type="button" onclick="logout()">Çıkış Yap</button>
         </div>
     </div>
     <div class="menu-header">
-        <img src="avatar.png" class="menu-avatar" alt="Yıldız Can">
+        <img src="avatar.png" class="menu-avatar" alt="YÄ±ldÄ±z Can">
         <div>
-            <h2 id="menu-greeting">Merhaba! 🌟</h2>
+            <h2 id="menu-greeting">Merhaba!</h2>
             <p class="menu-subtitle">Ne yapmak istersin?</p>
         </div>
     </div>
@@ -138,15 +138,15 @@
         <div class="onboarding-copy">
             <span class="onboarding-badge">İlk kullanım rehberi</span>
             <h3>Başlamak için en kolay yol burada</h3>
-            <p>Önce konuşma terapistiyle kısa bir oturum yap, sonra istersen hikaye bölümüne geç. En sonda veli raporunda bugünkü katılımı görebilirsin.</p>
+            <p>Önce konuşma terapistiyle kısa bir oturum yap, sonra istersen hikâye bölümüne geç. En sonda veli raporunda bugünkü katılımı görebilirsin.</p>
         </div>
         <div class="onboarding-steps">
             <div class="onboarding-step">
                 <strong>1. Konuşma Terapisti</strong>
-                <span>Kısa cevaplarla ısın ve mikrofonu dene.</span>
+                <span>KÄ±sa cevaplarla Ä±sÄ±n ve mikrofonu dene.</span>
             </div>
             <div class="onboarding-step">
-                <strong>2. Hikaye Dünyası</strong>
+                <strong>2. Hikâye Dünyası</strong>
                 <span>Karar vererek ilerle, eğlenirken ifade becerini kullan.</span>
             </div>
             <div class="onboarding-step">
@@ -164,7 +164,7 @@
         </div>
         <div class="menu-card story-card" onclick="goToStories()">
             <div class="menu-card-icon">📖</div>
-            <h3>Hikaye Dünyası</h3>
+            <h3>Hikâye Dünyası</h3>
             <p>Masalların içine gir, kararlar ver, maceraya atıl!</p>
             <span class="menu-card-badge new-badge">Yeni!</span>
         </div>
@@ -179,15 +179,15 @@
 </div>
 
 <div id="hearing-support-screen">
-    <button class="btn-back" onclick="goToMenu()">� Men�</button>
+    <button class="btn-back" onclick="goToMenu()">‹ Menü</button>
     <div class="hearing-shell">
         <div class="hearing-hero">
             <div>
-                <span class="hearing-kicker">Isitme Destegi</span>
-                <h2>Gorsel ve yapilandirilmis calismalar</h2>
-                <p>Bu alanda ses yerine gorsel ipucu, sirali yonerge ve simge temelli etkinlikler bulunur.</p>
+                <span class="hearing-kicker">İşitme Desteği</span>
+                <h2>Görsel ve yapılandırılmış çalışmalar</h2>
+                <p>Bu alanda ses yerine görsel ipucu, sıralı yönerge ve günlük rutin temelli etkinlikler bulunur.</p>
             </div>
-            <div class="hearing-hero-badge">3 mini modul</div>
+            <div class="hearing-hero-badge">3 mini modül</div>
         </div>
 
         <div class="hearing-layout">
@@ -195,29 +195,29 @@
 
             <div class="hearing-workspace">
                 <div class="hearing-workspace-head">
-                    <span class="hearing-step" id="hearingStepLabel">Modul sec</span>
-                    <h3 id="hearingTitle">Isitme destegi calismalari</h3>
-                    <p id="hearingDescription">Soldan bir modul secerek gorsel odakli etkinlikleri acabiliriz.</p>
+                    <span class="hearing-step" id="hearingStepLabel">Modül seç</span>
+                    <h3 id="hearingTitle">İşitme desteği çalışmaları</h3>
+                    <p id="hearingDescription">Soldan bir modül seçerek görsel odaklı etkinlikleri açabiliriz.</p>
                 </div>
 
                 <div class="hearing-prompt-card">
-                    <span class="hearing-prompt-label">Gorev</span>
-                    <div class="hearing-prompt" id="hearingPrompt">Hazir oldugunda bir modul sec.</div>
+                    <span class="hearing-prompt-label">Görev</span>
+                    <div class="hearing-prompt" id="hearingPrompt">Hazır olduğunda bir modül seç.</div>
                 </div>
 
                 <div class="hearing-visual-card" id="hearingVisualCard">
                     <div class="hearing-visual-emoji" id="hearingVisualEmoji">O</div>
-                    <div class="hearing-visual-title" id="hearingVisualTitle">Gorsel odak</div>
-                    <div class="hearing-visual-copy" id="hearingVisualCopy">Secilen modulun ana ipucu burada gosterilir.</div>
+                    <div class="hearing-visual-title" id="hearingVisualTitle">Görsel odak</div>
+                    <div class="hearing-visual-copy" id="hearingVisualCopy">Seçilen modülün ana ipucu burada gösterilir.</div>
                 </div>
 
                 <div class="hearing-options" id="hearingOptions"></div>
 
-                <div class="hearing-feedback" id="hearingFeedback">Bu alanda secimlerden sonra kisa geri bildirim goreceksin.</div>
+                <div class="hearing-feedback" id="hearingFeedback">Bu alanda seçimlerden sonra kısa geri bildirim göreceksin.</div>
 
                 <div class="hearing-actions">
-                    <button type="button" class="menu-ghost-btn" onclick="nextHearingStep()" id="hearingNextBtn" disabled>Sonraki adim</button>
-                    <button type="button" class="menu-ghost-btn" onclick="goToReport()">Raporu ac</button>
+                    <button type="button" class="menu-ghost-btn" onclick="nextHearingStep()" id="hearingNextBtn" disabled>Sonraki adım</button>
+                    <button type="button" class="menu-ghost-btn" onclick="goToReport()">Raporu aç</button>
                 </div>
             </div>
         </div>
@@ -236,28 +236,28 @@
         <div id="info">Lütfen bekleyin...</div>
     </div>
     <div class="side-card">
-        <img src="avatar.png" class="side-avatar" alt="Yıldız Can">
+        <img src="avatar.png" class="side-avatar" alt="YÄ±ldÄ±z Can">
         <div id="chat-bubbles"></div>
     </div>
 </div>
 
-<!-- ===================== HİKAYE SEÇİM EKRANI ===================== -->
+<!-- ===================== HİKÂYE SEÇİM EKRANI ===================== -->
 <div id="story-select-screen">
     <button class="btn-back" onclick="goToMenu()">← Menü</button>
     <div class="story-select-header">
-        <img src="avatar.png" class="menu-avatar" alt="Yıldız Can">
+        <img src="avatar.png" class="menu-avatar" alt="YÄ±ldÄ±z Can">
         <div>
-            <h2>Sosyal Beceri Gorevleri</h2>
-            <p>Bugun hangi gercek hayat becerisini calismak istersin?</p>
+            <h2>Sosyal Beceri Görevleri</h2>
+            <p>Bugün hangi gerçek hayat becerisini çalışmak istersin?</p>
         </div>
     </div>
     <div id="storyResumeCard" class="story-resume-card" style="display:none"></div>
     <div class="story-filter-row">
         <select id="storyThemeFilter" onchange="updateStoryFilters()">
-            <option value="all">Tum Beceriler</option>
-            <option value="yardim">Yardim Isteme</option>
-            <option value="bekleme">Sira Bekleme</option>
-            <option value="iletisim">Paylasma</option>
+            <option value="all">Tüm Beceriler</option>
+            <option value="yardim">Yardım İsteme</option>
+            <option value="bekleme">Sıra Bekleme</option>
+            <option value="iletisim">Paylaşma</option>
         </select>
         <select id="storyLevelFilter" onchange="updateStoryFilters()">
             <option value="all">Tüm Seviyeler</option>
@@ -292,20 +292,20 @@
     </div>
 </div>
 
-<!-- ===================== HİKAYE OYUN EKRANI ===================== -->
+<!-- ===================== HÄ°KAYE OYUN EKRANI ===================== -->
 <div id="story-screen">
     <!-- Tam ekran arka plan video -->
     <video id="storyBgVideo" playsinline loop muted autoplay></video>
     <div id="storyBgFallback"></div>
 
-    <button class="btn-back" onclick="exitStory()">← Hikayeler</button>
+    <button class="btn-back" onclick="exitStory()">← Hikâyeler</button>
     <div class="story-layout">
         <div class="story-main">
             <div class="story-scene-img" id="storySceneImg">
                 <div class="scene-emoji" id="sceneEmoji">🌲</div>
             </div>
             <div class="story-narrator">
-                <img src="avatar.png" class="narrator-avatar" alt="Yıldız Can">
+                <img src="avatar.png" class="narrator-avatar" alt="YÄ±ldÄ±z Can">
                 <div class="narrator-bubble" id="narratorBubble">Hazırlanıyorum...</div>
             </div>
             <div class="story-progress">
@@ -314,7 +314,7 @@
         </div>
         <div class="story-side">
             <div class="story-task-label" id="storyTaskLabel">🎯 Görevin:</div>
-            <div class="story-task" id="storyTask">Hikaye başlıyor...</div>
+            <div class="story-task" id="storyTask">Hikâye başlıyor...</div>
             <div class="story-choices" id="storyChoices"></div>
             <div class="story-mic-area" id="storyMicArea" style="display:none">
                 <button onclick="storyRec()" id="storyMicBtn" class="btn-mic story-mic-btn">🎙️</button>
@@ -328,14 +328,14 @@
     </div>
 </div>
 
-<!-- ===================== VELİ RAPORU EKRANI ===================== -->
+<!-- ===================== VELÄ° RAPORU EKRANI ===================== -->
 <div id="report-screen">
     <button class="btn-back" onclick="goToMenu()">← Menü</button>
 
     <div class="report-wrapper" id="reportWrapper">
         <!-- Başlık -->
         <div class="report-header">
-            <img src="avatar.png" class="report-avatar" alt="Yıldız Can">
+            <img src="avatar.png" class="report-avatar" alt="YÄ±ldÄ±z Can">
             <div class="report-title-block">
                 <h2>Veli Gelişim Raporu</h2>
                 <p id="reportSubtitle">Hazırlanıyor...</p>
@@ -358,7 +358,7 @@
             <div class="stat-card">
                 <div class="stat-icon">📖</div>
                 <div class="stat-value" id="statStoryProgress">-</div>
-                <div class="stat-label">Hikaye İlerlemesi</div>
+                <div class="stat-label">Hikâye İlerlemesi</div>
             </div>
             <div class="stat-card">
                 <div class="stat-icon">💬</div>
@@ -403,7 +403,7 @@
         <div class="report-section">
             <h3>🔍 Seçim Analizi</h3>
             <div id="choiceAnalysis" class="choice-analysis-list">
-                <p class="report-empty">Henüz hikaye oturumu yapılmadı.</p>
+                <p class="report-empty">Henüz hikâye oturumu yapılmadı.</p>
             </div>
         </div>
 

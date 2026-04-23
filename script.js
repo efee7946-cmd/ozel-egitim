@@ -42,83 +42,83 @@ let currentHearingStepIndex = 0;
 
 const HEARING_SUPPORT_MODULES = {
     visual_cues: {
-        title: 'Gorsel Yonerge Takibi',
-        description: 'Ses yerine sira, renk ve hareket ipuclarini takip ederek ilerlenir.',
-        badge: 'Gorsel ipucu',
+        title: 'Görsel Yönerge Takibi',
+        description: 'Günlük sınıf ve ev rutinlerinde sıralı görsel yönergeleri izleme çalışması.',
+        badge: 'Yönerge',
         steps: [
             {
                 emoji: '1-2-3',
-                title: 'Sirayi izle',
-                prompt: 'Ek randaki sirayi takip ettigini dusun: once mavi kart, sonra sari kart, en son kirmizi kart. Hangisi ikinci gelir?',
-                visualCopy: 'Mavi > Sari > Kirmizi',
-                options: ['Mavi', 'Sari', 'Kirmizi'],
+                title: 'Sırayı izle',
+                prompt: 'Öğretmen görsel kartlarla “çantanı as, yerine geç, defterini aç” yönergesi veriyor. İkinci adım hangisi?',
+                visualCopy: 'Çantanı as → Yerine geç → Defterini aç',
+                options: ['Çantanı as', 'Yerine geç', 'Defterini aç'],
                 correctIndex: 1,
-                feedbackCorrect: 'Dogru. Siradaki ikinci kart sari kartti.',
-                feedbackWrong: 'Bir daha siraya bakalim. Maviden sonra sari kart geliyordu.'
+                feedbackCorrect: 'Doğru. İkinci adım yerine geçmekti.',
+                feedbackWrong: 'Bir daha bakalım. Çantayı astıktan sonra yerine geçiyordu.'
             },
             {
                 emoji: 'EL',
-                title: 'Hareket ipucunu bul',
-                prompt: 'Ogretmen once otur isareti, sonra el kaldir isareti gosteriyor. Hangi hareket ikinci?',
-                visualCopy: 'Otur > El kaldir',
-                options: ['El kaldir', 'Bekle', 'Saga don'],
+                title: 'Sınıf işaretini anla',
+                prompt: 'Öğretmen önce “bekle”, sonra “gel” işareti gösteriyor. İkinci işaret hangisi?',
+                visualCopy: 'Bekle → Gel',
+                options: ['Gel', 'Bekle', 'Otur'],
                 correctIndex: 0,
-                feedbackCorrect: 'Evet. Ikinci adim el kaldirmakti.',
-                feedbackWrong: 'Bu adimda ikinci hareket el kaldirmakti.'
+                feedbackCorrect: 'Evet. İkinci işaret “gel” anlamına geliyor.',
+                feedbackWrong: 'Bu adımda ikinci işaret “gel”di.'
             }
         ]
     },
     lip_reading: {
-        title: 'Dudak Okuma Ipuclari',
-        description: 'Agiz sekli ve yuz ifadesi ipuclarini okuyarak kelime tahmini yapilir.',
-        badge: 'Yuz ifadesi',
+        title: 'Dudak Okuma Farkındalığı',
+        description: 'Ağız şekli, yüz ifadesi ve dikkatli bakışla temel kelime ipuçlarını ayırt etme çalışması.',
+        badge: 'Yüz ipucu',
         steps: [
             {
-                emoji: 'AGIZ',
-                title: 'Kisa kelime tahmini',
-                prompt: 'Ogretmenin dudaklari yavasca kapanip tekrar aciliyor. Hangisi kisa ve kolay okunabilen secenektir?',
-                visualCopy: 'Yuvarlak agiz acilisi ve kisa kapanis',
-                options: ['Anne', 'Su', 'Kalemlik'],
-                correctIndex: 1,
-                feedbackCorrect: 'Guzel. Kisa ve net agiz hareketleriyle en kolay secenek buydu.',
-                feedbackWrong: 'Burada en kisa ve net hareket su kelimesinde gorunur.'
+                emoji: 'AĞIZ',
+                title: 'Kısa kelimeyi tahmin et',
+                prompt: 'Öğretmenin dudakları kısa ve tek heceli bir kelime söylüyor. Hangisi dudak hareketiyle daha kolay ayırt edilir?',
+                visualCopy: 'Kısa ağız açılıp kapanması',
+                options: ['Su', 'Kalemlik', 'Oyuncak'],
+                correctIndex: 0,
+                feedbackCorrect: 'Güzel. Kısa ve net dudak hareketiyle en kolay ayırt edilen seçenek buydu.',
+                feedbackWrong: 'Burada kısa ve net hareket “su” kelimesinde görülür.'
             },
             {
-                emoji: 'YUZ',
-                title: 'Ifadeyi oku',
-                prompt: 'Yuz ifadesi sakin ve davetkar. Bu ifade sana ne anlatir?',
-                visualCopy: 'Kaslar yumusak, bakis sakin, agiz hafif acik',
-                options: ['Dinlemeye hazirim', 'Cok kizginim', 'Oyunu bitirdim'],
+                emoji: 'YÜZ',
+                title: 'İfadeyi oku',
+                prompt: 'Yüz ifadesi sakin ve destekleyici görünüyor. Bu ifade daha çok hangi mesajı verir?',
+                visualCopy: 'Kaşlar yumuşak, bakış sakin, ağız hafif açık',
+                options: ['Dinlemeye hazırım', 'Çok kızgınım', 'Buradan gidiyorum'],
                 correctIndex: 0,
-                feedbackCorrect: 'Dogru. Bu ifade iletisim kurmaya acik bir yuz ifadesi veriyor.',
-                feedbackWrong: 'Bu yuz ifadesi daha cok dinlemeye hazirim mesaji verir.'
+                feedbackCorrect: 'Doğru. Bu yüz ifadesi iletişime açık ve dinlemeye hazır bir mesaj veriyor.',
+                feedbackWrong: 'Bu yüz ifadesi daha çok “dinlemeye hazırım” mesajı verir.'
             }
         ]
     },
     symbol_match: {
-        title: 'Simge ve Isaret Eslestirme',
-        description: 'Simgeler ve temel isaretler anlamlariyla eslestirilir.',
-        badge: 'Simge esleme',
+        title: 'Simge ve Rutin Eşleştirme',
+        description: 'Günlük yaşam simgelerini ihtiyaç, etkinlik ve rutinlerle eşleştirme çalışması.',
+        badge: 'Rutin',
         steps: [
             {
-                emoji: 'YEMEK',
-                title: 'Simgeyi sec',
-                prompt: 'Tabak ve kasik simgesi gorunuyor. Bu simge hangi rutini anlatir?',
-                visualCopy: 'Tabak + kasik',
-                options: ['Yemek zamani', 'Uyku zamani', 'Disari cikma'],
+                emoji: '🍽️',
+                title: 'Rutini seç',
+                prompt: 'Tabak ve kaşık simgesi gösteriliyor. Bu simge hangi günlük rutini anlatır?',
+                visualCopy: 'Tabak + kaşık',
+                options: ['Yemek zamanı', 'Uyku zamanı', 'Dışarı çıkma'],
                 correctIndex: 0,
-                feedbackCorrect: 'Evet. Tabak ve kasik yemek zamanini anlatir.',
-                feedbackWrong: 'Bu simge yemek zamanini gosterir.'
+                feedbackCorrect: 'Evet. Bu simge yemek zamanını anlatır.',
+                feedbackWrong: 'Bu simge yemek zamanını gösterir.'
             },
             {
-                emoji: 'BEKLE',
-                title: 'Isareti anla',
-                prompt: 'Avuc ici acik ve one bakiyor. Bu temel isaret ne anlatir?',
-                visualCopy: 'Acik avuc one donuk',
-                options: ['Bekle', 'Kos', 'Bitir'],
+                emoji: '✋',
+                title: 'Temel işareti anla',
+                prompt: 'Avuç içi açık ve öne dönük. Bu temel işaret günlük kullanımda en çok ne anlatır?',
+                visualCopy: 'Açık avuç öne dönük',
+                options: ['Bekle', 'Koş', 'Bitir'],
                 correctIndex: 0,
-                feedbackCorrect: 'Dogru. Bu isaret genelde bekle anlamina gelir.',
-                feedbackWrong: 'Bu gorsel daha cok bekle anlamina gelir.'
+                feedbackCorrect: 'Doğru. Bu işaret genelde “bekle” anlamına gelir.',
+                feedbackWrong: 'Bu görsel daha çok “bekle” anlamına gelir.'
             }
         ]
     }
@@ -320,7 +320,7 @@ async function startApp(resetSession) {
     const hasStudentContext = await ensureActiveStudent();
     if (!hasStudentContext) return;
 
-    document.getElementById('menu-greeting').textContent = `Merhaba, ${activeStudentName || childName}! ğŸŒŸ`;
+    document.getElementById('menu-greeting').textContent = `Merhaba, ${activeStudentName || childName}!`;
     document.getElementById('menu-greeting').textContent = `Merhaba, ${activeStudentName || childName}!`;
     appStarted = true;
     updateMenuIdentity();
@@ -419,15 +419,15 @@ function renderHearingStep() {
 
     const module = HEARING_SUPPORT_MODULES[currentHearingModuleKey];
     if (!module) {
-        titleEl.textContent = 'Isitme destegi calismalari';
-        descEl.textContent = 'Soldan bir modul secerek gorsel odakli etkinlikleri acabiliriz.';
-        stepLabelEl.textContent = 'Modul sec';
-        promptEl.textContent = 'Hazir oldugunda bir modul sec.';
-        visualEmojiEl.textContent = 'O';
-        visualTitleEl.textContent = 'Gorsel odak';
-        visualCopyEl.textContent = 'Secilen modulun ana ipucu burada gosterilir.';
+        titleEl.textContent = 'İşitme desteği çalışmaları';
+        descEl.textContent = 'Soldaki modüllerden birini seçerek günlük yaşama yakın görsel etkinlikleri açabilirsin.';
+        stepLabelEl.textContent = 'Modül seç';
+        promptEl.textContent = 'Hazır olduğunda bir modül seç.';
+        visualEmojiEl.textContent = '◉';
+        visualTitleEl.textContent = 'Görsel odak';
+        visualCopyEl.textContent = 'Seçilen modülün ana ipucu burada gösterilir.';
         optionsEl.innerHTML = '';
-        feedbackEl.textContent = 'Bu alanda secimlerden sonra kisa geri bildirim goreceksin.';
+        feedbackEl.textContent = 'Bu alanda her seçimden sonra kısa ve açıklayıcı geri bildirim göreceksin.';
         nextBtn.disabled = true;
         return;
     }
@@ -435,12 +435,12 @@ function renderHearingStep() {
     const step = module.steps[currentHearingStepIndex];
     titleEl.textContent = module.title;
     descEl.textContent = module.description;
-    stepLabelEl.textContent = `Adim ${currentHearingStepIndex + 1}/${module.steps.length}`;
+    stepLabelEl.textContent = `Adım ${currentHearingStepIndex + 1}/${module.steps.length}`;
     promptEl.textContent = step.prompt;
     visualEmojiEl.textContent = step.emoji;
     visualTitleEl.textContent = step.title;
     visualCopyEl.textContent = step.visualCopy;
-    feedbackEl.textContent = 'Dogru cevabi bulunca sonraki adima gecebilirsin.';
+    feedbackEl.textContent = 'Doğru cevabı bulunca sonraki adıma geçebilirsin.';
     nextBtn.disabled = true;
 
     optionsEl.innerHTML = step.options.map((option, index) => `
@@ -497,15 +497,15 @@ function nextHearingStep() {
     const nextBtn = document.getElementById('hearingNextBtn');
     if (!titleEl || !descEl || !stepLabelEl || !promptEl || !visualEmojiEl || !visualTitleEl || !visualCopyEl || !optionsEl || !feedbackEl || !nextBtn) return;
 
-    titleEl.textContent = `${module.title} tamamlandi`;
-    descEl.textContent = 'Bu modulu bitirdin. Dilersen ayni alani tekrar acabilir ya da rapora gecebilirsin.';
-    stepLabelEl.textContent = 'Tamamlandi';
-    promptEl.textContent = 'Gorsel odakli tum adimlari tamamladin.';
-    visualEmojiEl.textContent = 'OK';
-    visualTitleEl.textContent = 'Modul bitti';
-    visualCopyEl.textContent = 'Simdi baska bir modul secerek devam edebiliriz.';
+    titleEl.textContent = `${module.title} tamamlandı`;
+    descEl.textContent = 'Bu modülü bitirdin. İstersen aynı alanı tekrar açabilir ya da rapora geçebilirsin.';
+    stepLabelEl.textContent = 'Tamamlandı';
+    promptEl.textContent = 'Görsel odaklı tüm adımları tamamladın.';
+    visualEmojiEl.textContent = '✓';
+    visualTitleEl.textContent = 'Modül bitti';
+    visualCopyEl.textContent = 'Şimdi başka bir modül seçerek devam edebiliriz.';
     optionsEl.innerHTML = '';
-    feedbackEl.textContent = 'Guclu bir gorsel takip calismasi tamamlandi.';
+    feedbackEl.textContent = 'Planlı ve anlaşılır bir görsel takip çalışmasını tamamladın.';
     nextBtn.disabled = true;
 }
 
@@ -607,7 +607,7 @@ function ensureStudentEnhancements() {
         updateBtn.type = 'button';
         updateBtn.id = 'updateStudentBtn';
         updateBtn.className = 'menu-ghost-btn student-secondary-btn';
-        updateBtn.textContent = 'Bilgileri Guncelle';
+        updateBtn.textContent = 'Bilgileri Güncelle';
         updateBtn.style.display = 'none';
         updateBtn.onclick = updateStudent;
         createBtn.insertAdjacentElement('afterend', updateBtn);
@@ -621,17 +621,17 @@ function ensureStudentEnhancements() {
             <div class="menu-insight-card">
                 <span class="menu-insight-label">Panel Modu</span>
                 <strong id="role-mode-title">Veli Paneli</strong>
-                <p id="role-mode-copy">Secili ogrenci icin dogru akisi secip oturumlari tek panelden takip edebilirsin.</p>
+                <p id="role-mode-copy">Seçili öğrenci için doğru akışı seçip oturumları tek panelden takip edebilirsin.</p>
             </div>
             <div class="menu-insight-card">
-                <span class="menu-insight-label">Ogrenci Ozeti</span>
-                <strong id="student-summary-name">Henuz secilmedi</strong>
-                <p id="student-summary-copy">Ogrenci secince notlari ve temel bilgileri burada goreceksin.</p>
+                <span class="menu-insight-label">Öğrenci Özeti</span>
+                <strong id="student-summary-name">Henüz seçilmedi</strong>
+                <p id="student-summary-copy">Öğrenci seçince notları ve temel bilgileri burada göreceksin.</p>
             </div>
             <div class="menu-insight-card">
-                <span class="menu-insight-label">Toplam Ogrenci</span>
+                <span class="menu-insight-label">Toplam Öğrenci</span>
                 <strong id="student-count-value">0</strong>
-                <p id="student-count-copy">Bu hesap icin takip edilen aktif ogrenci sayisi.</p>
+                <p id="student-count-copy">Bu hesap için takip edilen aktif öğrenci sayısı.</p>
             </div>
         `;
         menuHeader.insertAdjacentElement('afterend', insights);
@@ -644,24 +644,24 @@ function ensureStudentEnhancements() {
         detailPanel.innerHTML = `
             <div class="student-detail-head">
                 <div>
-                    <span class="student-detail-kicker">Secili Ogrenci</span>
-                    <h3 id="student-detail-title">Ogrenci secilmedi</h3>
-                    <p id="student-detail-subtitle">Bir ogrenci sectiginde guclu yonler, destek notlari ve oturum ozeti burada gorunur.</p>
+                    <span class="student-detail-kicker">Seçili Öğrenci</span>
+                    <h3 id="student-detail-title">Öğrenci seçilmedi</h3>
+                    <p id="student-detail-subtitle">Bir öğrenci seçtiğinde güçlü yönler, destek notları ve oturum özeti burada görünür.</p>
                 </div>
-                <button type="button" class="menu-ghost-btn" onclick="openStudentSetup()">Ogrenci Yonet</button>
+                <button type="button" class="menu-ghost-btn" onclick="openStudentSetup()">Öğrenci Yönet</button>
             </div>
             <div class="student-detail-grid">
                 <div class="student-detail-card">
                     <span class="student-detail-label">Destek Notu</span>
-                    <p id="student-detail-notes">Henuz destek notu eklenmedi.</p>
+                    <p id="student-detail-notes">Henüz destek notu eklenmedi.</p>
                 </div>
                 <div class="student-detail-card">
-                    <span class="student-detail-label">Ogrenme Odagi</span>
-                    <p id="student-detail-goal">Destek notlarina gore odak alani burada ozetlenir.</p>
+                    <span class="student-detail-label">Öğrenme Odağı</span>
+                    <p id="student-detail-goal">Destek notlarına göre odak alanı burada özetlenir.</p>
                 </div>
                 <div class="student-detail-card">
                     <span class="student-detail-label">Son Oturum</span>
-                    <p id="student-detail-session">Henuz kayitli oturum yok.</p>
+                    <p id="student-detail-session">Henüz kayıtlı oturum yok.</p>
                 </div>
             </div>
             <div class="student-detail-meta-row">
@@ -674,7 +674,7 @@ function ensureStudentEnhancements() {
                     <strong id="student-detail-total-minutes">0 dk</strong>
                 </div>
                 <div class="student-mini-stat">
-                    <span>Son Hikaye Ilerlemesi</span>
+                    <span>Son Hikâye İlerlemesi</span>
                     <strong id="student-detail-story-progress">-</strong>
                 </div>
             </div>
@@ -707,26 +707,26 @@ function ensureMenuWorkspace() {
         sidebar.className = 'menu-sidebar';
         sidebar.innerHTML = `
             <div class="sidebar-brand">
-                <img src="avatar.png" class="sidebar-brand-avatar" alt="Yildiz Can">
+                <img src="avatar.png" class="sidebar-brand-avatar" alt="Yıldız Can">
                 <div>
-                    <strong>Yildiz Sinifi</strong>
-                    <span>Cocuk destek paneli</span>
+                    <strong>Yıldız Sınıfı</strong>
+                    <span>Çocuk destek paneli</span>
                 </div>
             </div>
             <div class="sidebar-section">
-                <span class="sidebar-label">Calisma Alanlari</span>
-                <button type="button" class="sidebar-nav-btn active" data-section="overview">Genel Bakis</button>
-                <button type="button" class="sidebar-nav-btn" data-section="students">Ogrenciler</button>
+                <span class="sidebar-label">Çalışma Alanları</span>
+                <button type="button" class="sidebar-nav-btn active" data-section="overview">Genel Bakış</button>
+                <button type="button" class="sidebar-nav-btn" data-section="students">Öğrenciler</button>
                 <button type="button" class="sidebar-nav-btn" data-section="guide">Rehber</button>
                 <button type="button" class="sidebar-nav-btn" data-section="activities">Oturumlar</button>
             </div>
             <div class="sidebar-section">
-                <span class="sidebar-label">Hizli Erisim</span>
-                <button type="button" class="sidebar-link-btn" onclick="goToTherapy()">Konusma Terapisti</button>
-                <button type="button" class="sidebar-link-btn" onclick="goToHearingSupport()">Isitme Destegi</button>
-                <button type="button" class="sidebar-link-btn" onclick="goToStories()">Hikaye Dunyasi</button>
+                <span class="sidebar-label">Hızlı Erişim</span>
+                <button type="button" class="sidebar-link-btn" onclick="goToTherapy()">Konuşma Terapisti</button>
+                <button type="button" class="sidebar-link-btn" onclick="goToHearingSupport()">İşitme Desteği</button>
+                <button type="button" class="sidebar-link-btn" onclick="goToStories()">Hikâye Dünyası</button>
                 <button type="button" class="sidebar-link-btn" onclick="goToReport()">Veli Raporu</button>
-                <button type="button" class="sidebar-link-btn" onclick="openStudentSetup()">Ogrenci Yonetimi</button>
+                <button type="button" class="sidebar-link-btn" onclick="openStudentSetup()">Öğrenci Yönetimi</button>
             </div>
         `;
 
@@ -764,8 +764,8 @@ function ensureMenuWorkspace() {
         nav.id = 'menu-workspace-nav';
         nav.className = 'menu-workspace-nav';
         nav.innerHTML = `
-            <button type="button" class="workspace-tab active" data-section="overview">Genel Bakis</button>
-            <button type="button" class="workspace-tab" data-section="students">Ogrenciler</button>
+            <button type="button" class="workspace-tab active" data-section="overview">Genel Bakış</button>
+            <button type="button" class="workspace-tab" data-section="students">Öğrenciler</button>
             <button type="button" class="workspace-tab" data-section="guide">Rehber</button>
             <button type="button" class="workspace-tab" data-section="activities">Oturumlar</button>
         `;
@@ -782,9 +782,9 @@ function ensureMenuWorkspace() {
         mainPane.appendChild(overview);
         overview.innerHTML = `
             <div class="workspace-section-head">
-                <span class="workspace-section-kicker">Genel Bakis</span>
-                <h3>Bugunku genel durum</h3>
-                <p>Rolune ve secili ogrenciye gore hizli bir ozet, yonlendirme ve bir sonraki adimi gor.</p>
+                <span class="workspace-section-kicker">Genel Bakış</span>
+                <h3>Bugünkü genel durum</h3>
+                <p>Rolüne ve seçili öğrenciye göre hızlı bir özet, yönlendirme ve bir sonraki adımı gör.</p>
             </div>
         `;
         overview.appendChild(insights);
@@ -798,13 +798,13 @@ function ensureMenuWorkspace() {
         mainPane.appendChild(students);
         students.innerHTML = `
             <div class="workspace-section-head">
-                <span class="workspace-section-kicker">Ogrenciler</span>
-                <h3>Ogrenci yonetimi</h3>
-                <p>Secili ogrenciyi incele, destek notlarini guncelle ve hangi calismaya ihtiyaci oldugunu gor.</p>
+                <span class="workspace-section-kicker">Öğrenciler</span>
+                <h3>Öğrenci yönetimi</h3>
+                <p>Seçili öğrenciyi incele, destek notlarını güncelle ve hangi çalışmaya ihtiyacı olduğunu gör.</p>
             </div>
             <div class="students-section-actions">
-                <button type="button" class="menu-ghost-btn" onclick="openStudentSetup()">Ogrenci sec veya ekle</button>
-                <button type="button" class="menu-ghost-btn" onclick="openOnboarding()">Kullanim rehberini ac</button>
+                <button type="button" class="menu-ghost-btn" onclick="openStudentSetup()">Öğrenci seç veya ekle</button>
+                <button type="button" class="menu-ghost-btn" onclick="openOnboarding()">Kullanım rehberini aç</button>
             </div>
         `;
     }
@@ -817,29 +817,29 @@ function ensureMenuWorkspace() {
         guide.innerHTML = `
             <div class="workspace-section-head">
                 <span class="workspace-section-kicker">Rehber</span>
-                <h3>Ogretici kullanim akisi</h3>
-                <p>Karmasayi azaltmak icin her oturum once neye bakacagini, sonra hangi alana gececegini net gosteriyoruz.</p>
+                <h3>Öğretici kullanım akışı</h3>
+                <p>Karmaşayı azaltmak için her oturumda önce neye bakacağını, sonra hangi alana geçeceğini net gösteriyoruz.</p>
             </div>
             <div class="guide-grid">
                 <article class="guide-card">
-                    <span class="guide-card-step">1. Hazirlik</span>
-                    <h4>Ogrenci notlarini oku</h4>
-                    <p>Destek notlari cocugun ilgisini, zorlandigi alanlari ve dili nasil sade tutman gerektigini hatirlatir.</p>
+                    <span class="guide-card-step">1. Hazırlık</span>
+                    <h4>Öğrenci notlarını oku</h4>
+                    <p>Destek notları çocuğun ilgisini, zorlandığı alanları ve dili nasıl sade tutman gerektiğini hatırlatır.</p>
                 </article>
                 <article class="guide-card">
                     <span class="guide-card-step">2. Uygulama</span>
-                    <h4>Kisa terapiyle basla</h4>
-                    <p>Ilk olarak konusma terapisti acilip mikrofon, dikkat ve kisa cevap akisi denenebilir.</p>
+                    <h4>Kısa terapiyle başla</h4>
+                    <p>İlk olarak konuşma terapisti açılıp mikrofon, dikkat ve kısa cevap akışı denenebilir.</p>
                 </article>
                 <article class="guide-card">
-                    <span class="guide-card-step">3. Pekistirme</span>
-                    <h4>Hikaye ile genislet</h4>
-                    <p>Terapi sonrasi hikaye dunyasinda secim yaptirarak sosyal ipuclari ve ifade becerisi pekistirilir.</p>
+                    <span class="guide-card-step">3. Pekiştirme</span>
+                    <h4>Hikâye ile genişlet</h4>
+                    <p>Terapi sonrası hikâye dünyasında seçim yaptırarak sosyal ipuçları ve ifade becerisi pekiştirilir.</p>
                 </article>
                 <article class="guide-card guide-card-accent">
-                    <span class="guide-card-step">4. Gozlem</span>
+                    <span class="guide-card-step">4. Gözlem</span>
                     <h4>Raporla kapat</h4>
-                    <p>Son adimda veli raporundan sure, katilim ve ilerleme ozetini inceleyip bir sonraki oturuma not cikar.</p>
+                    <p>Son adımda veli raporundan süre, katılım ve ilerleme özetini inceleyip bir sonraki oturuma not çıkar.</p>
                 </article>
             </div>
         `;
@@ -853,25 +853,25 @@ function ensureMenuWorkspace() {
         activities.innerHTML = `
             <div class="workspace-section-head">
                 <span class="workspace-section-kicker">Oturumlar</span>
-                <h3>Calisma alanini sec</h3>
-                <p>Terapi, hikaye ve rapor akislari arasindan ihtiyacina uygun olani ac.</p>
+                <h3>Çalışma alanını seç</h3>
+                <p>Terapi, hikâye ve rapor akışları arasından ihtiyacına uygun olanı aç.</p>
             </div>
             <div class="activity-playbook">
                 <div class="activity-playbook-card">
-                    <strong>Hizli baslangic</strong>
-                    <p>Dikkat daginiksa once terapiyi acip 3-4 kisa yanitla isin.</p>
+                    <strong>Hızlı başlangıç</strong>
+                    <p>Dikkat dağınıksa önce terapiyi açıp 3-4 kısa yanıtla ısın.</p>
                 </div>
                 <div class="activity-playbook-card">
                     <strong>Dil ve ifade</strong>
-                    <p>Secenekli kararlar icin hikaye dunyasi sosyal dil ve anlatim calismasi icin daha uygundur.</p>
+                    <p>Seçenekli kararlar için hikâye dünyası sosyal dil ve anlatım çalışması için daha uygundur.</p>
                 </div>
                 <div class="activity-playbook-card">
-                    <strong>Isitme destegi</strong>
-                    <p>Gorsel ipucu, simge ve sira calismalari icin isitme destegi moduluyle sessiz akisa gecebilirsin.</p>
+                    <strong>İşitme desteği</strong>
+                    <p>Görsel ipucu, rutin kartı ve temel işaret çalışmaları için işitme desteği modülüne geçebilirsin.</p>
                 </div>
                 <div class="activity-playbook-card">
                     <strong>Takip</strong>
-                    <p>Oturum bitince veli raporuna gecip hangi alanda daha iyi katilim oldugunu kontrol et.</p>
+                    <p>Oturum bitince veli raporuna geçip hangi alanda daha iyi katılım olduğunu kontrol et.</p>
                 </div>
             </div>
         `;
@@ -881,19 +881,19 @@ function ensureMenuWorkspace() {
         moduleStrip.className = 'module-strip';
         moduleStrip.innerHTML = `
             <button type="button" class="module-strip-card hearing-module" onclick="goToHearingSupport()">
-                <span class="module-strip-badge">Yeni modul</span>
-                <strong>Isitme Destegi</strong>
-                <p>Ses yerine gorsel yonerge ve simge tabanli mini calismalar.</p>
+                <span class="module-strip-badge">Yeni modül</span>
+                <strong>İşitme Desteği</strong>
+                <p>Ses yerine görsel yönerge, rutin kartı ve işaret temelli kısa çalışmalar.</p>
             </button>
             <div class="module-strip-card module-strip-soon">
-                <span class="module-strip-badge">Sirada</span>
-                <strong>Gorme Destegi</strong>
-                <p>Yuksek kontrast, sesli yonlendirme ve klavye odakli erisim tasarimi.</p>
+                <span class="module-strip-badge">Sırada</span>
+                <strong>Görme Desteği</strong>
+                <p>Yüksek kontrast, sesli yönlendirme ve klavye odaklı erişim tasarımı.</p>
             </div>
             <div class="module-strip-card module-strip-soon">
-                <span class="module-strip-badge">Sirada</span>
-                <strong>Dikkat Calismalari</strong>
-                <p>Adim takip, odak ve gorsel esleme temelli kisa gorevler.</p>
+                <span class="module-strip-badge">Sırada</span>
+                <strong>Dikkat Çalışmaları</strong>
+                <p>Adım takip, odak ve görsel eşleme temelli kısa görevler.</p>
             </div>
         `;
         activities.insertBefore(moduleStrip, cards);
@@ -970,26 +970,26 @@ function renderRoleDashboard() {
     if (roleTitleEl) roleTitleEl.textContent = currentUserRole === 'specialist' ? 'Uzman Paneli' : 'Veli Paneli';
     if (roleCopyEl) {
         roleCopyEl.textContent = currentUserRole === 'specialist'
-            ? 'Birden fazla ogrenciyi takip edip secili ogrenci icin seanslari yonetebilirsin.'
-            : 'Secili ogrenci icin uygun calismayi secip gelisimini tek panelden izleyebilirsin.';
+            ? 'Birden fazla öğrenciyi takip edip seçili öğrenci için seansları yönetebilirsin.'
+            : 'Seçili öğrenci için uygun çalışmayı seçip gelişimini tek panelden izleyebilirsin.';
     }
 
-    if (studentSummaryNameEl) studentSummaryNameEl.textContent = activeStudentName || 'Henuz secilmedi';
+    if (studentSummaryNameEl) studentSummaryNameEl.textContent = activeStudentName || 'Henüz seçilmedi';
     if (studentSummaryCopyEl) {
         if (student) {
-            const note = student.support_notes ? student.support_notes : 'Destek notu henuz eklenmedi.';
-            const yearText = student.birth_year ? `Dogum yili: ${student.birth_year}. ` : '';
+            const note = student.support_notes ? student.support_notes : 'Destek notu henüz eklenmedi.';
+            const yearText = student.birth_year ? `Doğum yılı: ${student.birth_year}. ` : '';
             studentSummaryCopyEl.textContent = `${yearText}${note}`;
         } else {
-            studentSummaryCopyEl.textContent = 'Ogrenci secince notlari ve temel bilgileri burada goreceksin.';
+            studentSummaryCopyEl.textContent = 'Öğrenci seçince notları ve temel bilgileri burada göreceksin.';
         }
     }
 
     if (studentCountEl) studentCountEl.textContent = String(studentsCache.length);
     if (studentCountCopyEl) {
         studentCountCopyEl.textContent = currentUserRole === 'specialist'
-            ? 'Bu uzman hesabina bagli aktif ogrenci sayisi.'
-            : 'Bu veli hesabinda takip edilen aktif ogrenci sayisi.';
+            ? 'Bu uzman hesabına bağlı aktif öğrenci sayısı.'
+            : 'Bu veli hesabında takip edilen aktif öğrenci sayısı.';
     }
 }
 
@@ -1007,7 +1007,7 @@ async function loadStudentDetailMetrics(userId, studentId) {
         .limit(20);
 
     if (error) {
-        console.error('Ogrenci oturum ozetleri okunamadi:', error);
+        console.error('Öğrenci oturum özetleri okunamadı:', error);
         return { totalSessions: 0, totalMinutes: 0, latestSession: null };
     }
 
@@ -1032,37 +1032,37 @@ async function renderStudentDetailPanel() {
 
     const student = studentsCache.find(item => item.id === activeStudentId);
     if (!student) {
-        titleEl.textContent = 'Ogrenci secilmedi';
-        subtitleEl.textContent = 'Bir ogrenci sectiginde guclu yonler, destek notlari ve oturum ozeti burada gorunur.';
-        notesEl.textContent = 'Henuz destek notu eklenmedi.';
-        goalEl.textContent = 'Destek notlarina gore odak alani burada ozetlenir.';
-        sessionEl.textContent = 'Henuz kayitli oturum yok.';
+        titleEl.textContent = 'Öğrenci seçilmedi';
+        subtitleEl.textContent = 'Bir öğrenci seçtiğinde güçlü yönler, destek notları ve oturum özeti burada görünür.';
+        notesEl.textContent = 'Henüz destek notu eklenmedi.';
+        goalEl.textContent = 'Destek notlarına göre odak alanı burada özetlenir.';
+        sessionEl.textContent = 'Henüz kayıtlı oturum yok.';
         totalSessionsEl.textContent = '0';
         totalMinutesEl.textContent = '0 dk';
         storyProgressEl.textContent = '-';
         return;
     }
 
-    titleEl.textContent = student.full_name || 'Isimsiz ogrenci';
+    titleEl.textContent = student.full_name || 'İsimsiz öğrenci';
     subtitleEl.textContent = student.birth_year
-        ? `Dogum yili ${student.birth_year}. Secili ogrenci icin destek notlari ve oturum ozeti burada.`
-        : 'Secili ogrenci icin destek notlari ve oturum ozeti burada.';
-    notesEl.textContent = student.support_notes || 'Henuz destek notu eklenmedi.';
+        ? `Doğum yılı ${student.birth_year}. Seçili öğrenci için destek notları ve oturum özeti burada.`
+        : 'Seçili öğrenci için destek notları ve oturum özeti burada.';
+    notesEl.textContent = student.support_notes || 'Henüz destek notu eklenmedi.';
 
     const userId = await getCurrentUserId();
     const metrics = await loadStudentDetailMetrics(userId, student.id);
     goalEl.textContent = student.support_notes
         ? `Odak: ${student.support_notes}`
         : (currentUserRole === 'specialist'
-            ? 'Oturumdan once destek notu ekleyerek yonlendirmeyi guclendirebilirsin.'
-            : 'Destek notu ekleyerek hangi beceriye odaklanacagini netlestirebilirsin.');
+            ? 'Oturumdan önce destek notu ekleyerek yönlendirmeyi güçlendirebilirsin.'
+            : 'Destek notu ekleyerek hangi beceriye odaklanacağını netleştirebilirsin.');
 
     if (metrics.latestSession) {
         const sessionDate = new Date(metrics.latestSession.created_at).toLocaleDateString('tr-TR');
-        sessionEl.textContent = `${sessionDate} tarihinde ${metrics.latestSession.duration_min || 0} dk, ${metrics.latestSession.total_turns || 0} yanit`;
-        storyProgressEl.textContent = metrics.latestSession.story_completed ? 'Tamamlandi' : (metrics.latestSession.story_pct || '-');
+        sessionEl.textContent = `${sessionDate} tarihinde ${metrics.latestSession.duration_min || 0} dk, ${metrics.latestSession.total_turns || 0} yanıt`;
+        storyProgressEl.textContent = metrics.latestSession.story_completed ? 'Tamamlandı' : (metrics.latestSession.story_pct || '-');
     } else {
-        sessionEl.textContent = 'Henuz kayitli oturum yok.';
+        sessionEl.textContent = 'Henüz kayıtlı oturum yok.';
         storyProgressEl.textContent = '-';
     }
 
@@ -1225,12 +1225,12 @@ async function updateStudent() {
     const birthYearRaw = yearEl.value.trim();
     const supportNotes = notesEl.value.trim();
     if (!fullName) {
-        statusEl.textContent = 'Guncelleme icin ogrenci adi zorunlu.';
+        statusEl.textContent = 'Güncelleme için öğrenci adı zorunlu.';
         return;
     }
 
     updateBtn.disabled = true;
-    statusEl.textContent = 'Ogrenci bilgileri guncelleniyor...';
+    statusEl.textContent = 'Öğrenci bilgileri güncelleniyor...';
     const birthYear = birthYearRaw ? Number(birthYearRaw) : null;
 
     const { error } = await supabaseClient
@@ -1245,12 +1245,12 @@ async function updateStudent() {
 
     updateBtn.disabled = false;
     if (error) {
-        console.error('Ogrenci guncellenemedi:', error);
-        statusEl.textContent = 'Ogrenci bilgileri guncellenemedi. Lutfen tekrar dene.';
+        console.error('Öğrenci güncellenemedi:', error);
+        statusEl.textContent = 'Öğrenci bilgileri güncellenemedi. Lütfen tekrar dene.';
         return;
     }
 
-    statusEl.textContent = 'Ogrenci bilgileri guncellendi.';
+    statusEl.textContent = 'Öğrenci bilgileri güncellendi.';
     await ensureActiveStudent();
     await renderStudentDetailPanel();
 }
@@ -1868,9 +1868,9 @@ async function speakWithLipsync(text, onEnd, emotion = CharacterEmotion.NEUTRAL)
 
 const STORIES = {
     redhood: {
-        title: "Yardim Istiyorum",
+        title: "Yardım İstiyorum",
         emoji: "??",
-        description: "Gercek hayatta yardim isteme, dogru kisiyi bulma ve net cumle kurma gorevi.",
+        description: "Gerçek hayatta yardım isteme, doğru kişiyi bulma ve net cümle kurma görevi.",
         difficulty: "Kolay",
         ageRange: "5-6",
         theme: "yardim",
@@ -1919,7 +1919,7 @@ const STORIES = {
                 choices: [
                     { text: "Defterimin fermuari sikisti, acar misiniz?", next: 3, response: "Mukemmel. Sorunu da ne istedigini de acikca soyledin." },
                     { text: "Bir sey oldu...", next: 3, response: "Baslamak iyi ama biraz daha net olursan yardim daha kolay gelir." },
-                    { text: "Ben yapamam!", next: 3, response: "Duygunu anlattin, simdi bir adim daha atip nasil yardim istedigini soyleyebilirsin." }
+                    { text: "Ben yapamam!", next: 3, response: "Duygunu anlattın, şimdi bir adım daha atıp nasıl yardım istediğini söyleyebilirsin." }
                 ]
             },
             {
@@ -1939,9 +1939,9 @@ const STORIES = {
         ]
     },
     piggies: {
-        title: "Sirami Bekliyorum",
+        title: "Sıramı Bekliyorum",
         emoji: "?",
-        description: "Bekleme, siraya uyma ve heyecanlaninca sakin kalma gorevi.",
+        description: "Bekleme, sıraya uyma ve heyecanlanınca sakin kalma görevi.",
         difficulty: "Kolay",
         ageRange: "5-6",
         theme: "bekleme",
@@ -2008,9 +2008,9 @@ const STORIES = {
         ]
     },
     moonseed: {
-        title: "Paylasiyorum ve Konusuyorum",
+        title: "Paylaşıyorum ve Konuşuyorum",
         emoji: "??",
-        description: "Oyuncak paylasma, arkadasa donup konusma ve birlikte oyun kurma gorevi.",
+        description: "Oyuncak paylaşma, arkadaşa dönüp konuşma ve birlikte oyun kurma görevi.",
         difficulty: "Orta",
         ageRange: "7-8",
         theme: "iletisim",
@@ -2035,21 +2035,21 @@ const STORIES = {
                 id: 1,
                 emoji: "??",
                 bg: "linear-gradient(135deg, #89f7fe, #66a6ff)",
-                bgLabel: "Konusma kurma",
+                bgLabel: "Konuşma kurma",
                 videoQuery: "children talking together toy negotiation",
                 narration: "Arkadasin biraz uzuldu. Simdi onun da kendini iyi hissetmesi icin bir cumle daha ekleyebilirsin.",
                 taskType: "choice",
                 taskText: "Hangi ek cumle daha iyi gelir?",
                 choices: [
                     { text: "Sen de istersen mavi bloklari secebilirsin.", next: 2, response: "Secenek sunman cok iyi. Oyun beraber devam edebilir." },
-                    { text: "Biraz beklemek zor olabilir biliyorum.", next: 2, response: "Bu cumle empati kuruyor. Karsindaki anlasildigini hisseder." }
+                    { text: "Biraz beklemek zor olabilir biliyorum.", next: 2, response: "Bu cümle empati kuruyor. Karşındaki anlaşıldığını hisseder." }
                 ]
             },
             {
                 id: 2,
                 emoji: "??",
                 bg: "linear-gradient(135deg, #c471ed, #f64f59)",
-                bgLabel: "Paylasma ani",
+                bgLabel: "Paylaşma anı",
                 videoQuery: "two children sharing blocks smiling teamwork",
                 narration: "Kulen bitti. Simdi paylasma zamani. Oyunun devam etmesi icin ne yaparsin?",
                 taskType: "choice",
@@ -2125,9 +2125,9 @@ function restoreStorySideMarkup() {
 }
 
 function getStoryThemeLabel(theme) {
-    if (theme === 'yardim') return 'Yardim Isteme';
-    if (theme === 'bekleme') return 'Sira Bekleme';
-    if (theme === 'iletisim') return 'Paylasma';
+    if (theme === 'yardim') return 'Yardım İsteme';
+    if (theme === 'bekleme') return 'Sıra Bekleme';
+    if (theme === 'iletisim') return 'Paylaşma';
     return theme;
 }
 
