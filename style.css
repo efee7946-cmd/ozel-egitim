@@ -176,6 +176,101 @@ body {
     min-width: 0;
 }
 
+.workspace-section-head.compact {
+    margin-bottom: 18px;
+}
+
+.learning-area-showcase,
+.learning-roadmap-panel {
+    margin-top: 20px;
+}
+
+.learning-area-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.learning-area-card,
+.learning-roadmap-item,
+.learning-area-plan-card {
+    background: linear-gradient(135deg, #f7fbff 0%, #ffffff 100%);
+    border: 1px solid #d9e6f4;
+    border-radius: 22px;
+    padding: 18px;
+    box-shadow: 0 10px 24px rgba(44, 74, 110, 0.08);
+}
+
+.learning-area-head {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 10px;
+}
+
+.learning-area-age,
+.learning-area-plan-label {
+    font-size: 0.76rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #5c7592;
+}
+
+.learning-area-card strong,
+.learning-roadmap-item strong,
+.learning-area-plan-card strong {
+    color: #1f3d61;
+    font-size: 1rem;
+}
+
+.learning-area-card p,
+.learning-roadmap-item p,
+.learning-area-plan-card p {
+    margin: 0;
+    color: #617791;
+    line-height: 1.55;
+}
+
+.learning-area-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 12px 0;
+}
+
+.learning-area-list span {
+    padding: 8px 10px;
+    border-radius: 999px;
+    background: #edf5ff;
+    color: #36597e;
+    font-size: 0.82rem;
+    font-weight: 700;
+}
+
+.learning-area-screen {
+    margin-top: 6px;
+    color: #3c5774;
+    font-size: 0.9rem;
+    font-weight: 700;
+}
+
+.learning-roadmap-list,
+.learning-area-plan {
+    display: grid;
+    gap: 14px;
+}
+
+.learning-area-plan {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.learning-area-plan-card.emphasis {
+    grid-column: 1 / -1;
+    background: linear-gradient(135deg, #eefaf5 0%, #f7fffb 100%);
+    border-color: #b7dfcb;
+}
+
 .menu-topbar {
     width: 100%;
     display: flex;
@@ -870,6 +965,52 @@ body {
     position: relative;
 }
 
+.therapy-session-bar {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 44px;
+}
+
+.therapy-session-chip {
+    padding: 12px 14px;
+    border-radius: 18px;
+    background: #f7fbff;
+    border: 1px solid #d8e5f3;
+}
+
+.therapy-chip-label {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #67809a;
+    margin-bottom: 4px;
+}
+
+.therapy-session-chip strong {
+    color: #284562;
+    font-size: 0.95rem;
+}
+
+.therapy-progress-track {
+    width: 100%;
+    height: 10px;
+    background: #eaf1f8;
+    border-radius: 999px;
+    overflow: hidden;
+    margin: 14px 0 6px;
+}
+
+.therapy-progress-fill {
+    width: 0;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #16a085 0%, #4c8dff 100%);
+    transition: width 0.3s ease;
+}
+
 .main-card, .side-card { 
     background: white; 
     border-radius: 40px; 
@@ -975,7 +1116,7 @@ body {
 
 .media-box { 
     width: 100%; aspect-ratio: 16/9; background: #000; 
-    border-radius: 25px; overflow: hidden; margin-top: 45px;
+    border-radius: 25px; overflow: hidden; margin-top: 12px;
 }
 video { width: 100%; height: 100%; object-fit: cover; }
 
@@ -985,10 +1126,54 @@ video { width: 100%; height: 100%; object-fit: cover; }
     font-size: 1.3rem; font-weight: bold; text-align: center; color: var(--accent); 
 }
 
+.therapy-brief {
+    margin-top: -4px;
+    margin-bottom: 10px;
+    padding: 12px 14px;
+    border-radius: 16px;
+    background: #f5f9ff;
+    color: #4b6888;
+    font-weight: 700;
+    text-align: center;
+}
+
 #chat-bubbles { 
     width: 100%; flex-grow: 1; overflow-y: auto; 
     display: flex; flex-direction: column; gap: 10px; 
     padding: 10px; border-top: 2px solid #eee; 
+}
+
+.therapy-coach-card,
+.therapy-response-card {
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: 18px;
+    background: #f7fbff;
+    border: 1px solid #dbe7f2;
+    margin-bottom: 12px;
+}
+
+.therapy-coach-label {
+    display: block;
+    font-size: 0.74rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #67809a;
+    margin-bottom: 6px;
+}
+
+.therapy-coach-card h3 {
+    margin: 0 0 6px;
+    color: #284562;
+    font-size: 1rem;
+}
+
+.therapy-coach-card p,
+.therapy-response-card p {
+    margin: 0;
+    color: #5f738d;
+    line-height: 1.55;
 }
 
 .bubble { 

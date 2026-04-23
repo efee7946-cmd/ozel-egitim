@@ -40,6 +40,69 @@ let historyCalendarMonth = null;
 let currentHearingModuleKey = '';
 let currentHearingStepIndex = 0;
 
+const LEARNING_AREAS = [
+    {
+        key: 'speech',
+        title: 'Konuşma ve İfade',
+        ageRange: '4-8 yaş',
+        summary: 'Kısa cümle kurma, soru anlama ve ihtiyaç ifade etme becerileri.',
+        outcomes: [
+            'Basit sorulara uygun yanıt verir',
+            'Tek kelime yerine kısa cümle kurar',
+            'İhtiyacını sözel olarak ifade eder'
+        ],
+        screenPlan: 'Terapi ekranında kısa soru, yanıt ve terapist geri bildirimiyle ilerler.'
+    },
+    {
+        key: 'visual',
+        title: 'Görsel Dikkat',
+        ageRange: '4-7 yaş',
+        summary: 'Eşleştirme, sıralama ve yönerge takibi için görsel hazırlık alanı.',
+        outcomes: [
+            'Görsel eşleştirme yapar',
+            'Sıralı yönergeyi takip eder',
+            'Farklılıkları ayırt eder'
+        ],
+        screenPlan: 'Kart, eşleştirme ve adım takibi etkinlikleriyle kısa görevler sunulur.'
+    },
+    {
+        key: 'daily',
+        title: 'Günlük Yaşam Becerileri',
+        ageRange: '4-8 yaş',
+        summary: 'Rutin, bekleme, yardım isteme ve temel özbakım davranışları.',
+        outcomes: [
+            'Günlük rutinleri tanır',
+            'Yardım isteme davranışı geliştirir',
+            'Bekleme ve sıra alma becerisini uygular'
+        ],
+        screenPlan: 'Gerçek yaşam senaryoları ve kısa karar kartlarıyla çalışılır.'
+    }
+];
+
+const THERAPY_STAGES = [
+    {
+        title: 'Hazırlık',
+        focus: 'Tanıdık ve rahatlatıcı sorularla başlıyoruz',
+        brief: 'Kısa ve anlaşılır cevaplar vererek başlayacağız.',
+        coachTitle: 'Sakin başlangıç',
+        coachCopy: 'Önce çocuğun rahat konuşmasını sağlayan kısa ve tanıdık sorularla ilerleyeceğiz.'
+    },
+    {
+        title: 'İfade',
+        focus: 'Kısa cümle kurma ve açıklama becerisi',
+        brief: 'Yanıtı biraz daha açmasını destekleyen sorular seçiyoruz.',
+        coachTitle: 'İfade geliştirme',
+        coachCopy: 'Bu bölümde tek kelimeden kısa cümleye geçişi destekleyen sorular öne çıkıyor.'
+    },
+    {
+        title: 'Genelleme',
+        focus: 'Günlük yaşamla bağlantı kurma',
+        brief: 'Yanıtları günlük hayatla ilişkilendirerek beceriyi kalıcılaştırıyoruz.',
+        coachTitle: 'Günlük yaşama taşıma',
+        coachCopy: 'Son bölümde çocuk verdiği yanıtı günlük hayatına bağlamaya teşvik edilir.'
+    }
+];
+
 const HEARING_SUPPORT_MODULES = {
     visual_cues: {
         title: 'Görsel Yönerge Takibi',
@@ -385,6 +448,9 @@ function goToMenu() {
 
 function goToTherapy() {
     showOnly('game-container');
+    turnCount = 0;
+    updateTherapySessionUI();
+    updateTherapyResponseHint('');
     const vEl = document.getElementById('v');
     vEl.muted = true;
     vEl.play().catch(()=>{});
@@ -882,7 +948,80 @@ function ensureMenuWorkspace() {
         studentsSection.appendChild(detailPanel);
     }
 
+    renderLearningAreaBlueprint();
+
     switchMenuSection(currentMenuSection);
+}
+
+function inferLearningArea(student) {
+    const notes = ((student && student.support_notes) || '').toLocaleLowerCase('tr-TR');
+    if (notes.includes('dikkat') || notes.includes('görsel') || notes.includes('odak')) {
+        return LEARNING_AREAS.find(area => area.key === 'visual');
+    }
+    if (notes.includes('rutin') || notes.includes('bekle') || notes.includes('yardım') || notes.includes('özbakım')) {
+        return LEARNING_AREAS.find(area => area.key === 'daily');
+    }
+    return LEARNING_AREAS.find(area => area.key === 'speech');
+}
+
+function buildLearningAreaCards() {
+    return LEARNING_AREAS.map(area => `
+        <article class="learning-area-card">
+            <div class="learning-area-head">
+                <span class="learning-area-age">${area.ageRange}</span>
+                <strong>${area.title}</strong>
+            </div>
+            <p>${area.summary}</p>
+            <div class="learning-area-list">
+                ${area.outcomes.map(item => `<span>${item}</span>`).join('')}
+            </div>
+            <div class="learning-area-screen">${area.screenPlan}</div>
+        </article>
+    `).join('');
+}
+
+function renderLearningAreaBlueprint() {
+    const overview = document.getElementById('menu-overview-section');
+    if (overview && !document.getElementById('learning-area-showcase')) {
+        const showcase = document.createElement('section');
+        showcase.id = 'learning-area-showcase';
+        showcase.className = 'learning-area-showcase';
+        showcase.innerHTML = `
+            <div class="workspace-section-head compact">
+                <span class="workspace-section-kicker">Gelişim Alanları</span>
+                <h3>İlk müfredat omurgası</h3>
+                <p>Başlangıç sürümünde okul öncesi ve ilkokul başlangıcı için üç temel alanı görünür kılıyoruz.</p>
+            </div>
+            <div class="learning-area-grid">
+                ${buildLearningAreaCards()}
+            </div>
+        `;
+        overview.appendChild(showcase);
+    }
+
+    const guide = document.getElementById('menu-guide-section');
+    if (guide && !document.getElementById('learning-roadmap-panel')) {
+        const roadmap = document.createElement('section');
+        roadmap.id = 'learning-roadmap-panel';
+        roadmap.className = 'learning-roadmap-panel';
+        roadmap.innerHTML = `
+            <div class="workspace-section-head compact">
+                <span class="workspace-section-kicker">Ürün Planı</span>
+                <h3>Yaş, kazanım ve ekran akışı</h3>
+                <p>Her alan için hedef yaş aralığı, kazanım yapısı ve ekrandaki çalışma biçimini aynı yerde topluyoruz.</p>
+            </div>
+            <div class="learning-roadmap-list">
+                ${LEARNING_AREAS.map(area => `
+                    <article class="learning-roadmap-item">
+                        <strong>${area.title}</strong>
+                        <span>Yaş seviyesi: ${area.ageRange}</span>
+                        <p>${area.outcomes.join(' • ')}</p>
+                    </article>
+                `).join('')}
+            </div>
+        `;
+        guide.appendChild(roadmap);
+    }
 }
 
 function switchMenuSection(section) {
@@ -1033,6 +1172,11 @@ async function renderStudentDetailPanel() {
         : (currentUserRole === 'specialist'
             ? 'Oturumdan önce destek notu ekleyerek yönlendirmeyi güçlendirebilirsin.'
             : 'Destek notu ekleyerek hangi beceriye odaklanacağını netleştirebilirsin.');
+
+    const recommendedArea = inferLearningArea(student);
+    if (recommendedArea) {
+        goalEl.textContent = `${recommendedArea.title} (${recommendedArea.ageRange}) • ${recommendedArea.outcomes[0]}`;
+    }
 
     if (metrics.latestSession) {
         const sessionDate = new Date(metrics.latestSession.created_at).toLocaleDateString('tr-TR');
@@ -1476,6 +1620,26 @@ async function goToReport() {
     const history = await persistSessionSnapshot();
     renderReportHistory(history);
 
+    const learningAreaPlanEl = document.getElementById('learningAreaPlan');
+    if (learningAreaPlanEl) {
+        const student = studentsCache.find(item => item.id === activeStudentId);
+        const recommendedArea = inferLearningArea(student);
+        learningAreaPlanEl.innerHTML = `
+            <div class="learning-area-plan-card emphasis">
+                <span class="learning-area-plan-label">Önerilen ilk odak</span>
+                <strong>${recommendedArea.title}</strong>
+                <p>${recommendedArea.summary}</p>
+            </div>
+            ${LEARNING_AREAS.map(area => `
+                <div class="learning-area-plan-card">
+                    <span class="learning-area-plan-label">${area.ageRange}</span>
+                    <strong>${area.title}</strong>
+                    <p>${area.outcomes.join(' • ')}</p>
+                </div>
+            `).join('')}
+        `;
+    }
+
     // Seçim analizi
     const choiceEl = document.getElementById('choiceAnalysis');
     if (sessionData.storyChoices.length > 0) {
@@ -1612,6 +1776,52 @@ function resetIdleTimer() {
     }, 15000);
 }
 
+function updateTherapySessionUI() {
+    const stageIndex = turnCount >= 5 ? 2 : turnCount >= 2 ? 1 : 0;
+    const stage = THERAPY_STAGES[stageIndex];
+    const totalTarget = 7;
+    const progressPct = Math.min(100, Math.round((turnCount / totalTarget) * 100));
+
+    const stageTitleEl = document.getElementById('therapyStageTitle');
+    const focusEl = document.getElementById('therapyFocusText');
+    const progressTextEl = document.getElementById('therapyProgressText');
+    const progressFillEl = document.getElementById('therapyProgressFill');
+    const briefEl = document.getElementById('therapyBrief');
+    const coachTitleEl = document.getElementById('therapyCoachTitle');
+    const coachCopyEl = document.getElementById('therapyCoachCopy');
+
+    if (stageTitleEl) stageTitleEl.textContent = stage.title;
+    if (focusEl) focusEl.textContent = stage.focus;
+    if (progressTextEl) progressTextEl.textContent = `${turnCount} / ${totalTarget}`;
+    if (progressFillEl) progressFillEl.style.width = `${progressPct}%`;
+    if (briefEl) briefEl.textContent = stage.brief;
+    if (coachTitleEl) coachTitleEl.textContent = stage.coachTitle;
+    if (coachCopyEl) coachCopyEl.textContent = stage.coachCopy;
+}
+
+function updateTherapyResponseHint(answer) {
+    const responseEl = document.getElementById('therapyResponseHint');
+    if (!responseEl) return;
+
+    const wordCount = (answer || '').trim().split(/\s+/).filter(Boolean).length;
+    if (!answer || !answer.trim()) {
+        responseEl.textContent = 'İlk yanıttan sonra burada kısa bir terapist notu göreceksin.';
+        return;
+    }
+
+    if (wordCount <= 2) {
+        responseEl.textContent = 'Yanıt kısa geldi. Sonraki soruda cevabı biraz daha açmasını destekleyebiliriz.';
+        return;
+    }
+
+    if (wordCount <= 5) {
+        responseEl.textContent = 'Kısa ama anlaşılır bir yanıt verdi. Devam sorusuyla cümleyi genişletebiliriz.';
+        return;
+    }
+
+    responseEl.textContent = 'Yanıtını ayrıntılandırabildi. Bu oturumda ifade becerisi güçlü görünüyor.';
+}
+
 function getBestVideoUrl(videoFiles) {
     if (!videoFiles || videoFiles.length === 0) return null;
     const mp4Files = videoFiles.filter(f => f.file_type === 'video/mp4');
@@ -1634,9 +1844,11 @@ async function loadNext() {
     unaskedQuestions.splice(rIndex, 1);
 
     const vEl = document.getElementById('v');
-    chatHistory = [];
-    turnCount = 0;
-    document.getElementById('chat-bubbles').innerHTML = "";
+    if (!sessionData.therapyTurns.length && turnCount === 0) {
+        chatHistory = [];
+        document.getElementById('chat-bubbles').innerHTML = "";
+    }
+    updateTherapySessionUI();
 
     try {
         const r = await fetch('/api/video?query=' + currentObj.query);
@@ -1705,6 +1917,8 @@ async function rec() {
         addMessage(speech, "user");
         sessionData.micUsedInTherapy++;
         turnCount++;
+        updateTherapySessionUI();
+        updateTherapyResponseHint(speech);
         if (turnCount >= 7) {
             var final = "Seninle konuşmak harikaydı " + childName + "! Hadi şimdi yeni bir videoya bakalım!";
             addMessage(final, "ai");
