@@ -45,6 +45,9 @@ test.describe('Yıldız Can AI App Tests', () => {
 
     const gameContainer = page.locator('#game-container');
     await expect(gameContainer).toBeVisible();
+    await page.evaluate(() => {
+        window.startFocusedCityLocation();
+    });
     await expect(page.locator('#qBar')).not.toHaveText('Hazırlanıyorum...');
     await expect(page.locator('#chat-bubbles .ai-bubble').first()).toBeVisible();
     await page.screenshot({ path: testInfo.outputPath('therapy-screen.png') });

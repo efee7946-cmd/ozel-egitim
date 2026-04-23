@@ -155,7 +155,8 @@
             </div>
         </div>
     </div>
-    <div class="menu-cards city-scene-shell">
+    <div id="menuCityHost">
+    <div class="menu-cards therapy-entry-card" id="cityEntryShell">
         <div class="city-scene-copy">
             <span class="workspace-section-kicker">Konuşma Şehri</span>
             <h3>Bir yeri seç ve konuşmayı oradan başlat</h3>
@@ -178,6 +179,7 @@
             <button type="button" class="menu-ghost-btn" id="cityStartBtn" onclick="startFocusedCityLocation()">Seçili alanı aç</button>
             <button type="button" class="menu-ghost-btn" onclick="goToReport()">Veli raporunu aç</button>
         </div>
+    </div>
     </div>
     <div class="footer">© 2026 | Efe Erman tarafından geliştirilmiştir.</div>
 </div>
@@ -231,17 +233,18 @@
 <div id="game-container">
     <div class="main-card">
         <button class="btn-back" onclick="goToMenu()">← Menü</button>
-        <div class="therapy-category-bar" id="therapyCategoryBar"></div>
-        <div class="therapy-category-summary" id="therapyCategorySummary">Günlük Hayat alanında kısa ve tanıdık sorularla ilerliyoruz.</div>
-        <div class="media-box"><video id="v" playsinline loop muted autoplay></video></div>
-        <div class="question-bar" id="qBar">Hazırlanıyorum...</div>
-        <div class="btns">
+        <div id="therapyCityHost"></div>
+        <div class="therapy-category-bar therapy-session-ui" id="therapyCategoryBar"></div>
+        <div class="therapy-category-summary therapy-session-ui" id="therapyCategorySummary">Günlük Hayat alanında kısa ve tanıdık sorularla ilerliyoruz.</div>
+        <div class="media-box therapy-session-ui"><video id="v" playsinline loop muted autoplay></video></div>
+        <div class="question-bar therapy-session-ui" id="qBar">Hazırlanıyorum...</div>
+        <div class="btns therapy-session-ui">
             <button onclick="rec()" id="micBtn" class="btn-mic" disabled>🎙️</button>
             <button onclick="loadNext()" id="nextBtn" class="btn-next">➡️</button>
         </div>
-        <div id="info">Lütfen bekleyin...</div>
+        <div id="info" class="therapy-session-ui">Lütfen bekleyin...</div>
     </div>
-    <div class="side-card">
+    <div class="side-card" id="therapySideCard">
         <img src="avatar.png" class="side-avatar" alt="Yıldız Can">
         <div id="chat-bubbles"></div>
     </div>

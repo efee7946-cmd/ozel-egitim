@@ -680,6 +680,23 @@ body {
     flex-wrap: wrap;
 }
 
+.therapy-entry-card .city-scene,
+.therapy-entry-card .city-focus-panel {
+    display: none;
+}
+
+.therapy-entry-card .city-scene-actions {
+    margin-top: 18px;
+}
+
+.therapy-city-shell {
+    margin-top: 18px;
+}
+
+#therapyCityHost {
+    width: 100%;
+}
+
 .city-focus-panel {
     grid-column: 1 / -1;
     padding: 20px 22px;

@@ -286,6 +286,9 @@ function showOnly(id) {
     const target = document.getElementById(id);
     if (target) target.style.display = 'flex';
     currentScreenId = id;
+    if (id === 'menu-screen') {
+        requestAnimationFrame(() => renderCityScene());
+    }
 }
 
 function getChildNameFromUser(user) {
@@ -348,6 +351,7 @@ async function startApp(resetSession) {
         } else {
             showOnly('menu-screen');
         }
+        renderCityScene();
         return;
     }
     const isIOS = /iP(hone|ad|od)/.test(navigator.userAgent);
@@ -388,6 +392,7 @@ async function startApp(resetSession) {
     appStarted = true;
     updateMenuIdentity();
     showOnly('menu-screen');
+    renderCityScene();
     dismissOnboarding(false);
 }
 
@@ -438,25 +443,57 @@ document.addEventListener('DOMContentLoaded', function() {
     if (side) defaultStorySideMarkup = side.innerHTML;
     renderStoryLibrary();
     renderStoryResumeCard();
+    syncCityEntryPlacement(false);
     renderCityScene();
 });
+
+function syncCityEntryPlacement(useTherapyHost) {
+    const cityShell = document.getElementById('cityEntryShell');
+    const menuHost = document.getElementById('menuCityHost');
+    const therapyHost = document.getElementById('therapyCityHost');
+    const startBtn = document.getElementById('cityStartBtn');
+    if (!cityShell || !menuHost || !therapyHost) return;
+    const targetHost = useTherapyHost ? therapyHost : menuHost;
+    cityShell.classList.toggle('therapy-entry-card', !useTherapyHost);
+    cityShell.classList.toggle('therapy-city-shell', useTherapyHost);
+    if (startBtn) {
+        startBtn.onclick = useTherapyHost ? startFocusedCityLocation : goToTherapy;
+    }
+    if (cityShell.parentElement !== targetHost) {
+        targetHost.appendChild(cityShell);
+    }
+}
+
+function setTherapySelectionMode(isSelecting) {
+    syncCityEntryPlacement(isSelecting);
+    const cityShell = document.getElementById('cityEntryShell');
+    const sideCard = document.getElementById('therapySideCard');
+    document.querySelectorAll('.therapy-session-ui').forEach((element) => {
+        element.style.display = isSelecting ? 'none' : '';
+    });
+    if (cityShell) {
+        cityShell.style.display = isSelecting ? '' : 'none';
+    }
+    if (sideCard) {
+        sideCard.style.display = isSelecting ? 'none' : '';
+    }
+}
 
 function goToMenu() {
     window.speechSynthesis.cancel();
     clearTimeout(idleTimer);
+    setTherapySelectionMode(false);
+    syncCityEntryPlacement(false);
+    const cityShell = document.getElementById('cityEntryShell');
+    if (cityShell) cityShell.style.display = '';
     showOnly('menu-screen');
     renderCityScene();
 }
 
 function goToTherapy() {
     showOnly('game-container');
-    renderTherapyCategories();
-    resetTherapyQuestionPool();
-    turnCount = 0;
-    const vEl = document.getElementById('v');
-    vEl.muted = true;
-    vEl.play().catch(()=>{});
-    loadNext();
+    setTherapySelectionMode(true);
+    renderCityScene();
 }
 
 function renderHearingModuleList() {
@@ -2176,7 +2213,9 @@ function renderCityScene() {
         goalsEl.innerHTML = (location.goals || []).map((goal) => `<span>${goal}</span>`).join('');
     }
     if (startBtn) {
-        startBtn.textContent = `${location.label} alanını aç`;
+        startBtn.textContent = currentScreenId === 'game-container'
+            ? `${location.label} alanını aç`
+            : 'Konuşma Terapisine Git';
     }
     if (!city3D) initializeThreeCity();
     if (city3D) {
@@ -2214,7 +2253,16 @@ function focusCityLocation(locationKey) {
 function startFocusedCityLocation() {
     const location = getCurrentCityLocation();
     setTherapyCategory(location.category, false);
-    goToTherapy();
+    setTherapySelectionMode(false);
+    renderTherapyCategories();
+    resetTherapyQuestionPool();
+    turnCount = 0;
+    const bubbles = document.getElementById('chat-bubbles');
+    if (bubbles) bubbles.innerHTML = '';
+    const vEl = document.getElementById('v');
+    vEl.muted = true;
+    vEl.play().catch(()=>{});
+    loadNext();
 }
 
 function openCityLocation(locationKey) {
