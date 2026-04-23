@@ -545,6 +545,303 @@ body {
 }
 .new-badge { background: var(--story-orange); }
 
+.module-strip {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+    margin-bottom: 20px;
+}
+
+.module-strip-card {
+    border: 1px solid #d8e6f3;
+    border-radius: 24px;
+    padding: 18px;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+    text-align: left;
+}
+
+.module-strip-card strong {
+    display: block;
+    margin: 0 0 8px;
+    color: #1f3653;
+    font-size: 1rem;
+}
+
+.module-strip-card p {
+    margin: 0;
+    color: #6b7b93;
+    line-height: 1.55;
+    font-size: 0.88rem;
+}
+
+.module-strip-badge {
+    display: inline-flex;
+    margin-bottom: 10px;
+    padding: 5px 10px;
+    border-radius: 999px;
+    background: #eaf4ff;
+    color: #35608d;
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.hearing-module {
+    border-color: #8fd1d8;
+    background: linear-gradient(180deg, #f3fffe 0%, #eef9ff 100%);
+    cursor: pointer;
+}
+
+.module-strip-soon {
+    opacity: 0.86;
+}
+
+#hearing-support-screen {
+    display: none;
+    width: min(1180px, calc(100% - 40px));
+    max-width: 1180px;
+    margin: 24px auto;
+    padding: 40px;
+    box-sizing: border-box;
+    background: linear-gradient(180deg, #ffffff 0%, #f4fbff 100%);
+    border-radius: 40px;
+    box-shadow: 0 15px 50px rgba(0,0,0,0.1);
+    position: relative;
+    animation: fadeIn 0.6s ease;
+}
+
+.hearing-shell {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    width: 100%;
+}
+
+.hearing-hero {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+    padding: 24px 28px;
+    border-radius: 30px;
+    background: linear-gradient(135deg, #e8fbfb 0%, #f2f8ff 100%);
+    border: 1px solid #cfe6ee;
+}
+
+.hearing-kicker,
+.hearing-hero-badge,
+.hearing-step {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 0.76rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.hearing-kicker {
+    margin-bottom: 10px;
+    background: #dff6f2;
+    color: #177968;
+}
+
+.hearing-hero h2 {
+    margin: 0 0 8px;
+    color: #1f3653;
+    font-size: 1.9rem;
+}
+
+.hearing-hero p {
+    margin: 0;
+    color: #60748f;
+    line-height: 1.65;
+    max-width: 620px;
+}
+
+.hearing-hero-badge {
+    background: #edf5ff;
+    color: #43658b;
+}
+
+.hearing-layout {
+    display: grid;
+    grid-template-columns: 300px minmax(0, 1fr);
+    gap: 22px;
+}
+
+.hearing-modules {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.hearing-module-card {
+    width: 100%;
+    text-align: left;
+    border: 1px solid #d7e8f0;
+    border-radius: 24px;
+    padding: 18px;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.hearing-module-card:hover,
+.hearing-module-card.active {
+    transform: translateY(-2px);
+    border-color: #8bc9d2;
+    box-shadow: 0 14px 28px rgba(60, 116, 159, 0.12);
+}
+
+.hearing-module-card strong {
+    display: block;
+    margin: 0 0 8px;
+    color: #1e3652;
+    font-size: 1rem;
+}
+
+.hearing-module-card p {
+    margin: 0;
+    color: #6c7d94;
+    line-height: 1.5;
+    font-size: 0.88rem;
+}
+
+.hearing-module-badge,
+.hearing-prompt-label {
+    display: inline-flex;
+    margin-bottom: 10px;
+    padding: 5px 10px;
+    border-radius: 999px;
+    background: #eaf6ff;
+    color: #426a90;
+    font-size: 0.72rem;
+    font-weight: 800;
+}
+
+.hearing-workspace {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 24px;
+    border-radius: 30px;
+    background: white;
+    border: 1px solid #dbe7f3;
+    box-shadow: 0 16px 30px rgba(34, 72, 122, 0.08);
+}
+
+.hearing-workspace-head h3 {
+    margin: 10px 0 8px;
+    color: #1f3653;
+    font-size: 1.35rem;
+}
+
+.hearing-workspace-head p {
+    margin: 0;
+    color: #6b7b93;
+    line-height: 1.6;
+}
+
+.hearing-step {
+    background: #edf8f5;
+    color: #177968;
+}
+
+.hearing-prompt-card,
+.hearing-visual-card,
+.hearing-feedback {
+    border-radius: 24px;
+    border: 1px solid #dbe7f3;
+    background: linear-gradient(180deg, #fcfeff 0%, #f5faff 100%);
+}
+
+.hearing-prompt-card {
+    padding: 18px;
+}
+
+.hearing-prompt {
+    color: #24405f;
+    font-size: 1rem;
+    line-height: 1.65;
+    font-weight: 700;
+}
+
+.hearing-visual-card {
+    padding: 22px;
+    text-align: center;
+}
+
+.hearing-visual-emoji {
+    font-size: 3rem;
+    margin-bottom: 10px;
+    color: #167c86;
+    font-weight: 800;
+}
+
+.hearing-visual-title {
+    color: #1f3653;
+    font-size: 1.05rem;
+    font-weight: 800;
+    margin-bottom: 6px;
+}
+
+.hearing-visual-copy {
+    color: #697b92;
+    line-height: 1.55;
+}
+
+.hearing-options {
+    display: grid;
+    gap: 12px;
+}
+
+.hearing-option-btn {
+    width: 100%;
+    border: 1px solid #d9e5f3;
+    border-radius: 18px;
+    padding: 14px 16px;
+    background: white;
+    color: #284563;
+    font-size: 0.96rem;
+    font-weight: 700;
+    text-align: left;
+    cursor: pointer;
+    transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.hearing-option-btn:hover {
+    transform: translateX(2px);
+    border-color: #8bc9d2;
+    background: #f7fdfd;
+}
+
+.hearing-option-btn.correct {
+    background: #ecfbf4;
+    border-color: #5bb588;
+    color: #1c6c4f;
+}
+
+.hearing-option-btn.wrong {
+    background: #fff2f2;
+    border-color: #d98585;
+    color: #9c4c4c;
+}
+
+.hearing-feedback {
+    padding: 16px 18px;
+    color: #5f738d;
+    line-height: 1.6;
+}
+
+.hearing-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
 /* ========== GERİ BUTONU ========== */
 .btn-back {
     position: absolute;
@@ -1628,6 +1925,10 @@ video { width: 100%; height: 100%; object-fit: cover; }
     .student-detail-grid,
     .student-detail-meta-row { grid-template-columns: 1fr; }
     .menu-cards { flex-direction: column; }
+    .module-strip { grid-template-columns: 1fr; }
+    #hearing-support-screen { width: 100%; max-width: none; padding: 24px 18px; margin-top: 10px; }
+    .hearing-hero { flex-direction: column; }
+    .hearing-layout { grid-template-columns: 1fr; }
     .guide-grid,
     .activity-playbook { grid-template-columns: 1fr; }
     .menu-card { padding: 22px 16px; }

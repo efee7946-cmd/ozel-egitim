@@ -37,6 +37,92 @@ const sessionData = {
 
 let selectedHistoryDateKey = null;
 let historyCalendarMonth = null;
+let currentHearingModuleKey = '';
+let currentHearingStepIndex = 0;
+
+const HEARING_SUPPORT_MODULES = {
+    visual_cues: {
+        title: 'Gorsel Yonerge Takibi',
+        description: 'Ses yerine sira, renk ve hareket ipuclarini takip ederek ilerlenir.',
+        badge: 'Gorsel ipucu',
+        steps: [
+            {
+                emoji: '1-2-3',
+                title: 'Sirayi izle',
+                prompt: 'Ek randaki sirayi takip ettigini dusun: once mavi kart, sonra sari kart, en son kirmizi kart. Hangisi ikinci gelir?',
+                visualCopy: 'Mavi > Sari > Kirmizi',
+                options: ['Mavi', 'Sari', 'Kirmizi'],
+                correctIndex: 1,
+                feedbackCorrect: 'Dogru. Siradaki ikinci kart sari kartti.',
+                feedbackWrong: 'Bir daha siraya bakalim. Maviden sonra sari kart geliyordu.'
+            },
+            {
+                emoji: 'EL',
+                title: 'Hareket ipucunu bul',
+                prompt: 'Ogretmen once otur isareti, sonra el kaldir isareti gosteriyor. Hangi hareket ikinci?',
+                visualCopy: 'Otur > El kaldir',
+                options: ['El kaldir', 'Bekle', 'Saga don'],
+                correctIndex: 0,
+                feedbackCorrect: 'Evet. Ikinci adim el kaldirmakti.',
+                feedbackWrong: 'Bu adimda ikinci hareket el kaldirmakti.'
+            }
+        ]
+    },
+    lip_reading: {
+        title: 'Dudak Okuma Ipuclari',
+        description: 'Agiz sekli ve yuz ifadesi ipuclarini okuyarak kelime tahmini yapilir.',
+        badge: 'Yuz ifadesi',
+        steps: [
+            {
+                emoji: 'AGIZ',
+                title: 'Kisa kelime tahmini',
+                prompt: 'Ogretmenin dudaklari yavasca kapanip tekrar aciliyor. Hangisi kisa ve kolay okunabilen secenektir?',
+                visualCopy: 'Yuvarlak agiz acilisi ve kisa kapanis',
+                options: ['Anne', 'Su', 'Kalemlik'],
+                correctIndex: 1,
+                feedbackCorrect: 'Guzel. Kisa ve net agiz hareketleriyle en kolay secenek buydu.',
+                feedbackWrong: 'Burada en kisa ve net hareket su kelimesinde gorunur.'
+            },
+            {
+                emoji: 'YUZ',
+                title: 'Ifadeyi oku',
+                prompt: 'Yuz ifadesi sakin ve davetkar. Bu ifade sana ne anlatir?',
+                visualCopy: 'Kaslar yumusak, bakis sakin, agiz hafif acik',
+                options: ['Dinlemeye hazirim', 'Cok kizginim', 'Oyunu bitirdim'],
+                correctIndex: 0,
+                feedbackCorrect: 'Dogru. Bu ifade iletisim kurmaya acik bir yuz ifadesi veriyor.',
+                feedbackWrong: 'Bu yuz ifadesi daha cok dinlemeye hazirim mesaji verir.'
+            }
+        ]
+    },
+    symbol_match: {
+        title: 'Simge ve Isaret Eslestirme',
+        description: 'Simgeler ve temel isaretler anlamlariyla eslestirilir.',
+        badge: 'Simge esleme',
+        steps: [
+            {
+                emoji: 'YEMEK',
+                title: 'Simgeyi sec',
+                prompt: 'Tabak ve kasik simgesi gorunuyor. Bu simge hangi rutini anlatir?',
+                visualCopy: 'Tabak + kasik',
+                options: ['Yemek zamani', 'Uyku zamani', 'Disari cikma'],
+                correctIndex: 0,
+                feedbackCorrect: 'Evet. Tabak ve kasik yemek zamanini anlatir.',
+                feedbackWrong: 'Bu simge yemek zamanini gosterir.'
+            },
+            {
+                emoji: 'BEKLE',
+                title: 'Isareti anla',
+                prompt: 'Avuc ici acik ve one bakiyor. Bu temel isaret ne anlatir?',
+                visualCopy: 'Acik avuc one donuk',
+                options: ['Bekle', 'Kos', 'Bitir'],
+                correctIndex: 0,
+                feedbackCorrect: 'Dogru. Bu isaret genelde bekle anlamina gelir.',
+                feedbackWrong: 'Bu gorsel daha cok bekle anlamina gelir.'
+            }
+        ]
+    }
+};
 
 // =============================================
 // LIPSYNC + KARAKTER MOTORU
@@ -129,7 +215,7 @@ function celebrateCorrectAnswer() {
 // EKRAN YÖNETİMİ
 // =============================================
 function showOnly(id) {
-    const screens = ['start-screen','student-setup-screen','menu-screen','game-container','story-select-screen','story-screen','report-screen'];
+    const screens = ['start-screen','student-setup-screen','menu-screen','hearing-support-screen','game-container','story-select-screen','story-screen','report-screen'];
     screens.forEach(s => {
         const el = document.getElementById(s);
         if (el) el.style.display = 'none';
@@ -303,6 +389,130 @@ function goToTherapy() {
     vEl.muted = true;
     vEl.play().catch(()=>{});
     loadNext();
+}
+
+function renderHearingModuleList() {
+    const listEl = document.getElementById('hearingModuleList');
+    if (!listEl) return;
+
+    listEl.innerHTML = Object.entries(HEARING_SUPPORT_MODULES).map(([key, module]) => `
+        <button type="button" class="hearing-module-card ${currentHearingModuleKey === key ? 'active' : ''}" onclick="startHearingModule('${key}')">
+            <span class="hearing-module-badge">${module.badge}</span>
+            <strong>${module.title}</strong>
+            <p>${module.description}</p>
+        </button>
+    `).join('');
+}
+
+function renderHearingStep() {
+    const titleEl = document.getElementById('hearingTitle');
+    const descEl = document.getElementById('hearingDescription');
+    const stepLabelEl = document.getElementById('hearingStepLabel');
+    const promptEl = document.getElementById('hearingPrompt');
+    const visualEmojiEl = document.getElementById('hearingVisualEmoji');
+    const visualTitleEl = document.getElementById('hearingVisualTitle');
+    const visualCopyEl = document.getElementById('hearingVisualCopy');
+    const optionsEl = document.getElementById('hearingOptions');
+    const feedbackEl = document.getElementById('hearingFeedback');
+    const nextBtn = document.getElementById('hearingNextBtn');
+    if (!titleEl || !descEl || !stepLabelEl || !promptEl || !visualEmojiEl || !visualTitleEl || !visualCopyEl || !optionsEl || !feedbackEl || !nextBtn) return;
+
+    const module = HEARING_SUPPORT_MODULES[currentHearingModuleKey];
+    if (!module) {
+        titleEl.textContent = 'Isitme destegi calismalari';
+        descEl.textContent = 'Soldan bir modul secerek gorsel odakli etkinlikleri acabiliriz.';
+        stepLabelEl.textContent = 'Modul sec';
+        promptEl.textContent = 'Hazir oldugunda bir modul sec.';
+        visualEmojiEl.textContent = 'O';
+        visualTitleEl.textContent = 'Gorsel odak';
+        visualCopyEl.textContent = 'Secilen modulun ana ipucu burada gosterilir.';
+        optionsEl.innerHTML = '';
+        feedbackEl.textContent = 'Bu alanda secimlerden sonra kisa geri bildirim goreceksin.';
+        nextBtn.disabled = true;
+        return;
+    }
+
+    const step = module.steps[currentHearingStepIndex];
+    titleEl.textContent = module.title;
+    descEl.textContent = module.description;
+    stepLabelEl.textContent = `Adim ${currentHearingStepIndex + 1}/${module.steps.length}`;
+    promptEl.textContent = step.prompt;
+    visualEmojiEl.textContent = step.emoji;
+    visualTitleEl.textContent = step.title;
+    visualCopyEl.textContent = step.visualCopy;
+    feedbackEl.textContent = 'Dogru cevabi bulunca sonraki adima gecebilirsin.';
+    nextBtn.disabled = true;
+
+    optionsEl.innerHTML = step.options.map((option, index) => `
+        <button type="button" class="hearing-option-btn" onclick="chooseHearingOption(${index})">${option}</button>
+    `).join('');
+}
+
+function startHearingModule(moduleKey) {
+    currentHearingModuleKey = moduleKey;
+    currentHearingStepIndex = 0;
+    renderHearingModuleList();
+    renderHearingStep();
+}
+
+function chooseHearingOption(optionIndex) {
+    const module = HEARING_SUPPORT_MODULES[currentHearingModuleKey];
+    if (!module) return;
+
+    const step = module.steps[currentHearingStepIndex];
+    const feedbackEl = document.getElementById('hearingFeedback');
+    const nextBtn = document.getElementById('hearingNextBtn');
+    const optionButtons = Array.from(document.querySelectorAll('.hearing-option-btn'));
+    if (!feedbackEl || !nextBtn || !optionButtons.length) return;
+
+    optionButtons.forEach((button, index) => {
+        button.disabled = true;
+        if (index === step.correctIndex) button.classList.add('correct');
+        if (index === optionIndex && index !== step.correctIndex) button.classList.add('wrong');
+    });
+
+    feedbackEl.textContent = optionIndex === step.correctIndex ? step.feedbackCorrect : step.feedbackWrong;
+    nextBtn.disabled = false;
+}
+
+function nextHearingStep() {
+    const module = HEARING_SUPPORT_MODULES[currentHearingModuleKey];
+    if (!module) return;
+
+    if (currentHearingStepIndex < module.steps.length - 1) {
+        currentHearingStepIndex += 1;
+        renderHearingStep();
+        return;
+    }
+
+    const titleEl = document.getElementById('hearingTitle');
+    const descEl = document.getElementById('hearingDescription');
+    const stepLabelEl = document.getElementById('hearingStepLabel');
+    const promptEl = document.getElementById('hearingPrompt');
+    const visualEmojiEl = document.getElementById('hearingVisualEmoji');
+    const visualTitleEl = document.getElementById('hearingVisualTitle');
+    const visualCopyEl = document.getElementById('hearingVisualCopy');
+    const optionsEl = document.getElementById('hearingOptions');
+    const feedbackEl = document.getElementById('hearingFeedback');
+    const nextBtn = document.getElementById('hearingNextBtn');
+    if (!titleEl || !descEl || !stepLabelEl || !promptEl || !visualEmojiEl || !visualTitleEl || !visualCopyEl || !optionsEl || !feedbackEl || !nextBtn) return;
+
+    titleEl.textContent = `${module.title} tamamlandi`;
+    descEl.textContent = 'Bu modulu bitirdin. Dilersen ayni alani tekrar acabilir ya da rapora gecebilirsin.';
+    stepLabelEl.textContent = 'Tamamlandi';
+    promptEl.textContent = 'Gorsel odakli tum adimlari tamamladin.';
+    visualEmojiEl.textContent = 'OK';
+    visualTitleEl.textContent = 'Modul bitti';
+    visualCopyEl.textContent = 'Simdi baska bir modul secerek devam edebiliriz.';
+    optionsEl.innerHTML = '';
+    feedbackEl.textContent = 'Guclu bir gorsel takip calismasi tamamlandi.';
+    nextBtn.disabled = true;
+}
+
+function goToHearingSupport() {
+    renderHearingModuleList();
+    renderHearingStep();
+    showOnly('hearing-support-screen');
 }
 
 function goToStories() {
@@ -513,6 +723,7 @@ function ensureMenuWorkspace() {
             <div class="sidebar-section">
                 <span class="sidebar-label">Hizli Erisim</span>
                 <button type="button" class="sidebar-link-btn" onclick="goToTherapy()">Konusma Terapisti</button>
+                <button type="button" class="sidebar-link-btn" onclick="goToHearingSupport()">Isitme Destegi</button>
                 <button type="button" class="sidebar-link-btn" onclick="goToStories()">Hikaye Dunyasi</button>
                 <button type="button" class="sidebar-link-btn" onclick="goToReport()">Veli Raporu</button>
                 <button type="button" class="sidebar-link-btn" onclick="openStudentSetup()">Ogrenci Yonetimi</button>
@@ -655,12 +866,37 @@ function ensureMenuWorkspace() {
                     <p>Secenekli kararlar icin hikaye dunyasi sosyal dil ve anlatim calismasi icin daha uygundur.</p>
                 </div>
                 <div class="activity-playbook-card">
+                    <strong>Isitme destegi</strong>
+                    <p>Gorsel ipucu, simge ve sira calismalari icin isitme destegi moduluyle sessiz akisa gecebilirsin.</p>
+                </div>
+                <div class="activity-playbook-card">
                     <strong>Takip</strong>
                     <p>Oturum bitince veli raporuna gecip hangi alanda daha iyi katilim oldugunu kontrol et.</p>
                 </div>
             </div>
         `;
         activities.appendChild(cards);
+
+        const moduleStrip = document.createElement('div');
+        moduleStrip.className = 'module-strip';
+        moduleStrip.innerHTML = `
+            <button type="button" class="module-strip-card hearing-module" onclick="goToHearingSupport()">
+                <span class="module-strip-badge">Yeni modul</span>
+                <strong>Isitme Destegi</strong>
+                <p>Ses yerine gorsel yonerge ve simge tabanli mini calismalar.</p>
+            </button>
+            <div class="module-strip-card module-strip-soon">
+                <span class="module-strip-badge">Sirada</span>
+                <strong>Gorme Destegi</strong>
+                <p>Yuksek kontrast, sesli yonlendirme ve klavye odakli erisim tasarimi.</p>
+            </div>
+            <div class="module-strip-card module-strip-soon">
+                <span class="module-strip-badge">Sirada</span>
+                <strong>Dikkat Calismalari</strong>
+                <p>Adim takip, odak ve gorsel esleme temelli kisa gorevler.</p>
+            </div>
+        `;
+        activities.insertBefore(moduleStrip, cards);
     }
 
     const studentsSection = document.getElementById('menu-students-section');
@@ -2534,6 +2770,7 @@ window.switchAuth = switchAuth;
 window.handleAuth = handleAuth;
 window.goToMenu = goToMenu;
 window.goToTherapy = goToTherapy;
+window.goToHearingSupport = goToHearingSupport;
 window.goToStories = goToStories;
 window.goToReport = goToReport;
 window.exitStory = exitStory;
@@ -2552,6 +2789,9 @@ window.changeHistoryMonth = changeHistoryMonth;
 window.updateStoryFilters = updateStoryFilters;
 window.resumeSavedStory = resumeSavedStory;
 window.restartSavedStory = restartSavedStory;
+window.startHearingModule = startHearingModule;
+window.chooseHearingOption = chooseHearingOption;
+window.nextHearingStep = nextHearingStep;
 
 
 

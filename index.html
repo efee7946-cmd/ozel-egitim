@@ -178,6 +178,51 @@
     <div class="footer">© 2026 | Efe Erman tarafından geliştirilmiştir.</div>
 </div>
 
+<div id="hearing-support-screen">
+    <button class="btn-back" onclick="goToMenu()">� Men�</button>
+    <div class="hearing-shell">
+        <div class="hearing-hero">
+            <div>
+                <span class="hearing-kicker">Isitme Destegi</span>
+                <h2>Gorsel ve yapilandirilmis calismalar</h2>
+                <p>Bu alanda ses yerine gorsel ipucu, sirali yonerge ve simge temelli etkinlikler bulunur.</p>
+            </div>
+            <div class="hearing-hero-badge">3 mini modul</div>
+        </div>
+
+        <div class="hearing-layout">
+            <div class="hearing-modules" id="hearingModuleList"></div>
+
+            <div class="hearing-workspace">
+                <div class="hearing-workspace-head">
+                    <span class="hearing-step" id="hearingStepLabel">Modul sec</span>
+                    <h3 id="hearingTitle">Isitme destegi calismalari</h3>
+                    <p id="hearingDescription">Soldan bir modul secerek gorsel odakli etkinlikleri acabiliriz.</p>
+                </div>
+
+                <div class="hearing-prompt-card">
+                    <span class="hearing-prompt-label">Gorev</span>
+                    <div class="hearing-prompt" id="hearingPrompt">Hazir oldugunda bir modul sec.</div>
+                </div>
+
+                <div class="hearing-visual-card" id="hearingVisualCard">
+                    <div class="hearing-visual-emoji" id="hearingVisualEmoji">O</div>
+                    <div class="hearing-visual-title" id="hearingVisualTitle">Gorsel odak</div>
+                    <div class="hearing-visual-copy" id="hearingVisualCopy">Secilen modulun ana ipucu burada gosterilir.</div>
+                </div>
+
+                <div class="hearing-options" id="hearingOptions"></div>
+
+                <div class="hearing-feedback" id="hearingFeedback">Bu alanda secimlerden sonra kisa geri bildirim goreceksin.</div>
+
+                <div class="hearing-actions">
+                    <button type="button" class="menu-ghost-btn" onclick="nextHearingStep()" id="hearingNextBtn" disabled>Sonraki adim</button>
+                    <button type="button" class="menu-ghost-btn" onclick="goToReport()">Raporu ac</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 <!-- ===================== KONUŞMA TERAPİSTİ ===================== -->
 <div id="game-container">
     <div class="main-card">
@@ -390,4 +435,5 @@
 <script src="script.js" defer></script>
 </body>
 </html>
+
 
