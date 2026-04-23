@@ -123,35 +123,35 @@
         </div>
         <div class="menu-topbar-actions">
             <button class="menu-ghost-btn" type="button" onclick="openStudentSetup()">Öğrenci Değiştir</button>
-            <button class="menu-ghost-btn" type="button" onclick="openOnboarding()">NasÄ±l KullanÄ±lÄ±r?</button>
+            <button class="menu-ghost-btn" type="button" onclick="openOnboarding()">Nasıl Kullanılır?</button>
             <button class="menu-ghost-btn logout-btn" type="button" onclick="logout()">Çıkış Yap</button>
         </div>
     </div>
     <div class="menu-header">
-        <img src="avatar.png" class="menu-avatar" alt="YÄ±ldÄ±z Can">
+            <img src="avatar.png" class="menu-avatar" alt="Yıldız Can">
         <div>
             <h2 id="menu-greeting">Merhaba!</h2>
-            <p class="menu-subtitle">Ne yapmak istersin?</p>
+            <p class="menu-subtitle">Bugün terapiyi başlatabilir veya veli raporunu inceleyebilirsin.</p>
         </div>
     </div>
     <div id="onboarding-panel" class="onboarding-panel" style="display: none;">
         <div class="onboarding-copy">
             <span class="onboarding-badge">İlk kullanım rehberi</span>
-            <h3>Başlamak için en kolay yol burada</h3>
-            <p>Önce konuşma terapistiyle kısa bir oturum yap, sonra istersen hikâye bölümüne geç. En sonda veli raporunda bugünkü katılımı görebilirsin.</p>
+            <h3>Başlamak için en net akış burada</h3>
+            <p>Önce öğrenci notlarına bak, sonra konuşma terapisiyle kısa bir oturum yap. En sonda veli raporunda bugünkü katılımı, süreyi ve kısa değerlendirmeyi incele.</p>
         </div>
         <div class="onboarding-steps">
             <div class="onboarding-step">
-                <strong>1. Konuşma Terapisti</strong>
-                <span>KÄ±sa cevaplarla Ä±sÄ±n ve mikrofonu dene.</span>
+                <strong>1. Öğrenci Hazırlığı</strong>
+                <span>Öğrenci notlarını okuyup hangi desteğe odaklanacağını netleştir.</span>
             </div>
             <div class="onboarding-step">
-                <strong>2. Hikâye Dünyası</strong>
-                <span>Karar vererek ilerle, eğlenirken ifade becerini kullan.</span>
+                <strong>2. Konuşma Terapisti</strong>
+                <span>Kısa cevaplarla ısın, mikrofonu dene ve iletişim akışını başlat.</span>
             </div>
             <div class="onboarding-step">
                 <strong>3. Veli Raporu</strong>
-                <span>Oturum sonunda katılım ve özet değerlendirmeyi incele.</span>
+                <span>Oturum sonunda katılım, süre ve değerlendirme özetini incele.</span>
             </div>
         </div>
     </div>
@@ -159,19 +159,13 @@
         <div class="menu-card therapy-card" onclick="goToTherapy()">
             <div class="menu-card-icon">🎙️</div>
             <h3>Konuşma Terapisti</h3>
-            <p>Yıldız Can ile sohbet et, soruları cevapla!</p>
+            <p>Yıldız Can ile sohbet et, soruları cevapla ve ifade becerilerini çalış.</p>
             <span class="menu-card-badge">Sohbet</span>
-        </div>
-        <div class="menu-card story-card" onclick="goToStories()">
-            <div class="menu-card-icon">📖</div>
-            <h3>Hikâye Dünyası</h3>
-            <p>Masalların içine gir, kararlar ver, maceraya atıl!</p>
-            <span class="menu-card-badge new-badge">Yeni!</span>
         </div>
         <div class="menu-card report-card" onclick="goToReport()">
             <div class="menu-card-icon">📋</div>
             <h3>Veli Raporu</h3>
-            <p>Çocuğunuzun gelişim verilerini ve AI değerlendirmesini görün.</p>
+            <p>Çocuğunuzun gelişim verilerini, oturum özetini ve AI değerlendirmesini görün.</p>
             <span class="menu-card-badge report-badge">Rapor</span>
         </div>
     </div>

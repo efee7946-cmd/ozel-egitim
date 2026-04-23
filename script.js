@@ -674,7 +674,7 @@ function ensureStudentEnhancements() {
                     <strong id="student-detail-total-minutes">0 dk</strong>
                 </div>
                 <div class="student-mini-stat">
-                    <span>Son Hikâye İlerlemesi</span>
+                    <span>Son Kayıt Özeti</span>
                     <strong id="student-detail-story-progress">-</strong>
                 </div>
             </div>
@@ -723,8 +723,6 @@ function ensureMenuWorkspace() {
             <div class="sidebar-section">
                 <span class="sidebar-label">Hızlı Erişim</span>
                 <button type="button" class="sidebar-link-btn" onclick="goToTherapy()">Konuşma Terapisti</button>
-                <button type="button" class="sidebar-link-btn" onclick="goToHearingSupport()">İşitme Desteği</button>
-                <button type="button" class="sidebar-link-btn" onclick="goToStories()">Hikâye Dünyası</button>
                 <button type="button" class="sidebar-link-btn" onclick="goToReport()">Veli Raporu</button>
                 <button type="button" class="sidebar-link-btn" onclick="openStudentSetup()">Öğrenci Yönetimi</button>
             </div>
@@ -818,7 +816,7 @@ function ensureMenuWorkspace() {
             <div class="workspace-section-head">
                 <span class="workspace-section-kicker">Rehber</span>
                 <h3>Öğretici kullanım akışı</h3>
-                <p>Karmaşayı azaltmak için her oturumda önce neye bakacağını, sonra hangi alana geçeceğini net gösteriyoruz.</p>
+                <p>Karmaşayı azaltmak için her oturumda terapi ve rapor odağında net bir akış sunuyoruz.</p>
             </div>
             <div class="guide-grid">
                 <article class="guide-card">
@@ -833,13 +831,13 @@ function ensureMenuWorkspace() {
                 </article>
                 <article class="guide-card">
                     <span class="guide-card-step">3. Pekiştirme</span>
-                    <h4>Hikâye ile genişlet</h4>
-                    <p>Terapi sonrası hikâye dünyasında seçim yaptırarak sosyal ipuçları ve ifade becerisi pekiştirilir.</p>
+                    <h4>Oturumu notla</h4>
+                    <p>Terapi sırasında verilen yanıtları ve dikkat düzeyini gözleyip raporda anlamlı bir özet oluşmasını sağla.</p>
                 </article>
                 <article class="guide-card guide-card-accent">
                     <span class="guide-card-step">4. Gözlem</span>
                     <h4>Raporla kapat</h4>
-                    <p>Son adımda veli raporundan süre, katılım ve ilerleme özetini inceleyip bir sonraki oturuma not çıkar.</p>
+                    <p>Son adımda veli raporundan süre, katılım ve değerlendirme özetini inceleyip bir sonraki oturuma not çıkar.</p>
                 </article>
             </div>
         `;
@@ -854,7 +852,7 @@ function ensureMenuWorkspace() {
             <div class="workspace-section-head">
                 <span class="workspace-section-kicker">Oturumlar</span>
                 <h3>Çalışma alanını seç</h3>
-                <p>Terapi, hikâye ve rapor akışları arasından ihtiyacına uygun olanı aç.</p>
+                <p>Bugün konuşma terapisi başlatabilir veya önceki oturumların veli raporlarını inceleyebilirsin.</p>
             </div>
             <div class="activity-playbook">
                 <div class="activity-playbook-card">
@@ -862,41 +860,20 @@ function ensureMenuWorkspace() {
                     <p>Dikkat dağınıksa önce terapiyi açıp 3-4 kısa yanıtla ısın.</p>
                 </div>
                 <div class="activity-playbook-card">
-                    <strong>Dil ve ifade</strong>
-                    <p>Seçenekli kararlar için hikâye dünyası sosyal dil ve anlatım çalışması için daha uygundur.</p>
+                    <strong>Terapi odağı</strong>
+                    <p>Bugünün hedefi kısa yanıt, cümle kurma ya da anlama çalışmasıysa konuşma terapisiyle ilerle.</p>
                 </div>
                 <div class="activity-playbook-card">
-                    <strong>İşitme desteği</strong>
-                    <p>Görsel ipucu, rutin kartı ve temel işaret çalışmaları için işitme desteği modülüne geçebilirsin.</p>
+                    <strong>Rapor odağı</strong>
+                    <p>Önceki oturumları karşılaştırmak, süreyi görmek ve AI değerlendirmesini okumak için raporu aç.</p>
                 </div>
                 <div class="activity-playbook-card">
                     <strong>Takip</strong>
-                    <p>Oturum bitince veli raporuna geçip hangi alanda daha iyi katılım olduğunu kontrol et.</p>
+                    <p>Oturum bitince veli raporuna geçip hangi sorularda daha iyi katılım olduğunu kontrol et.</p>
                 </div>
             </div>
         `;
         activities.appendChild(cards);
-
-        const moduleStrip = document.createElement('div');
-        moduleStrip.className = 'module-strip';
-        moduleStrip.innerHTML = `
-            <button type="button" class="module-strip-card hearing-module" onclick="goToHearingSupport()">
-                <span class="module-strip-badge">Yeni modül</span>
-                <strong>İşitme Desteği</strong>
-                <p>Ses yerine görsel yönerge, rutin kartı ve işaret temelli kısa çalışmalar.</p>
-            </button>
-            <div class="module-strip-card module-strip-soon">
-                <span class="module-strip-badge">Sırada</span>
-                <strong>Görme Desteği</strong>
-                <p>Yüksek kontrast, sesli yönlendirme ve klavye odaklı erişim tasarımı.</p>
-            </div>
-            <div class="module-strip-card module-strip-soon">
-                <span class="module-strip-badge">Sırada</span>
-                <strong>Dikkat Çalışmaları</strong>
-                <p>Adım takip, odak ve görsel eşleme temelli kısa görevler.</p>
-            </div>
-        `;
-        activities.insertBefore(moduleStrip, cards);
     }
 
     const studentsSection = document.getElementById('menu-students-section');
@@ -1060,7 +1037,7 @@ async function renderStudentDetailPanel() {
     if (metrics.latestSession) {
         const sessionDate = new Date(metrics.latestSession.created_at).toLocaleDateString('tr-TR');
         sessionEl.textContent = `${sessionDate} tarihinde ${metrics.latestSession.duration_min || 0} dk, ${metrics.latestSession.total_turns || 0} yanıt`;
-        storyProgressEl.textContent = metrics.latestSession.story_completed ? 'Tamamlandı' : (metrics.latestSession.story_pct || '-');
+        storyProgressEl.textContent = metrics.latestSession.story_completed ? 'Tamamlandı' : `${metrics.latestSession.total_turns || 0} yanıt`;
     } else {
         sessionEl.textContent = 'Henüz kayıtlı oturum yok.';
         storyProgressEl.textContent = '-';
