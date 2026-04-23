@@ -449,8 +449,6 @@ function goToMenu() {
 function goToTherapy() {
     showOnly('game-container');
     turnCount = 0;
-    updateTherapySessionUI();
-    updateTherapyResponseHint('');
     const vEl = document.getElementById('v');
     vEl.muted = true;
     vEl.play().catch(()=>{});
@@ -981,47 +979,11 @@ function buildLearningAreaCards() {
 }
 
 function renderLearningAreaBlueprint() {
-    const overview = document.getElementById('menu-overview-section');
-    if (overview && !document.getElementById('learning-area-showcase')) {
-        const showcase = document.createElement('section');
-        showcase.id = 'learning-area-showcase';
-        showcase.className = 'learning-area-showcase';
-        showcase.innerHTML = `
-            <div class="workspace-section-head compact">
-                <span class="workspace-section-kicker">Gelişim Alanları</span>
-                <h3>İlk müfredat omurgası</h3>
-                <p>Başlangıç sürümünde okul öncesi ve ilkokul başlangıcı için üç temel alanı görünür kılıyoruz.</p>
-            </div>
-            <div class="learning-area-grid">
-                ${buildLearningAreaCards()}
-            </div>
-        `;
-        overview.appendChild(showcase);
-    }
+    const showcase = document.getElementById('learning-area-showcase');
+    if (showcase) showcase.remove();
 
-    const guide = document.getElementById('menu-guide-section');
-    if (guide && !document.getElementById('learning-roadmap-panel')) {
-        const roadmap = document.createElement('section');
-        roadmap.id = 'learning-roadmap-panel';
-        roadmap.className = 'learning-roadmap-panel';
-        roadmap.innerHTML = `
-            <div class="workspace-section-head compact">
-                <span class="workspace-section-kicker">Ürün Planı</span>
-                <h3>Yaş, kazanım ve ekran akışı</h3>
-                <p>Her alan için hedef yaş aralığı, kazanım yapısı ve ekrandaki çalışma biçimini aynı yerde topluyoruz.</p>
-            </div>
-            <div class="learning-roadmap-list">
-                ${LEARNING_AREAS.map(area => `
-                    <article class="learning-roadmap-item">
-                        <strong>${area.title}</strong>
-                        <span>Yaş seviyesi: ${area.ageRange}</span>
-                        <p>${area.outcomes.join(' • ')}</p>
-                    </article>
-                `).join('')}
-            </div>
-        `;
-        guide.appendChild(roadmap);
-    }
+    const roadmap = document.getElementById('learning-roadmap-panel');
+    if (roadmap) roadmap.remove();
 }
 
 function switchMenuSection(section) {
@@ -1776,52 +1738,6 @@ function resetIdleTimer() {
     }, 15000);
 }
 
-function updateTherapySessionUI() {
-    const stageIndex = turnCount >= 5 ? 2 : turnCount >= 2 ? 1 : 0;
-    const stage = THERAPY_STAGES[stageIndex];
-    const totalTarget = 7;
-    const progressPct = Math.min(100, Math.round((turnCount / totalTarget) * 100));
-
-    const stageTitleEl = document.getElementById('therapyStageTitle');
-    const focusEl = document.getElementById('therapyFocusText');
-    const progressTextEl = document.getElementById('therapyProgressText');
-    const progressFillEl = document.getElementById('therapyProgressFill');
-    const briefEl = document.getElementById('therapyBrief');
-    const coachTitleEl = document.getElementById('therapyCoachTitle');
-    const coachCopyEl = document.getElementById('therapyCoachCopy');
-
-    if (stageTitleEl) stageTitleEl.textContent = stage.title;
-    if (focusEl) focusEl.textContent = stage.focus;
-    if (progressTextEl) progressTextEl.textContent = `${turnCount} / ${totalTarget}`;
-    if (progressFillEl) progressFillEl.style.width = `${progressPct}%`;
-    if (briefEl) briefEl.textContent = stage.brief;
-    if (coachTitleEl) coachTitleEl.textContent = stage.coachTitle;
-    if (coachCopyEl) coachCopyEl.textContent = stage.coachCopy;
-}
-
-function updateTherapyResponseHint(answer) {
-    const responseEl = document.getElementById('therapyResponseHint');
-    if (!responseEl) return;
-
-    const wordCount = (answer || '').trim().split(/\s+/).filter(Boolean).length;
-    if (!answer || !answer.trim()) {
-        responseEl.textContent = 'İlk yanıttan sonra burada kısa bir terapist notu göreceksin.';
-        return;
-    }
-
-    if (wordCount <= 2) {
-        responseEl.textContent = 'Yanıt kısa geldi. Sonraki soruda cevabı biraz daha açmasını destekleyebiliriz.';
-        return;
-    }
-
-    if (wordCount <= 5) {
-        responseEl.textContent = 'Kısa ama anlaşılır bir yanıt verdi. Devam sorusuyla cümleyi genişletebiliriz.';
-        return;
-    }
-
-    responseEl.textContent = 'Yanıtını ayrıntılandırabildi. Bu oturumda ifade becerisi güçlü görünüyor.';
-}
-
 function getBestVideoUrl(videoFiles) {
     if (!videoFiles || videoFiles.length === 0) return null;
     const mp4Files = videoFiles.filter(f => f.file_type === 'video/mp4');
@@ -1848,7 +1764,6 @@ async function loadNext() {
         chatHistory = [];
         document.getElementById('chat-bubbles').innerHTML = "";
     }
-    updateTherapySessionUI();
 
     try {
         const r = await fetch('/api/video?query=' + currentObj.query);
@@ -1917,8 +1832,6 @@ async function rec() {
         addMessage(speech, "user");
         sessionData.micUsedInTherapy++;
         turnCount++;
-        updateTherapySessionUI();
-        updateTherapyResponseHint(speech);
         if (turnCount >= 7) {
             var final = "Seninle konuşmak harikaydı " + childName + "! Hadi şimdi yeni bir videoya bakalım!";
             addMessage(final, "ai");

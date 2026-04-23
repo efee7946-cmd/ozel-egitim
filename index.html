@@ -221,26 +221,8 @@
 <div id="game-container">
     <div class="main-card">
         <button class="btn-back" onclick="goToMenu()">← Menü</button>
-        <div class="therapy-session-bar">
-            <div class="therapy-session-chip">
-                <span class="therapy-chip-label">Aşama</span>
-                <strong id="therapyStageTitle">Hazırlık</strong>
-            </div>
-            <div class="therapy-session-chip">
-                <span class="therapy-chip-label">Odak</span>
-                <strong id="therapyFocusText">İlk soruya hazırlanıyoruz</strong>
-            </div>
-            <div class="therapy-session-chip">
-                <span class="therapy-chip-label">İlerleme</span>
-                <strong id="therapyProgressText">0 / 7</strong>
-            </div>
-        </div>
-        <div class="therapy-progress-track">
-            <div class="therapy-progress-fill" id="therapyProgressFill"></div>
-        </div>
         <div class="media-box"><video id="v" playsinline loop muted autoplay></video></div>
         <div class="question-bar" id="qBar">Hazırlanıyorum...</div>
-        <div class="therapy-brief" id="therapyBrief">Kısa ve anlaşılır cevaplar vererek başlayacağız.</div>
         <div class="btns">
             <button onclick="rec()" id="micBtn" class="btn-mic" disabled>🎙️</button>
             <button onclick="loadNext()" id="nextBtn" class="btn-next">➡️</button>
@@ -249,15 +231,6 @@
     </div>
     <div class="side-card">
         <img src="avatar.png" class="side-avatar" alt="Yıldız Can">
-        <div class="therapy-coach-card">
-            <span class="therapy-coach-label">Terapi Rehberi</span>
-            <h3 id="therapyCoachTitle">Sakin başlangıç</h3>
-            <p id="therapyCoachCopy">Önce çocuğun rahat konuşmasını sağlayan kısa ve tanıdık sorularla ilerleyeceğiz.</p>
-        </div>
-        <div class="therapy-response-card">
-            <span class="therapy-coach-label">Son Yanıt Notu</span>
-            <p id="therapyResponseHint">İlk yanıttan sonra burada kısa bir terapist notu göreceksin.</p>
-        </div>
         <div id="chat-bubbles"></div>
     </div>
 </div>

@@ -965,52 +965,6 @@ body {
     position: relative;
 }
 
-.therapy-session-bar {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 12px;
-    margin-top: 44px;
-}
-
-.therapy-session-chip {
-    padding: 12px 14px;
-    border-radius: 18px;
-    background: #f7fbff;
-    border: 1px solid #d8e5f3;
-}
-
-.therapy-chip-label {
-    display: block;
-    font-size: 0.72rem;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: #67809a;
-    margin-bottom: 4px;
-}
-
-.therapy-session-chip strong {
-    color: #284562;
-    font-size: 0.95rem;
-}
-
-.therapy-progress-track {
-    width: 100%;
-    height: 10px;
-    background: #eaf1f8;
-    border-radius: 999px;
-    overflow: hidden;
-    margin: 14px 0 6px;
-}
-
-.therapy-progress-fill {
-    width: 0;
-    height: 100%;
-    border-radius: inherit;
-    background: linear-gradient(90deg, #16a085 0%, #4c8dff 100%);
-    transition: width 0.3s ease;
-}
-
 .main-card, .side-card { 
     background: white; 
     border-radius: 40px; 
@@ -1126,54 +1080,10 @@ video { width: 100%; height: 100%; object-fit: cover; }
     font-size: 1.3rem; font-weight: bold; text-align: center; color: var(--accent); 
 }
 
-.therapy-brief {
-    margin-top: -4px;
-    margin-bottom: 10px;
-    padding: 12px 14px;
-    border-radius: 16px;
-    background: #f5f9ff;
-    color: #4b6888;
-    font-weight: 700;
-    text-align: center;
-}
-
 #chat-bubbles { 
     width: 100%; flex-grow: 1; overflow-y: auto; 
     display: flex; flex-direction: column; gap: 10px; 
     padding: 10px; border-top: 2px solid #eee; 
-}
-
-.therapy-coach-card,
-.therapy-response-card {
-    width: 100%;
-    padding: 14px 16px;
-    border-radius: 18px;
-    background: #f7fbff;
-    border: 1px solid #dbe7f2;
-    margin-bottom: 12px;
-}
-
-.therapy-coach-label {
-    display: block;
-    font-size: 0.74rem;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: #67809a;
-    margin-bottom: 6px;
-}
-
-.therapy-coach-card h3 {
-    margin: 0 0 6px;
-    color: #284562;
-    font-size: 1rem;
-}
-
-.therapy-coach-card p,
-.therapy-response-card p {
-    margin: 0;
-    color: #5f738d;
-    line-height: 1.55;
 }
 
 .bubble { 
