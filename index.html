@@ -73,6 +73,29 @@
             <p class="menu-subtitle">Bugün terapiyi başlatabilir veya veli raporunu inceleyebilirsin.</p>
         </div>
     </div>
+    <div class="menu-actions-grid">
+        <button class="menu-cta-btn menu-action-card" type="button" onclick="goToTherapy()">
+            <div class="action-card-icon">🎤</div>
+            <div>
+                <strong>Konuşma Terapisti</strong>
+                <p>Hızlı oturum başlat ve konuşma pratiğiyle ısın.</p>
+            </div>
+        </button>
+        <button class="menu-ghost-btn menu-action-card" type="button" onclick="goToReport()">
+            <div class="action-card-icon">📄</div>
+            <div>
+                <strong>Veli Raporu</strong>
+                <p>Bugünkü ilerlemeyi ve katılım özetini hemen gör.</p>
+            </div>
+        </button>
+        <button class="menu-ghost-btn menu-action-card" type="button" onclick="openStudentSetup()">
+            <div class="action-card-icon">👧</div>
+            <div>
+                <strong>Öğrenci Yönetimi</strong>
+                <p>Aktif öğrenciyi değiştir veya yeni profil ekle.</p>
+            </div>
+        </button>
+    </div>
     <div id="onboarding-panel" class="onboarding-panel" style="display: none;">
         <div class="onboarding-copy">
             <span class="onboarding-badge">İlk kullanım rehberi</span>
@@ -91,41 +114,6 @@
             <div class="onboarding-step">
                 <strong>3. Veli Raporu</strong>
                 <span>Oturum sonunda katılım, süre ve değerlendirme özetini incele.</span>
-            </div>
-        </div>
-    </div>
-    <div id="menuCityHost">
-        <div class="menu-cards therapy-entry-card" id="cityEntryShell">
-            <div class="city-scene-copy">
-                <span class="workspace-section-kicker">Hızlı Erişim</span>
-                <h3>Hemen başla</h3>
-                <p>Sık kullanılan çalışma alanlarına hızlı erişim.</p>
-            </div>
-            <div class="city-option-grid quick-access-grid">
-                <button type="button" class="city-option-card" onclick="focusCityLocation('home')">
-                    <span class="city-option-icon">🏠</span>
-                    <strong>Ev</strong>
-                    <p>Günlük rutinler</p>
-                </button>
-                <button type="button" class="city-option-card" onclick="focusCityLocation('school')">
-                    <span class="city-option-icon">🏫</span>
-                    <strong>Okul</strong>
-                    <p>Sınıf ve arkadaşlar</p>
-                </button>
-                <button type="button" class="city-option-card" onclick="focusCityLocation('park')">
-                    <span class="city-option-icon">🌳</span>
-                    <strong>Park</strong>
-                    <p>Oyun ve sosyal</p>
-                </button>
-                <button type="button" class="city-option-card" onclick="focusCityLocation('market')">
-                    <span class="city-option-icon">🛒</span>
-                    <strong>Market</strong>
-                    <p>Seçim ve seçim yapma</p>
-                </button>
-            </div>
-            <div class="city-scene-actions">
-                <button type="button" class="menu-ghost-btn" id="cityStartBtn" onclick="startFocusedCityLocation()">Hemen Başlat</button>
-                <button type="button" class="menu-ghost-btn" onclick="goToReport()">Veli Raporu</button>
             </div>
         </div>
     </div>
