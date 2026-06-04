@@ -17,7 +17,20 @@ app.post('/api/tts', (req, res) => {
 });
 
 app.get('/api/video', (req, res) => {
-    res.json({ videos: [] });
+    const fallbackVideo = 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4';
+    res.json({
+        videos: [
+            {
+                video_files: [
+                    {
+                        file_type: 'video/mp4',
+                        height: 480,
+                        link: fallbackVideo
+                    }
+                ]
+            }
+        ]
+    });
 });
 
 // Bind to 0.0.0.0

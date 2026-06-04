@@ -2125,8 +2125,38 @@ async function loadNext() {
                 setTimeout(function() { startQuestion(); }, 2000);
             };
             vEl.onerror = function() { clearTimeout(videoTimeout); startQuestion(); };
-        } else { startQuestion(); }
-    } catch(e) { startQuestion(); }
+        } else {
+            const fallbackVideoUrl = 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4';
+            vEl.muted = true;
+            vEl.setAttribute('playsinline', '');
+            vEl.src = fallbackVideoUrl;
+            vEl.load();
+            const videoTimeout = setTimeout(function() {
+                startQuestion();
+            }, 5000);
+            vEl.onloadeddata = function() {
+                clearTimeout(videoTimeout);
+                vEl.play().catch(function() {});
+                setTimeout(function() { startQuestion(); }, 1200);
+            };
+            vEl.onerror = function() { clearTimeout(videoTimeout); startQuestion(); };
+        }
+    } catch(e) {
+        const fallbackVideoUrl = 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4';
+        vEl.muted = true;
+        vEl.setAttribute('playsinline', '');
+        vEl.src = fallbackVideoUrl;
+        vEl.load();
+        const videoTimeout = setTimeout(function() {
+            startQuestion();
+        }, 5000);
+        vEl.onloadeddata = function() {
+            clearTimeout(videoTimeout);
+            vEl.play().catch(function() {});
+            setTimeout(function() { startQuestion(); }, 1200);
+        };
+        vEl.onerror = function() { clearTimeout(videoTimeout); startQuestion(); };
+    }
 }
 
 function startQuestion() {
@@ -2152,7 +2182,11 @@ async function rec() {
         return;
     }
     var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) { alert("Tarayıcı ses tanımayı desteklemiyor."); return; }
+    if (!SpeechRecognition) {
+        document.getElementById('info').innerText = "Tarayıcı ses tanımayı desteklemiyor. Chrome veya Edge kullanmayı dene.";
+        document.getElementById('micBtn').disabled = true;
+        return;
+    }
     document.getElementById('micBtn').disabled = true;
     document.getElementById('info').innerText = "Dinlemeye hazırlanıyorum...";
     var recognition = new SpeechRecognition();
