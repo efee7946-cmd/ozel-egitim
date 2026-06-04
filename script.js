@@ -495,13 +495,7 @@ function goToMenu() {
 
 function goToTherapy() {
     showOnly('game-container');
-    const cityShell = document.getElementById('cityEntryShell');
-    if (cityShell) {
-        setTherapySelectionMode(true);
-    } else {
-        setTherapySelectionMode(false);
-    }
-    renderCityScene();
+    startFocusedCityLocation();
 }
 
 function renderHearingModuleList() {
