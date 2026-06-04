@@ -406,14 +406,17 @@ async function initializeAuth() {
             childName = getChildNameFromUser(user);
             currentUserEmail = user.email || '';
             currentUserRole = getUserRoleFromUser(user);
-            startApp(false);
+            await startApp(false);
             return;
         }
     } catch (error) {
         console.error('Oturum kontrol edilemedi:', error);
     }
 
-    showOnly('start-screen');
+    childName = 'Arkadaş';
+    currentUserEmail = '';
+    currentUserRole = 'parent';
+    await startApp(true);
 }
 
 supabaseClient.auth.onAuthStateChange(function(event, session) {
@@ -427,11 +430,11 @@ supabaseClient.auth.onAuthStateChange(function(event, session) {
     if (event === 'SIGNED_OUT') {
         persistSessionSnapshot();
         appStarted = false;
-        childName = "";
+        childName = "Arkadaş";
         currentUserEmail = "";
         currentUserRole = "parent";
         dismissOnboarding(false);
-        showOnly('start-screen');
+        startApp(true);
     }
 });
 

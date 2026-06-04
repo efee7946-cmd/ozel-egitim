@@ -2,39 +2,26 @@ const { test, expect } = require('@playwright/test');
 
 test.describe('Yıldız Can AI App Tests', () => {
 
-  test('should load the start screen and allow guest login simulation', async ({ page }, testInfo) => {
+  test('should load the app and allow guest navigation directly to the menu', async ({ page }, testInfo) => {
     await page.goto('/');
 
     // Check if the title is correct
     await expect(page).toHaveTitle(/Yıldız Sınıfı/);
 
-    // Check if the auth container is visible
-    const authContainer = page.locator('#start-screen');
-    await expect(authContainer).toBeVisible();
-
-    // Verify main title on start screen
-    const mainTitle = page.locator('#auth-main-title');
-    await expect(mainTitle).toHaveText('Hoş Geldin!');
-
-    // Take a screenshot of the start screen
-    await page.screenshot({ path: testInfo.outputPath('start-screen.png') });
-
-    // Test that the app start works despite global variable scope issues by letting UI buttons do the work if we can,
-    // or by overriding variables correctly inside the evaluate function.
-    await page.evaluate(() => {
-        childName = "Test Çocuğu";
-        currentUserEmail = "test@example.com";
-        window.startApp(true);
-    });
-
-    // Wait for the menu screen to be visible
+    // The app now skips auth and shows the main menu directly
     const menuScreen = page.locator('#menu-screen');
     await expect(menuScreen).toBeVisible();
 
     // Take a screenshot of the menu screen
     await page.screenshot({ path: testInfo.outputPath('menu-screen.png') });
 
-    // Verify greeting contains "Test Çocuğu"
+    // Test that the app start works and greeting updates correctly
+    await page.evaluate(() => {
+        childName = "Test Çocuğu";
+        currentUserEmail = "test@example.com";
+        window.startApp(true);
+    });
+
     const greeting = page.locator('#menu-greeting');
     await expect(greeting).toContainText('Test Çocuğu');
 
