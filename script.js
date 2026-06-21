@@ -336,24 +336,7 @@ async function initializeAuth() {
     await startApp(true);
 }
 
-supabaseClient.auth.onAuthStateChange(function(event, session) {
-    if (event === 'SIGNED_IN' && session && session.user) {
-        childName = getChildNameFromUser(session.user);
-        currentUserEmail = session.user.email || '';
-        currentUserRole = getUserRoleFromUser(session.user);
-        startApp(false);
-    }
-
-    if (event === 'SIGNED_OUT') {
-        persistSessionSnapshot();
-        appStarted = false;
-        childName = "Arkadaş";
-        currentUserEmail = "";
-        currentUserRole = "parent";
-        dismissOnboarding(false);
-        startApp(true);
-    }
-});
+// Supabase auth listener kaldırıldı — kendi auth sistemi kullanılıyor
 
 document.addEventListener('DOMContentLoaded', function() {
     // Supabase auth atlanıyor — kendi auth sistemimizi kullanıyoruz
@@ -3291,8 +3274,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // =============================================
 // WINDOW EXPORT (HTML onclick için)
 // =============================================
-window.switchAuth = switchAuth;
-window.handleAuth = handleAuth;
+// switchAuth / handleAuth kaldırıldı (eski Supabase kodu)
 window.goToMenu = goToMenu;
 window.goToTherapy = goToTherapy;
 window.setTherapyCategory = setTherapyCategory;
