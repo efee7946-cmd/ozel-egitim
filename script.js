@@ -1,6 +1,11 @@
 var supabaseUrl = 'https://mtmskfyufuxahdctwuay.supabase.co';
 var supabaseKey = 'sb_publishable_kYPbSRUpyPe6tsQZOCcY0g_U1brYQ6U';
 
+function escapeHtml(str) {
+    if (!str) return '';
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
 // Değişken ismini 'supabaseClient' olarak değiştirerek çakışmayı önleyelim
 var supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
 // =============================================
@@ -37,8 +42,6 @@ const sessionData = {
 
 let selectedHistoryDateKey = null;
 let historyCalendarMonth = null;
-let currentHearingModuleKey = '';
-let currentHearingStepIndex = 0;
 
 const LEARNING_AREAS = [
     {
@@ -102,90 +105,6 @@ const THERAPY_STAGES = [
         coachCopy: 'Son bölümde çocuk verdiği yanıtı günlük hayatına bağlamaya teşvik edilir.'
     }
 ];
-
-const HEARING_SUPPORT_MODULES = {
-    visual_cues: {
-        title: 'Görsel Yönerge Takibi',
-        description: 'Günlük sınıf ve ev rutinlerinde sıralı görsel yönergeleri izleme çalışması.',
-        badge: 'Yönerge',
-        steps: [
-            {
-                emoji: '1-2-3',
-                title: 'Sırayı izle',
-                prompt: 'Öğretmen görsel kartlarla “çantanı as, yerine geç, defterini aç” yönergesi veriyor. İkinci adım hangisi?',
-                visualCopy: 'Çantanı as → Yerine geç → Defterini aç',
-                options: ['Çantanı as', 'Yerine geç', 'Defterini aç'],
-                correctIndex: 1,
-                feedbackCorrect: 'Doğru. İkinci adım yerine geçmekti.',
-                feedbackWrong: 'Bir daha bakalım. Çantayı astıktan sonra yerine geçiyordu.'
-            },
-            {
-                emoji: 'EL',
-                title: 'Sınıf işaretini anla',
-                prompt: 'Öğretmen önce “bekle”, sonra “gel” işareti gösteriyor. İkinci işaret hangisi?',
-                visualCopy: 'Bekle → Gel',
-                options: ['Gel', 'Bekle', 'Otur'],
-                correctIndex: 0,
-                feedbackCorrect: 'Evet. İkinci işaret “gel” anlamına geliyor.',
-                feedbackWrong: 'Bu adımda ikinci işaret “gel”di.'
-            }
-        ]
-    },
-    lip_reading: {
-        title: 'Dudak Okuma Farkındalığı',
-        description: 'Ağız şekli, yüz ifadesi ve dikkatli bakışla temel kelime ipuçlarını ayırt etme çalışması.',
-        badge: 'Yüz ipucu',
-        steps: [
-            {
-                emoji: 'AĞIZ',
-                title: 'Kısa kelimeyi tahmin et',
-                prompt: 'Öğretmenin dudakları kısa ve tek heceli bir kelime söylüyor. Hangisi dudak hareketiyle daha kolay ayırt edilir?',
-                visualCopy: 'Kısa ağız açılıp kapanması',
-                options: ['Su', 'Kalemlik', 'Oyuncak'],
-                correctIndex: 0,
-                feedbackCorrect: 'Güzel. Kısa ve net dudak hareketiyle en kolay ayırt edilen seçenek buydu.',
-                feedbackWrong: 'Burada kısa ve net hareket “su” kelimesinde görülür.'
-            },
-            {
-                emoji: 'YÜZ',
-                title: 'İfadeyi oku',
-                prompt: 'Yüz ifadesi sakin ve destekleyici görünüyor. Bu ifade daha çok hangi mesajı verir?',
-                visualCopy: 'Kaşlar yumuşak, bakış sakin, ağız hafif açık',
-                options: ['Dinlemeye hazırım', 'Çok kızgınım', 'Buradan gidiyorum'],
-                correctIndex: 0,
-                feedbackCorrect: 'Doğru. Bu yüz ifadesi iletişime açık ve dinlemeye hazır bir mesaj veriyor.',
-                feedbackWrong: 'Bu yüz ifadesi daha çok “dinlemeye hazırım” mesajı verir.'
-            }
-        ]
-    },
-    symbol_match: {
-        title: 'Simge ve Rutin Eşleştirme',
-        description: 'Günlük yaşam simgelerini ihtiyaç, etkinlik ve rutinlerle eşleştirme çalışması.',
-        badge: 'Rutin',
-        steps: [
-            {
-                emoji: '🍽️',
-                title: 'Rutini seç',
-                prompt: 'Tabak ve kaşık simgesi gösteriliyor. Bu simge hangi günlük rutini anlatır?',
-                visualCopy: 'Tabak + kaşık',
-                options: ['Yemek zamanı', 'Uyku zamanı', 'Dışarı çıkma'],
-                correctIndex: 0,
-                feedbackCorrect: 'Evet. Bu simge yemek zamanını anlatır.',
-                feedbackWrong: 'Bu simge yemek zamanını gösterir.'
-            },
-            {
-                emoji: '✋',
-                title: 'Temel işareti anla',
-                prompt: 'Avuç içi açık ve öne dönük. Bu temel işaret günlük kullanımda en çok ne anlatır?',
-                visualCopy: 'Açık avuç öne dönük',
-                options: ['Bekle', 'Koş', 'Bitir'],
-                correctIndex: 0,
-                feedbackCorrect: 'Doğru. Bu işaret genelde “bekle” anlamına gelir.',
-                feedbackWrong: 'Bu görsel daha çok “bekle” anlamına gelir.'
-            }
-        ]
-    }
-};
 
 // =============================================
 // LIPSYNC + KARAKTER MOTORU
@@ -278,7 +197,9 @@ function celebrateCorrectAnswer() {
 // EKRAN YÖNETİMİ
 // =============================================
 function showOnly(id) {
-    const screens = ['start-screen','student-setup-screen','menu-screen','hearing-support-screen','game-container','story-select-screen','story-screen','report-screen'];
+    const screens = ['start-screen','student-setup-screen','menu-screen','game-container','report-screen','matching-screen',
+                      'schedule-screen','aac-screen','token-screen','sequence-screen',
+                      'login-screen','iep-screen','skills-screen','behavior-screen','auth-screen'];
     screens.forEach(s => {
         const el = document.getElementById(s);
         if (el) el.style.display = 'none';
@@ -314,8 +235,11 @@ function updateMenuIdentity() {
         emailEl.textContent = currentUserEmail ? `${currentUserEmail} • ${roleLabel}` : 'Misafir';
     }
     if (studentEl) {
-        studentEl.textContent = activeStudentName || 'Henüz seçilmedi';
+        studentEl.textContent = activeStudentName || 'Öğrenci seç';
     }
+    // Pill dot: green if student selected
+    const dot = document.querySelector('.pill-dot');
+    if (dot) dot.style.background = activeStudentName ? '#22c55e' : '#f59e0b';
 }
 
 function openOnboarding() {
@@ -384,16 +308,9 @@ async function startApp(resetSession) {
     }
 
     document.getElementById('menu-greeting').textContent = `Merhaba, ${childName}! 🌟`;
-    const hasStudentContext = await ensureActiveStudent();
-    if (!hasStudentContext) return;
-
-    document.getElementById('menu-greeting').textContent = `Merhaba, ${activeStudentName || childName}!`;
-    document.getElementById('menu-greeting').textContent = `Merhaba, ${activeStudentName || childName}!`;
     appStarted = true;
-    updateMenuIdentity();
-    showOnly('menu-screen');
-    renderCityScene();
-    dismissOnboarding(false);
+    // Auth kontrolü: oturum var mı?
+    checkAuthSession();
 }
 
 async function initializeAuth() {
@@ -438,14 +355,13 @@ supabaseClient.auth.onAuthStateChange(function(event, session) {
     }
 });
 
-document.addEventListener('DOMContentLoaded', initializeAuth);
+document.addEventListener('DOMContentLoaded', function() {
+    // Supabase auth atlanıyor — kendi auth sistemimizi kullanıyoruz
+    checkAuthSession();
+});
 window.addEventListener('pagehide', persistSessionSnapshot);
 document.addEventListener('DOMContentLoaded', function() {
     ensureStudentEnhancements();
-    const side = document.querySelector('.story-side');
-    if (side) defaultStorySideMarkup = side.innerHTML;
-    renderStoryLibrary();
-    renderStoryResumeCard();
     syncCityEntryPlacement(false);
     renderCityScene();
 });
@@ -496,146 +412,6 @@ function goToMenu() {
 function goToTherapy() {
     showOnly('game-container');
     startFocusedCityLocation();
-}
-
-function renderHearingModuleList() {
-    const listEl = document.getElementById('hearingModuleList');
-    if (!listEl) return;
-
-    listEl.innerHTML = Object.entries(HEARING_SUPPORT_MODULES).map(([key, module]) => `
-        <button type="button" class="hearing-module-card ${currentHearingModuleKey === key ? 'active' : ''}" onclick="startHearingModule('${key}')">
-            <span class="hearing-module-badge">${module.badge}</span>
-            <strong>${module.title}</strong>
-            <p>${module.description}</p>
-        </button>
-    `).join('');
-}
-
-function renderHearingStep() {
-    const titleEl = document.getElementById('hearingTitle');
-    const descEl = document.getElementById('hearingDescription');
-    const stepLabelEl = document.getElementById('hearingStepLabel');
-    const promptEl = document.getElementById('hearingPrompt');
-    const visualEmojiEl = document.getElementById('hearingVisualEmoji');
-    const visualTitleEl = document.getElementById('hearingVisualTitle');
-    const visualCopyEl = document.getElementById('hearingVisualCopy');
-    const optionsEl = document.getElementById('hearingOptions');
-    const feedbackEl = document.getElementById('hearingFeedback');
-    const nextBtn = document.getElementById('hearingNextBtn');
-    if (!titleEl || !descEl || !stepLabelEl || !promptEl || !visualEmojiEl || !visualTitleEl || !visualCopyEl || !optionsEl || !feedbackEl || !nextBtn) return;
-
-    const module = HEARING_SUPPORT_MODULES[currentHearingModuleKey];
-    if (!module) {
-        titleEl.textContent = 'İşitme desteği çalışmaları';
-        descEl.textContent = 'Soldaki modüllerden birini seçerek günlük yaşama yakın görsel etkinlikleri açabilirsin.';
-        stepLabelEl.textContent = 'Modül seç';
-        promptEl.textContent = 'Hazır olduğunda bir modül seç.';
-        visualEmojiEl.textContent = '◉';
-        visualTitleEl.textContent = 'Görsel odak';
-        visualCopyEl.textContent = 'Seçilen modülün ana ipucu burada gösterilir.';
-        optionsEl.innerHTML = '';
-        feedbackEl.textContent = 'Bu alanda her seçimden sonra kısa ve açıklayıcı geri bildirim göreceksin.';
-        nextBtn.disabled = true;
-        return;
-    }
-
-    const step = module.steps[currentHearingStepIndex];
-    titleEl.textContent = module.title;
-    descEl.textContent = module.description;
-    stepLabelEl.textContent = `Adım ${currentHearingStepIndex + 1}/${module.steps.length}`;
-    promptEl.textContent = step.prompt;
-    visualEmojiEl.textContent = step.emoji;
-    visualTitleEl.textContent = step.title;
-    visualCopyEl.textContent = step.visualCopy;
-    feedbackEl.textContent = 'Doğru cevabı bulunca sonraki adıma geçebilirsin.';
-    nextBtn.disabled = true;
-
-    optionsEl.innerHTML = step.options.map((option, index) => `
-        <button type="button" class="hearing-option-btn" onclick="chooseHearingOption(${index})">${option}</button>
-    `).join('');
-}
-
-function startHearingModule(moduleKey) {
-    currentHearingModuleKey = moduleKey;
-    currentHearingStepIndex = 0;
-    renderHearingModuleList();
-    renderHearingStep();
-}
-
-function chooseHearingOption(optionIndex) {
-    const module = HEARING_SUPPORT_MODULES[currentHearingModuleKey];
-    if (!module) return;
-
-    const step = module.steps[currentHearingStepIndex];
-    const feedbackEl = document.getElementById('hearingFeedback');
-    const nextBtn = document.getElementById('hearingNextBtn');
-    const optionButtons = Array.from(document.querySelectorAll('.hearing-option-btn'));
-    if (!feedbackEl || !nextBtn || !optionButtons.length) return;
-
-    optionButtons.forEach((button, index) => {
-        button.disabled = true;
-        if (index === step.correctIndex) button.classList.add('correct');
-        if (index === optionIndex && index !== step.correctIndex) button.classList.add('wrong');
-    });
-
-    feedbackEl.textContent = optionIndex === step.correctIndex ? step.feedbackCorrect : step.feedbackWrong;
-    nextBtn.disabled = false;
-}
-
-function nextHearingStep() {
-    const module = HEARING_SUPPORT_MODULES[currentHearingModuleKey];
-    if (!module) return;
-
-    if (currentHearingStepIndex < module.steps.length - 1) {
-        currentHearingStepIndex += 1;
-        renderHearingStep();
-        return;
-    }
-
-    const titleEl = document.getElementById('hearingTitle');
-    const descEl = document.getElementById('hearingDescription');
-    const stepLabelEl = document.getElementById('hearingStepLabel');
-    const promptEl = document.getElementById('hearingPrompt');
-    const visualEmojiEl = document.getElementById('hearingVisualEmoji');
-    const visualTitleEl = document.getElementById('hearingVisualTitle');
-    const visualCopyEl = document.getElementById('hearingVisualCopy');
-    const optionsEl = document.getElementById('hearingOptions');
-    const feedbackEl = document.getElementById('hearingFeedback');
-    const nextBtn = document.getElementById('hearingNextBtn');
-    if (!titleEl || !descEl || !stepLabelEl || !promptEl || !visualEmojiEl || !visualTitleEl || !visualCopyEl || !optionsEl || !feedbackEl || !nextBtn) return;
-
-    titleEl.textContent = `${module.title} tamamlandı`;
-    descEl.textContent = 'Bu modülü bitirdin. İstersen aynı alanı tekrar açabilir ya da rapora geçebilirsin.';
-    stepLabelEl.textContent = 'Tamamlandı';
-    promptEl.textContent = 'Görsel odaklı tüm adımları tamamladın.';
-    visualEmojiEl.textContent = '✓';
-    visualTitleEl.textContent = 'Modül bitti';
-    visualCopyEl.textContent = 'Şimdi başka bir modül seçerek devam edebiliriz.';
-    optionsEl.innerHTML = '';
-    feedbackEl.textContent = 'Planlı ve anlaşılır bir görsel takip çalışmasını tamamladın.';
-    nextBtn.disabled = true;
-}
-
-function goToHearingSupport() {
-    renderHearingModuleList();
-    renderHearingStep();
-    showOnly('hearing-support-screen');
-}
-
-function goToStories() {
-    renderStoryLibrary();
-    renderStoryResumeCard();
-    showOnly('story-select-screen');
-}
-
-function exitStory() {
-    window.speechSynthesis.cancel();
-    const v = document.getElementById('storyBgVideo');
-    v.pause();
-    v.src = '';
-    saveStoryProgress();
-    renderStoryResumeCard();
-    showOnly('story-select-screen');
 }
 
 function getDateKey(date) {
@@ -793,6 +569,7 @@ function ensureStudentEnhancements() {
 }
 
 function ensureMenuWorkspace() {
+    return; // Sade menü tasarımı aktif — karmaşık workspace devre dışı
     const menuScreen = document.getElementById('menu-screen');
     const menuHeader = document.querySelector('.menu-header');
     const menuTopbar = document.querySelector('.menu-topbar');
@@ -1202,10 +979,10 @@ function renderStudentList() {
 
     statusEl.textContent = 'Bir öğrenciyi seçebilir ya da yeni öğrenci ekleyebilirsin.';
     listEl.innerHTML = studentsCache.map(student => `
-        <button type="button" class="student-card ${student.id === activeStudentId ? 'active' : ''}" onclick="selectStudent('${student.id}')">
-            <h4>${student.full_name || 'İsimsiz öğrenci'}</h4>
-            <p>${student.support_notes || 'Henüz destek notu eklenmedi.'}</p>
-            <span class="student-card-meta">${student.birth_year ? `Doğum yılı: ${student.birth_year}` : 'Doğum yılı girilmedi'}</span>
+        <button type="button" class="student-card ${student.id === activeStudentId ? 'active' : ''}" onclick="selectStudent('${escapeHtml(student.id)}')">
+            <h4>${escapeHtml(student.full_name) || 'İsimsiz öğrenci'}</h4>
+            <p>${escapeHtml(student.support_notes) || 'Henüz destek notu eklenmedi.'}</p>
+            <span class="student-card-meta">${student.birth_year ? `Doğum yılı: ${escapeHtml(String(student.birth_year))}` : 'Doğum yılı girilmedi'}</span>
         </button>
     `).join('');
     renderRoleDashboard();
@@ -1485,7 +1262,7 @@ function renderHistoryDetails(history, dateKey) {
             ${entries.map(entry => `
                 <div class="history-session-item">
                     <div class="history-session-top">
-                        <strong>${entry.storyName ? `${entry.storyName} + konuşma çalışması` : 'Konuşma çalışması'}</strong>
+                        <strong>${entry.storyName ? `${escapeHtml(entry.storyName)} + konuşma çalışması` : 'Konuşma çalışması'}</strong>
                         <span class="history-session-time">${new Date(entry.createdAt).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}</span>
                     </div>
                     <div class="history-session-summary">
@@ -1708,7 +1485,7 @@ async function goToReport() {
         sessionData.therapyTurns.forEach(t => {
             const entry = document.createElement('div');
             entry.className = 'therapy-entry';
-            entry.innerHTML = `<div class="therapy-q">🎙️ ${t.location ? `${t.location} • ` : ''}${t.category ? `${t.category} • ` : ''}Soru: ${t.question}</div>${t.answer}`;
+            entry.innerHTML = `<div class="therapy-q">🎙️ ${t.location ? `${escapeHtml(t.location)} • ` : ''}${t.category ? `${escapeHtml(t.category)} • ` : ''}Soru: ${escapeHtml(t.question)}</div>${escapeHtml(t.answer)}`;
             therapyEl.appendChild(entry);
         });
     }
@@ -1776,6 +1553,7 @@ Kesinlikle emoji kullanma. Sıcak, profesyonel ve umut verici bir dil kullan.`;
 // =============================================
 const THERAPY_CATEGORIES = {
     daily_life: {
+        emoji: '🏠',
         label: 'Günlük Hayat',
         summary: 'Rutinler, ihtiyaçlar ve ev-okul yaşamı üzerine kısa konuşmalar.',
         questions: [
@@ -1792,6 +1570,7 @@ const THERAPY_CATEGORIES = {
         ]
     },
     emotions: {
+        emoji: '😊',
         label: 'Duygular',
         summary: 'Mutlu, üzgün, heyecanlı gibi duyguları fark edip ifade etmeye odaklanır.',
         questions: [
@@ -1808,6 +1587,7 @@ const THERAPY_CATEGORIES = {
         ]
     },
     social_communication: {
+        emoji: '🤝',
         label: 'Sosyal İletişim',
         summary: 'Selamlaşma, yardım isteme ve arkadaşlarla konuşma becerileri.',
         questions: [
@@ -1824,6 +1604,7 @@ const THERAPY_CATEGORIES = {
         ]
     },
     play_sports: {
+        emoji: '⚽',
         label: 'Oyun ve Spor',
         summary: 'İlgi alanı üzerinden seçim yapma, karşılaştırma ve anlatım becerileri.',
         questions: [
@@ -1948,6 +1729,264 @@ let chatHistory = [];
 let idleTimer;
 let turnCount = 0;
 
+// =============================================
+// EŞLEŞTİRME OYUNLARI
+// =============================================
+const MATCHING_GAMES = [
+    {
+        key: 'animals',
+        title: 'Hayvanları Eşleştir',
+        icon: '🐾',
+        description: 'Hayvan adını doğru resmiyle eşleştir!',
+        usePhotos: true,
+        pairs: [
+            { label: 'Kedi', emoji: '🐱', query: 'cute cat' },
+            { label: 'Köpek', emoji: '🐶', query: 'cute dog' },
+            { label: 'Kuş', emoji: '🐦', query: 'colorful bird' },
+            { label: 'Balık', emoji: '🐟', query: 'colorful fish' }
+        ]
+    },
+    {
+        key: 'colors',
+        title: 'Renkleri Eşleştir',
+        icon: '🌈',
+        description: 'Renk adını doğru renkle eşleştir!',
+        usePhotos: false,
+        pairs: [
+            { label: 'Kırmızı', emoji: '🔴' },
+            { label: 'Mavi', emoji: '🔵' },
+            { label: 'Sarı', emoji: '🟡' },
+            { label: 'Yeşil', emoji: '🟢' }
+        ]
+    },
+    {
+        key: 'daily',
+        title: 'Eşyaları Eşleştir',
+        icon: '🏠',
+        description: 'Eşya adını doğru resmiyle eşleştir!',
+        usePhotos: true,
+        pairs: [
+            { label: 'Kalem', emoji: '✏️', query: 'pencil' },
+            { label: 'Kitap', emoji: '📚', query: 'book' },
+            { label: 'Elma', emoji: '🍎', query: 'red apple' },
+            { label: 'Top', emoji: '⚽', query: 'soccer ball' }
+        ]
+    },
+    {
+        key: 'fruits',
+        title: 'Meyveleri Eşleştir',
+        icon: '🍓',
+        description: 'Meyve adını doğru resmiyle eşleştir!',
+        usePhotos: true,
+        pairs: [
+            { label: 'Elma', emoji: '🍎', query: 'red apple fruit' },
+            { label: 'Muz', emoji: '🍌', query: 'banana fruit' },
+            { label: 'Çilek', emoji: '🍓', query: 'strawberry fruit' },
+            { label: 'Üzüm', emoji: '🍇', query: 'grapes fruit' }
+        ]
+    }
+];
+
+let currentMatchingGame = null;
+let selectedLeftKey = null;
+let matchedPairs = [];
+let matchingErrors = 0;
+
+function goToMatching() {
+    showOnly('matching-screen');
+    renderMatchingMenu();
+}
+
+function renderMatchingMenu() {
+    const gridEl = document.getElementById('matchingMenuGrid');
+    const menuSection = document.getElementById('matchingMenuSection');
+    const gameSection = document.getElementById('matchingGameSection');
+    if (!gridEl) return;
+    if (menuSection) menuSection.style.display = 'block';
+    if (gameSection) gameSection.style.display = 'none';
+
+    gridEl.innerHTML = MATCHING_GAMES.map(game => `
+        <button type="button" class="matching-game-card" onclick="startMatchingGame('${game.key}')">
+            <div class="matching-game-icon">${game.icon}</div>
+            <strong>${game.title}</strong>
+            <p>${game.description}</p>
+        </button>
+    `).join('');
+    speakFallback('Bir oyun seç!', () => {});
+}
+
+function startMatchingGame(gameKey) {
+    currentMatchingGame = MATCHING_GAMES.find(g => g.key === gameKey);
+    if (!currentMatchingGame) return;
+    selectedLeftKey = null;
+    matchedPairs = [];
+    matchingErrors = 0;
+
+    const menuSection = document.getElementById('matchingMenuSection');
+    const gameSection = document.getElementById('matchingGameSection');
+    const titleEl = document.getElementById('matchingGameTitle');
+    if (menuSection) menuSection.style.display = 'none';
+    if (gameSection) gameSection.style.display = 'block';
+    if (titleEl) titleEl.textContent = currentMatchingGame.title;
+
+    renderMatchingGame();
+    loadMatchingPhotos(currentMatchingGame);
+    speakFallback(currentMatchingGame.description, () => {});
+}
+
+function renderMatchingGame() {
+    const container = document.getElementById('matchingGameArea');
+    if (!container || !currentMatchingGame) return;
+
+    const pairs = currentMatchingGame.pairs;
+    const usePhotos = currentMatchingGame.usePhotos;
+    const shuffledRight = [...pairs].sort(() => Math.random() - 0.5);
+
+    container.innerHTML = `
+        <div class="matching-columns">
+            <div class="matching-column" id="matchingLeft">
+                ${pairs.map(pair => `
+                    <button type="button" class="matching-card matching-label-card ${matchedPairs.includes(pair.label) ? 'matched' : ''}"
+                            data-key="${pair.label}"
+                            onclick="selectMatchLeft('${pair.label}')">
+                        ${pair.label}
+                    </button>
+                `).join('')}
+            </div>
+            <div class="matching-column" id="matchingRight">
+                ${shuffledRight.map(pair => `
+                    <button type="button" class="matching-card matching-emoji-card ${matchedPairs.includes(pair.label) ? 'matched' : ''}"
+                            data-key="${pair.label}"
+                            onclick="selectMatchRight('${pair.label}', this)">
+                        ${usePhotos
+                            ? `<div class="matching-photo-shimmer" data-photo-key="${pair.label}">
+                                   <span class="shimmer-emoji">${pair.emoji}</span>
+                               </div>`
+                            : `<span class="matching-emoji">${pair.emoji}</span>`
+                        }
+                    </button>
+                `).join('')}
+            </div>
+        </div>
+    `;
+}
+
+async function fetchCardPhoto(query) {
+    try {
+        const r = await fetch('/api/video?query=' + encodeURIComponent(query));
+        const d = await r.json();
+        if (d && d.videos && d.videos[0] && d.videos[0].image) {
+            return d.videos[0].image;
+        }
+    } catch (e) {}
+    return null;
+}
+
+async function loadMatchingPhotos(game) {
+    if (!game || !game.usePhotos) return;
+    for (const pair of game.pairs) {
+        const photoUrl = await fetchCardPhoto(pair.query);
+        if (!photoUrl) continue;
+        const shimmer = document.querySelector(`.matching-photo-shimmer[data-photo-key="${pair.label}"]`);
+        if (shimmer) {
+            shimmer.innerHTML = `<img src="${photoUrl}" alt="${pair.label}" class="matching-card-photo" onerror="this.parentNode.innerHTML='<span class=\\'matching-emoji\\'>${pair.emoji}</span>'">`;
+            shimmer.classList.add('loaded');
+        }
+    }
+}
+
+function selectMatchLeft(key) {
+    if (matchedPairs.includes(key)) return;
+    selectedLeftKey = key;
+    document.querySelectorAll('#matchingLeft .matching-label-card').forEach(card => {
+        card.classList.toggle('selected', card.dataset.key === key);
+    });
+    speakFallback(key, () => {});
+}
+
+function selectMatchRight(key, btn) {
+    if (!selectedLeftKey || matchedPairs.includes(key)) return;
+
+    if (selectedLeftKey === key) {
+        matchedPairs.push(key);
+        btn.classList.add('matched');
+        document.querySelectorAll('#matchingLeft .matching-label-card').forEach(card => {
+            if (card.dataset.key === key) {
+                card.classList.add('matched');
+                card.classList.remove('selected');
+            }
+        });
+        selectedLeftKey = null;
+        confetti({ particleCount: 30, spread: 45, origin: { y: 0.6 } });
+        speakFallback('Harika! Doğru!', () => {});
+
+        if (matchedPairs.length === currentMatchingGame.pairs.length) {
+            setTimeout(showMatchingComplete, 700);
+        }
+    } else {
+        matchingErrors++;
+        btn.classList.add('error');
+        setTimeout(() => btn.classList.remove('error'), 600);
+        speakFallback('Tekrar deneyelim!', () => {});
+    }
+}
+
+function showMatchingComplete() {
+    const container = document.getElementById('matchingGameArea');
+    if (!container) return;
+    confetti({ particleCount: 100, spread: 80 });
+    speakFallback('Tebrikler! Çok güzel yaptın!', () => {});
+    container.innerHTML = `
+        <div class="matching-complete">
+            <div class="matching-complete-icon">⭐</div>
+            <h3>Tebrikler!</h3>
+            <p>Tüm eşleştirmeleri doğru yaptın!</p>
+            <div class="matching-complete-stats">
+                <span>${currentMatchingGame.pairs.length} doğru eşleştirme</span>
+                ${matchingErrors > 0 ? `<span>${matchingErrors} deneme</span>` : ''}
+            </div>
+            <div class="matching-complete-btns">
+                <button type="button" class="btn-primary-gradient" onclick="startMatchingGame('${currentMatchingGame.key}')">Tekrar Oyna</button>
+                <button type="button" class="menu-ghost-btn" onclick="renderMatchingMenu()">Başka Oyun</button>
+            </div>
+        </div>
+    `;
+}
+
+// =============================================
+// İLERLEME & YARDIMCI FONKSIYONLAR
+// =============================================
+function updateProgressBar() {
+    const allQuestions = getActiveTherapyQuestions();
+    const total = allQuestions.length;
+    const answered = total - unaskedQuestions.length;
+    const pct = total > 0 ? Math.round((answered / total) * 100) : 0;
+
+    const fill = document.getElementById('therapyProgressFill');
+    const label = document.getElementById('therapyProgressLabel');
+    if (fill) fill.style.width = pct + '%';
+    if (label) label.textContent = `Soru ${answered} / ${total}`;
+}
+
+function rereadQuestion() {
+    if (currentObj) {
+        speakFallback(currentObj.q, () => {});
+    }
+}
+
+async function askAIMode(mode) {
+    if (!currentObj) return;
+    if (mode === 'repeat') {
+        addMessage('Soruyu tekrar okuyorum...', 'ai');
+        speakFallback(currentObj.q, () => {});
+    } else if (mode === 'simplify') {
+        const simplePrompt = `Şu soruyu, 4-8 yaş arası özel eğitim desteği alan bir çocuk için çok basit 1-2 kelimeyle açıkla: "${currentObj.q}". Maksimum 1 kısa cümle.`;
+        const res = await getGemmaResponse(simplePrompt);
+        addMessage(res, 'ai');
+        speakFallback(res, () => {});
+    }
+}
+
 function getCurrentTherapyCategory() {
     return THERAPY_CATEGORIES[currentTherapyCategoryKey] || THERAPY_CATEGORIES.daily_life;
 }
@@ -1975,7 +2014,7 @@ function renderTherapyCategories() {
 
     barEl.innerHTML = Object.entries(THERAPY_CATEGORIES).map(([key, category]) => `
         <button type="button" class="therapy-category-btn ${currentTherapyCategoryKey === key ? 'active' : ''}" onclick="setTherapyCategory('${key}')">
-            ${category.label}
+            <span class="therapy-cat-emoji">${category.emoji || ''}</span> ${category.label}
         </button>
     `).join('');
 
@@ -2048,6 +2087,7 @@ function startFocusedCityLocation() {
     turnCount = 0;
     const bubbles = document.getElementById('chat-bubbles');
     if (bubbles) bubbles.innerHTML = '';
+    updateProgressBar();
     const vEl = document.getElementById('v');
     vEl.muted = true;
     vEl.play().catch(()=>{});
@@ -2089,6 +2129,7 @@ async function loadNext() {
     const rIndex = Math.floor(Math.random() * unaskedQuestions.length);
     currentObj = unaskedQuestions[rIndex];
     unaskedQuestions.splice(rIndex, 1);
+    updateProgressBar();
 
     const vEl = document.getElementById('v');
     if (!sessionData.therapyTurns.length && turnCount === 0) {
@@ -2255,20 +2296,21 @@ async function getGemmaResponse(text) {
     const currentCategory = getCurrentTherapyCategory();
     const currentGoal = currentObj && currentObj.goal ? currentObj.goal : 'kısa ve anlaşılır konuşma';
     const currentLocation = CITY_LOCATIONS[currentCityLocationKey];
-    var instructions = `Sen, özel eğitim desteği alan 4-8 yaş arası bir çocukla konuşan sabırlı ve pedagojik farkındalığı yüksek Yıldız Can'sın. Çocuğun adı ${childName}.
+    var instructions = `Sen, özel eğitim desteği alan 4-8 yaş arası bir çocukla konuşan sıcak ve sabırlı Yıldız Can'sın. Çocuğun adı ${childName}.
 Şu an seçili şehir noktası: ${currentLocation ? currentLocation.label : 'Genel konuşma alanı'}.
 Şu an seçili konuşma alanı: ${currentCategory.label}.
 Bu sorunun hedefi: ${currentGoal}.
 
-KRİTİK KURALLAR:
-1. Yalnızca seçili konuşma alanı içinde kal, konu dışına çıkma.
-2. Çocuk farklı bir konuya kayarsa nazikçe mevcut alana geri dön.
-3. Cevabın mevcut soruya ve çocuğun son cümlesine bağlı olsun.
-4. Kısa, somut ve anlaşılır Türkçe kullan.
-5. Emoji kullanma.
-6. En fazla 2 kısa cümle kur.
-7. Sonda sadece seçili alanla ilgili tek kısa takip sorusu sor.
-8. Asla yargılama; gerekirse doğru modeli nazikçe örnekle.`;
+KRİTİK KURALLAR (özel eğitim prensiplerine göre):
+1. Her cevabı mutlaka olumla: "Harika!", "Aferin!", "Çok güzel!" gibi kısa bir teşvik ile başla.
+2. Sadece 1-2 kısa cümle kur. Uzun açıklamalar yapma.
+3. Çocuk yanlış ya da eksik cevap verirse yargılama; "Birlikte deneyelim: ..." veya "Şöyle de diyebiliriz: ..." de.
+4. Çocuk susuyor veya anlayamıyorsa: "Sorun değil, birlikte düşünelim." de ve basit bir ipucu ver.
+5. Sonunda yalnızca 1 kısa takip sorusu sor. Çok soru sorma.
+6. Emoji kullanma.
+7. Yalnızca seçili konuşma alanında kal, konu dışına çıkma.
+8. Bilişsel yükü düşük tut: kısa kelimeler, basit cümleler, somut örnekler.
+9. Her zaman güçlendirici ve umut verici bir ton kullan.`;
     var payload = {
         contents: [
             { role: "user", parts: [{ text: "GÖREV: " + instructions }] },
@@ -2350,747 +2392,6 @@ async function speakWithLipsync(text, onEnd, emotion = CharacterEmotion.NEUTRAL)
         console.warn('Lipsync TTS hatasi, fallback:', e);
         setCharacterEmotion(CharacterEmotion.NEUTRAL);
         speakFallback(text, onEnd);
-    }
-}
-
-// =============================================
-// HİKAYE SİSTEMİ
-// =============================================
-
-const STORIES = {
-    redhood: {
-        title: "Yardım İstiyorum",
-        emoji: "??",
-        description: "Gerçek hayatta yardım isteme, doğru kişiyi bulma ve net cümle kurma görevi.",
-        difficulty: "Kolay",
-        ageRange: "5-6",
-        theme: "yardim",
-        scenes: [
-            {
-                id: 0,
-                emoji: "??",
-                bg: "linear-gradient(135deg, #ffe29f, #ffa99f)",
-                bgLabel: "Sinif girisi",
-                videoQuery: "school hallway child teacher warm light",
-                narration: "Defterin yere dustu ve fermuarin sikisti. Ogretmenin yakininda. Simdi yardim istemen gerekiyor.",
-                taskType: "both",
-                taskText: "Yardim istemek icin en iyi cumleyi sec ya da soyle.",
-                micPrompt: "Yardim isterken ne soylersin?",
-                choices: [
-                    { text: "Ogretmenim, yardim eder misiniz?", next: 1, response: "Bu cok iyi bir baslangic. Nazik ve net bir sekilde yardim istedin." },
-                    { text: "Bunu yapamiyorum, bana yardim lazim.", next: 1, response: "Ihtiyacini soylemen cok degerli. Boylece karsindaki seni daha iyi anlar." },
-                    { text: "Bekleyip hicbir sey soylemem.", next: 1, response: "Sessiz kalmak zor gelebilir. Yardim istemek seni guclu yapar." }
-                ]
-            },
-            {
-                id: 1,
-                emoji: "??",
-                bg: "linear-gradient(135deg, #a8edea, #c8f7c5)",
-                bgLabel: "El kaldirma ani",
-                videoQuery: "classroom child raising hand teacher smiling",
-                narration: "Ogretmen baska biriyle konusuyor. Yardim istemek istiyorsun ama sirani da beklemen gerekiyor.",
-                taskType: "choice",
-                taskText: "Simdi hangi davranis daha uygun?",
-                choices: [
-                    { text: "Elimi kaldirip ogretmenin bana donmesini beklerim.", next: 2, response: "Harika. Bu hem seni gorunur yapar hem de sirayi korur." },
-                    { text: "Ogretmenin sozunu keserim.", next: 2, response: "Acil hissettirebilir ama sirayi bozmak karsindakini sasirtabilir." },
-                    { text: "Arkadasima bagirarak yardim isterim.", next: 2, response: "Bagirmak bazen karisiklik yaratir. Daha sakin bir yol bulabiliriz." }
-                ]
-            },
-            {
-                id: 2,
-                emoji: "???",
-                bg: "linear-gradient(135deg, #667eea, #764ba2)",
-                bgLabel: "Net cumle kurma",
-                videoQuery: "child speaking calmly in classroom support",
-                narration: "Ogretmenin sana dondu. Simdi yardimi tam olarak ne icin istedigini soylemelisin.",
-                taskType: "both",
-                taskText: "Ihtiyacini acik bir cumleyle anlat.",
-                micPrompt: "Neye yardim lazim oldugunu soyle.",
-                choices: [
-                    { text: "Defterimin fermuari sikisti, acar misiniz?", next: 3, response: "Mukemmel. Sorunu da ne istedigini de acikca soyledin." },
-                    { text: "Bir sey oldu...", next: 3, response: "Baslamak iyi ama biraz daha net olursan yardim daha kolay gelir." },
-                    { text: "Ben yapamam!", next: 3, response: "Duygunu anlattın, şimdi bir adım daha atıp nasıl yardım istediğini söyleyebilirsin." }
-                ]
-            },
-            {
-                id: 3,
-                emoji: "??",
-                bg: "linear-gradient(135deg, #f093fb, #f5576c)",
-                bgLabel: "Rahatlama ani",
-                videoQuery: "child feeling relieved after help classroom",
-                narration: "Ogretmenin yardim etti. Simdi tesekkur ederek durumu kapatabilirsin.",
-                taskType: "choice",
-                taskText: "Hangi kapanis cumlesi daha uygun?",
-                choices: [
-                    { text: "Tesekkur ederim ogretmenim.", next: -1, response: "Harika kapanis. Hem nazik hem kendinden emin." },
-                    { text: "Tamam oldu.", next: -1, response: "Ise yarar ama tesekkur etmek iliskiyi daha guclu hale getirir." }
-                ]
-            }
-        ]
-    },
-    piggies: {
-        title: "Sıramı Bekliyorum",
-        emoji: "?",
-        description: "Bekleme, sıraya uyma ve heyecanlanınca sakin kalma görevi.",
-        difficulty: "Kolay",
-        ageRange: "5-6",
-        theme: "bekleme",
-        scenes: [
-            {
-                id: 0,
-                emoji: "??",
-                bg: "linear-gradient(135deg, #fff1c1, #ffd5a0)",
-                bgLabel: "Park sirasi",
-                videoQuery: "playground children waiting slide sunny day",
-                narration: "Parkta kaydirak icin sira var. Sen de cok heyecanlisin ama once beklemen gerekiyor.",
-                taskType: "choice",
-                taskText: "Beklerken ilk ne yapmak daha iyi olur?",
-                choices: [
-                    { text: "Ayaklarimi yerde tutup derin nefes alirim.", next: 1, response: "Bu cok iyi bir baslangic. Bedenin sakinlesince beklemek kolaylasir." },
-                    { text: "Hemen one gecmeye calisirim.", next: 1, response: "Bu seni hizlandirir gibi gorunur ama diger cocuklarla sorun yaratabilir." },
-                    { text: "Ofkelenip siradan cikarim.", next: 1, response: "Zorlandigini anliyorum. Simdi daha guvenli bir bekleme yolu bulalim." }
-                ]
-            },
-            {
-                id: 1,
-                emoji: "??",
-                bg: "linear-gradient(135deg, #d4fc79, #96e6a1)",
-                bgLabel: "Beklerken odak",
-                videoQuery: "child waiting calmly playground observing turn",
-                narration: "Sira beklerken ellerin ve gozlerin ne yapacak? Bunlar da beklemeyi kolaylastirir.",
-                taskType: "speak",
-                taskText: "Beklerken kendine hangi sakin gorevi verebilirsin?",
-                micPrompt: "Beklerken ne yaparsin?",
-                choices: [
-                    { text: "Icerimden bire kadar sayarim.", next: 2, response: "Saymak cok iyi bir bekleme aracidir." },
-                    { text: "Onumdeki cocugu izlerim ve sirami takip ederim.", next: 2, response: "Harika. Sirani takip etmek ne zaman hareket edecegini anlamani saglar." }
-                ]
-            },
-            {
-                id: 2,
-                emoji: "??",
-                bg: "linear-gradient(135deg, #89f7fe, #66a6ff)",
-                bgLabel: "Siran geldi",
-                videoQuery: "playground children taking turns smiling",
-                narration: "Sira sana geldi ama arkandaki cocuk da sabirsiz. Simdi hem kendi siranin tadini cikarip hem de baskasina saygi gostermen gerekiyor.",
-                taskType: "choice",
-                taskText: "Hangi davranis en dengeli olur?",
-                choices: [
-                    { text: "Bir kere kayip sonra arkadaki cocuga alan acmak.", next: 3, response: "Bu cok dengeli bir secim. Hem sen oynadin hem sira akisini korudun." },
-                    { text: "Uzun sure ayrilmadan kalmak.", next: 3, response: "Eglenceli gelebilir ama baskalarinin sirasini uzatir." }
-                ]
-            },
-            {
-                id: 3,
-                emoji: "?",
-                bg: "linear-gradient(135deg, #cfd9df, #e2ebf0)",
-                bgLabel: "Bekleme tamam",
-                videoQuery: "child proud after waiting turn playground",
-                narration: "Bekledin, sirani kullandin ve baskalarina da alan actin. Simdi bu beceriyi baska nerede kullanabilecegini dusun.",
-                taskType: "both",
-                taskText: "Sira beklemeyi baska hangi yerde kullanirsin?",
-                micPrompt: "Sira beklemeyi nerede kullanirsin?",
-                choices: [
-                    { text: "Yemek sirasinda.", next: -1, response: "Evet. Sira bekleme yemekte de cok ise yarar." },
-                    { text: "Sinifta ogretmenle konusurken.", next: -1, response: "Harika. Sinifta da sirayi takip etmek herkesin rahat etmesini saglar." }
-                ]
-            }
-        ]
-    },
-    moonseed: {
-        title: "Paylaşıyorum ve Konuşuyorum",
-        emoji: "??",
-        description: "Oyuncak paylaşma, arkadaşa dönüp konuşma ve birlikte oyun kurma görevi.",
-        difficulty: "Orta",
-        ageRange: "7-8",
-        theme: "iletisim",
-        scenes: [
-            {
-                id: 0,
-                emoji: "??",
-                bg: "linear-gradient(135deg, #1f2a63, #6a5acd)",
-                bgLabel: "Oyun kosesi",
-                videoQuery: "children playing with toys classroom sharing",
-                narration: "Sen bloklarla oynuyorsun. Yanindaki cocuk da ayni bloklari istiyor ve sana bakiyor.",
-                taskType: "both",
-                taskText: "Oyunu bozmadan nasil cevap verirsin?",
-                micPrompt: "Arkadasina ne soylersin?",
-                choices: [
-                    { text: "Birazdan sana da vereyim, once kulemi bitireyim.", next: 1, response: "Bu harika bir paylasma dili. Hem kendini anlattin hem cozum sundun." },
-                    { text: "Hayir, vermem!", next: 1, response: "Duygunu anliyorum ama daha yumusak bir yol kurabiliriz." },
-                    { text: "Gel birlikte yapalim.", next: 1, response: "Cok guzel bir ortak oyun daveti sundun." }
-                ]
-            },
-            {
-                id: 1,
-                emoji: "??",
-                bg: "linear-gradient(135deg, #89f7fe, #66a6ff)",
-                bgLabel: "Konuşma kurma",
-                videoQuery: "children talking together toy negotiation",
-                narration: "Arkadasin biraz uzuldu. Simdi onun da kendini iyi hissetmesi icin bir cumle daha ekleyebilirsin.",
-                taskType: "choice",
-                taskText: "Hangi ek cumle daha iyi gelir?",
-                choices: [
-                    { text: "Sen de istersen mavi bloklari secebilirsin.", next: 2, response: "Secenek sunman cok iyi. Oyun beraber devam edebilir." },
-                    { text: "Biraz beklemek zor olabilir biliyorum.", next: 2, response: "Bu cümle empati kuruyor. Karşındaki anlaşıldığını hisseder." }
-                ]
-            },
-            {
-                id: 2,
-                emoji: "??",
-                bg: "linear-gradient(135deg, #c471ed, #f64f59)",
-                bgLabel: "Paylaşma anı",
-                videoQuery: "two children sharing blocks smiling teamwork",
-                narration: "Kulen bitti. Simdi paylasma zamani. Oyunun devam etmesi icin ne yaparsin?",
-                taskType: "choice",
-                taskText: "En guclu paylasma davranisini sec.",
-                choices: [
-                    { text: "Sari bloklari sana vereyim, birlikte kopru yapalim.", next: 3, response: "Mukemmel. Hem paylastin hem ortak oyun kurdun." },
-                    { text: "Hepsini birden verip oyundan cikayim.", next: 3, response: "Paylasmak guzel ama oyunda kalman da onemli. Denge kurabiliriz." }
-                ]
-            },
-            {
-                id: 3,
-                emoji: "??",
-                bg: "linear-gradient(135deg, #43cea2, #185a9d)",
-                bgLabel: "Ortak oyun",
-                videoQuery: "children celebrating finished block tower teamwork",
-                narration: "Artik ikiniz de oyundasiniz. Simdi bu guzel oyunu bitirirken nasil bir kapanis yaparsin?",
-                taskType: "speak",
-                taskText: "Arkadasina oyun sonunda ne soylemek istersin?",
-                micPrompt: "Oyun sonunda ne dersin?",
-                choices: [
-                    { text: "Beraber yapmak guzeldi.", next: -1, response: "Bu sicak bir kapanis. Arkadaslik icin cok iyi." },
-                    { text: "Yarin yine oynayalim.", next: -1, response: "Harika. Gelecek oyuna kapi acan cok guzel bir cumle." }
-                ]
-            }
-        ]
-    }
-};
-
-let currentStory = null;
-let currentStoryKey = null;
-let currentSceneIdx = 0;
-let storyChoiceMade = false;
-let defaultStorySideMarkup = '';
-
-function getStoryProgressStorageKey() {
-    return currentUserEmail ? `story_progress_${currentUserEmail}` : 'story_progress_guest';
-}
-
-function loadSavedStoryProgress() {
-    try {
-        const raw = localStorage.getItem(getStoryProgressStorageKey());
-        return raw ? JSON.parse(raw) : null;
-    } catch (error) {
-        console.error('Hikaye ilerlemesi okunamadı:', error);
-        return null;
-    }
-}
-
-function saveStoryProgress() {
-    if (!currentStory || sessionData.storyCompleted) return;
-
-    const payload = {
-        storyKey: currentStoryKey,
-        sceneIndex: currentSceneIdx,
-        totalScenesReached: sessionData.totalScenesReached,
-        storyChoices: sessionData.storyChoices.slice(),
-        storyName: sessionData.storyName,
-        updatedAt: new Date().toISOString()
-    };
-
-    localStorage.setItem(getStoryProgressStorageKey(), JSON.stringify(payload));
-}
-
-function clearStoryProgress() {
-    localStorage.removeItem(getStoryProgressStorageKey());
-}
-
-function restoreStorySideMarkup() {
-    const side = document.querySelector('.story-side');
-    if (side && defaultStorySideMarkup) {
-        side.innerHTML = defaultStorySideMarkup;
-    }
-}
-
-function getStoryThemeLabel(theme) {
-    if (theme === 'yardim') return 'Yardım İsteme';
-    if (theme === 'bekleme') return 'Sıra Bekleme';
-    if (theme === 'iletisim') return 'Paylaşma';
-    return theme;
-}
-
-function renderStoryLibrary() {
-    const grid = document.getElementById('storyGrid');
-    if (!grid) return;
-
-    const theme = document.getElementById('storyThemeFilter').value;
-    const level = document.getElementById('storyLevelFilter').value;
-    const age = document.getElementById('storyAgeFilter').value;
-
-    const items = Object.entries(STORIES).filter(([, story]) => {
-        const themeOk = theme === 'all' || story.theme === theme;
-        const levelOk = level === 'all' || story.difficulty === level;
-        const ageOk = age === 'all' || story.ageRange === age;
-        return themeOk && levelOk && ageOk;
-    });
-
-    if (!items.length) {
-        grid.innerHTML = '<div class="story-empty-state">Bu filtrelere uygun hikaye bulunamadı. Başka bir tema veya seviye seçebilirsin.</div>';
-        return;
-    }
-
-    grid.innerHTML = items.map(([key, story]) => `
-        <div class="story-thumb active-story" onclick="startStory('${key}')">
-            <div class="story-thumb-img">${story.emoji}</div>
-            <h4>${story.title}</h4>
-            <p>${story.description}</p>
-            <span class="story-difficulty">${story.difficulty}</span>
-            <div class="story-thumb-meta">
-                <span class="story-meta-pill">${getStoryThemeLabel(story.theme)}</span>
-                <span class="story-meta-pill">${story.ageRange} yaş</span>
-                <span class="story-meta-pill">${story.scenes.length} sahne</span>
-            </div>
-        </div>
-    `).join('');
-}
-
-function updateStoryFilters() {
-    renderStoryLibrary();
-}
-
-function renderStoryResumeCard() {
-    const card = document.getElementById('storyResumeCard');
-    if (!card) return;
-
-    const saved = loadSavedStoryProgress();
-    if (!saved || !saved.storyKey || !STORIES[saved.storyKey]) {
-        card.style.display = 'none';
-        card.innerHTML = '';
-        return;
-    }
-
-    const story = STORIES[saved.storyKey];
-    card.style.display = 'flex';
-    card.innerHTML = `
-        <div class="story-resume-copy">
-            <h3>Kaldığın yerden devam et</h3>
-            <p>${story.title} hikayesinde ${saved.sceneIndex + 1}. sahneye kadar geldin. İstersen tek dokunuşla devam edebilirsin.</p>
-        </div>
-        <div class="story-resume-actions">
-            <button class="menu-cta-btn" type="button" onclick="resumeSavedStory()">Devam Et</button>
-            <button class="menu-ghost-btn" type="button" onclick="restartSavedStory()">Baştan Başlat</button>
-        </div>
-    `;
-}
-
-function startStory(storyKey, resumeProgress) {
-    currentStoryKey = storyKey;
-    currentStory = STORIES[storyKey];
-    restoreStorySideMarkup();
-
-    currentSceneIdx = resumeProgress ? resumeProgress.sceneIndex || 0 : 0;
-    sessionData.storyName = currentStory.title;
-    sessionData.totalScenes = currentStory.scenes.length;
-    sessionData.totalScenesReached = resumeProgress ? (resumeProgress.totalScenesReached || currentSceneIdx + 1) : 0;
-    sessionData.storyCompleted = false;
-    sessionData.storyChoices = resumeProgress ? (resumeProgress.storyChoices || []).slice() : [];
-    sessionData.storyGoalInjection = '';
-
-    showOnly('story-screen');
-    buildProgressDots();
-    renderScene(currentSceneIdx);
-    saveStoryProgress();
-}
-
-function resumeSavedStory() {
-    const saved = loadSavedStoryProgress();
-    if (!saved || !saved.storyKey) return;
-    startStory(saved.storyKey, saved);
-}
-
-function restartSavedStory() {
-    const saved = loadSavedStoryProgress();
-    if (!saved || !saved.storyKey) return;
-    clearStoryProgress();
-    renderStoryResumeCard();
-    startStory(saved.storyKey);
-}
-
-function buildProgressDots() {
-    const container = document.getElementById('progressDots');
-    container.innerHTML = '';
-    currentStory.scenes.forEach((_, i) => {
-        const dot = document.createElement('div');
-        dot.className = 'p-dot';
-        dot.id = 'dot-' + i;
-        container.appendChild(dot);
-    });
-}
-
-function updateDots(idx) {
-    currentStory.scenes.forEach((_, i) => {
-        const dot = document.getElementById('dot-' + i);
-        if (!dot) return;
-        dot.className = 'p-dot';
-        if (i < idx) dot.classList.add('done');
-        else if (i === idx) dot.classList.add('active');
-    });
-}
-
-function renderScene(idx) {
-    const scene = currentStory.scenes[idx];
-    storyChoiceMade = false;
-
-    // Fallback arka planı hemen uygula
-    const fallback = document.getElementById('storyBgFallback');
-    fallback.style.background = scene.bg;
-    fallback.style.opacity = '1';
-
-    // Sahne emojisi
-    document.getElementById('sceneEmoji').textContent = scene.emoji;
-
-    // Arka plan etiketi
-    const sceneImg = document.getElementById('storySceneImg');
-    let bgLabel = sceneImg.querySelector('.scene-bg-label');
-    if (!bgLabel) {
-        bgLabel = document.createElement('div');
-        bgLabel.className = 'scene-bg-label';
-        sceneImg.appendChild(bgLabel);
-    }
-    bgLabel.textContent = scene.bgLabel || '';
-
-    // Pexels'ten sahneye uygun video çek
-    loadStoryVideo(scene.videoQuery, scene.bg);
-
-    // İlerleme noktaları
-    updateDots(idx);
-    sessionData.totalScenesReached = Math.max(sessionData.totalScenesReached, idx + 1);
-
-    // Anlatıcı
-    document.getElementById('narratorBubble').textContent = scene.narration;
-
-    // Görev
-    document.getElementById('storyTask').textContent = scene.taskText;
-    document.getElementById('storyTaskLabel').textContent = '🎯 Görevin:';
-
-    // Sohbet temizle
-    document.getElementById('storyChatBubbles').innerHTML = '';
-
-    // Seçim butonları
-    renderChoices(scene);
-
-    // Mikrofon alanı
-    const micArea = document.getElementById('storyMicArea');
-    if (scene.taskType === 'speak' || scene.taskType === 'both') {
-        micArea.style.display = 'flex';
-        document.getElementById('storyMicInfo').textContent = scene.micPrompt || 'Söylemek istiyorsan mikrofona bas!';
-        document.getElementById('storyMicBtn').disabled = false;
-        document.getElementById('storyMicBtn').classList.remove('listening');
-    } else {
-        micArea.style.display = 'none';
-    }
-
-    // İleri butonu gizle
-    document.getElementById('storyNextBtn').style.display = 'none';
-
-    // Anlatıyı seslendir
-    speak(scene.narration, () => {});
-    saveStoryProgress();
-}
-
-// Sahneye uygun Pexels videosu yükle
-async function loadStoryVideo(query, fallbackBg) {
-    const videoEl = document.getElementById('storyBgVideo');
-    const fallbackEl = document.getElementById('storyBgFallback');
-
-    try {
-        const r = await fetch('/api/video?query=' + encodeURIComponent(query));
-        const d = await r.json();
-
-        if (d.videos && d.videos[0]) {
-            const files = d.videos[0].video_files || [];
-            const mp4s = files.filter(f => f.file_type === 'video/mp4');
-            const chosen = mp4s.find(f => f.height && f.height <= 720) || mp4s[0] || files[0];
-            if (!chosen) return;
-
-            videoEl.src = chosen.link;
-            videoEl.muted = true;
-            videoEl.loop = true;
-            videoEl.setAttribute('playsinline', '');
-            videoEl.load();
-
-            videoEl.onloadeddata = function() {
-                videoEl.play().catch(() => {});
-                // Video hazır olunca fallback rengi kaldır
-                fallbackEl.style.opacity = '0';
-                setTimeout(() => { fallbackEl.style.opacity = '0'; }, 800);
-            };
-            videoEl.onerror = function() {
-                fallbackEl.style.background = fallbackBg;
-                fallbackEl.style.opacity = '1';
-            };
-        }
-    } catch(e) {
-        // Video gelmezse fallback renk kalır
-        fallbackEl.style.background = fallbackBg;
-        fallbackEl.style.opacity = '1';
-    }
-}
-
-function renderChoices(scene) {
-    const container = document.getElementById('storyChoices');
-    container.innerHTML = '';
-    if (!scene.choices) return;
-
-    scene.choices.forEach((choice, i) => {
-        const btn = document.createElement('button');
-        btn.className = 'choice-btn';
-        btn.textContent = choice.text;
-        btn.onclick = () => { handleChoice(choice, btn, scene); };
-        container.appendChild(btn);
-    });
-}
-
-const PROSOCIAL_KEYWORDS = ['yardim', 'yardım', 'paylas', 'paylaş', 'birlikte', 'ozur', 'özür', 'tesekkur', 'teşekkür', 'sor', 'bekle'];
-const ANTISOCIAL_KEYWORDS = ['bencil', 'yalan', 'saklamak', 'kirmak', 'kırmak', 'itmek', 'bagirmak', 'bağırmak', 'zorla', 'almak'];
-
-function normalizeTr(text) {
-    return (text || '')
-        .toLowerCase()
-        .replace(/ı/g, 'i')
-        .replace(/ğ/g, 'g')
-        .replace(/ü/g, 'u')
-        .replace(/ş/g, 's')
-        .replace(/ö/g, 'o')
-        .replace(/ç/g, 'c');
-}
-
-function choiceEthicsScore(choiceText, sceneResponse) {
-    const lower = normalizeTr(choiceText);
-    const responseLower = normalizeTr(sceneResponse || '');
-    let score = 0;
-    PROSOCIAL_KEYWORDS.forEach(k => { if (lower.includes(k)) score += 1; });
-    ANTISOCIAL_KEYWORDS.forEach(k => { if (lower.includes(k)) score -= 1; });
-    // Hikaye metni "riskli/dikkat" sinyali veriyorsa müdahaleyi tetikle.
-    if (responseLower.includes('riskli') || responseLower.includes('dikkat') || responseLower.includes('supheli')) {
-        score -= 1;
-    }
-    return score;
-}
-
-async function getTherapeuticResponse(choiceText, sceneResponse, sceneContext) {
-    const score = choiceEthicsScore(choiceText, sceneResponse);
-    const needsIntervention = score < 0;
-
-    const systemPrompt = needsIntervention
-        ? `Sen Yildiz Can adli sicak, sabirli bir cocuk gelisim uzmansin.
-           "${childName}" adli cocuk hikayede "${choiceText}" secimini yapti.
-           Sahne geri bildirimi: "${sceneResponse}".
-           Ozel egitim destegi alan cocuklara uygun, sade ve net dil kullan.
-           Konudan sapma; sadece bu secim ve bu sahneye odaklan.
-           Bu secimin bir arkadasi uzebilecegini nazikce belirt.
-           "Bunu yaparsan arkadasin uzulebilir, sence baska ne yapabiliriz?" tarzinda
-           rehberlik eden SADECE BIR soru sor. Cok kisa tut (2-3 cumle).`
-        : `Sen Yildiz Can adli neseli bir AI arkadassin.
-           "${childName}" harika bir secim yapti: "${choiceText}".
-           Ozel egitim destegi alan cocuklara uygun, sade ve net dil kullan.
-           Sadece bu secime ve sahneye bagli kal.
-           Onu 1-2 cumleyle ictenlikle tebrik et ve bu secimin neden guzel oldugunu soyle.`;
-
-    const res = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            contents: [{ role: 'user', parts: [{ text: systemPrompt }] }]
-        })
-    });
-    const data = await res.json();
-    const reply = data.candidates[0].content.parts[0].text;
-
-    sessionData.storyChoices.push({
-        scene: sceneContext.id,
-        sceneLabel: sceneContext.label,
-        sceneEmoji: sceneContext.emoji,
-        choice: choiceText,
-        response: reply,
-        ethicsScore: score,
-        needsIntervention
-    });
-
-    const emotion = needsIntervention ? CharacterEmotion.SAD : CharacterEmotion.HAPPY;
-    await speakWithLipsync(reply, null, emotion);
-    return { reply, needsIntervention };
-}
-
-async function handleChoice(choice, btn, scene) {
-    if (storyChoiceMade) return;
-    storyChoiceMade = true;
-
-    document.querySelectorAll('.choice-btn').forEach(b => b.disabled = true);
-    btn.classList.add('chosen');
-
-    addStoryBubble(choice.text, 'user');
-    let therapeuticReply = choice.response;
-    let needsIntervention = false;
-    try {
-        const result = await getTherapeuticResponse(
-            choice.text,
-            choice.response,
-            { id: scene.id, label: scene.bgLabel || `Sahne ${scene.id + 1}`, emoji: scene.emoji }
-        );
-        therapeuticReply = result.reply;
-        needsIntervention = result.needsIntervention;
-    } catch (error) {
-        addStoryBubble(choice.response, 'ai');
-        await speak(choice.response, () => {});
-    }
-
-    if (therapeuticReply) addStoryBubble(therapeuticReply, 'ai');
-    if (!needsIntervention) celebrateCorrectAnswer();
-
-    if (choice.next === -1) {
-        showStoryEnd();
-    } else {
-        const nextBtn = document.getElementById('storyNextBtn');
-        nextBtn.style.display = 'block';
-        saveStoryProgress();
-    }
-}
-
-function nextScene() {
-    currentSceneIdx++;
-    if (currentSceneIdx >= currentStory.scenes.length) {
-        showStoryEnd();
-    } else {
-        renderScene(currentSceneIdx);
-    }
-}
-
-function showStoryEnd() {
-    window.speechSynthesis.cancel();
-    sessionData.storyCompleted = true;
-    clearStoryProgress();
-    renderStoryResumeCard();
-
-    confetti({ particleCount: 150, spread: 100, origin: { y: 0.6 } });
-    setTimeout(() => confetti({ particleCount: 100, spread: 120, origin: { y: 0.4 } }), 500);
-
-    const side = document.querySelector('.story-side');
-    side.innerHTML = `
-        <div class="story-end-screen">
-            <div class="end-emoji">🎉</div>
-            <h2>Aferin ${childName}!</h2>
-            <p>Hikayeyi tamamladın! Çok başarıldın, harikasın!</p>
-            <div style="font-size:2.5rem; margin:16px 0">⭐⭐⭐</div>
-            <button class="btn-restart" onclick="exitStory()">Başka Hikayeye Git 📖</button>
-            <button class="btn-restart" style="background:#6C63FF; margin-top:10px" onclick="startStory('${currentStoryKey}')">Tekrar Oyna 🔄</button>
-        </div>
-    `;
-
-    const endMsg = `Aferin ${childName}! Hikayeyi tamamladın, çok başarılısın!`;
-    speak(endMsg, () => {});
-}
-
-function addStoryBubble(text, type) {
-    const container = document.getElementById('storyChatBubbles');
-    const b = document.createElement('div');
-    b.className = type === 'ai' ? 'story-bubble-ai' : 'story-bubble-user';
-    b.textContent = text;
-    container.appendChild(b);
-    container.scrollTop = container.scrollHeight;
-}
-
-// Hikaye mikrofonu
-function storyRec() {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) { alert("Tarayıcı ses tanımayı desteklemiyor."); return; }
-
-    const micBtn = document.getElementById('storyMicBtn');
-    const micInfo = document.getElementById('storyMicInfo');
-    micBtn.disabled = true;
-    micInfo.textContent = "Dinliyorum...";
-
-    const recognition = new SpeechRecognition();
-    recognition.lang = "tr-TR";
-    recognition.interimResults = false;
-    recognition.maxAlternatives = 1;
-
-    recognition.onstart = () => {
-        micBtn.classList.add('listening');
-        micInfo.textContent = "Seni dinliyorum! 🎙️";
-    };
-
-    recognition.onresult = async (e) => {
-        const speech = e.results[0][0].transcript;
-        micBtn.classList.remove('listening');
-        addStoryBubble(speech, 'user');
-        micInfo.textContent = "Düşünüyorum...";
-        sessionData.micUsedInStory++;
-
-        // AI'dan kısa geri bildirim al
-        const scene = currentStory.scenes[currentSceneIdx];
-        const prompt = `Sen Yildiz Can'sin, 5-8 yas ve ozel egitim destegi alan cocuklarla konusan sabirli bir arkadassin. Cocugun adi ${childName}. 
-Hikayedeki sahne: "${scene.narration}"
-Çocuğun cevabı: "${speech}"
-KURAL: Sahneden ve cocugun verdigi bu cevaptan kopma.
-Cok kisa (max 2 cumle, 8-12 kelime) sevecen geri bildirim ver.
-Gereksiz yeni konu acma. Emoji kullanma.`;
-
-        try {
-            const res = await fetch('/api/chat', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    contents: [
-                        { role: "user", parts: [{ text: prompt }] }
-                    ]
-                })
-            });
-            const data = await res.json();
-            const reply = data.candidates[0].content.parts[0].text;
-            addStoryBubble(reply, 'ai');
-            confetti({ particleCount: 40 });
-            speak(reply, () => {
-                micBtn.disabled = false;
-                micInfo.textContent = scene.micPrompt || 'Tekrar konuşmak ister misin?';
-                // Seçim yapılmadıysa devam butonu göster
-                if (!storyChoiceMade && scene.taskType === 'speak') {
-                    document.getElementById('storyNextBtn').style.display = 'block';
-                }
-            });
-        } catch(err) {
-            const fallback = `Harika anlattın ${childName}! Çok güzeldi.`;
-            addStoryBubble(fallback, 'ai');
-            speak(fallback, () => {
-                micBtn.disabled = false;
-                micInfo.textContent = scene.micPrompt || 'Tekrar konuşmak ister misin?';
-                if (!storyChoiceMade && scene.taskType === 'speak') {
-                    document.getElementById('storyNextBtn').style.display = 'block';
-                }
-            });
-        }
-    };
-
-    recognition.onerror = (err) => {
-        micBtn.classList.remove('listening');
-        micBtn.disabled = false;
-        if (err.error === 'no-speech') micInfo.textContent = "Duyamadım, tekrar dene!";
-        else micInfo.textContent = "Bir sorun oldu, tekrar dene!";
-    };
-
-    recognition.onend = () => {
-        micBtn.classList.remove('listening');
-        if (micBtn.disabled) {
-            // onresult gelmediyse
-        }
-    };
-
-    try { recognition.start(); } catch(e) {
-        micBtn.disabled = false;
-        micInfo.textContent = "Tekrar dene!";
     }
 }
 
@@ -3216,14 +2517,6 @@ async function resetPassword() {
     }
 }
 
-function turkishAuthError(msg) {
-    if (msg.includes('Invalid login credentials')) return 'E-posta veya şifre yanlış! Lütfen tekrar dene.';
-    if (msg.includes('Email not confirmed')) return 'E-posta adresin henüz onaylanmamış! Lütfen mailini kontrol et.';
-    if (msg.includes('already registered')) return 'Bu e-posta zaten kayıtlı! Giriş yapmayı deneyebilirsin.';
-    if (msg.includes('Password should be')) return 'Şifre çok kısa! En az 6 karakter olmalı.';
-    return "Bir hata oluştu: " + msg;
-}
-
 // window exportlarına ekle
 window.resetPassword = resetPassword;
 function turkishAuthError(msg) {
@@ -3255,6 +2548,747 @@ async function saveSessionToDatabase(type, turns, evaluation) {
 
 
 // =============================================
+// GÜNLÜK PROGRAM (SCHEDULE)
+// =============================================
+// Activities (the list itself) are per-student and persist across days.
+// Completion status is per-student per-day.
+function scheduleActivitiesKey() {
+    return `sched_acts_${activeStudentId || 'default'}`;
+}
+function scheduleCompletionKey() {
+    const today = new Date().toISOString().slice(0, 10);
+    return `sched_done_${activeStudentId || 'default'}_${today}`;
+}
+
+function loadScheduleActivities() {
+    const raw = localStorage.getItem(scheduleActivitiesKey());
+    if (raw) { try { return JSON.parse(raw); } catch(e) {} }
+    return [];
+}
+function saveScheduleActivities(acts) {
+    localStorage.setItem(scheduleActivitiesKey(), JSON.stringify(acts));
+}
+function loadScheduleCompletion() {
+    const raw = localStorage.getItem(scheduleCompletionKey());
+    if (raw) { try { return JSON.parse(raw); } catch(e) {} }
+    return {};
+}
+function saveScheduleCompletion(done) {
+    localStorage.setItem(scheduleCompletionKey(), JSON.stringify(done));
+}
+
+function goToSchedule() {
+    showOnly('schedule-screen');
+    const today = new Date();
+    const days = ['Pazar','Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi'];
+    const months = ['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
+    document.getElementById('scheduleDate').textContent =
+        `${days[today.getDay()]}, ${today.getDate()} ${months[today.getMonth()]}`;
+    cancelAddActivity();
+    renderSchedule();
+}
+
+function renderSchedule() {
+    const activities = loadScheduleActivities();
+    const done = loadScheduleCompletion();
+    const list = document.getElementById('scheduleList');
+    const progressWrap = document.getElementById('scheduleProgressWrap');
+    const resetBtn = document.getElementById('scheduleResetBtn');
+
+    if (!activities.length) {
+        list.innerHTML = `
+            <div class="schedule-empty">
+                <span>📋</span>
+                <p>Henüz etkinlik eklenmedi.</p>
+                <p><strong>"+ Etkinlik Ekle"</strong> butonuyla bu öğrencinin programını oluşturun.</p>
+            </div>`;
+        progressWrap.style.display = 'none';
+        resetBtn.style.display = 'none';
+        return;
+    }
+
+    progressWrap.style.display = '';
+    resetBtn.style.display = '';
+    const doneCount = activities.filter(a => done[a.id]).length;
+    const pct = Math.round((doneCount / activities.length) * 100);
+    document.getElementById('scheduleProgress').textContent = `${doneCount} / ${activities.length} tamamlandı`;
+    document.getElementById('scheduleProgressFill').style.width = pct + '%';
+
+    list.innerHTML = activities.map(a => `
+        <div class="schedule-item ${done[a.id] ? 'done' : ''}">
+            <button class="schedule-check-btn" onclick="toggleScheduleActivity('${escapeHtml(a.id)}')"
+                aria-label="${done[a.id] ? 'Geri al' : 'Tamamlandı işaretle'}">
+                ${done[a.id] ? '✅' : '⬜'}
+            </button>
+            <span class="schedule-item-emoji">${escapeHtml(a.emoji)}</span>
+            <span class="schedule-item-label">${escapeHtml(a.label)}</span>
+            ${a.time ? `<span class="schedule-item-time">${escapeHtml(a.time)}</span>` : ''}
+            <button class="schedule-delete-btn" onclick="deleteScheduleActivity('${escapeHtml(a.id)}')"
+                aria-label="Sil">✕</button>
+        </div>
+    `).join('');
+}
+
+function showAddActivityForm() {
+    document.getElementById('scheduleAddForm').style.display = '';
+    document.getElementById('scheduleLabelInput').focus();
+}
+
+function cancelAddActivity() {
+    const form = document.getElementById('scheduleAddForm');
+    if (form) form.style.display = 'none';
+    ['scheduleEmojiInput','scheduleLabelInput','scheduleTimeInput'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = '';
+    });
+}
+
+function saveNewActivity() {
+    const emoji = (document.getElementById('scheduleEmojiInput').value.trim()) || '📌';
+    const label = document.getElementById('scheduleLabelInput').value.trim();
+    const time  = document.getElementById('scheduleTimeInput').value;
+    if (!label) { document.getElementById('scheduleLabelInput').focus(); return; }
+    const acts = loadScheduleActivities();
+    acts.push({ id: 'a_' + Date.now(), emoji, label, time });
+    saveScheduleActivities(acts);
+    cancelAddActivity();
+    renderSchedule();
+}
+
+function deleteScheduleActivity(id) {
+    saveScheduleActivities(loadScheduleActivities().filter(a => a.id !== id));
+    const done = loadScheduleCompletion();
+    delete done[id];
+    saveScheduleCompletion(done);
+    renderSchedule();
+}
+
+function toggleScheduleActivity(id) {
+    const done = loadScheduleCompletion();
+    const wasDone = !!done[id];
+    if (wasDone) { delete done[id]; } else { done[id] = true; }
+    saveScheduleCompletion(done);
+    if (!wasDone) {
+        const act = loadScheduleActivities().find(a => a.id === id);
+        if (act) speakFallback(act.label + ' tamamlandı!');
+    }
+    renderSchedule();
+}
+
+function resetSchedule() {
+    saveScheduleCompletion({});
+    renderSchedule();
+}
+
+// =============================================
+// AAC PANOSU
+// =============================================
+const AAC_CATEGORIES = [
+    {
+        id: 'feelings', label: '😊 Duygular', color: '#ff9f43',
+        cards: [
+            { emoji: '😊', text: 'Mutluyum' },
+            { emoji: '😢', text: 'Üzgünüm' },
+            { emoji: '😡', text: 'Kızgınım' },
+            { emoji: '😨', text: 'Korkuyorum' },
+            { emoji: '😴', text: 'Yorgunum' },
+            { emoji: '🤢', text: 'Midem bulanıyor' },
+            { emoji: '😍', text: 'Seviyorum' },
+            { emoji: '😐', text: 'Fark etmez' },
+        ]
+    },
+    {
+        id: 'needs', label: '🙋 İhtiyaçlar', color: '#48dbfb',
+        cards: [
+            { emoji: '🚰', text: 'Su istiyorum' },
+            { emoji: '🍎', text: 'Acıktım' },
+            { emoji: '🚽', text: 'Tuvalet' },
+            { emoji: '😴', text: 'Uyumak istiyorum' },
+            { emoji: '🎮', text: 'Oyun oynamak istiyorum' },
+            { emoji: '🤗', text: 'Sarılmak istiyorum' },
+            { emoji: '🛑', text: 'Dur / Hayır' },
+            { emoji: '✅', text: 'Evet / Tamam' },
+        ]
+    },
+    {
+        id: 'activities', label: '🎯 Etkinlikler', color: '#1dd1a1',
+        cards: [
+            { emoji: '📚', text: 'Okumak istiyorum' },
+            { emoji: '✏️', text: 'Çizmek istiyorum' },
+            { emoji: '🎵', text: 'Müzik dinlemek istiyorum' },
+            { emoji: '📺', text: 'Video izlemek istiyorum' },
+            { emoji: '🧩', text: 'Puzzle yapmak istiyorum' },
+            { emoji: '🏃', text: 'Koşmak istiyorum' },
+            { emoji: '🎨', text: 'Boyama yapmak istiyorum' },
+            { emoji: '🤝', text: 'Yardım istiyorum' },
+        ]
+    },
+    {
+        id: 'places', label: '📍 Yerler', color: '#a29bfe',
+        cards: [
+            { emoji: '🏠', text: 'Eve gitmek istiyorum' },
+            { emoji: '🏫', text: 'Okula gitmek istiyorum' },
+            { emoji: '🌳', text: 'Bahçeye gitmek istiyorum' },
+            { emoji: '🏪', text: 'Markete gitmek istiyorum' },
+            { emoji: '🚗', text: 'Arabaya binmek istiyorum' },
+            { emoji: '🏥', text: 'Doktora gitmek istiyorum' },
+            { emoji: '🛁', text: 'Banyoya gitmek istiyorum' },
+            { emoji: '🛏️', text: 'Odama gitmek istiyorum' },
+        ]
+    },
+];
+
+let aacSentence = [];
+let aacCurrentCategory = 'feelings';
+
+function goToAac() {
+    showOnly('aac-screen');
+    aacSentence = [];
+    aacCurrentCategory = AAC_CATEGORIES[0].id;
+    renderAacCategories();
+    renderAacGrid();
+    updateAacSentenceBar();
+}
+
+function renderAacCategories() {
+    const wrap = document.getElementById('aacCategories');
+    wrap.innerHTML = AAC_CATEGORIES.map(cat => `
+        <button type="button"
+            class="aac-cat-btn ${cat.id === aacCurrentCategory ? 'active' : ''}"
+            style="--cat-color:${escapeHtml(cat.color)}"
+            onclick="setAacCategory('${escapeHtml(cat.id)}')">
+            ${escapeHtml(cat.label)}
+        </button>
+    `).join('');
+}
+
+function setAacCategory(id) {
+    aacCurrentCategory = id;
+    renderAacCategories();
+    renderAacGrid();
+}
+
+function renderAacGrid() {
+    const cat = AAC_CATEGORIES.find(c => c.id === aacCurrentCategory);
+    if (!cat) return;
+    const grid = document.getElementById('aacGrid');
+    grid.innerHTML = cat.cards.map((card, i) => `
+        <button type="button" class="aac-card" onclick="tapAacCard(${i})"
+            style="--cat-color:${escapeHtml(cat.color)}">
+            <span class="aac-card-emoji">${escapeHtml(card.emoji)}</span>
+            <span class="aac-card-text">${escapeHtml(card.text)}</span>
+        </button>
+    `).join('');
+}
+
+function tapAacCard(index) {
+    const cat = AAC_CATEGORIES.find(c => c.id === aacCurrentCategory);
+    if (!cat) return;
+    const card = cat.cards[index];
+    if (!card) return;
+    aacSentence.push(card.text);
+    updateAacSentenceBar();
+    speakFallback(card.text);
+}
+
+function updateAacSentenceBar() {
+    const wrap = document.getElementById('aacSentenceWords');
+    if (!aacSentence.length) {
+        wrap.innerHTML = '<span class="aac-sentence-placeholder">Kart seç, cümle oluştur...</span>';
+        return;
+    }
+    wrap.innerHTML = aacSentence.map((w, i) => `
+        <span class="aac-word-chip" onclick="removeAacWord(${i})">${escapeHtml(w)} ✕</span>
+    `).join('');
+}
+
+function removeAacWord(index) {
+    aacSentence.splice(index, 1);
+    updateAacSentenceBar();
+}
+
+function speakAacSentence() {
+    if (!aacSentence.length) return;
+    speakFallback(aacSentence.join('. '));
+}
+
+function clearAacSentence() {
+    aacSentence = [];
+    updateAacSentenceBar();
+}
+
+// =============================================
+// ÖDÜL SİSTEMİ (TOKEN ECONOMY)
+// =============================================
+// Goal-based: teacher sets a specific behavior goal + desired reward before using.
+const TOKEN_REWARDS = [
+    { emoji: '🎮', label: 'Tablet Zamanı' },
+    { emoji: '🍬', label: 'Şeker' },
+    { emoji: '🎨', label: 'Boyama' },
+    { emoji: '📺', label: 'Çizgi Film' },
+    { emoji: '🎵', label: 'Müzik Dinleme' },
+    { emoji: '🌳', label: 'Bahçe Oyunu' },
+    { emoji: '📖', label: 'Hikaye Okuma' },
+    { emoji: '🧸', label: 'Oyuncak Seçimi' },
+];
+
+function tokenSetupKey() { return `tok_setup_${activeStudentId || 'default'}`; }
+function tokenCountKey() { return `tok_count_${activeStudentId || 'default'}`; }
+
+function loadTokenSetup() {
+    const raw = localStorage.getItem(tokenSetupKey());
+    if (raw) { try { return JSON.parse(raw); } catch(e) {} }
+    return null;
+}
+function saveTokenSetup(setup) {
+    localStorage.setItem(tokenSetupKey(), JSON.stringify(setup));
+}
+function loadTokenCount() {
+    return parseInt(localStorage.getItem(tokenCountKey()) || '0', 10);
+}
+function saveTokenCount(n) {
+    localStorage.setItem(tokenCountKey(), String(n));
+}
+
+let _tokenSetupMax = 5;
+let _tokenSetupRewardIdx = 0;
+
+function goToTokens() {
+    showOnly('token-screen');
+    document.getElementById('tokenCelebration').style.display = 'none';
+    const setup = loadTokenSetup();
+    if (setup) {
+        showTokenActive(setup);
+    } else {
+        openTokenSetupForm(null);
+    }
+}
+
+function openTokenSetupForm(prefill) {
+    _tokenSetupMax = prefill?.max || 5;
+    _tokenSetupRewardIdx = prefill?.rewardIndex ?? 0;
+    document.getElementById('tokenSetupForm').style.display = '';
+    document.getElementById('tokenActive').style.display = 'none';
+    if (prefill?.goal) document.getElementById('tokenGoalInput').value = prefill.goal;
+    else document.getElementById('tokenGoalInput').value = '';
+
+    document.getElementById('tokenRewardSelect').innerHTML = TOKEN_REWARDS.map((r, i) => `
+        <button type="button" class="token-reward-opt ${i === _tokenSetupRewardIdx ? 'selected' : ''}"
+            onclick="pickSetupReward(${i})">
+            <span>${escapeHtml(r.emoji)}</span>
+            <span>${escapeHtml(r.label)}</span>
+        </button>
+    `).join('');
+    updateTokenMaxButtons();
+}
+
+function pickSetupReward(i) {
+    _tokenSetupRewardIdx = i;
+    document.querySelectorAll('.token-reward-opt').forEach((btn, idx) => {
+        btn.classList.toggle('selected', idx === i);
+    });
+}
+
+function selectTokenMax(n) {
+    _tokenSetupMax = n;
+    updateTokenMaxButtons();
+}
+
+function updateTokenMaxButtons() {
+    document.querySelectorAll('.token-max-select .token-target-btn').forEach(btn => {
+        btn.classList.toggle('active', parseInt(btn.textContent) === _tokenSetupMax);
+    });
+}
+
+function commitTokenSetup() {
+    const goal = document.getElementById('tokenGoalInput').value.trim();
+    if (!goal) {
+        const inp = document.getElementById('tokenGoalInput');
+        inp.style.borderColor = '#e74c3c';
+        inp.focus();
+        setTimeout(() => { inp.style.borderColor = ''; }, 1800);
+        return;
+    }
+    const setup = { goal, rewardIndex: _tokenSetupRewardIdx, max: _tokenSetupMax };
+    saveTokenSetup(setup);
+    saveTokenCount(0);
+    showTokenActive(setup);
+}
+
+function showTokenActive(setup) {
+    document.getElementById('tokenSetupForm').style.display = 'none';
+    document.getElementById('tokenActive').style.display = '';
+    const reward = TOKEN_REWARDS[setup.rewardIndex] || TOKEN_REWARDS[0];
+    document.getElementById('tokenGoalCard').innerHTML = `
+        <div class="token-goal-behavior">
+            <span class="token-goal-tag">Hedef Davranış</span>
+            <span class="token-goal-text">${escapeHtml(setup.goal)}</span>
+        </div>
+        <div class="token-goal-arrow">→</div>
+        <div class="token-goal-reward">
+            <span class="token-goal-tag">Ödül</span>
+            <span class="token-goal-reward-val">${escapeHtml(reward.emoji)} ${escapeHtml(reward.label)}</span>
+        </div>
+    `;
+    renderTokenBoard(setup);
+}
+
+function renderTokenBoard(setup) {
+    if (!setup) setup = loadTokenSetup();
+    if (!setup) return;
+    const max = setup.max;
+    const count = Math.min(loadTokenCount(), max);
+    document.getElementById('tokenCount').textContent = `${count} / ${max}`;
+    let html = '';
+    for (let i = 0; i < max; i++) {
+        html += `<div class="token-slot ${i < count ? 'filled' : ''}">${i < count ? '⭐' : ''}</div>`;
+    }
+    document.getElementById('tokenBoard').innerHTML = html;
+}
+
+function awardToken() {
+    const setup = loadTokenSetup();
+    if (!setup) return;
+    const count = loadTokenCount();
+    if (count >= setup.max) return;
+    const next = count + 1;
+    saveTokenCount(next);
+    speakFallback('Aferin! Bir yıldız kazandın!');
+    renderTokenBoard(setup);
+    if (next >= setup.max) {
+        setTimeout(() => showTokenCelebration(setup), 600);
+    }
+}
+
+function removeToken() {
+    const count = loadTokenCount();
+    if (count <= 0) return;
+    saveTokenCount(count - 1);
+    renderTokenBoard();
+}
+
+function showTokenCelebration(setup) {
+    if (typeof confetti === 'function') {
+        confetti({ particleCount: 120, spread: 80, origin: { y: 0.5 } });
+    }
+    const reward = TOKEN_REWARDS[setup.rewardIndex] || TOKEN_REWARDS[0];
+    document.getElementById('tokenCelebrationTitle').textContent = 'Tebrikler! 🎉';
+    document.getElementById('tokenCelebrationMsg').textContent =
+        `"${setup.goal}" için tüm puanları topladın!\nÖdülün: ${reward.emoji} ${reward.label}`;
+    speakFallback(`Tebrikler! ${setup.goal} için tüm puanları topladın! Ödülün: ${reward.label}`);
+    document.getElementById('tokenCelebration').style.display = 'flex';
+}
+
+function completeTokenReward() {
+    saveTokenCount(0);
+    document.getElementById('tokenCelebration').style.display = 'none';
+    renderTokenBoard();
+}
+
+function changeTokenGoal() {
+    openTokenSetupForm(loadTokenSetup());
+}
+
+// =============================================
+// SIRALAMA OYUNLARI
+// =============================================
+const SEQUENCE_GAMES = [
+    {
+        id: 'morning', title: 'Sabah Rutini', emoji: '🌅',
+        type: 'order',
+        items: [
+            { emoji: '😴', text: 'Uyan' },
+            { emoji: '🦷', text: 'Diş Fırçala' },
+            { emoji: '👕', text: 'Giy' },
+            { emoji: '🍳', text: 'Kahvaltı Et' },
+            { emoji: '🎒', text: 'Çantanı Al' },
+            { emoji: '🚌', text: 'Okula Git' },
+        ]
+    },
+    {
+        id: 'washing', title: 'El Yıkama', emoji: '🧼',
+        type: 'order',
+        items: [
+            { emoji: '🚰', text: 'Musluğu Aç' },
+            { emoji: '💧', text: 'Elleri Islatır' },
+            { emoji: '🧴', text: 'Sabun Al' },
+            { emoji: '🤲', text: 'Ova Ova Yıka' },
+            { emoji: '🚿', text: 'Durula' },
+            { emoji: '🧻', text: 'Kurula' },
+        ]
+    },
+    {
+        id: 'meal', title: 'Yemek Hazırlığı', emoji: '🍽️',
+        type: 'order',
+        items: [
+            { emoji: '🪑', text: 'Masaya Otur' },
+            { emoji: '🧺', text: 'Önlük Tak' },
+            { emoji: '🥄', text: 'Kaşık Al' },
+            { emoji: '😋', text: 'Ye' },
+            { emoji: '🧹', text: 'Masayı Temizle' },
+        ]
+    },
+    {
+        id: 'cause', title: 'Sebep-Sonuç', emoji: '🔗',
+        type: 'cause',
+        pairs: [
+            { cause: { emoji: '🌧️', text: 'Yağmur yağıyor' }, effect: { emoji: '☂️', text: 'Şemsiye alıyoruz' } },
+            { cause: { emoji: '😢', text: 'Düşüp acıdı' }, effect: { emoji: '😭', text: 'Ağlıyor' } },
+            { cause: { emoji: '🌱', text: 'Çiçeği suladım' }, effect: { emoji: '🌸', text: 'Çiçek açtı' } },
+            { cause: { emoji: '🌑', text: 'Hava karardı' }, effect: { emoji: '💡', text: 'Işık yaktık' } },
+        ]
+    },
+];
+
+let seqState = null;
+
+function goToSequence() {
+    showOnly('sequence-screen');
+    seqState = null;
+    document.getElementById('sequenceGame').style.display = 'none';
+    document.getElementById('sequenceMenu').style.display = '';
+    renderSequenceMenu();
+}
+
+function renderSequenceMenu() {
+    const menu = document.getElementById('sequenceMenu');
+    menu.innerHTML = `
+        <h2 class="seq-menu-title">🔢 Sıralama Oyunları</h2>
+        <div class="seq-menu-grid">
+            ${SEQUENCE_GAMES.map((g, i) => `
+                <button type="button" class="seq-menu-card" onclick="startSequenceGame(${i})">
+                    <span class="seq-menu-emoji">${escapeHtml(g.emoji)}</span>
+                    <span class="seq-menu-label">${escapeHtml(g.title)}</span>
+                    <span class="seq-menu-type">${g.type === 'cause' ? 'Sebep-Sonuç' : 'Sıralama'}</span>
+                </button>
+            `).join('')}
+        </div>
+    `;
+}
+
+function startSequenceGame(index) {
+    const game = SEQUENCE_GAMES[index];
+    document.getElementById('sequenceMenu').style.display = 'none';
+    document.getElementById('sequenceGame').style.display = '';
+    if (game.type === 'cause') {
+        renderCauseEffectGame(game);
+    } else {
+        renderOrderingGame(game);
+    }
+}
+
+function renderOrderingGame(game) {
+    const shuffled = [...game.items].sort(() => Math.random() - 0.5);
+    seqState = { game, shuffled, selected: null, placed: [], errors: 0 };
+    const el = document.getElementById('sequenceGame');
+    el.innerHTML = `
+        <div class="seq-game-header">
+            <h3>${escapeHtml(game.emoji)} ${escapeHtml(game.title)}</h3>
+            <p class="seq-hint">Adımları doğru sıraya diz!</p>
+        </div>
+        <div class="seq-target-slots" id="seqTargetSlots">
+            ${game.items.map((_, i) => `<div class="seq-slot" id="seqSlot_${i}">${i+1}</div>`).join('')}
+        </div>
+        <div class="seq-cards-pool" id="seqCardsPool">
+            ${shuffled.map((item, i) => `
+                <button type="button" class="seq-card" id="seqCard_${i}"
+                    onclick="tapSequenceCard(${i})">
+                    <span class="seq-card-emoji">${escapeHtml(item.emoji)}</span>
+                    <span class="seq-card-text">${escapeHtml(item.text)}</span>
+                </button>
+            `).join('')}
+        </div>
+        <div class="seq-feedback" id="seqFeedback"></div>
+        <button type="button" class="seq-back-btn" onclick="goToSequence()">← Oyun Seçimine Dön</button>
+    `;
+}
+
+function tapSequenceCard(cardIndex) {
+    if (!seqState || seqState.placed.includes(cardIndex)) return;
+    const item = seqState.shuffled[cardIndex];
+    const nextPos = seqState.placed.length;
+    const correctItem = seqState.game.items[nextPos];
+    const cardEl = document.getElementById('seqCard_' + cardIndex);
+
+    if (item.text === correctItem.text) {
+        seqState.placed.push(cardIndex);
+        const slot = document.getElementById('seqSlot_' + (nextPos));
+        if (slot) slot.innerHTML = `<span>${escapeHtml(item.emoji)}</span><span>${escapeHtml(item.text)}</span>`;
+        if (slot) slot.classList.add('filled');
+        if (cardEl) { cardEl.classList.add('used'); cardEl.disabled = true; }
+        speakFallback(item.text);
+        document.getElementById('seqFeedback').textContent = '';
+
+        if (seqState.placed.length === seqState.game.items.length) {
+            setTimeout(() => {
+                document.getElementById('seqFeedback').textContent = '🎉 Harika! Doğru sıraladın!';
+                speakFallback('Harika! Doğru sıraladın!');
+                if (typeof confetti === 'function') confetti({ particleCount: 80, spread: 60, origin: {y: 0.6} });
+            }, 300);
+        }
+    } else {
+        seqState.errors++;
+        if (cardEl) cardEl.classList.add('shake');
+        setTimeout(() => { if (cardEl) cardEl.classList.remove('shake'); }, 500);
+        document.getElementById('seqFeedback').textContent = '❌ Bu doğru sıra değil, tekrar dene!';
+        speakFallback('Tekrar dene!');
+    }
+}
+
+function renderCauseEffectGame(game) {
+    const pairs = [...game.pairs].sort(() => Math.random() - 0.5);
+    const effectsShuffled = [...pairs].sort(() => Math.random() - 0.5);
+    seqState = { game, pairs, effectsShuffled, selectedCause: null, matched: 0, errors: 0 };
+
+    const el = document.getElementById('sequenceGame');
+    el.innerHTML = `
+        <div class="seq-game-header">
+            <h3>${escapeHtml(game.emoji)} ${escapeHtml(game.title)}</h3>
+            <p class="seq-hint">Sebebi seç, sonra sonucuna dokun!</p>
+        </div>
+        <div class="cause-effect-area">
+            <div class="cause-col">
+                <h4>Sebep</h4>
+                <div class="cause-cards" id="causeCards">
+                    ${pairs.map((p, i) => `
+                        <button type="button" class="seq-card cause-card" id="causeCard_${i}"
+                            onclick="selectCause(${i})">
+                            <span class="seq-card-emoji">${escapeHtml(p.cause.emoji)}</span>
+                            <span class="seq-card-text">${escapeHtml(p.cause.text)}</span>
+                        </button>
+                    `).join('')}
+                </div>
+            </div>
+            <div class="effect-col">
+                <h4>Sonuç</h4>
+                <div class="effect-cards" id="effectCards">
+                    ${effectsShuffled.map((p, i) => `
+                        <button type="button" class="seq-card effect-card" id="effectCard_${i}"
+                            onclick="selectEffect(${i})">
+                            <span class="seq-card-emoji">${escapeHtml(p.effect.emoji)}</span>
+                            <span class="seq-card-text">${escapeHtml(p.effect.text)}</span>
+                        </button>
+                    `).join('')}
+                </div>
+            </div>
+        </div>
+        <div class="seq-feedback" id="seqFeedback"></div>
+        <button type="button" class="seq-back-btn" onclick="goToSequence()">← Oyun Seçimine Dön</button>
+    `;
+}
+
+function selectCause(i) {
+    document.querySelectorAll('.cause-card').forEach(c => c.classList.remove('selected'));
+    const el = document.getElementById('causeCard_' + i);
+    if (el) el.classList.add('selected');
+    seqState.selectedCause = i;
+    speakFallback(seqState.pairs[i].cause.text);
+}
+
+function selectEffect(i) {
+    if (seqState.selectedCause === null) {
+        document.getElementById('seqFeedback').textContent = 'Önce bir sebep seç!';
+        return;
+    }
+    const causePair = seqState.pairs[seqState.selectedCause];
+    const effectPair = seqState.effectsShuffled[i];
+
+    if (causePair.effect.text === effectPair.effect.text) {
+        const causeEl = document.getElementById('causeCard_' + seqState.selectedCause);
+        const effectEl = document.getElementById('effectCard_' + i);
+        if (causeEl) { causeEl.classList.add('used'); causeEl.disabled = true; }
+        if (effectEl) { effectEl.classList.add('used'); effectEl.disabled = true; }
+        seqState.matched++;
+        seqState.selectedCause = null;
+        document.getElementById('seqFeedback').textContent = '✅ Doğru eşleştirme!';
+        speakFallback('Doğru! Aferin!');
+        if (seqState.matched === seqState.pairs.length) {
+            setTimeout(() => {
+                document.getElementById('seqFeedback').textContent = '🎉 Tüm çiftleri buldun!';
+                speakFallback('Tüm çiftleri buldun! Harika!');
+                if (typeof confetti === 'function') confetti({ particleCount: 80, spread: 60, origin: {y: 0.6} });
+            }, 300);
+        }
+    } else {
+        seqState.errors++;
+        const effectEl = document.getElementById('effectCard_' + i);
+        if (effectEl) { effectEl.classList.add('shake'); setTimeout(() => effectEl.classList.remove('shake'), 500); }
+        document.getElementById('seqFeedback').textContent = '❌ Bu doğru eşleşme değil!';
+        speakFallback('Tekrar dene!');
+    }
+}
+
+// =============================================
+// ERİŞİLEBİLİRLİK AYARLARI
+// =============================================
+function loadA11ySettings() {
+    const raw = localStorage.getItem('a11y_settings');
+    if (raw) { try { return JSON.parse(raw); } catch(e) {} }
+    return { largeText: false, highContrast: false, largeTouch: false, reduceMotion: false, voiceLabel: false };
+}
+
+function saveA11ySettings(settings) {
+    localStorage.setItem('a11y_settings', JSON.stringify(settings));
+}
+
+function applyA11y() {
+    const settings = {
+        largeText:     document.getElementById('a11y-large-text')?.checked || false,
+        highContrast:  document.getElementById('a11y-high-contrast')?.checked || false,
+        largeTouch:    document.getElementById('a11y-large-touch')?.checked || false,
+        reduceMotion:  document.getElementById('a11y-reduce-motion')?.checked || false,
+        voiceLabel:    document.getElementById('a11y-voice-label')?.checked || false,
+    };
+    saveA11ySettings(settings);
+    applyA11yClasses(settings);
+}
+
+function _a11yVoiceHandler(e) {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+    const txt = btn.getAttribute('aria-label') || btn.textContent.replace(/\s+/g, ' ').trim().slice(0, 80);
+    if (txt) speakFallback(txt);
+}
+
+function applyA11yClasses(settings) {
+    document.body.classList.toggle('a11y-large-text',    settings.largeText);
+    document.body.classList.toggle('a11y-high-contrast', settings.highContrast);
+    document.body.classList.toggle('a11y-large-touch',   settings.largeTouch);
+    document.body.classList.toggle('a11y-reduce-motion', settings.reduceMotion);
+    document.body.classList.toggle('a11y-voice-label',   settings.voiceLabel);
+    document.removeEventListener('click', _a11yVoiceHandler, true);
+    if (settings.voiceLabel) {
+        document.addEventListener('click', _a11yVoiceHandler, true);
+    }
+}
+
+function toggleA11yPanel() {
+    const panel = document.getElementById('a11y-panel');
+    if (!panel) return;
+    const isOpen = panel.style.display !== 'none';
+    panel.style.display = isOpen ? 'none' : 'flex';
+    if (!isOpen) {
+        const settings = loadA11ySettings();
+        const map = {
+            'a11y-large-text':    'largeText',
+            'a11y-high-contrast': 'highContrast',
+            'a11y-large-touch':   'largeTouch',
+            'a11y-reduce-motion': 'reduceMotion',
+            'a11y-voice-label':   'voiceLabel',
+        };
+        Object.entries(map).forEach(([id, key]) => {
+            const el = document.getElementById(id);
+            if (el) el.checked = !!settings[key];
+        });
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const settings = loadA11ySettings();
+    applyA11yClasses(settings);
+});
+
+// =============================================
 // WINDOW EXPORT (HTML onclick için)
 // =============================================
 window.switchAuth = switchAuth;
@@ -3265,15 +3299,9 @@ window.setTherapyCategory = setTherapyCategory;
 window.focusCityLocation = focusCityLocation;
 window.startFocusedCityLocation = startFocusedCityLocation;
 window.openCityLocation = openCityLocation;
-window.goToHearingSupport = goToHearingSupport;
-window.goToStories = goToStories;
 window.goToReport = goToReport;
-window.exitStory = exitStory;
-window.startStory = startStory;
-window.nextScene = nextScene;
 window.rec = rec;
 window.loadNext = loadNext;
-window.storyRec = storyRec;
 window.logout = logout;
 window.openOnboarding = openOnboarding;
 window.openStudentSetup = openStudentSetup;
@@ -3281,12 +3309,870 @@ window.createStudent = createStudent;
 window.updateStudent = updateStudent;
 window.selectStudent = selectStudent;
 window.changeHistoryMonth = changeHistoryMonth;
-window.updateStoryFilters = updateStoryFilters;
-window.resumeSavedStory = resumeSavedStory;
-window.restartSavedStory = restartSavedStory;
-window.startHearingModule = startHearingModule;
-window.chooseHearingOption = chooseHearingOption;
-window.nextHearingStep = nextHearingStep;
+window.goToMatching = goToMatching;
+window.renderMatchingMenu = renderMatchingMenu;
+window.startMatchingGame = startMatchingGame;
+window.selectMatchLeft = selectMatchLeft;
+window.selectMatchRight = selectMatchRight;
+window.rereadQuestion = rereadQuestion;
+window.askAIMode = askAIMode;
+// Yeni özellikler
+window.goToSchedule = goToSchedule;
+window.showAddActivityForm = showAddActivityForm;
+window.cancelAddActivity = cancelAddActivity;
+window.saveNewActivity = saveNewActivity;
+window.deleteScheduleActivity = deleteScheduleActivity;
+window.toggleScheduleActivity = toggleScheduleActivity;
+window.resetSchedule = resetSchedule;
+window.goToAac = goToAac;
+window.setAacCategory = setAacCategory;
+window.tapAacCard = tapAacCard;
+window.removeAacWord = removeAacWord;
+window.speakAacSentence = speakAacSentence;
+window.clearAacSentence = clearAacSentence;
+window.goToTokens = goToTokens;
+window.pickSetupReward = pickSetupReward;
+window.selectTokenMax = selectTokenMax;
+window.commitTokenSetup = commitTokenSetup;
+window.awardToken = awardToken;
+window.removeToken = removeToken;
+window.completeTokenReward = completeTokenReward;
+window.changeTokenGoal = changeTokenGoal;
+window.goToSequence = goToSequence;
+window.startSequenceGame = startSequenceGame;
+window.tapSequenceCard = tapSequenceCard;
+window.selectCause = selectCause;
+window.selectEffect = selectEffect;
+window.toggleA11yPanel = toggleA11yPanel;
+window.applyA11y = applyA11y;
+window.switchAuthTab = switchAuthTab;
+window.handleLogin = handleLogin;
+window.handleRegister = handleRegister;
+window.authLogout = authLogout;
+
+// =============================================
+// KİMLİK DOĞRULAMA (AUTH)
+// =============================================
+let _authToken    = null;
+let _authUser     = null; // { username, displayName }
+let _authMode     = 'login'; // 'login' | 'register'
+
+function authStorageKey()  { return 'auth_token'; }
+function authUserStorageKey() { return 'auth_user'; }
+
+async function authApi(action, body = {}) {
+    try {
+        const r = await fetch('/api/auth', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action, ...body }),
+            signal: AbortSignal.timeout(8000),
+        });
+        return r.json();
+    } catch {
+        return { fallback: true, error: 'Bağlantı hatası' };
+    }
+}
+
+async function checkAuthSession() {
+    const savedToken = DB.getSync(authStorageKey());
+    const savedUser  = DB.getSync(authUserStorageKey());
+
+    if (savedToken && savedUser) {
+        // Token'ı doğrula
+        const res = await authApi('verify', { token: savedToken });
+        if (res.valid) {
+            _authToken = savedToken;
+            _authUser  = { username: res.username, displayName: res.displayName };
+            onAuthSuccess();
+            return;
+        } else if (res.fallback) {
+            // API yoksa (geliştirme ortamı), kaydedilmiş oturumu kabul et
+            _authToken = savedToken;
+            _authUser  = savedUser;
+            onAuthSuccess();
+            return;
+        }
+        // Token geçersiz — sil
+        DB.del(authStorageKey());
+        DB.del(authUserStorageKey());
+    }
+
+    // Auth ekranını göster
+    showOnly('auth-screen');
+}
+
+function onAuthSuccess() {
+    // Topbar'daki kullanıcı bilgisini güncelle
+    const greetEl = document.getElementById('menu-greeting');
+    if (greetEl) greetEl.textContent = `Merhaba, ${_authUser?.displayName || ''}! 🌟`;
+    // Öğrenci seçim ekranına geç
+    initLoginScreen();
+    showOnly('login-screen');
+}
+
+function switchAuthTab(mode) {
+    _authMode = mode;
+    document.getElementById('loginForm').style.display    = mode === 'login'    ? '' : 'none';
+    document.getElementById('registerForm').style.display = mode === 'register' ? '' : 'none';
+    document.getElementById('tabLogin').classList.toggle('active',    mode === 'login');
+    document.getElementById('tabRegister').classList.toggle('active', mode === 'register');
+    document.getElementById('authError').textContent = '';
+}
+
+function setAuthLoading(loading) {
+    const btn = document.getElementById(_authMode === 'login' ? 'loginBtn' : 'registerBtn');
+    if (btn) { btn.disabled = loading; btn.textContent = loading ? 'Bekleniyor...' : (_authMode === 'login' ? 'Giriş Yap' : 'Kayıt Ol'); }
+}
+
+function showAuthError(msg) {
+    const el = document.getElementById('authError');
+    if (el) { el.textContent = msg; }
+}
+
+async function handleLogin(e) {
+    e.preventDefault();
+    const username = document.getElementById('loginUsername').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    if (!username || !password) return showAuthError('Tüm alanları doldurun');
+    setAuthLoading(true);
+
+    const res = await authApi('login', { username, password });
+    setAuthLoading(false);
+
+    if (res.fallback) {
+        // Sunucu yoksa → demo mod
+        _authToken = 'demo_' + username;
+        _authUser  = { username, displayName: username };
+        DB.set(authStorageKey(), _authToken);
+        DB.set(authUserStorageKey(), _authUser);
+        const note = document.getElementById('authOfflineNote');
+        if (note) note.style.display = '';
+        onAuthSuccess();
+        return;
+    }
+    if (!res.ok) return showAuthError(res.error || 'Giriş başarısız');
+    _authToken = res.token;
+    _authUser  = { username: username.toLowerCase(), displayName: res.displayName };
+    DB.set(authStorageKey(), _authToken);
+    DB.set(authUserStorageKey(), _authUser);
+    onAuthSuccess();
+}
+
+async function handleRegister(e) {
+    e.preventDefault();
+    const username  = document.getElementById('regUsername').value.trim();
+    const password  = document.getElementById('regPassword').value;
+    const password2 = document.getElementById('regPassword2').value;
+    if (!username || !password) return showAuthError('Tüm alanları doldurun');
+    if (password !== password2) return showAuthError('Şifreler uyuşmuyor');
+    if (password.length < 6) return showAuthError('Şifre en az 6 karakter olmalı');
+    setAuthLoading(true);
+
+    const res = await authApi('register', { username, password });
+    setAuthLoading(false);
+
+    if (res.fallback) {
+        _authToken = 'demo_' + username;
+        _authUser  = { username, displayName: username };
+        DB.set(authStorageKey(), _authToken);
+        DB.set(authUserStorageKey(), _authUser);
+        const note = document.getElementById('authOfflineNote');
+        if (note) note.style.display = '';
+        onAuthSuccess();
+        return;
+    }
+    if (!res.ok) return showAuthError(res.error || 'Kayıt başarısız');
+    _authToken = res.token;
+    _authUser  = { username: username.toLowerCase(), displayName: res.displayName };
+    DB.set(authStorageKey(), _authToken);
+    DB.set(authUserStorageKey(), _authUser);
+    onAuthSuccess();
+}
+
+async function authLogout() {
+    if (_authToken && !_authToken.startsWith('demo_')) {
+        authApi('logout', { token: _authToken });
+    }
+    DB.del(authStorageKey());
+    DB.del(authUserStorageKey());
+    _authToken = null;
+    _authUser  = null;
+    showOnly('auth-screen');
+    document.getElementById('authError').textContent = '';
+    switchAuthTab('login');
+}
+
+// =============================================
+// GİRİŞ EKRANI (LOGIN)
+// =============================================
+const STUDENT_EMOJIS = [
+    '🦁','🐯','🐻','🐼','🦊','🐸','🐧','🦋',
+    '🌸','🌻','⭐','🌈','🎈','🚀','🦄','🐬',
+];
+
+async function initLoginScreen() {
+    const students = await loadStudents();
+    renderLoginStudents(students);
+    const settings = loadA11ySettings();
+    applyA11yClasses(settings);
+}
+
+async function loadStudents() {
+    let list = DB.getSync('students');
+    if (!list) list = await DB.get('students');
+    return list || [];
+}
+
+async function saveStudents(list) {
+    DB.set('students', list);
+}
+
+function renderLoginStudents(students) {
+    const wrap = document.getElementById('loginStudents');
+    if (!wrap) return;
+    if (!students.length) {
+        wrap.innerHTML = `<div class="login-empty">
+            <p>Henüz öğrenci eklenmedi.</p>
+            <p>Aşağıdan ilk öğrenciyi ekleyin!</p>
+        </div>`;
+        return;
+    }
+    wrap.innerHTML = students.map(s => `
+        <button type="button" class="login-student-card" onclick="selectStudentLogin('${escapeHtml(s.id)}')">
+            <span class="login-student-emoji">${escapeHtml(s.emoji || '🌟')}</span>
+            <span class="login-student-name">${escapeHtml(s.name)}</span>
+        </button>
+    `).join('');
+}
+
+function showLoginAddForm() {
+    document.getElementById('loginAddForm').style.display = '';
+    const picker = document.getElementById('loginEmojiPicker');
+    picker.innerHTML = STUDENT_EMOJIS.map((e, i) => `
+        <button type="button" class="emoji-pick-btn ${i === 0 ? 'selected' : ''}"
+            onclick="selectLoginEmoji('${e}', this)">${e}</button>
+    `).join('');
+    document.getElementById('loginNameInput').focus();
+}
+
+function hideLoginAddForm() {
+    document.getElementById('loginAddForm').style.display = 'none';
+    document.getElementById('loginNameInput').value = '';
+}
+
+function selectLoginEmoji(emoji, btn) {
+    document.querySelectorAll('.emoji-pick-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+}
+
+async function createStudentFromLogin() {
+    const name = document.getElementById('loginNameInput').value.trim();
+    if (!name) { document.getElementById('loginNameInput').focus(); return; }
+    const selectedBtn = document.querySelector('.emoji-pick-btn.selected');
+    const emoji = selectedBtn ? selectedBtn.textContent : '🌟';
+    const students = await loadStudents();
+    const student = { id: 'st_' + Date.now(), name, emoji, createdAt: new Date().toISOString() };
+    students.push(student);
+    await saveStudents(students);
+    hideLoginAddForm();
+    renderLoginStudents(students);
+}
+
+async function selectStudentLogin(id) {
+    const students = await loadStudents();
+    const student = students.find(s => s.id === id);
+    if (!student) return;
+    // Mevcut öğrenci sistemini güncelle
+    activeStudentId = student.id;
+    activeStudentName = student.name;
+    const nameEl = document.getElementById('active-student-name');
+    if (nameEl) nameEl.textContent = student.name;
+    document.getElementById('menu-greeting').textContent = `Merhaba, ${student.name}! 🌟`;
+    speakFallback(`Merhaba ${student.name}! Hoş geldin!`);
+    showOnly('menu-screen');
+    renderCityScene();
+}
+
+function goToLogin() {
+    window.speechSynthesis.cancel();
+    showOnly('login-screen');
+    loadStudents().then(renderLoginStudents);
+}
+
+// =============================================
+// ÖĞRETMEN PANELİ (PIN KORUMALII)
+// =============================================
+let _teacherUnlocked = false;
+let _pinBuffer = '';
+const DEFAULT_TEACHER_PIN = '1234';
+
+function openTeacherPanel() {
+    const overlay = document.getElementById('teacherOverlay');
+    if (!overlay) return;
+    overlay.style.display = 'flex';
+    if (_teacherUnlocked) {
+        showTeacherPanelMenu();
+    } else {
+        showTeacherPinView();
+    }
+}
+
+function closeTeacherOverlay() {
+    const overlay = document.getElementById('teacherOverlay');
+    if (overlay) overlay.style.display = 'none';
+    _pinBuffer = '';
+    updatePinDots();
+}
+
+function showTeacherPinView() {
+    document.getElementById('teacherPinView').style.display = '';
+    document.getElementById('teacherPanelMenu').style.display = 'none';
+    document.getElementById('teacherPinError').textContent = '';
+    _pinBuffer = '';
+    updatePinDots();
+}
+
+function showTeacherPanelMenu() {
+    document.getElementById('teacherPinView').style.display = 'none';
+    document.getElementById('teacherPanelMenu').style.display = '';
+    const studentEl = document.getElementById('teacherStudentName');
+    if (studentEl) studentEl.textContent = activeStudentName
+        ? `👤 ${activeStudentName}`
+        : '(Öğrenci seçili değil)';
+}
+
+function pinTap(digit) {
+    if (_pinBuffer.length >= 4) return;
+    _pinBuffer += String(digit);
+    updatePinDots();
+    if (_pinBuffer.length === 4) {
+        setTimeout(checkPin, 150);
+    }
+}
+
+function pinClear() {
+    _pinBuffer = _pinBuffer.slice(0, -1);
+    updatePinDots();
+}
+
+function updatePinDots() {
+    const dots = document.querySelectorAll('#teacherPinDots span');
+    dots.forEach((d, i) => {
+        d.style.background = i < _pinBuffer.length ? '#6c5ce7' : '#dde3ee';
+    });
+}
+
+async function checkPin() {
+    const storedPin = DB.getSync('teacher_pin') || DEFAULT_TEACHER_PIN;
+    if (_pinBuffer === storedPin) {
+        _teacherUnlocked = true;
+        showTeacherPanelMenu();
+    } else {
+        document.getElementById('teacherPinError').textContent = '❌ Yanlış PIN';
+        _pinBuffer = '';
+        updatePinDots();
+    }
+}
+
+function lockTeacher() {
+    _teacherUnlocked = false;
+    closeTeacherOverlay();
+}
+
+function showChangePinForm() {
+    document.getElementById('changePinForm').style.display = '';
+    document.getElementById('newPinInput').focus();
+}
+
+function saveNewPin() {
+    const val = document.getElementById('newPinInput').value.trim();
+    if (!val || val.length < 4) return;
+    DB.set('teacher_pin', val.slice(0, 4));
+    document.getElementById('changePinForm').style.display = 'none';
+    document.getElementById('newPinInput').value = '';
+    alert('PIN güncellendi!');
+}
+
+// =============================================
+// IEP HEDEFLERİ
+// =============================================
+const IEP_DOMAINS = [
+    { id: 'communication', label: 'İletişim',   emoji: '🗣️', color: '#48dbfb' },
+    { id: 'academic',      label: 'Akademik',   emoji: '📚', color: '#ff9f43' },
+    { id: 'selfcare',      label: 'Öz Bakım',   emoji: '🧼', color: '#1dd1a1' },
+    { id: 'social',        label: 'Sosyal',      emoji: '🤝', color: '#a29bfe' },
+    { id: 'motor',         label: 'Motor',       emoji: '🏃', color: '#fd79a8' },
+];
+
+let _iepCurrentGoalId = null;
+let _iepCurrentTrials = [];
+let _iepSelectedDomain = 'communication';
+
+function iepBack() {
+    closeTeacherOverlay();
+    showOnly('menu-screen');
+    renderCityScene();
+}
+
+function goToIep() {
+    closeTeacherOverlay();
+    showOnly('iep-screen');
+    document.getElementById('iepStudentBadge').textContent = activeStudentName || '';
+    hideIepGoalForm();
+    closeSessionPanel();
+    renderIepGoals();
+}
+
+function iepGoalsKey() { return `iep_${activeStudentId || 'default'}`; }
+function iepTrialsKey(goalId) { return `trials_${goalId}`; }
+
+async function loadIepGoals() {
+    let goals = DB.getSync(iepGoalsKey());
+    if (!goals) goals = await DB.get(iepGoalsKey());
+    return goals || [];
+}
+
+async function renderIepGoals() {
+    const goals = await loadIepGoals();
+    const el = document.getElementById('iepGoalList');
+    if (!goals.length) {
+        el.innerHTML = `<div class="iep-empty">
+            <p>📋 Henüz hedef eklenmedi.</p>
+            <p>Aşağıdaki <strong>"+ Hedef Ekle"</strong> butonuyla başlayın.</p>
+        </div>`;
+        return;
+    }
+    const items = await Promise.all(goals.map(async g => {
+        const trials = await loadTrials(g.id);
+        const pct = calcGoalPct(trials);
+        const domain = IEP_DOMAINS.find(d => d.id === g.domain) || IEP_DOMAINS[0];
+        const statusClass = g.status === 'mastered' ? 'status-mastered'
+                          : g.status === 'not_started' ? 'status-not-started'
+                          : 'status-learning';
+        const statusLabel = g.status === 'mastered' ? '✅ Kazanıldı'
+                          : g.status === 'not_started' ? '⬜ Başlanmadı'
+                          : '🔄 Öğreniliyor';
+        return `
+        <div class="iep-goal-card">
+            <div class="iep-goal-top">
+                <span class="iep-domain-badge" style="background:${domain.color}20;color:${domain.color}">
+                    ${domain.emoji} ${domain.label}
+                </span>
+                <span class="iep-status-badge ${statusClass}">${statusLabel}</span>
+                <button class="iep-delete-btn" onclick="deleteIepGoal('${escapeHtml(g.id)}')" aria-label="Sil">✕</button>
+            </div>
+            <p class="iep-goal-text">${escapeHtml(g.goalText)}</p>
+            <div class="iep-progress-row">
+                <div class="iep-progress-track">
+                    <div class="iep-progress-fill" style="width:${pct}%;background:${domain.color}"></div>
+                    <div class="iep-target-line" style="left:${g.targetPct}%"></div>
+                </div>
+                <span class="iep-pct-label">%${pct} / %${g.targetPct} hedef</span>
+            </div>
+            <div class="iep-goal-meta">
+                <span>${trials.length} seans · ${countTotalTrials(trials)} deneme</span>
+                ${g.targetDate ? `<span>Hedef: ${g.targetDate}</span>` : ''}
+            </div>
+            <button type="button" class="iep-session-btn" onclick="openSessionPanel('${escapeHtml(g.id)}')">
+                ▶ Seans Başlat
+            </button>
+        </div>`;
+    }));
+    el.innerHTML = items.join('');
+}
+
+function calcGoalPct(trials) {
+    if (!trials.length) return 0;
+    // Son 3 seansın ortalaması
+    const recent = trials.slice(-3);
+    let correct = 0, total = 0;
+    recent.forEach(s => {
+        s.trials.forEach(t => {
+            total++;
+            if (t.result === 'correct') correct++;
+        });
+    });
+    return total ? Math.round((correct / total) * 100) : 0;
+}
+
+function countTotalTrials(trials) {
+    return trials.reduce((acc, s) => acc + s.trials.length, 0);
+}
+
+async function loadTrials(goalId) {
+    let t = DB.getSync(iepTrialsKey(goalId));
+    if (!t) t = await DB.get(iepTrialsKey(goalId));
+    return t || [];
+}
+
+function showIepGoalForm() {
+    document.getElementById('iepGoalForm').style.display = '';
+    document.getElementById('iepSessionPanel').style.display = 'none';
+    // Domain chip'leri render et
+    const chips = document.getElementById('iepDomainChips');
+    chips.innerHTML = IEP_DOMAINS.map(d => `
+        <button type="button" class="iep-domain-chip ${d.id === _iepSelectedDomain ? 'selected' : ''}"
+            style="--dc:${d.color}" onclick="selectIepDomain('${d.id}', this)">
+            ${d.emoji} ${d.label}
+        </button>
+    `).join('');
+    // Varsayılan tarihler
+    const today = new Date().toISOString().slice(0, 10);
+    const sixMonths = new Date(Date.now() + 180 * 86400000).toISOString().slice(0, 10);
+    document.getElementById('iepStartDate').value = today;
+    document.getElementById('iepTargetDate').value = sixMonths;
+}
+
+function hideIepGoalForm() {
+    document.getElementById('iepGoalForm').style.display = 'none';
+}
+
+function selectIepDomain(id, btn) {
+    _iepSelectedDomain = id;
+    document.querySelectorAll('.iep-domain-chip').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+}
+
+async function saveIepGoal() {
+    const goalText = document.getElementById('iepGoalText').value.trim();
+    if (!goalText) { document.getElementById('iepGoalText').focus(); return; }
+    const goals = await loadIepGoals();
+    const goal = {
+        id: 'goal_' + Date.now(),
+        domain: _iepSelectedDomain,
+        goalText,
+        targetPct: parseInt(document.getElementById('iepTargetPct').value) || 80,
+        targetTrials: parseInt(document.getElementById('iepTargetTrials').value) || 10,
+        status: 'not_started',
+        startDate: document.getElementById('iepStartDate').value,
+        targetDate: document.getElementById('iepTargetDate').value,
+    };
+    goals.push(goal);
+    DB.set(iepGoalsKey(), goals);
+    document.getElementById('iepGoalText').value = '';
+    hideIepGoalForm();
+    renderIepGoals();
+}
+
+async function deleteIepGoal(id) {
+    const goals = (await loadIepGoals()).filter(g => g.id !== id);
+    DB.set(iepGoalsKey(), goals);
+    DB.del(iepTrialsKey(id));
+    renderIepGoals();
+}
+
+function openSessionPanel(goalId) {
+    _iepCurrentGoalId = goalId;
+    _iepCurrentTrials = [];
+    document.getElementById('iepSessionPanel').style.display = '';
+    document.getElementById('iepGoalForm').style.display = 'none';
+    document.getElementById('iepSessionNotes').value = '';
+    loadIepGoals().then(goals => {
+        const g = goals.find(x => x.id === goalId);
+        if (g) {
+            const d = IEP_DOMAINS.find(x => x.id === g.domain) || IEP_DOMAINS[0];
+            document.getElementById('iepSessionGoalInfo').innerHTML = `
+                <span class="iep-domain-badge" style="background:${d.color}20;color:${d.color}">${d.emoji} ${d.label}</span>
+                <p>${escapeHtml(g.goalText)}</p>
+                <small>Hedef: %${g.targetPct} · ${g.targetTrials} deneme</small>
+            `;
+        }
+    });
+    updateTrialTally();
+}
+
+function closeSessionPanel() {
+    document.getElementById('iepSessionPanel').style.display = 'none';
+    _iepCurrentGoalId = null;
+    _iepCurrentTrials = [];
+}
+
+function recordTrial(result) {
+    _iepCurrentTrials.push({ result });
+    updateTrialTally();
+    // Görsel geri bildirim
+    const btn = document.querySelector(`.trial-${result}`);
+    if (btn) { btn.classList.add('trial-flash'); setTimeout(() => btn.classList.remove('trial-flash'), 300); }
+}
+
+function updateTrialTally() {
+    const c = _iepCurrentTrials.filter(t => t.result === 'correct').length;
+    const p = _iepCurrentTrials.filter(t => t.result === 'prompted').length;
+    const w = _iepCurrentTrials.filter(t => t.result === 'incorrect').length;
+    const total = _iepCurrentTrials.length;
+    const pct = total ? Math.round((c / total) * 100) : 0;
+    document.getElementById('iepTrialTally').innerHTML = `
+        <span class="tally-correct">✓ ${c}</span>
+        <span class="tally-prompted">P ${p}</span>
+        <span class="tally-incorrect">✗ ${w}</span>
+        <span class="tally-pct">${total} deneme · %${pct}</span>
+    `;
+}
+
+async function submitTrialSession() {
+    if (!_iepCurrentGoalId || !_iepCurrentTrials.length) {
+        closeSessionPanel();
+        return;
+    }
+    const session = {
+        goalId: _iepCurrentGoalId,
+        date: new Date().toISOString().slice(0, 10),
+        trials: [..._iepCurrentTrials],
+        notes: document.getElementById('iepSessionNotes').value.trim(),
+    };
+    const trials = await loadTrials(_iepCurrentGoalId);
+    trials.push(session);
+    DB.set(iepTrialsKey(_iepCurrentGoalId), trials);
+
+    // Durumu güncelle (mastery check)
+    const goals = await loadIepGoals();
+    const goalIdx = goals.findIndex(g => g.id === _iepCurrentGoalId);
+    if (goalIdx >= 0) {
+        const pct = calcGoalPct(trials);
+        const target = goals[goalIdx].targetPct;
+        if (goals[goalIdx].status === 'not_started') goals[goalIdx].status = 'learning';
+        if (pct >= target && trials.length >= 3) goals[goalIdx].status = 'mastered';
+        DB.set(iepGoalsKey(), goals);
+        if (goals[goalIdx].status === 'mastered' && typeof confetti === 'function') {
+            confetti({ particleCount: 80, spread: 60, origin: { y: 0.6 } });
+            speakFallback('Tebrikler! Hedef kazanıldı!');
+        } else {
+            speakFallback('Seans kaydedildi!');
+        }
+    }
+    closeSessionPanel();
+    renderIepGoals();
+}
+
+// =============================================
+// BECERİ HARİTASI
+// =============================================
+const SKILL_MAP = {
+    communication: {
+        label: 'İletişim', emoji: '🗣️', color: '#48dbfb',
+        skills: ['Adını söyleme','İstek ifade etme','Hayır diyebilme',
+                 'İki kelime cümle','Soru sorma','Selamlama',
+                 'Sıra bekleme','Görsel destek kullanma'],
+    },
+    academic: {
+        label: 'Akademik', emoji: '📚', color: '#ff9f43',
+        skills: ['Rakam tanıma (1-10)','Harf tanıma','Renk tanıma',
+                 'Şekil tanıma','Boyut kavramı','Nesne eşleştirme',
+                 'Kategorilere ayırma','Basit toplama'],
+    },
+    selfcare: {
+        label: 'Öz Bakım', emoji: '🧼', color: '#1dd1a1',
+        skills: ['El yıkama','Diş fırçalama','Tuvalet terbiyesi',
+                 'Giyinme/soyunma','Yemek yeme','Çanta hazırlama',
+                 'Uyku rutini','Saç tarama'],
+    },
+    social: {
+        label: 'Sosyal', emoji: '🤝', color: '#a29bfe',
+        skills: ['Göz teması','Sıra bekleme','Paylaşma',
+                 'Empati','Grup etkinliğine katılma','Uygun davranış',
+                 'Kurallara uyma','Duygularını ifade etme'],
+    },
+    motor: {
+        label: 'Motor', emoji: '🏃', color: '#fd79a8',
+        skills: ['Kalem tutma','Makas kullanma','Top yakalama/atma',
+                 'Bağcık bağlama','Düğme ilikleme','Boyama',
+                 'Çizgi takibi','Denge'],
+    },
+};
+
+let _skillsDomain = 'communication';
+
+function skillsBack() {
+    closeTeacherOverlay();
+    showOnly('menu-screen');
+    renderCityScene();
+}
+
+function goToSkills() {
+    closeTeacherOverlay();
+    showOnly('skills-screen');
+    document.getElementById('skillsStudentBadge').textContent = activeStudentName || '';
+    renderSkillsDomainTabs();
+    renderSkillsGrid();
+}
+
+function skillsKey() { return `skills_${activeStudentId || 'default'}`; }
+
+function loadSkillsSync() {
+    return DB.getSync(skillsKey()) || {};
+}
+
+function renderSkillsDomainTabs() {
+    const tabs = document.getElementById('skillsDomainTabs');
+    tabs.innerHTML = Object.entries(SKILL_MAP).map(([id, d]) => `
+        <button type="button" class="skills-tab ${id === _skillsDomain ? 'active' : ''}"
+            style="--sc:${d.color}" onclick="switchSkillsDomain('${id}')">
+            ${d.emoji} ${d.label}
+        </button>
+    `).join('');
+}
+
+function switchSkillsDomain(id) {
+    _skillsDomain = id;
+    renderSkillsDomainTabs();
+    renderSkillsGrid();
+}
+
+function renderSkillsGrid() {
+    const domain = SKILL_MAP[_skillsDomain];
+    const map = loadSkillsSync();
+    const grid = document.getElementById('skillsGrid');
+    grid.innerHTML = domain.skills.map((skill, i) => {
+        const key = `${_skillsDomain}:${i}`;
+        const status = map[key] || 'not_started';
+        const icon = status === 'mastered' ? '✅' : status === 'learning' ? '🔄' : '⬜';
+        return `
+        <button type="button" class="skill-card skill-${status}"
+            style="--sc:${domain.color}" onclick="cycleSkill('${key}')">
+            <span class="skill-icon">${icon}</span>
+            <span class="skill-label">${escapeHtml(skill)}</span>
+        </button>`;
+    }).join('');
+}
+
+function cycleSkill(key) {
+    const map = loadSkillsSync();
+    const current = map[key] || 'not_started';
+    const next = current === 'not_started' ? 'learning'
+               : current === 'learning'    ? 'mastered'
+               :                             'not_started';
+    map[key] = next;
+    DB.set(skillsKey(), map);
+    renderSkillsGrid();
+    const label = next === 'mastered' ? 'Kazanıldı!' : next === 'learning' ? 'Öğreniliyor' : 'Sıfırlandı';
+    speakFallback(label);
+}
+
+// =============================================
+// DAVRANIŞ KAYDI
+// =============================================
+let _behaviorCount = 1;
+
+function behaviorBack() {
+    closeTeacherOverlay();
+    showOnly('menu-screen');
+    renderCityScene();
+}
+
+function goToBehavior() {
+    closeTeacherOverlay();
+    showOnly('behavior-screen');
+    document.getElementById('behaviorStudentBadge').textContent = activeStudentName || '';
+    _behaviorCount = 1;
+    document.getElementById('behaviorCount').textContent = '1';
+    renderBehaviorLog();
+}
+
+function behaviorKey() { return `behavior_${activeStudentId || 'default'}`; }
+
+function loadBehaviorSync() {
+    return DB.getSync(behaviorKey()) || [];
+}
+
+function behaviorCountChange(delta) {
+    _behaviorCount = Math.max(1, _behaviorCount + delta);
+    document.getElementById('behaviorCount').textContent = _behaviorCount;
+}
+
+function saveBehaviorEntry() {
+    const text = document.getElementById('behaviorText').value.trim();
+    if (!text) { document.getElementById('behaviorText').focus(); return; }
+    const log = loadBehaviorSync();
+    log.unshift({
+        id: 'b_' + Date.now(),
+        date: new Date().toISOString(),
+        behavior: text,
+        antecedent: document.getElementById('behaviorAntecedent').value.trim(),
+        consequence: document.getElementById('behaviorConsequence').value.trim(),
+        frequency: _behaviorCount,
+        duration: parseInt(document.getElementById('behaviorDuration').value) || 0,
+    });
+    DB.set(behaviorKey(), log.slice(0, 100)); // son 100 kayıt
+    // formu temizle
+    ['behaviorText','behaviorAntecedent','behaviorConsequence','behaviorDuration'].forEach(id => {
+        document.getElementById(id).value = '';
+    });
+    _behaviorCount = 1;
+    document.getElementById('behaviorCount').textContent = '1';
+    renderBehaviorLog();
+    speakFallback('Kayıt eklendi!');
+}
+
+function renderBehaviorLog() {
+    const log = loadBehaviorSync();
+    const el = document.getElementById('behaviorLogList');
+    if (!log.length) {
+        el.innerHTML = '<p class="behavior-empty">Henüz kayıt yok.</p>';
+        return;
+    }
+    el.innerHTML = log.slice(0, 20).map(e => {
+        const d = new Date(e.date);
+        const dateStr = `${d.getDate()}.${d.getMonth()+1}.${d.getFullYear()} ${d.getHours()}:${String(d.getMinutes()).padStart(2,'0')}`;
+        return `
+        <div class="behavior-log-item">
+            <div class="behavior-log-top">
+                <strong>${escapeHtml(e.behavior)}</strong>
+                <span class="behavior-log-date">${dateStr}</span>
+            </div>
+            ${e.antecedent ? `<div class="behavior-log-abc"><span>A:</span> ${escapeHtml(e.antecedent)}</div>` : ''}
+            ${e.consequence ? `<div class="behavior-log-abc"><span>C:</span> ${escapeHtml(e.consequence)}</div>` : ''}
+            <div class="behavior-log-stats">
+                <span>×${e.frequency}</span>
+                ${e.duration ? `<span>${e.duration} dk</span>` : ''}
+            </div>
+            <button class="behavior-delete-btn" onclick="deleteBehaviorEntry('${escapeHtml(e.id)}')">Sil</button>
+        </div>`;
+    }).join('');
+}
+
+function deleteBehaviorEntry(id) {
+    const log = loadBehaviorSync().filter(e => e.id !== id);
+    DB.set(behaviorKey(), log);
+    renderBehaviorLog();
+}
+
+// =============================================
+// WINDOW EXPORTS (YENİ)
+// =============================================
+window.goToLogin = goToLogin;
+window.showLoginAddForm = showLoginAddForm;
+window.hideLoginAddForm = hideLoginAddForm;
+window.selectLoginEmoji = selectLoginEmoji;
+window.createStudentFromLogin = createStudentFromLogin;
+window.selectStudentLogin = selectStudentLogin;
+window.openTeacherPanel = openTeacherPanel;
+window.closeTeacherOverlay = closeTeacherOverlay;
+window.pinTap = pinTap;
+window.pinClear = pinClear;
+window.lockTeacher = lockTeacher;
+window.showChangePinForm = showChangePinForm;
+window.saveNewPin = saveNewPin;
+window.goToIep = goToIep;
+window.iepBack = iepBack;
+window.showIepGoalForm = showIepGoalForm;
+window.hideIepGoalForm = hideIepGoalForm;
+window.selectIepDomain = selectIepDomain;
+window.saveIepGoal = saveIepGoal;
+window.deleteIepGoal = deleteIepGoal;
+window.openSessionPanel = openSessionPanel;
+window.closeSessionPanel = closeSessionPanel;
+window.recordTrial = recordTrial;
+window.submitTrialSession = submitTrialSession;
+window.goToSkills = goToSkills;
+window.skillsBack = skillsBack;
+window.switchSkillsDomain = switchSkillsDomain;
+window.cycleSkill = cycleSkill;
+window.goToBehavior = goToBehavior;
+window.behaviorBack = behaviorBack;
+window.behaviorCountChange = behaviorCountChange;
+window.saveBehaviorEntry = saveBehaviorEntry;
+window.deleteBehaviorEntry = deleteBehaviorEntry;
 
 
 
