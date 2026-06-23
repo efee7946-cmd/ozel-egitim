@@ -1,12 +1,11 @@
-// Kullanıcı kimlik doğrulama — Vercel KV üzerinde çalışır.
+// Kullanıcı kimlik doğrulama — Aiven PostgreSQL üzerinde çalışır.
 // SHA-256 + salt ile şifre hash'i, 32-byte random session token'ı.
-// KV_REST_API_URL ve KV_REST_API_TOKEN env var'ları gereklidir.
+// DATABASE_URL env var'ı gereklidir.
 
 import crypto from 'crypto';
+import { query } from './_db.js';
 
-const KV_URL   = process.env.KV_REST_API_URL;
-const KV_TOKEN = process.env.KV_REST_API_TOKEN;
-const SESSION_SECS = 60 * 60 * 24 * 14; // 2 hafta
+const SESSION_DAYS = 14;
 
 function cors(res) {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -14,36 +13,14 @@ function cors(res) {
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 }
 
-async function kvPipeline(commands) {
-    if (!KV_URL || !KV_TOKEN) throw Object.assign(new Error('KV_NOT_CONFIGURED'), { fallback: true });
-    const r = await fetch(KV_URL + '/pipeline', {
-        method: 'POST',
-        headers: { Authorization: 'Bearer ' + KV_TOKEN, 'Content-Type': 'application/json' },
-        body: JSON.stringify(commands),
-    });
-    if (!r.ok) throw new Error('KV HTTP ' + r.status);
-    return r.json();
-}
-
-async function kvGet(key) {
-    const [res] = await kvPipeline([['GET', 'auth:' + key]]);
-    return res.result ? JSON.parse(res.result) : null;
-}
-
-async function kvSet(key, value, exSecs) {
-    const cmd = ['SET', 'auth:' + key, JSON.stringify(value)];
-    if (exSecs) { cmd.push('EX', exSecs); }
-    await kvPipeline([cmd]);
-}
-
-async function kvDel(key) {
-    await kvPipeline([['DEL', 'auth:' + key]]);
-}
-
 function hashPw(password, salt) {
     return crypto.createHash('sha256')
         .update(salt + ':' + password + ':yz2026')
         .digest('hex');
+}
+
+function expiresAt() {
+    return new Date(Date.now() + SESSION_DAYS * 24 * 60 * 60 * 1000);
 }
 
 export default async function handler(req, res) {
@@ -66,19 +43,24 @@ export default async function handler(req, res) {
             if (!/^[a-z0-9_]+$/.test(u))
                 return res.status(400).json({ error: 'Sadece harf, rakam ve alt çizgi kullanabilirsin' });
 
-            const exists = await kvGet('user:' + u);
-            if (exists) return res.status(409).json({ error: 'Bu kullanıcı adı zaten alınmış' });
+            const existing = await query('SELECT username FROM users WHERE username = $1', [u]);
+            if (existing.length > 0)
+                return res.status(409).json({ error: 'Bu kullanıcı adı zaten alınmış' });
 
             const salt = crypto.randomBytes(16).toString('hex');
             const hash = hashPw(password, salt);
-            await kvSet('user:' + u, {
-                username: u, displayName: username.trim(),
-                hash, salt, createdAt: new Date().toISOString(),
-            });
+            const displayName = username.trim();
+            await query(
+                'INSERT INTO users (username, display_name, hash, salt) VALUES ($1, $2, $3, $4)',
+                [u, displayName, hash, salt]
+            );
 
             const tok = crypto.randomBytes(32).toString('hex');
-            await kvSet('session:' + tok, { username: u, displayName: username.trim() }, SESSION_SECS);
-            return res.json({ ok: true, token: tok, displayName: username.trim() });
+            await query(
+                'INSERT INTO sessions (token, username, display_name, expires_at) VALUES ($1, $2, $3, $4)',
+                [tok, u, displayName, expiresAt()]
+            );
+            return res.json({ ok: true, token: tok, displayName });
         }
 
         /* ---- GİRİŞ YAP ---- */
@@ -87,38 +69,42 @@ export default async function handler(req, res) {
                 return res.status(400).json({ error: 'Kullanıcı adı ve şifre gerekli' });
             const u = username.trim().toLowerCase();
 
-            const user = await kvGet('user:' + u);
-            if (!user) return res.status(401).json({ error: 'Kullanıcı adı veya şifre yanlış' });
+            const rows = await query('SELECT * FROM users WHERE username = $1', [u]);
+            if (!rows.length)
+                return res.status(401).json({ error: 'Kullanıcı adı veya şifre yanlış' });
 
-            const hash = hashPw(password, user.salt);
-            if (hash !== user.hash)
+            const user = rows[0];
+            if (hashPw(password, user.salt) !== user.hash)
                 return res.status(401).json({ error: 'Kullanıcı adı veya şifre yanlış' });
 
             const tok = crypto.randomBytes(32).toString('hex');
-            await kvSet('session:' + tok, { username: u, displayName: user.displayName }, SESSION_SECS);
-            return res.json({ ok: true, token: tok, displayName: user.displayName });
+            await query(
+                'INSERT INTO sessions (token, username, display_name, expires_at) VALUES ($1, $2, $3, $4)',
+                [tok, u, user.display_name, expiresAt()]
+            );
+            return res.json({ ok: true, token: tok, displayName: user.display_name });
         }
 
         /* ---- OTURUM DOĞRULA ---- */
         if (action === 'verify') {
             if (!token) return res.json({ valid: false });
-            const session = await kvGet('session:' + token);
-            if (!session) return res.json({ valid: false });
-            return res.json({ valid: true, displayName: session.displayName, username: session.username });
+            const rows = await query(
+                'SELECT username, display_name FROM sessions WHERE token = $1 AND expires_at > now()',
+                [token]
+            );
+            if (!rows.length) return res.json({ valid: false });
+            return res.json({ valid: true, username: rows[0].username, displayName: rows[0].display_name });
         }
 
         /* ---- ÇIKIŞ ---- */
         if (action === 'logout') {
-            if (token) await kvDel('session:' + token);
+            if (token) await query('DELETE FROM sessions WHERE token = $1', [token]);
             return res.json({ ok: true });
         }
 
         return res.status(400).json({ error: 'Geçersiz action' });
 
     } catch (err) {
-        if (err.fallback) {
-            return res.status(503).json({ error: 'Sunucu yapılandırılmamış', fallback: true });
-        }
         console.error('Auth error:', err.message);
         return res.status(500).json({ error: 'Sunucu hatası' });
     }

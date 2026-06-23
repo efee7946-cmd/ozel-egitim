@@ -19,7 +19,8 @@
   },
   "homepage": "https://github.com/efee7946-cmd/ozel-egitim#readme",
   "dependencies": {
-    "express": "^5.2.1"
+    "express": "^5.2.1",
+    "pg": "^8.13.3"
   },
   "devDependencies": {
     "@playwright/test": "^1.59.1"
