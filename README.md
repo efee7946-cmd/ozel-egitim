@@ -41,7 +41,7 @@
 
 ### Giriş ve Öğrenci Seçimi
 
-- **Kimlik doğrulama ekranı** (`auth-screen`) — Kullanıcı adı + şifre ile giriş veya kayıt
+- **Kimlik doğrulama ekranı** (`auth-screen`) — Kullanıcı adı + şifre ile giriş veya kayıt; kayıt formunda öğrenci profili (ad, yaş, eğitim seviyesi, tanı bilgisi) toplanır
 - **Öğrenci seçim ekranı** (`login-screen`) — Emoji kartları ile aktif öğrenciyi seç veya yeni ekle
 
 ### Ana Menü
@@ -59,24 +59,16 @@ Altı ana faaliyet döşemesi:
 
 ### Konuşma Terapisi
 
-**4 Kategori:**
-- Günlük Hayat (10 soru)
-- Duygular (10 soru)
-- Sosyal İletişim (10 soru)
-- Oyun ve Spor (10 soru)
-
-**Şehir Lokasyonları:**
-- Ev — aile rutinleri ve temel ihtiyaçlar
-- Okul — öğretmen ve akran etkileşimi
-- Market — tercih ifadesi ve talep
+**Seans Başlangıcı:**
+Sabit kategori butonları yerine serbest konu girişi — öğretmen veya terapist istediği konuyu yazarak seans başlatır. Gemini bu konuya uygun sorular üretir.
 
 **Seans Akışı:**
 
-1. Kategori veya şehir lokasyonu seçilir
+1. Serbest konu girilir (örn. "piknik", "doğum günü")
 2. Pexels API'den bağlamsal video yüklenir
 3. Soru ElevenLabs TTS ile seslendirilir; animasyonlu karakter dudak senkronizasyonu yapar
-4. Öğrenci Web Speech API ile yanıtını kaydeder
-5. Gemini AI pedagojik kurallara göre gerçek zamanlı geri bildirim verir
+4. Öğrenci Web Speech API ile yanıtını kaydeder (özel eğitim için duraklama toleransı ayarlı)
+5. Gemini AI, AAC etkileşim modeline göre gerçek zamanlı geri bildirim verir
 6. Seans verileri kaydedilir
 
 **AI Pedagoji Kuralları (4 ilke):**
@@ -142,6 +134,7 @@ Kartlar seçilerek cümle oluşturulur; TTS ile seslendirilir.
 - Hedef token sayısını belirle (3, 5, 7, 10)
 - Token ekle / geri al
 - Hedefe ulaşınca kutlama ekranı gösterilir
+- Seans sonunda gizli yıldız ödülü animasyonu ile pekiştirme yapılır
 
 ### Öğretmen Paneli
 
@@ -174,24 +167,24 @@ Her hedef için:
 - Frekans sayacı ve süre (dakika)
 - Son 100 kayıt saklanır
 
-### Veli Raporu
+### Veli Raporu ve BEP Çıktısı
 
 **Otomatik veriler:**
 - Seans süresi (dakika)
 - Mikrofon kullanım sayısı
-- Hikaye ilerleme yüzdesi
 - Toplam yanıt sayısı
 
 **Rapor bölümleri:**
 1. Günlük kullanım takvimi (tıklanabilir günler)
-2. Öğrenme alanı planı (3 gelişim alanı)
-3. Tercih analizi (hikaye seçimleri)
+2. Bağımsızlık metrikleri analiz ekranı (bağımsız / destekli / hatalı yanıt oranları)
+3. Öğrenme alanı planı (3 gelişim alanı)
 4. Konuşma terapisi tur özeti
 5. Gemini AI değerlendirmesi (3-4 paragraf):
    - Katılım ve motivasyon gözlemleri
    - Sosyal-duygusal çıkarımlar
    - İletişim becerileri değerlendirmesi
    - Aileye somut öneriler
+6. BEP raporu çıktısı — IEP hedeflerine göre biçimlendirilmiş yazılı döküm
 
 ---
 
@@ -252,28 +245,28 @@ Okuma  →  localStorage (önce)    →  Vercel KV (yedek)
 | `DB.pushAll()` | localStorage → KV toplu yükleme |
 | `DB.isCloud()` | KV erişilebilirliğini kontrol et |
 
-**Önemli veri anahtarları:**
+**Önemli veri anahtarları** (tümü `lms_` öneki ile başlar):
 
 | Anahtar | İçerik |
 |---|---|
-| `students` | Öğrenci listesi |
-| `session_history_<userId>` | Seans anlık görüntüleri (son 180) |
-| `teacher_students_<userId>` | Öğretmene bağlı öğrenciler |
-| `iep_<studentId>` | IEP hedefleri |
-| `trials_<goalId>` | Deneme kayıtları |
-| `skills_<studentId>` | Beceri haritası durumu |
-| `behavior_<studentId>` | Davranış log (son 100) |
-| `sched_acts_<studentId>` | Günlük program aktiviteleri |
-| `sched_done_<studentId>_<YYYY-MM-DD>` | Günlük tamamlanma |
-| `tok_setup_<studentId>` | Token hedef yapılandırması |
-| `custom_matching_games` | Öğretmen tarafından oluşturulan oyunlar |
-| `teacher_pin` | Öğretmen paneli PIN'i |
+| `lms_students` | Öğrenci listesi |
+| `lms_session_history_<userId>` | Seans anlık görüntüleri (son 180) |
+| `lms_teacher_students_<userId>` | Öğretmene bağlı öğrenciler |
+| `lms_iep_<studentId>` | IEP/BEP hedefleri |
+| `lms_trials_<goalId>` | Deneme kayıtları |
+| `lms_skills_<studentId>` | Beceri haritası durumu |
+| `lms_behavior_<studentId>` | Davranış log (son 100) |
+| `lms_sched_acts_<studentId>` | Günlük program aktiviteleri |
+| `lms_sched_done_<studentId>_<YYYY-MM-DD>` | Günlük tamamlanma |
+| `lms_tok_setup_<studentId>` | Token hedef yapılandırması |
+| `lms_custom_matching_games` | Öğretmen tarafından oluşturulan oyunlar |
+| `lms_teacher_pin` | Öğretmen paneli PIN'i |
 
 ---
 
 ## Kimlik Doğrulama
 
-`/api/auth` — Vercel KV üzerinde çalışır, Supabase veya üçüncü taraf bağımlılığı yoktur.
+`/api/auth` — PostgreSQL (Aiven) üzerinde çalışır; Supabase veya üçüncü taraf auth bağımlılığı yoktur. Bağlantı havuzu `api/_db.js` üzerinden yönetilir.
 
 **Actions:**
 
@@ -309,7 +302,7 @@ Okuma  →  localStorage (önce)    →  Vercel KV (yedek)
 
 ## Kurulum
 
-**Gereksinimler:** Node.js 18+, npm
+**Gereksinimler:** Node.js 20+, npm
 
 ```bash
 # Repoyu klonla
@@ -346,6 +339,9 @@ ELEVENLABS_VOICE=your_voice_id
 # Pexels — https://www.pexels.com/api
 PEXELS_KEY=your_pexels_api_key
 
+# PostgreSQL / Aiven
+DATABASE_URL=postgresql://user:pass@host:port/dbname
+
 # Vercel KV (opsiyonel — yoksa localStorage yedek olarak çalışır)
 KV_REST_API_URL=https://your-kv.upstash.io
 KV_REST_API_TOKEN=your_kv_token
@@ -368,14 +364,15 @@ KV_REST_API_TOKEN=your_kv_token
 
 ```
 ozel-egitim/
-├── index.html          # Tüm ekranların HTML şablonu (853 satır)
-├── script.js           # Uygulama mantığı ve özellikler (4 078 satır)
-├── style.css           # Tasarım sistemi ve animasyonlar (4 795 satır)
+├── index.html          # Tüm ekranların HTML şablonu
+├── script.js           # Uygulama mantığı ve özellikler
+├── style.css           # Tasarım sistemi ve animasyonlar
 ├── db-client.js        # localStorage + Vercel KV veri katmanı
 ├── server.js           # Yerel geliştirme sunucusu (Express)
+├── schema.sql          # PostgreSQL şeması (users, sessions, app_data)
 ├── package.json
-├── vercel.json
 ├── api/
+│   ├── _db.js          # PostgreSQL bağlantı havuzu (Aiven)
 │   ├── auth.js         # Kimlik doğrulama (register/login/verify/logout)
 │   ├── chat.js         # Gemini AI entegrasyonu
 │   ├── tts.js          # ElevenLabs TTS
