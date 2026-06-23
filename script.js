@@ -3276,26 +3276,24 @@ async function checkAuthSession() {
     const savedUser  = DB.getSync(authUserStorageKey());
 
     if (savedToken && savedUser) {
-        // Token'ı doğrula
         const res = await authApi('verify', { token: savedToken });
         if (res.valid) {
             _authToken = savedToken;
             _authUser  = { username: res.username, displayName: res.displayName };
             onAuthSuccess();
             return;
-        } else if (res.fallback) {
-            // API yoksa (geliştirme ortamı), kaydedilmiş oturumu kabul et
+        } else if (res.fallback && !savedToken.startsWith('demo_')) {
+            // API geçici olarak erişilemez ama gerçek bir token var → kabul et
             _authToken = savedToken;
             _authUser  = savedUser;
             onAuthSuccess();
             return;
         }
-        // Token geçersiz — sil
+        // Token geçersiz veya demo token → sil, auth ekranını göster
         DB.del(authStorageKey());
         DB.del(authUserStorageKey());
     }
 
-    // Auth ekranını göster
     showOnly('auth-screen');
 }
 
@@ -3338,11 +3336,9 @@ async function handleLogin(e) {
     setAuthLoading(false);
 
     if (res.fallback) {
-        // Sunucu yoksa → demo mod
+        // Sunucu yoksa → demo mod (sadece memory, localStorage'a yazılmaz)
         _authToken = 'demo_' + username;
         _authUser  = { username, displayName: username };
-        DB.set(authStorageKey(), _authToken);
-        DB.set(authUserStorageKey(), _authUser);
         const note = document.getElementById('authOfflineNote');
         if (note) note.style.display = '';
         onAuthSuccess();
@@ -3370,10 +3366,9 @@ async function handleRegister(e) {
     setAuthLoading(false);
 
     if (res.fallback) {
+        // Sunucu yoksa → demo mod (sadece memory, localStorage'a yazılmaz)
         _authToken = 'demo_' + username;
         _authUser  = { username, displayName: username };
-        DB.set(authStorageKey(), _authToken);
-        DB.set(authUserStorageKey(), _authUser);
         const note = document.getElementById('authOfflineNote');
         if (note) note.style.display = '';
         onAuthSuccess();
