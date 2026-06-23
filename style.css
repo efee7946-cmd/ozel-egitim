@@ -1826,7 +1826,7 @@ video { width: 100%; height: 100%; object-fit: cover; }
 
 .matching-wrapper {
     width: 100%;
-    max-width: 680px;
+    max-width: 860px;
     margin-top: 60px;
     padding-bottom: 40px;
 }
@@ -1909,29 +1909,44 @@ video { width: 100%; height: 100%; object-fit: cover; }
 .matching-columns {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 16px;
+    gap: 22px;
     margin-bottom: 20px;
 }
 
 .matching-column {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 14px;
 }
 
 .matching-card {
     width: 100%;
-    padding: 22px 16px;
+    padding: 18px 16px;
     border-radius: 22px;
     border: 3px solid #d8e6f3;
     background: white;
     cursor: pointer;
-    font-size: 1.15rem;
+    font-size: 1.2rem;
     font-weight: 800;
     transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
     text-align: center;
     color: #1f3653;
     box-shadow: 0 4px 14px rgba(40, 84, 145, 0.06);
+    min-height: 140px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 10px;
+    box-sizing: border-box;
+}
+
+.matching-label-card {
+    background: linear-gradient(135deg, #eef4ff 0%, #e8f0ff 100%);
+    border-color: #b8cff5;
+    font-size: 1.4rem;
+    letter-spacing: -0.01em;
+    color: #1a3a6a;
 }
 
 .matching-card:hover {
@@ -1968,17 +1983,18 @@ video { width: 100%; height: 100%; object-fit: cover; }
 }
 
 .matching-emoji {
-    font-size: 2.2rem;
+    font-size: 3.4rem;
     display: block;
+    line-height: 1;
 }
 
 .matching-emoji-card {
-    padding: 10px !important;
+    padding: 14px !important;
 }
 
 .matching-photo-shimmer {
     width: 100%;
-    aspect-ratio: 1 / 1;
+    height: 120px;
     border-radius: 14px;
     background: linear-gradient(90deg, #e8edf5 25%, #f4f7fc 50%, #e8edf5 75%);
     background-size: 200% 100%;
@@ -1987,22 +2003,23 @@ video { width: 100%; height: 100%; object-fit: cover; }
     align-items: center;
     justify-content: center;
     overflow: hidden;
-    min-height: 80px;
+    flex-shrink: 0;
 }
 
 .matching-photo-shimmer.loaded {
     background: none;
     animation: none;
+    height: 120px;
 }
 
 .shimmer-emoji {
-    font-size: 1.6rem;
+    font-size: 2.4rem;
     opacity: 0.35;
 }
 
 .matching-card-photo {
     width: 100%;
-    height: 100%;
+    height: 120px;
     object-fit: cover;
     border-radius: 14px;
     display: block;
@@ -2124,8 +2141,12 @@ video { width: 100%; height: 100%; object-fit: cover; }
     .footer { display: none !important; }
     .question-bar { font-size: 1.1rem; padding: 10px; }
     .btn-mic { width: 70px; height: 70px; font-size: 2.2rem; }
-    .matching-columns { grid-template-columns: 1fr 1fr; gap: 10px; }
-    .matching-card { padding: 16px 10px; font-size: 1rem; }
+    .matching-columns { grid-template-columns: 1fr 1fr; gap: 12px; }
+    .matching-card { padding: 14px 10px; font-size: 1rem; min-height: 110px; }
+    .matching-label-card { font-size: 1.1rem; }
+    .matching-emoji { font-size: 2.6rem; }
+    .matching-photo-shimmer, .matching-photo-shimmer.loaded { height: 90px; }
+    .matching-card-photo { height: 90px; }
     .matching-menu-grid { grid-template-columns: repeat(2, 1fr); }
     .matching-complete-btns { flex-direction: column; }
     .question-bar-wrap .question-bar { font-size: 1.05rem; }
