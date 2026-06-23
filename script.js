@@ -237,13 +237,6 @@ async function startApp(resetSession) {
         renderCityScene();
         return;
     }
-    const isIOS = /iP(hone|ad|od)/.test(navigator.userAgent);
-    const isChrome = /CriOS/.test(navigator.userAgent);
-    if (isIOS && isChrome) {
-        alert("Mikrofon özelliği iOS Chrome'da çalışmıyor. Lütfen Safari ile aç.");
-        return;
-    }
-
     try {
         window.speechSynthesis.cancel();
         window.speechSynthesis.getVoices();
@@ -2626,6 +2619,15 @@ async function speak(t, callback) {
 async function speakWithLipsync(text, onEnd, emotion = CharacterEmotion.NEUTRAL) {
     setCharacterEmotion(emotion);
 
+    // Genel güvenlik: 20sn içinde hiçbir şey olmazsa fallback'e düş
+    let _ttsHandled = false;
+    const _safetyTimer = setTimeout(() => {
+        if (_ttsHandled) return;
+        _ttsHandled = true;
+        setCharacterEmotion(CharacterEmotion.NEUTRAL);
+        speakFallback(text, onEnd);
+    }, 20000);
+
     try {
         const _ttsCtrl = new AbortController();
         const _ttsFetchTimer = setTimeout(() => _ttsCtrl.abort(), 8000);
@@ -2638,12 +2640,20 @@ async function speakWithLipsync(text, onEnd, emotion = CharacterEmotion.NEUTRAL)
         clearTimeout(_ttsFetchTimer);
 
         if (!res.ok) {
+            clearTimeout(_safetyTimer); _ttsHandled = true;
             setCharacterEmotion(CharacterEmotion.NEUTRAL);
             return speakFallback(text, onEnd);
         }
 
         initAudioContext();
-        if (audioCtx.state === 'suspended') await audioCtx.resume();
+        if (audioCtx.state === 'suspended') {
+            await Promise.race([audioCtx.resume(), new Promise(r => setTimeout(r, 1500))]);
+        }
+        if (audioCtx.state !== 'running') {
+            clearTimeout(_safetyTimer); _ttsHandled = true;
+            setCharacterEmotion(CharacterEmotion.NEUTRAL);
+            return speakFallback(text, onEnd);
+        }
 
         const arrayBuf = await res.arrayBuffer();
         const audioBuf = await audioCtx.decodeAudioData(arrayBuf);
@@ -2662,6 +2672,7 @@ async function speakWithLipsync(text, onEnd, emotion = CharacterEmotion.NEUTRAL)
         const _fireEnd = () => {
             if (_endFired) return;
             _endFired = true;
+            clearTimeout(_safetyTimer); _ttsHandled = true;
             stopLipsync();
             setCharacterEmotion(CharacterEmotion.NEUTRAL);
             if (onEnd) onEnd();
@@ -2669,6 +2680,9 @@ async function speakWithLipsync(text, onEnd, emotion = CharacterEmotion.NEUTRAL)
         source.onended = _fireEnd;
         setTimeout(_fireEnd, _durMs);
     } catch (e) {
+        if (_ttsHandled) return;
+        _ttsHandled = true;
+        clearTimeout(_safetyTimer);
         console.warn('Lipsync TTS hatasi, fallback:', e);
         setCharacterEmotion(CharacterEmotion.NEUTRAL);
         speakFallback(text, onEnd);
