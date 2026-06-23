@@ -241,11 +241,39 @@ document.addEventListener('DOMContentLoaded', function(){
 </script>
 <!-- ===================== KONUŞMA TERAPİSTİ ===================== -->
 <div id="game-container">
-    <div class="main-card">
+
+    <!-- Konu Seçim Overlay -->
+    <div id="topicOverlay" class="topic-overlay">
+        <div class="topic-card">
+            <button class="btn-back topic-back-btn" onclick="goToMenu()">← Menü</button>
+            <div class="topic-card-icon">🎤</div>
+            <h2 class="topic-card-title">Hangi konuyu çalışalım?</h2>
+            <p class="topic-card-sub">Bir konu yaz, Yıldız Can o konuyla ilgili sorular soracak.</p>
+            <input type="text" id="topicInput" class="topic-input"
+                placeholder="örn: alışveriş, futbol, okul..." maxlength="60"
+                onkeydown="if(event.key==='Enter') startTherapyWithTopic()">
+            <div class="topic-suggestions">
+                <button type="button" class="topic-chip" onclick="setTopicChip('Alışveriş')">🛒 Alışveriş</button>
+                <button type="button" class="topic-chip" onclick="setTopicChip('Okul')">🏫 Okul</button>
+                <button type="button" class="topic-chip" onclick="setTopicChip('Futbol')">⚽ Futbol</button>
+                <button type="button" class="topic-chip" onclick="setTopicChip('Arkadaşlık')">🤝 Arkadaşlık</button>
+                <button type="button" class="topic-chip" onclick="setTopicChip('Yemek')">🍽️ Yemek</button>
+                <button type="button" class="topic-chip" onclick="setTopicChip('Duygular')">😊 Duygular</button>
+            </div>
+            <button class="topic-start-btn" id="topicStartBtn" onclick="startTherapyWithTopic()">
+                Başla →
+            </button>
+            <div class="topic-loading" id="topicLoading" style="display:none">
+                <div class="topic-spinner"></div>
+                <span>Sorular hazırlanıyor...</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-card" id="therapyMainCard" style="display:none">
         <button class="btn-back" onclick="goToMenu()">← Menü</button>
         <div id="therapyCityHost"></div>
-        <div class="therapy-category-bar therapy-session-ui" id="therapyCategoryBar"></div>
-        <div class="therapy-category-summary therapy-session-ui" id="therapyCategorySummary">Günlük Hayat alanında kısa ve tanıdık sorularla ilerliyoruz.</div>
+        <div class="therapy-topic-badge" id="therapyTopicBadge"></div>
         <div class="therapy-progress-wrap therapy-session-ui">
             <span id="therapyProgressLabel" class="therapy-progress-label">Soru 0 / 10</span>
             <div class="therapy-progress-track">
@@ -262,7 +290,7 @@ document.addEventListener('DOMContentLoaded', function(){
             <button onclick="loadNext()" id="nextBtn" class="btn-next">➡️</button>
         </div>
         <div id="info" class="therapy-session-ui">Lütfen bekleyin...</div>
-    </div>
+    </div><!-- /.main-card -->
     <div class="side-card" id="therapySideCard">
         <img src="avatar.png" class="side-avatar" alt="Yıldız Can">
         <div id="chat-bubbles"></div>

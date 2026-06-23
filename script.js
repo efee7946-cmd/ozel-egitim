@@ -324,9 +324,65 @@ function goToMenu() {
     renderCityScene();
 }
 
+let currentTopic = '';
+
 function goToTherapy() {
     showOnly('game-container');
-    startFocusedCityLocation();
+    document.getElementById('topicOverlay').style.display = 'flex';
+    document.getElementById('therapyMainCard').style.display = 'none';
+    document.getElementById('topicInput').value = '';
+    document.getElementById('topicLoading').style.display = 'none';
+    document.getElementById('topicStartBtn').style.display = '';
+    setTimeout(() => document.getElementById('topicInput').focus(), 100);
+}
+
+function setTopicChip(topic) {
+    document.getElementById('topicInput').value = topic;
+    document.getElementById('topicInput').focus();
+}
+
+async function startTherapyWithTopic() {
+    const input = document.getElementById('topicInput').value.trim();
+    if (!input) return;
+    currentTopic = input;
+
+    document.getElementById('topicLoading').style.display = 'flex';
+    document.getElementById('topicStartBtn').style.display = 'none';
+
+    try {
+        const prompt = `Özel eğitim öğrencisi (8-12 yaş, orta düzey) için "${currentTopic}" konusunda 6 kısa soru üret. Her soru günlük yaşam ve sosyal beceriye yönelik olsun. Her soru yeni satırda, maksimum 10 kelime. Sadece soruları yaz.`;
+        const res = await fetch('/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ contents: [{ role: 'user', parts: [{ text: prompt }] }] }),
+            signal: AbortSignal.timeout(15000)
+        });
+        const data = await res.json();
+        const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+        const questions = text.split('\n')
+            .map(q => q.replace(/^[\d\-\.\*]+\s*/, '').trim())
+            .filter(q => q.length > 5)
+            .slice(0, 6)
+            .map(q => ({ q, query: currentTopic, goal: currentTopic }));
+
+        unaskedQuestions = questions.length ? questions : [{ q: `${currentTopic} hakkında ne düşünüyorsun?`, query: currentTopic, goal: currentTopic }];
+    } catch {
+        unaskedQuestions = [{ q: `${currentTopic} hakkında ne düşünüyorsun?`, query: currentTopic, goal: currentTopic }];
+    }
+
+    chatHistory = [];
+    turnCount = 0;
+    currentObj = null;
+
+    const badge = document.getElementById('therapyTopicBadge');
+    if (badge) badge.textContent = `🎯 ${currentTopic}`;
+
+    document.getElementById('topicOverlay').style.display = 'none';
+    document.getElementById('therapyMainCard').style.display = '';
+    document.getElementById('chat-bubbles').innerHTML = '';
+
+    updateProgressBar();
+    await loadNext();
 }
 
 function getDateKey(date) {
@@ -2326,7 +2382,7 @@ async function getGemmaResponse(text) {
     const currentGoal = currentObj && currentObj.goal ? currentObj.goal : 'kısa ve anlaşılır konuşma';
     const currentLocation = CITY_LOCATIONS[currentCityLocationKey];
     var instructions = `Sen özel eğitim öğrencileriyle (Hafif ve Orta Düzey / Eğitilebilir kademe) sosyal beceri ve günlük yaşam rutinleri çalışan neşeli, sabırlı ve çok kısa konuşan bir oyun arkadaşı botsun. Adın Yıldız Can. Öğrencinin adı ${childName}.
-Şu an seçili alan: ${currentCategory.label}. Şehir noktası: ${currentLocation ? currentLocation.label : 'Genel'}. Bu sorunun hedefi: ${currentGoal}.
+Çalışılan konu: ${currentTopic || currentCategory.label}. Bu sorunun hedefi: ${currentGoal}.
 
 ÖĞRENCİYLE KONUŞMA KURALLARI (STRICT RULES):
 1. DİKKAT VE BELLEK SINIRI: Öğrencinin dikkat ve bellek güçlüklerini tetiklememek için ASLA tek seferde birden fazla cümle kurma. Maksimum cümle uzunluğun 6-7 kelimeyi geçmesin.
@@ -3169,6 +3225,8 @@ document.addEventListener('DOMContentLoaded', function() {
 // =============================================
 window.goToMenu = goToMenu;
 window.goToTherapy = goToTherapy;
+window.setTopicChip = setTopicChip;
+window.startTherapyWithTopic = startTherapyWithTopic;
 window.setTherapyCategory = setTherapyCategory;
 window.focusCityLocation = focusCityLocation;
 window.startFocusedCityLocation = startFocusedCityLocation;
