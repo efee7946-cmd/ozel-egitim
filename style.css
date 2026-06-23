@@ -4674,20 +4674,28 @@ body.a11y-reduce-motion * { transition: none !important; animation: none !import
 
 /* Kayıt formu — kademe & tanı */
 .reg-level-group {
-    display: flex; flex-direction: column; gap: 6px; margin-top: 4px;
+    display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px;
 }
 .reg-level-opt {
-    display: flex; align-items: center; gap: 8px;
-    font-size: 0.85rem; color: #2d3a5c; cursor: pointer;
+    cursor: pointer; user-select: none;
 }
-.reg-level-opt input[type="radio"] { accent-color: #6c5ce7; }
+.reg-level-opt input[type="radio"] { display: none; }
+.reg-level-opt span {
+    display: block;
+    background: #f0f2f8; border-radius: 14px;
+    padding: 7px 13px; font-size: 0.82rem; font-weight: 600;
+    color: #5a6a8a; transition: background .15s, color .15s;
+}
+.reg-level-opt input[type="radio"]:checked + span {
+    background: #ebe9ff; color: #6c5ce7;
+}
 .reg-condition-chips {
     display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px;
 }
 .reg-chip {
-    display: flex; align-items: center; gap: 5px;
+    display: flex; align-items: center;
     background: #f0f2f8; border-radius: 14px;
-    padding: 5px 11px; font-size: 0.8rem; font-weight: 600;
+    padding: 7px 13px; font-size: 0.82rem; font-weight: 600;
     color: #5a6a8a; cursor: pointer; transition: background .15s, color .15s;
     user-select: none;
 }
