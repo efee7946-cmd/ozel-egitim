@@ -316,6 +316,7 @@ function setTherapySelectionMode(isSelecting) {
 function goToMenu() {
     window.speechSynthesis.cancel();
     clearTimeout(idleTimer);
+    persistSessionSnapshot();
     setTherapySelectionMode(false);
     syncCityEntryPlacement(false);
     const cityShell = document.getElementById('cityEntryShell');
