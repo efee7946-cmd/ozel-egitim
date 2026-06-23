@@ -4536,40 +4536,42 @@ body.a11y-reduce-motion * { transition: none !important; animation: none !import
    ============================================= */
 #auth-screen {
     position: fixed; inset: 0; z-index: 9000;
-    display: flex; align-items: center; justify-content: center;
+    display: flex; align-items: flex-start; justify-content: center;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    padding: 24px;
+    padding: 20px 24px;
+    overflow-y: auto;
 }
 .auth-card {
     background: #fff;
     border-radius: 24px;
     box-shadow: 0 20px 60px rgba(0,0,0,.25);
-    padding: 40px 36px 32px;
+    padding: 28px 28px 24px;
     width: 100%; max-width: 380px;
     display: flex; flex-direction: column; align-items: center;
     gap: 0;
+    margin: auto;
 }
 .auth-logo {
-    width: 72px; height: 72px;
+    width: 60px; height: 60px;
     border-radius: 50%;
     object-fit: cover;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
     box-shadow: 0 4px 16px rgba(102,126,234,.3);
 }
 .auth-app-name {
-    font-size: 1.5rem; font-weight: 800;
-    color: #2d3a5c; margin: 0 0 4px;
+    font-size: 1.4rem; font-weight: 800;
+    color: #2d3a5c; margin: 0 0 2px;
     text-align: center; letter-spacing: -0.5px;
 }
 .auth-tagline {
     font-size: 0.82rem; color: #8892a4;
-    margin: 0 0 20px; text-align: center;
+    margin: 0 0 14px; text-align: center;
 }
 .auth-tabs {
     display: flex; width: 100%;
     background: #f0f2f8; border-radius: 12px;
     padding: 4px; gap: 4px;
-    margin-bottom: 24px;
+    margin-bottom: 16px;
 }
 .auth-tabs button {
     flex: 1; padding: 10px 0;
@@ -4584,7 +4586,7 @@ body.a11y-reduce-motion * { transition: none !important; animation: none !import
     box-shadow: 0 2px 8px rgba(102,126,234,.2);
 }
 #loginForm, #registerForm {
-    width: 100%; display: flex; flex-direction: column; gap: 14px;
+    width: 100%; display: flex; flex-direction: column; gap: 10px;
 }
 .auth-field {
     display: flex; flex-direction: column; gap: 6px;
