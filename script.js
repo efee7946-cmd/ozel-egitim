@@ -1557,6 +1557,27 @@ Kesinlikle emoji kullanma. Sıcak, profesyonel ve umut verici bir dil kullan.`;
 // =============================================
 // KONUŞMA TERAPİSTİ (orijinal kod)
 // =============================================
+const _FALLBACK_VIDEOS = [
+    'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
+    'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/friday.mp4',
+    'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flicker-of-hope.mp4',
+];
+function _pickFallbackVideo() {
+    return _FALLBACK_VIDEOS[Math.floor(Math.random() * _FALLBACK_VIDEOS.length)];
+}
+function _loadFallbackVideo(vEl) {
+    vEl.muted = true;
+    vEl.setAttribute('playsinline', '');
+    vEl.src = _pickFallbackVideo();
+    vEl.load();
+    const t = setTimeout(function() { startQuestion(); }, 5000);
+    vEl.onloadeddata = function() {
+        clearTimeout(t);
+        vEl.play().catch(function() {});
+        setTimeout(function() { startQuestion(); }, 1200);
+    };
+    vEl.onerror = function() { clearTimeout(t); startQuestion(); };
+}
 const THERAPY_CATEGORIES = {
     daily_life: {
         emoji: '🏠',
@@ -2345,36 +2366,10 @@ async function loadNext() {
             };
             vEl.onerror = function() { clearTimeout(videoTimeout); startQuestion(); };
         } else {
-            const fallbackVideoUrl = 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4';
-            vEl.muted = true;
-            vEl.setAttribute('playsinline', '');
-            vEl.src = fallbackVideoUrl;
-            vEl.load();
-            const videoTimeout = setTimeout(function() {
-                startQuestion();
-            }, 5000);
-            vEl.onloadeddata = function() {
-                clearTimeout(videoTimeout);
-                vEl.play().catch(function() {});
-                setTimeout(function() { startQuestion(); }, 1200);
-            };
-            vEl.onerror = function() { clearTimeout(videoTimeout); startQuestion(); };
+            _loadFallbackVideo(vEl);
         }
     } catch(e) {
-        const fallbackVideoUrl = 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4';
-        vEl.muted = true;
-        vEl.setAttribute('playsinline', '');
-        vEl.src = fallbackVideoUrl;
-        vEl.load();
-        const videoTimeout = setTimeout(function() {
-            startQuestion();
-        }, 5000);
-        vEl.onloadeddata = function() {
-            clearTimeout(videoTimeout);
-            vEl.play().catch(function() {});
-            setTimeout(function() { startQuestion(); }, 1200);
-        };
-        vEl.onerror = function() { clearTimeout(videoTimeout); startQuestion(); };
+        _loadFallbackVideo(vEl);
     }
 }
 
