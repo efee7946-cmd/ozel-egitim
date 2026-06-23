@@ -106,6 +106,6 @@ export default async function handler(req, res) {
 
     } catch (err) {
         console.error('Auth error:', err.message);
-        return res.status(500).json({ error: 'Sunucu hatası' });
+        return res.status(500).json({ error: 'Sunucu hatası: ' + err.message });
     }
 }
