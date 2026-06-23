@@ -1780,7 +1780,7 @@ function goToMatching() {
     renderMatchingMenu();
 }
 
-function renderMatchingMenu() {
+async function renderMatchingMenu() {
     const gridEl = document.getElementById('matchingMenuGrid');
     const menuSection = document.getElementById('matchingMenuSection');
     const gameSection = document.getElementById('matchingGameSection');
@@ -1788,18 +1788,27 @@ function renderMatchingMenu() {
     if (menuSection) menuSection.style.display = 'block';
     if (gameSection) gameSection.style.display = 'none';
 
-    gridEl.innerHTML = MATCHING_GAMES.map(game => `
+    const customGames = (await DB.get('custom_matching_games')) || [];
+    const allGames = [...MATCHING_GAMES, ...customGames];
+
+    gridEl.innerHTML = allGames.map(game => `
         <button type="button" class="matching-game-card" onclick="startMatchingGame('${game.key}')">
             <div class="matching-game-icon">${game.icon}</div>
             <strong>${game.title}</strong>
             <p>${game.description}</p>
+            ${game.isCustom ? '<span class="matching-custom-badge">Özel</span>' : ''}
         </button>
     `).join('');
     speakFallback('Bir oyun seç!', () => {});
 }
 
-function startMatchingGame(gameKey) {
-    currentMatchingGame = MATCHING_GAMES.find(g => g.key === gameKey);
+async function startMatchingGame(gameKey) {
+    let game = MATCHING_GAMES.find(g => g.key === gameKey);
+    if (!game) {
+        const customGames = (await DB.get('custom_matching_games')) || [];
+        game = customGames.find(g => g.key === gameKey);
+    }
+    currentMatchingGame = game;
     if (!currentMatchingGame) return;
     selectedLeftKey = null;
     matchedPairs = [];
@@ -1842,9 +1851,11 @@ function renderMatchingGame() {
                             data-key="${pair.label}"
                             onclick="selectMatchRight('${pair.label}', this)">
                         ${usePhotos
-                            ? `<div class="matching-photo-shimmer" data-photo-key="${pair.label}">
-                                   <span class="shimmer-emoji">${pair.emoji}</span>
-                               </div>`
+                            ? pair.photoUrl
+                                ? `<img src="${pair.photoUrl}" alt="${pair.label}" class="matching-card-photo" onerror="this.outerHTML='<span class=\\'matching-emoji\\'>${pair.emoji || '❓'}</span>'">`
+                                : `<div class="matching-photo-shimmer" data-photo-key="${pair.label}">
+                                       <span class="shimmer-emoji">${pair.emoji}</span>
+                                   </div>`
                             : `<span class="matching-emoji">${pair.emoji}</span>`
                         }
                     </button>
@@ -1868,6 +1879,7 @@ async function fetchCardPhoto(query) {
 async function loadMatchingPhotos(game) {
     if (!game || !game.usePhotos) return;
     for (const pair of game.pairs) {
+        if (pair.photoUrl) continue; // özel oyunlarda URL zaten var
         const photoUrl = await fetchCardPhoto(pair.query);
         if (!photoUrl) continue;
         const shimmer = document.querySelector(`.matching-photo-shimmer[data-photo-key="${pair.label}"]`);
@@ -1877,6 +1889,160 @@ async function loadMatchingPhotos(game) {
         }
     }
 }
+
+/* ========== EŞLEŞTİRME EDITÖRÜ ========== */
+let _editorPairs = [];
+let _photoDebounceTimers = {};
+
+function openMatchingEditor() {
+    const overlay = document.getElementById('matchingEditorOverlay');
+    if (overlay) overlay.style.display = 'flex';
+    switchEditorTab('list');
+    renderEditorGameList();
+}
+
+function closeMatchingEditor() {
+    const overlay = document.getElementById('matchingEditorOverlay');
+    if (overlay) overlay.style.display = 'none';
+}
+
+function switchEditorTab(tab) {
+    document.getElementById('medListView').style.display = tab === 'list' ? 'block' : 'none';
+    document.getElementById('medCreateView').style.display = tab === 'create' ? 'block' : 'none';
+    document.getElementById('medTabList').classList.toggle('active', tab === 'list');
+    document.getElementById('medTabCreate').classList.toggle('active', tab === 'create');
+    if (tab === 'create') {
+        _editorPairs = [
+            { label: '', photoUrl: '', emoji: '❓' },
+            { label: '', photoUrl: '', emoji: '❓' },
+            { label: '', photoUrl: '', emoji: '❓' }
+        ];
+        const titleEl = document.getElementById('medGameTitle');
+        const iconEl = document.getElementById('medGameIcon');
+        if (titleEl) titleEl.value = '';
+        if (iconEl) iconEl.value = '🎯';
+        renderEditorPairs();
+    }
+}
+
+async function renderEditorGameList() {
+    const list = document.getElementById('medCustomGameList');
+    if (!list) return;
+    const games = (await DB.get('custom_matching_games')) || [];
+    if (!games.length) {
+        list.innerHTML = '<p class="med-empty">Henüz özel oyun yok. "+ Yeni Oyun" ile başla!</p>';
+        return;
+    }
+    list.innerHTML = games.map(g => `
+        <div class="med-game-item">
+            <span class="med-game-icon">${g.icon}</span>
+            <span class="med-game-title">${g.title}</span>
+            <span class="med-game-count">${g.pairs.length} çift</span>
+            <button type="button" class="med-delete-btn" onclick="deleteCustomMatchingGame('${g.key}')">🗑️</button>
+        </div>
+    `).join('');
+}
+
+function renderEditorPairs() {
+    const el = document.getElementById('medPairsList');
+    if (!el) return;
+    el.innerHTML = _editorPairs.map((pair, i) => `
+        <div class="med-pair-row" id="medPair_${i}">
+            <input type="text" class="med-pair-input" placeholder="Kelime gir..."
+                value="${pair.label}"
+                oninput="debounceEditorPhoto(${i}, this.value)">
+            <div class="med-pair-preview ${pair.photoUrl ? 'has-photo' : ''}" id="medPreview_${i}">
+                ${pair.photoUrl
+                    ? `<img src="${pair.photoUrl}" alt="${pair.label}">`
+                    : `<span>${pair.emoji || '❓'}</span>`
+                }
+            </div>
+            <button type="button" class="med-pair-remove"
+                onclick="removeEditorPair(${i})"
+                ${_editorPairs.length <= 2 ? 'disabled' : ''}>✕</button>
+        </div>
+    `).join('');
+}
+
+function debounceEditorPhoto(index, value) {
+    _editorPairs[index].label = value;
+    clearTimeout(_photoDebounceTimers[index]);
+    if (!value.trim()) return;
+    _photoDebounceTimers[index] = setTimeout(() => fetchEditorPhoto(index, value.trim()), 700);
+}
+
+async function fetchEditorPhoto(index, query) {
+    const preview = document.getElementById('medPreview_' + index);
+    if (preview) preview.innerHTML = '<span style="font-size:1rem;opacity:0.5">⏳</span>';
+    try {
+        const r = await fetch('/api/video?query=' + encodeURIComponent(query));
+        const d = await r.json();
+        const url = d?.videos?.[0]?.image;
+        if (url && _editorPairs[index] !== undefined) {
+            _editorPairs[index].photoUrl = url;
+            const p = document.getElementById('medPreview_' + index);
+            if (p) {
+                p.classList.add('has-photo');
+                p.innerHTML = `<img src="${url}" alt="${query}">`;
+            }
+        } else {
+            const p = document.getElementById('medPreview_' + index);
+            if (p) p.innerHTML = '<span>🖼️</span>';
+        }
+    } catch {
+        const p = document.getElementById('medPreview_' + index);
+        if (p) p.innerHTML = '<span>❓</span>';
+    }
+}
+
+function addEditorPair() {
+    _editorPairs.push({ label: '', photoUrl: '', emoji: '❓' });
+    renderEditorPairs();
+}
+
+function removeEditorPair(index) {
+    if (_editorPairs.length <= 2) return;
+    _editorPairs.splice(index, 1);
+    renderEditorPairs();
+}
+
+async function saveCustomMatchingGame() {
+    const title = (document.getElementById('medGameTitle')?.value || '').trim();
+    const icon = (document.getElementById('medGameIcon')?.value || '').trim() || '🎯';
+    const validPairs = _editorPairs.filter(p => p.label.trim());
+
+    if (!title) { alert('Oyun adı girin!'); return; }
+    if (validPairs.length < 2) { alert('En az 2 kelime girin!'); return; }
+
+    const games = (await DB.get('custom_matching_games')) || [];
+    const key = 'custom_' + Date.now();
+    const newGame = {
+        key,
+        title,
+        icon,
+        description: `${validPairs.length} kelime çifti`,
+        usePhotos: validPairs.some(p => p.photoUrl),
+        pairs: validPairs.map(p => ({
+            label: p.label.trim(),
+            emoji: '🖼️',
+            query: p.label.trim(),
+            photoUrl: p.photoUrl || null
+        })),
+        isCustom: true
+    };
+    games.push(newGame);
+    DB.set('custom_matching_games', games);
+    switchEditorTab('list');
+    renderEditorGameList();
+}
+
+async function deleteCustomMatchingGame(key) {
+    if (!confirm('Bu oyunu silmek istiyor musun?')) return;
+    const games = (await DB.get('custom_matching_games')) || [];
+    DB.set('custom_matching_games', games.filter(g => g.key !== key));
+    renderEditorGameList();
+}
+/* ========================================== */
 
 function selectMatchLeft(key) {
     if (matchedPairs.includes(key)) return;
@@ -3331,6 +3497,14 @@ window.switchAuthTab = switchAuthTab;
 window.handleLogin = handleLogin;
 window.handleRegister = handleRegister;
 window.authLogout = authLogout;
+window.openMatchingEditor = openMatchingEditor;
+window.closeMatchingEditor = closeMatchingEditor;
+window.switchEditorTab = switchEditorTab;
+window.addEditorPair = addEditorPair;
+window.removeEditorPair = removeEditorPair;
+window.debounceEditorPhoto = debounceEditorPhoto;
+window.saveCustomMatchingGame = saveCustomMatchingGame;
+window.deleteCustomMatchingGame = deleteCustomMatchingGame;
 
 // =============================================
 // KİMLİK DOĞRULAMA (AUTH)
