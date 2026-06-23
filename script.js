@@ -1,13 +1,29 @@
-var supabaseUrl = 'https://mtmskfyufuxahdctwuay.supabase.co';
-var supabaseKey = 'sb_publishable_kYPbSRUpyPe6tsQZOCcY0g_U1brYQ6U';
-
 function escapeHtml(str) {
     if (!str) return '';
     return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 
-// Değişken ismini 'supabaseClient' olarak değiştirerek çakışmayı önleyelim
-var supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
+// Supabase kaldırıldı — auth ve veri Vercel KV üzerinde (api/auth.js + db-client.js)
+var supabaseClient = (() => {
+    const empty = Promise.resolve({ data: [], error: null });
+    function chain() {
+        const p = Promise.resolve({ data: [], error: null });
+        ['select','eq','neq','order','limit','upsert','update','insert','delete'].forEach(m => { p[m] = () => chain(); });
+        return p;
+    }
+    return {
+        auth: {
+            getSession:          async () => ({ data: { session: null }, error: null }),
+            getUser:             async () => ({ data: { user: null },    error: null }),
+            signOut:             async () => ({ error: null }),
+            signInWithPassword:  async () => ({ data: null, error: { message: 'Devre dışı' } }),
+            signUp:              async () => ({ data: null, error: { message: 'Devre dışı' } }),
+            resetPasswordForEmail: async () => ({ error: null }),
+            onAuthStateChange:   () => ({ data: { subscription: { unsubscribe: () => {} } } }),
+        },
+        from: () => chain(),
+    };
+})();
 // =============================================
 // GENEL DEĞİŞKENLER
 // =============================================
@@ -20,11 +36,6 @@ let currentMenuSection = 'overview';
 let activeStudentId = '';
 let activeStudentName = '';
 let studentsCache = [];
-
-function getUserRoleFromUser(user) {
-    if (!user || !user.user_metadata || !user.user_metadata.role) return 'parent';
-    return user.user_metadata.role === 'specialist' ? 'specialist' : 'parent';
-}
 
 // Oturum verisi — tüm modüller buraya yazar
 const sessionData = {
@@ -212,17 +223,6 @@ function showOnly(id) {
     }
 }
 
-function getChildNameFromUser(user) {
-    if (!user) return "";
-
-    const displayName = user.user_metadata && user.user_metadata.display_name;
-    if (displayName && displayName.trim()) return displayName.trim();
-
-    if (user.email) return user.email.split('@')[0];
-
-    return "Arkadaşım";
-}
-
 function getOnboardingStorageKey() {
     return currentUserEmail ? `onboarding_seen_${currentUserEmail}` : '';
 }
@@ -259,15 +259,6 @@ function dismissOnboarding(persistPreference) {
     }
 }
 
-async function logout() {
-    const confirmed = window.confirm('Çıkış yapmak istiyor musun? Bu cihazda tekrar giriş yapman gerekecek.');
-    if (!confirmed) return;
-
-    const { error } = await supabaseClient.auth.signOut();
-    if (error) {
-        alert('Çıkış yapılırken bir hata oluştu. Lütfen tekrar dene.');
-    }
-}
 async function startApp(resetSession) {
     if (appStarted && !resetSession) {
         if (currentScreenId && currentScreenId !== 'start-screen') {
@@ -311,29 +302,6 @@ async function startApp(resetSession) {
     appStarted = true;
     // Auth kontrolü: oturum var mı?
     checkAuthSession();
-}
-
-async function initializeAuth() {
-    try {
-        const { data, error } = await supabaseClient.auth.getSession();
-        if (error) throw error;
-
-        const user = data.session && data.session.user;
-        if (user) {
-            childName = getChildNameFromUser(user);
-            currentUserEmail = user.email || '';
-            currentUserRole = getUserRoleFromUser(user);
-            await startApp(false);
-            return;
-        }
-    } catch (error) {
-        console.error('Oturum kontrol edilemedi:', error);
-    }
-
-    childName = 'Arkadaş';
-    currentUserEmail = '';
-    currentUserRole = 'parent';
-    await startApp(true);
 }
 
 // Supabase auth listener kaldırıldı — kendi auth sistemi kullanılıyor
@@ -447,8 +415,11 @@ function mapHistoryRow(row) {
 }
 
 async function getCurrentUserId() {
-    const result = await supabaseClient.auth.getUser();
-    return result && result.data && result.data.user ? result.data.user.id : null;
+    // Yeni auth: aktif kullanıcı adını döndür (Supabase UUID yerine)
+    if (_authUser && _authUser.username) return _authUser.username;
+    // Fallback: localStorage'dan oku
+    const saved = DB.getSync('auth_user');
+    return saved && saved.username ? saved.username : null;
 }
 
 function getStudentStorageKey(userId) {
@@ -871,21 +842,8 @@ async function loadStudentDetailMetrics(userId, studentId) {
     if (!userId || !studentId) {
         return { totalSessions: 0, totalMinutes: 0, latestSession: null };
     }
-
-    const { data, error } = await supabaseClient
-        .from('session_history')
-        .select('created_at, duration_min, story_pct, story_completed, total_turns')
-        .eq('user_id', userId)
-        .eq('student_id', studentId)
-        .order('created_at', { ascending: false })
-        .limit(20);
-
-    if (error) {
-        console.error('Öğrenci oturum özetleri okunamadı:', error);
-        return { totalSessions: 0, totalMinutes: 0, latestSession: null };
-    }
-
-    const rows = data || [];
+    const history = await DB.get('session_history_' + userId) || [];
+    const rows = history.filter(h => h.student_id === studentId).slice(0, 20);
     return {
         totalSessions: rows.length,
         totalMinutes: rows.reduce((sum, row) => sum + (row.duration_min || 0), 0),
@@ -974,24 +932,9 @@ function renderStudentList() {
 
 async function loadStudentsForCurrentUser() {
     const userId = await getCurrentUserId();
-    if (!userId) {
-        studentsCache = [];
-        return [];
-    }
-
-    const { data, error } = await supabaseClient
-        .from('students')
-        .select('id, full_name, birth_year, support_notes, active, created_at')
-        .eq('active', true)
-        .order('created_at', { ascending: false });
-
-    if (error) {
-        console.error('Öğrenciler yüklenemedi:', error);
-        studentsCache = [];
-        return [];
-    }
-
-    studentsCache = data || [];
+    if (!userId) { studentsCache = []; return []; }
+    const data = await DB.get('teacher_students_' + userId) || [];
+    studentsCache = data.filter(s => s.active !== false);
     return studentsCache;
 }
 
@@ -1053,36 +996,25 @@ async function createStudent() {
     statusEl.textContent = 'Öğrenci oluşturuluyor...';
     const birthYear = birthYearRaw ? Number(birthYearRaw) : null;
 
-    const { data, error } = await supabaseClient
-        .from('students')
-        .insert({
-            created_by: userId,
-            full_name: fullName,
-            birth_year: Number.isFinite(birthYear) ? birthYear : null,
-            support_notes: supportNotes
-        })
-        .select('id, full_name, birth_year, support_notes, active, created_at')
-        .single();
-
-    if (error) {
-        console.error('Öğrenci oluşturulamadı:', error);
-        statusEl.textContent = 'Öğrenci oluşturulamadı. Lütfen tekrar dene.';
-        createBtn.disabled = false;
-        return;
-    }
-
-    const linkTable = currentUserRole === 'specialist' ? 'specialist_student_links' : 'parent_student_links';
-    const linkPayload = currentUserRole === 'specialist'
-        ? { specialist_id: userId, student_id: data.id }
-        : { parent_id: userId, student_id: data.id, relationship_label: 'parent' };
-    await supabaseClient.from(linkTable).upsert(linkPayload, { onConflict: currentUserRole === 'specialist' ? 'specialist_id,student_id' : 'parent_id,student_id' });
+    const newStudent = {
+        id: 'st_' + Date.now(),
+        full_name: fullName,
+        birth_year: Number.isFinite(birthYear) ? birthYear : null,
+        support_notes: supportNotes,
+        active: true,
+        created_at: new Date().toISOString(),
+    };
+    const key = 'teacher_students_' + userId;
+    const existing = await DB.get(key) || [];
+    existing.unshift(newStudent);
+    await DB.set(key, existing);
 
     nameEl.value = '';
     yearEl.value = '';
     notesEl.value = '';
     createBtn.disabled = false;
     await ensureActiveStudent();
-    await selectStudent(data.id);
+    await selectStudent(newStudent.id);
 }
 
 async function openStudentSetup() {
@@ -1111,24 +1043,17 @@ async function updateStudent() {
     updateBtn.disabled = true;
     statusEl.textContent = 'Öğrenci bilgileri güncelleniyor...';
     const birthYear = birthYearRaw ? Number(birthYearRaw) : null;
+    const userId = await getCurrentUserId();
 
-    const { error } = await supabaseClient
-        .from('students')
-        .update({
-            full_name: fullName,
-            birth_year: Number.isFinite(birthYear) ? birthYear : null,
-            support_notes: supportNotes,
-            updated_at: new Date().toISOString()
-        })
-        .eq('id', activeStudentId);
-
-    updateBtn.disabled = false;
-    if (error) {
-        console.error('Öğrenci güncellenemedi:', error);
-        statusEl.textContent = 'Öğrenci bilgileri güncellenemedi. Lütfen tekrar dene.';
-        return;
+    const key = 'teacher_students_' + userId;
+    const list = await DB.get(key) || [];
+    const idx = list.findIndex(s => s.id === activeStudentId);
+    if (idx >= 0) {
+        list[idx] = { ...list[idx], full_name: fullName, birth_year: Number.isFinite(birthYear) ? birthYear : null, support_notes: supportNotes, updated_at: new Date().toISOString() };
+        await DB.set(key, list);
     }
 
+    updateBtn.disabled = false;
     statusEl.textContent = 'Öğrenci bilgileri güncellendi.';
     await ensureActiveStudent();
     await renderStudentDetailPanel();
@@ -1170,22 +1095,9 @@ function hasSessionActivity() {
 async function loadReportHistory() {
     const userId = await getCurrentUserId();
     if (!userId) return [];
-
-    let query = supabaseClient
-        .from('session_history')
-        .select('*')
-        .eq('user_id', userId)
-        .order('created_at', { ascending: false })
-        .limit(180);
-    if (activeStudentId) query = query.eq('student_id', activeStudentId);
-    const { data, error } = await query;
-
-    if (error) {
-        console.error('Supabase rapor geçmişi okunamadı:', error);
-        return [];
-    }
-
-    return (data || []).map(mapHistoryRow);
+    const all = await DB.get('session_history_' + userId) || [];
+    const data = activeStudentId ? all.filter(h => h.student_id === activeStudentId) : all;
+    return data.slice(0, 180).map(mapHistoryRow);
 }
 
 async function persistSessionSnapshot() {
@@ -1203,14 +1115,13 @@ async function persistSessionSnapshot() {
     const totalTurns = sessionData.therapyTurns.length + sessionData.storyChoices.length + sessionData.micUsedInStory;
     const snapshot = buildSessionSnapshot(userId, durationMin, totalMic, storyPct, totalTurns);
 
-    const { error } = await supabaseClient
-        .from('session_history')
-        .upsert(snapshot, { onConflict: 'id' });
-
-    if (error) {
-        console.error('Supabase rapor geçmişi kaydedilemedi:', error);
-        return [];
-    }
+    const key = 'session_history_' + userId;
+    const history = await DB.get(key) || [];
+    const idx = history.findIndex(h => h.id === snapshot.id);
+    if (idx >= 0) history[idx] = snapshot;
+    else history.unshift(snapshot);
+    if (history.length > 180) history.splice(180);
+    await DB.set(key, history);
 
     sessionData.reportEntryId = snapshot.id;
     return loadReportHistory();
@@ -2608,111 +2519,6 @@ function showStatus(msg, type) {
     else status.style.color = '#555';
 }
 
-// ozel-egitim-main/script.js
-
-// --- AUTH FONKSİYONLARI ---
-async function handleAuth() {
-    const email = document.getElementById('emailInput').value.trim();
-    const password = document.getElementById('passwordInput').value;
-    const displayName = document.getElementById('nameInput').value.trim();
-    const role = document.getElementById('roleInput').value;
-    const authBtn = document.getElementById('mainAuthBtn');
-
-    if (!email || !password) {
-        showStatus("Lütfen tüm alanları doldur!", "error");
-        return;
-    }
-
-    if (authMode === 'register' && !displayName) {
-        showStatus("Lütfen çocuğun adını da yaz!", "error");
-        return;
-    }
-
-    showStatus("İşlem yapılıyor...", "info");
-    authBtn.disabled = true;
-
-    try {
-        if (authMode === 'register') {
-            const { error } = await supabaseClient.auth.signUp({
-                email,
-                password,
-                options: {
-                    data: { display_name: displayName, role: role },
-                    emailRedirectTo: window.location.origin
-                }
-            });
-            
-            authBtn.disabled = false;
-            if (error) throw error;
-            
-            showStatus("Kayıt başarılı! Lütfen e-posta kutunu kontrol et ve onay linkine tıkla.", "success");
-        } else {
-            const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-            
-            authBtn.disabled = false;
-            if (error) throw error;
-            
-            showStatus("Giriş başarılı! Yükleniyor...", "success");
-            childName = getChildNameFromUser(data.user);
-            currentUserEmail = data.user.email || '';
-            currentUserRole = getUserRoleFromUser(data.user);
-
-            setTimeout(() => startApp(true), 800);
-        }
-    } catch (e) {
-        authBtn.disabled = false;
-        showStatus(turkishAuthError(e.message), "error");
-    }
-}
-
-// Şifremi Unuttum Fonksiyonu
-async function resetPassword() {
-    const email = document.getElementById('emailInput').value.trim();
-    if (!email) {
-        showStatus("Lütfen şifre sıfırlama linki için e-posta adresini yaz! 📧", "error");
-        return;
-    }
-    
-    showStatus("Sıfırlama linki gönderiliyor... ⏳", "info");
-    const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
-        redirectTo: window.location.origin,
-    });
-    
-    if (error) {
-        showStatus("❌ Hata: " + turkishAuthError(error.message), "error");
-    } else {
-        showStatus("📧 Şifre sıfırlama maili gönderildi! Kutunu kontrol et.", "success");
-    }
-}
-
-// window exportlarına ekle
-window.resetPassword = resetPassword;
-function turkishAuthError(msg) {
-    if (msg.includes('Invalid login credentials')) return 'E-posta veya şifre yanlış!';
-    if (msg.includes('Email not confirmed')) return 'E-posta adresin henüz doğrulanmamış. Gelen kutunu kontrol et!';
-    if (msg.includes('User already registered')) return 'Bu e-posta zaten kayıtlı! Giriş yapmayı dene.';
-    if (msg.includes('Password should be')) return 'Şifre en az 6 karakter olmalı!';
-    if (msg.includes('Unable to validate email')) return 'Geçerli bir e-posta adresi gir!';
-    if (msg.includes('Network')) return 'İnternet bağlantını kontrol et!';
-    return msg;
-}
-
-async function saveSessionToDatabase(type, turns, evaluation) {
-    const { data: { user } } = await supabase.auth.getUser();
-    
-    if (user) {
-        const { error } = await supabase
-            .from('user_sessions')
-            .insert([{ 
-                user_id: user.id, 
-                session_type: type, 
-                total_turns: turns, 
-                ai_evaluation: evaluation 
-            }]);
-            
-        if (error) console.error("Veri saklanamadı:", error);
-    }
-}
 
 
 // =============================================
@@ -3469,7 +3275,7 @@ window.openCityLocation = openCityLocation;
 window.goToReport = goToReport;
 window.rec = rec;
 window.loadNext = loadNext;
-window.logout = logout;
+window.logout = authLogout;
 window.openOnboarding = openOnboarding;
 window.openStudentSetup = openStudentSetup;
 window.createStudent = createStudent;
