@@ -3238,6 +3238,7 @@ window.switchAuthTab = switchAuthTab;
 window.handleLogin = handleLogin;
 window.handleRegister = handleRegister;
 window.authLogout = authLogout;
+window.selectRegisterEmoji = selectRegisterEmoji;
 window.openMatchingEditor = openMatchingEditor;
 window.closeMatchingEditor = closeMatchingEditor;
 window.switchEditorTab = switchEditorTab;
@@ -3302,16 +3303,37 @@ function onAuthSuccess() {
     const prevUser = localStorage.getItem('lms_last_user');
     const curUser  = _authUser?.username || '';
     if (prevUser !== curUser) {
-        DB.del('students'); // eski paylaşılan anahtar
+        DB.del('students');
         activeStudentId   = null;
         activeStudentName = '';
-        localStorage.setItem('lms_last_user', curUser);
     }
-
-    const greetEl = document.getElementById('menu-greeting');
-    if (greetEl) greetEl.textContent = `Merhaba, ${_authUser?.displayName || ''}! 🌟`;
     initLoginScreen();
     showOnly('login-screen');
+}
+
+function onAuthSuccessWithStudent(student) {
+    const nameEl = document.getElementById('active-student-name');
+    if (nameEl) nameEl.textContent = student.name;
+    const greetEl = document.getElementById('menu-greeting');
+    if (greetEl) greetEl.textContent = `Merhaba, ${student.name}! 🌟`;
+    showOnly('menu-screen');
+    renderCityScene();
+}
+
+function renderRegisterEmojiPicker() {
+    const wrap = document.getElementById('regEmojiPicker');
+    if (!wrap) return;
+    wrap.innerHTML = STUDENT_EMOJIS.map(em => `
+        <button type="button" class="emoji-pick-btn${em === '🌟' ? ' selected' : ''}"
+            onclick="selectRegisterEmoji('${em}')">${em}</button>
+    `).join('');
+}
+
+function selectRegisterEmoji(em) {
+    document.getElementById('regStudentEmoji').value = em;
+    document.querySelectorAll('#regEmojiPicker .emoji-pick-btn').forEach(b => {
+        b.classList.toggle('selected', b.textContent === em);
+    });
 }
 
 function switchAuthTab(mode) {
@@ -3321,6 +3343,7 @@ function switchAuthTab(mode) {
     document.getElementById('tabLogin').classList.toggle('active',    mode === 'login');
     document.getElementById('tabRegister').classList.toggle('active', mode === 'register');
     document.getElementById('authError').textContent = '';
+    if (mode === 'register') renderRegisterEmojiPicker();
 }
 
 function setAuthLoading(loading) {
@@ -3351,15 +3374,28 @@ async function handleLogin(e) {
     _authUser  = { username: username.toLowerCase(), displayName: res.displayName };
     DB.set(authStorageKey(), _authToken);
     DB.set(authUserStorageKey(), _authUser);
-    onAuthSuccess();
+    localStorage.setItem('lms_last_user', _authUser.username);
+
+    // Öğrenci varsa direkt menüye, yoksa öğrenci seçim ekranına
+    const students = await loadStudents();
+    if (students.length > 0) {
+        const student = students[0];
+        activeStudentId   = student.id;
+        activeStudentName = student.name;
+        onAuthSuccessWithStudent(student);
+    } else {
+        onAuthSuccess();
+    }
 }
 
 async function handleRegister(e) {
     e.preventDefault();
-    const username  = document.getElementById('regUsername').value.trim();
-    const password  = document.getElementById('regPassword').value;
-    const password2 = document.getElementById('regPassword2').value;
-    if (!username || !password) return showAuthError('Tüm alanları doldurun');
+    const username    = document.getElementById('regUsername').value.trim();
+    const password    = document.getElementById('regPassword').value;
+    const password2   = document.getElementById('regPassword2').value;
+    const studentName = document.getElementById('regStudentName').value.trim();
+    const emoji       = document.getElementById('regStudentEmoji').value || '🌟';
+    if (!username || !password || !studentName) return showAuthError('Tüm alanları doldurun');
     if (password !== password2) return showAuthError('Şifreler uyuşmuyor');
     if (password.length < 6) return showAuthError('Şifre en az 6 karakter olmalı');
     setAuthLoading(true);
@@ -3375,7 +3411,14 @@ async function handleRegister(e) {
     _authUser  = { username: username.toLowerCase(), displayName: res.displayName };
     DB.set(authStorageKey(), _authToken);
     DB.set(authUserStorageKey(), _authUser);
-    onAuthSuccess();
+
+    // Öğrenciyi hemen oluştur ve menüye git
+    const student = { id: 'st_' + Date.now(), name: studentName, emoji, createdAt: new Date().toISOString() };
+    await saveStudents([student]);
+    activeStudentId   = student.id;
+    activeStudentName = student.name;
+    localStorage.setItem('lms_last_user', _authUser.username);
+    onAuthSuccessWithStudent(student);
 }
 
 async function authLogout() {

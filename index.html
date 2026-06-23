@@ -60,6 +60,15 @@
                 <input type="password" id="regPassword2" autocomplete="new-password"
                     placeholder="••••••" required>
             </div>
+            <div class="auth-field">
+                <label>Öğrencinin Adı</label>
+                <input type="text" id="regStudentName" placeholder="örn: Ali" required>
+            </div>
+            <div class="auth-field">
+                <label>Öğrenci Emojisi</label>
+                <div class="auth-emoji-picker" id="regEmojiPicker"></div>
+                <input type="hidden" id="regStudentEmoji" value="🌟">
+            </div>
             <button type="submit" class="auth-submit-btn" id="registerBtn">Kayıt Ol</button>
         </form>
 
@@ -271,10 +280,13 @@
         </button>
     </div>
 
-    <!-- Alt çubuk: çıkış -->
+    <!-- Alt çubuk -->
     <div class="menu-bottom-bar">
-        <button type="button" class="menu-logout-btn" onclick="goToLogin()">
-            ⬅ Çıkış (Öğrenci Değiştir)
+        <button type="button" class="menu-student-btn" onclick="goToLogin()">
+            👤 Öğrenci Değiştir
+        </button>
+        <button type="button" class="menu-logout-btn" onclick="authLogout()">
+            Çıkış Yap
         </button>
     </div>
 

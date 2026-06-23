@@ -4209,14 +4209,25 @@ body.a11y-reduce-motion * { transition: none !important; animation: none !import
 .icon-btn-teacher:hover { background: rgba(255,255,255,0.32); }
 .menu-bottom-bar {
     width: 100%; padding: 0 20px 8px;
-    display: flex; justify-content: center;
+    display: flex; justify-content: center; gap: 10px;
 }
-.menu-logout-btn {
+.menu-logout-btn, .menu-student-btn {
     background: none; border: 2px solid #dde3ee; border-radius: 14px;
-    padding: 10px 24px; font-size: 0.82rem; font-weight: 700; color: #7a8fa8;
+    padding: 10px 20px; font-size: 0.82rem; font-weight: 700; color: #7a8fa8;
     cursor: pointer; transition: all 0.18s;
 }
-.menu-logout-btn:hover { border-color: #a8c8ff; color: #1a2f4a; }
+.menu-logout-btn:hover { border-color: #ffb3b3; color: #c0392b; }
+.menu-student-btn:hover { border-color: #a8c8ff; color: #1a2f4a; }
+.auth-emoji-picker {
+    display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px;
+}
+.auth-emoji-picker .emoji-pick-btn {
+    background: #f4f6fb; border: 2px solid transparent; border-radius: 10px;
+    width: 38px; height: 38px; font-size: 1.3rem; cursor: pointer; transition: all 0.15s;
+}
+.auth-emoji-picker .emoji-pick-btn.selected {
+    border-color: #6c5ce7; background: #ebe9ff;
+}
 
 /* ======================================================
    IEP HEDEFLERİ
