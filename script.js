@@ -3,33 +3,11 @@ function escapeHtml(str) {
     return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 
-// Supabase kaldırıldı — auth ve veri Vercel KV üzerinde (api/auth.js + db-client.js)
-var supabaseClient = (() => {
-    const empty = Promise.resolve({ data: [], error: null });
-    function chain() {
-        const p = Promise.resolve({ data: [], error: null });
-        ['select','eq','neq','order','limit','upsert','update','insert','delete'].forEach(m => { p[m] = () => chain(); });
-        return p;
-    }
-    return {
-        auth: {
-            getSession:          async () => ({ data: { session: null }, error: null }),
-            getUser:             async () => ({ data: { user: null },    error: null }),
-            signOut:             async () => ({ error: null }),
-            signInWithPassword:  async () => ({ data: null, error: { message: 'Devre dışı' } }),
-            signUp:              async () => ({ data: null, error: { message: 'Devre dışı' } }),
-            resetPasswordForEmail: async () => ({ error: null }),
-            onAuthStateChange:   () => ({ data: { subscription: { unsubscribe: () => {} } } }),
-        },
-        from: () => chain(),
-    };
-})();
 // =============================================
 // GENEL DEĞİŞKENLER
 // =============================================
 let childName = "";
 let appStarted = false;
-let currentUserEmail = "";
 let currentUserRole = "parent";
 let currentScreenId = 'start-screen';
 let currentMenuSection = 'overview';
@@ -223,16 +201,12 @@ function showOnly(id) {
     }
 }
 
-function getOnboardingStorageKey() {
-    return currentUserEmail ? `onboarding_seen_${currentUserEmail}` : '';
-}
-
 function updateMenuIdentity() {
     const emailEl = document.getElementById('account-email');
     const studentEl = document.getElementById('active-student-name');
     if (emailEl) {
         const roleLabel = currentUserRole === 'specialist' ? 'Uzman' : 'Veli';
-        emailEl.textContent = currentUserEmail ? `${currentUserEmail} • ${roleLabel}` : 'Misafir';
+        emailEl.textContent = (_authUser && _authUser.displayName) ? `${_authUser.displayName} • ${roleLabel}` : 'Misafir';
     }
     if (studentEl) {
         studentEl.textContent = activeStudentName || 'Öğrenci seç';
@@ -247,16 +221,6 @@ function openOnboarding() {
     if (!panel) return;
 
     panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
-}
-
-function dismissOnboarding(persistPreference) {
-    const panel = document.getElementById('onboarding-panel');
-    if (panel) panel.style.display = 'none';
-
-    if (persistPreference) {
-        const storageKey = getOnboardingStorageKey();
-        if (storageKey) localStorage.setItem(storageKey, '1');
-    }
 }
 
 async function startApp(resetSession) {
@@ -1101,7 +1065,7 @@ async function loadReportHistory() {
 }
 
 async function persistSessionSnapshot() {
-    if (!currentUserEmail || !hasSessionActivity()) return loadReportHistory();
+    if (!hasSessionActivity()) return loadReportHistory();
 
     const userId = await getCurrentUserId();
     if (!userId) return [];
@@ -2475,53 +2439,6 @@ async function speakWithLipsync(text, onEnd, emotion = CharacterEmotion.NEUTRAL)
 }
 
 // =============================================
-// AUTH FONKSİYONLARI
-// =============================================
-let authMode = 'login';
-
-function switchAuth(mode) {
-    authMode = mode;
-    const nameField = document.getElementById('nameField');
-    const roleField = document.getElementById('roleField');
-    const forgotLink = document.getElementById('forgot-link');
-    const loginTab = document.getElementById('tab-login');
-    const registerTab = document.getElementById('tab-register');
-    const btnText = document.getElementById('btnText');
-    const title = document.getElementById('auth-main-title');
-    const subTitle = document.querySelector('.auth-sub');
-
-    if (mode === 'login') {
-        roleField.style.display = 'none';
-        nameField.style.display = 'none';    // İsmi gizle
-        forgotLink.style.display = 'block';  // Şifremi unuttumu göster
-        loginTab.classList.add('active');
-        registerTab.classList.remove('active');
-        title.innerText = "Hoş Geldin!";
-        subTitle.innerText = "Öğrenme yolculuğuna başlamak için giriş yap.";
-        btnText.innerText = "Giriş Yap";
-    } else {
-        roleField.style.display = 'block';
-        nameField.style.display = 'block';   // İsmi göster
-        forgotLink.style.display = 'none';   // Şifremi unuttumu gizle
-        registerTab.classList.add('active');
-        loginTab.classList.remove('active');
-        title.innerText = "Yeni Hesap";
-        subTitle.innerText = "Yıldız Can dünyasına katılmak için kayıt ol.";
-        btnText.innerText = "Kayıt Ol";
-    }
-}
-
-function showStatus(msg, type) {
-    const status = document.getElementById('auth-status');
-    status.innerText = msg;
-    if (type === 'error') status.style.color = '#ff4757';
-    else if (type === 'success') status.style.color = '#2ed573';
-    else status.style.color = '#555';
-}
-
-
-
-// =============================================
 // GÜNLÜK PROGRAM (SCHEDULE)
 // =============================================
 // Activities (the list itself) are per-student and persist across days.
@@ -3265,7 +3182,6 @@ document.addEventListener('DOMContentLoaded', function() {
 // =============================================
 // WINDOW EXPORT (HTML onclick için)
 // =============================================
-// switchAuth / handleAuth kaldırıldı (eski Supabase kodu)
 window.goToMenu = goToMenu;
 window.goToTherapy = goToTherapy;
 window.setTherapyCategory = setTherapyCategory;
