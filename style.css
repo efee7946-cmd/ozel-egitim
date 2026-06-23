@@ -4664,10 +4664,38 @@ body.a11y-reduce-motion * { transition: none !important; animation: none !import
     cursor: pointer; transition: opacity .2s;
 }
 .bep-save-btn:hover { opacity: .88; }
-.bep-save-status {
-    margin-left: 12px; font-size: 0.85rem;
-    color: #00b894; font-weight: 600;
+.bep-profile-row {
+    display: flex; gap: 10px; padding: 5px 0;
+    border-bottom: 1px solid #f0f2f8; font-size: 0.88rem;
 }
+.bep-profile-row:last-child { border-bottom: none; }
+.bep-profile-key { color: #8892a4; min-width: 60px; font-weight: 600; }
+.bep-profile-val { color: #2d3a5c; font-weight: 500; }
+
+/* Kayıt formu — kademe & tanı */
+.reg-level-group {
+    display: flex; flex-direction: column; gap: 6px; margin-top: 4px;
+}
+.reg-level-opt {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 0.85rem; color: #2d3a5c; cursor: pointer;
+}
+.reg-level-opt input[type="radio"] { accent-color: #6c5ce7; }
+.reg-condition-chips {
+    display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px;
+}
+.reg-chip {
+    display: flex; align-items: center; gap: 5px;
+    background: #f0f2f8; border-radius: 14px;
+    padding: 5px 11px; font-size: 0.8rem; font-weight: 600;
+    color: #5a6a8a; cursor: pointer; transition: background .15s, color .15s;
+    user-select: none;
+}
+.reg-chip:has(input:checked) {
+    background: #ebe9ff; color: #6c5ce7;
+}
+.reg-chip input[type="checkbox"] { display: none; }
+
 .analysis-session-row {
     display: flex; align-items: center; gap: 10px;
     padding: 9px 0; border-bottom: 1px solid #f0f2f8;

@@ -75,6 +75,36 @@
                 <div class="auth-emoji-picker" id="regEmojiPicker"></div>
                 <input type="hidden" id="regStudentEmoji" value="🌟">
             </div>
+            <div class="auth-field">
+                <label>Eğitim Kademesi</label>
+                <div class="reg-level-group">
+                    <label class="reg-level-opt">
+                        <input type="radio" name="regLevel" value="ogreti">
+                        <span>Hafif – Öğretilebilir</span>
+                    </label>
+                    <label class="reg-level-opt">
+                        <input type="radio" name="regLevel" value="egit" checked>
+                        <span>Orta – Eğitilebilir</span>
+                    </label>
+                    <label class="reg-level-opt">
+                        <input type="radio" name="regLevel" value="destekli">
+                        <span>Ağır/İleri – Desteklenen</span>
+                    </label>
+                </div>
+            </div>
+            <div class="auth-field">
+                <label>Tanı / Eşlik Eden Durumlar</label>
+                <div class="reg-condition-chips">
+                    <label class="reg-chip"><input type="checkbox" class="reg-cond" value="osb"> OSB</label>
+                    <label class="reg-chip"><input type="checkbox" class="reg-cond" value="dehb"> DEHB</label>
+                    <label class="reg-chip"><input type="checkbox" class="reg-cond" value="dil"> Dil / Konuşma</label>
+                    <label class="reg-chip"><input type="checkbox" class="reg-cond" value="down"> Down Sendromu</label>
+                    <label class="reg-chip"><input type="checkbox" class="reg-cond" value="cp"> Serebral Palsi</label>
+                    <label class="reg-chip"><input type="checkbox" class="reg-cond" value="oog"> Öz. Öğrenme Güçlüğü</label>
+                    <label class="reg-chip"><input type="checkbox" class="reg-cond" value="ekolali"> Ekolali</label>
+                    <label class="reg-chip"><input type="checkbox" class="reg-cond" value="stereotipik"> Stereotipik Hareket</label>
+                </div>
+            </div>
             <button type="submit" class="auth-submit-btn" id="registerBtn">Kayıt Ol</button>
         </form>
 
@@ -674,45 +704,8 @@ document.addEventListener('DOMContentLoaded', function(){
         <h2 class="analysis-title">📊 BEP Analiz</h2>
         <div class="analysis-student-badge" id="analysisStudentBadge"></div>
 
-        <!-- Öğrenci Profili -->
-        <div class="bep-section">
-            <h3 class="bep-section-title">Öğrenci Profili</h3>
-
-            <div class="bep-field-label">Eğitim Kademesi</div>
-            <div class="bep-radio-group">
-                <label class="bep-radio">
-                    <input type="radio" name="bepCategory" value="ogreti">
-                    <span>Hafif Düzey – Öğretilebilir</span>
-                </label>
-                <label class="bep-radio">
-                    <input type="radio" name="bepCategory" value="egit">
-                    <span>Orta Düzey – Eğitilebilir</span>
-                </label>
-                <label class="bep-radio">
-                    <input type="radio" name="bepCategory" value="destekli">
-                    <span>Ağır/İleri – Desteklenen</span>
-                </label>
-            </div>
-
-            <div class="bep-field-label" style="margin-top:14px">Eşlik Eden Durumlar</div>
-            <div class="bep-checkbox-group">
-                <label class="bep-check">
-                    <input type="checkbox" class="bep-condition-check" value="ekolali">
-                    <span>Ekolali</span>
-                </label>
-                <label class="bep-check">
-                    <input type="checkbox" class="bep-condition-check" value="stereotipik">
-                    <span>Stereotipik Hareketler</span>
-                </label>
-                <label class="bep-check">
-                    <input type="checkbox" class="bep-condition-check" value="dehb">
-                    <span>DEHB / Anksiyete</span>
-                </label>
-            </div>
-
-            <button class="bep-save-btn" onclick="saveBepProfile()">Kaydet</button>
-            <span class="bep-save-status" id="bepSaveStatus"></span>
-        </div>
+        <!-- Öğrenci Profili Özeti -->
+        <div class="bep-section" id="bepProfileSummary"></div>
 
         <!-- Son Seanslar -->
         <div class="bep-section">

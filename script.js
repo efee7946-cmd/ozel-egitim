@@ -3462,6 +3462,11 @@ async function handleRegister(e) {
     DB.set(authStorageKey(), _authToken);
     DB.set(authUserStorageKey(), _authUser);
 
+    // BEP profilini kaydet
+    const level = document.querySelector('input[name="regLevel"]:checked')?.value || 'egit';
+    const conditions = [...document.querySelectorAll('.reg-cond:checked')].map(c => c.value);
+    await DB.set('bep_profile_' + username.toLowerCase(), { category: level, conditions });
+
     // Öğrenciyi hemen oluştur ve menüye git
     const student = { id: 'st_' + Date.now(), name: studentName, emoji, createdAt: new Date().toISOString() };
     await saveStudents([student]);
@@ -3589,44 +3594,46 @@ function goToLogin() {
 // =============================================
 // ANALİZ / BEP EKRANI
 // =============================================
+const BEP_CATEGORY_LABELS = {
+    ogreti: 'Hafif Düzey – Öğretilebilir',
+    egit:   'Orta Düzey – Eğitilebilir',
+    destekli: 'Ağır/İleri – Desteklenen'
+};
+const BEP_CONDITION_LABELS = {
+    osb: 'OSB', dehb: 'DEHB', dil: 'Dil / Konuşma',
+    down: 'Down Sendromu', cp: 'Serebral Palsi',
+    oog: 'Öz. Öğrenme Güçlüğü', ekolali: 'Ekolali',
+    stereotipik: 'Stereotipik Hareket',
+    // eski değerler uyumluluk için
+    ekolali: 'Ekolali', stereotipik: 'Stereotipik Hareket'
+};
+
 async function goToAnalysis() {
     showOnly('analysis-screen');
 
     const badge = document.getElementById('analysisStudentBadge');
     if (badge) badge.textContent = activeStudentName ? `👤 ${activeStudentName}` : '';
 
-    await loadBepProfile();
+    await renderBepProfileSummary();
     await loadAnalysisSessions();
 }
 
-async function loadBepProfile() {
+async function renderBepProfileSummary() {
+    const el = document.getElementById('bepProfileSummary');
+    if (!el) return;
     const userId = await getCurrentUserId();
-    if (!userId) return;
+    if (!userId) { el.style.display = 'none'; return; }
     const profile = await DB.get('bep_profile_' + userId) || {};
+    if (!profile.category && !(profile.conditions || []).length) { el.style.display = 'none'; return; }
 
-    if (profile.category) {
-        const radio = document.querySelector(`input[name="bepCategory"][value="${profile.category}"]`);
-        if (radio) radio.checked = true;
-    }
-    document.querySelectorAll('.bep-condition-check').forEach(cb => {
-        cb.checked = (profile.conditions || []).includes(cb.value);
-    });
-}
-
-async function saveBepProfile() {
-    const userId = await getCurrentUserId();
-    if (!userId) return;
-
-    const category = document.querySelector('input[name="bepCategory"]:checked')?.value || '';
-    const conditions = [...document.querySelectorAll('.bep-condition-check:checked')].map(c => c.value);
-
-    await DB.set('bep_profile_' + userId, { category, conditions });
-
-    const status = document.getElementById('bepSaveStatus');
-    if (status) {
-        status.textContent = 'Kaydedildi ✓';
-        setTimeout(() => { status.textContent = ''; }, 2000);
-    }
+    const condText = (profile.conditions || [])
+        .map(c => BEP_CONDITION_LABELS[c] || c).join(' · ') || '—';
+    el.style.display = '';
+    el.innerHTML = `
+        <h3 class="bep-section-title">Öğrenci Profili</h3>
+        <div class="bep-profile-row"><span class="bep-profile-key">Kademe</span><span class="bep-profile-val">${BEP_CATEGORY_LABELS[profile.category] || '—'}</span></div>
+        <div class="bep-profile-row"><span class="bep-profile-key">Tanı</span><span class="bep-profile-val">${condText}</span></div>
+    `;
 }
 
 async function loadAnalysisSessions() {
@@ -4173,7 +4180,6 @@ window.selectLoginEmoji = selectLoginEmoji;
 window.createStudentFromLogin = createStudentFromLogin;
 window.selectStudentLogin = selectStudentLogin;
 window.goToAnalysis = goToAnalysis;
-window.saveBepProfile = saveBepProfile;
 window.generateBepReport = generateBepReport;
 window.copyBepReport = copyBepReport;
 window.goToIep = goToIep;
