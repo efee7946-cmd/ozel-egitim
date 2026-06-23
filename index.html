@@ -639,37 +639,71 @@ document.addEventListener('DOMContentLoaded', function(){
     </div>
 </div>
 
-<!-- ===================== ANALİZ EKRANI ===================== -->
+<!-- ===================== ANALİZ / BEP EKRANI ===================== -->
 <div id="analysis-screen">
     <div class="analysis-wrapper">
         <button class="btn-back" onclick="goToMenu()">← Menü</button>
-        <h2 class="analysis-title">📊 Analiz</h2>
-        <div class="analysis-grid">
-            <button class="analysis-card" onclick="goToReport()">
-                <span class="analysis-card-icon">📄</span>
-                <span class="analysis-card-label">Seans Raporu</span>
-                <span class="analysis-card-sub">Geçmiş seans istatistikleri</span>
-            </button>
-            <button class="analysis-card" onclick="goToIep()">
-                <span class="analysis-card-icon">📋</span>
-                <span class="analysis-card-label">IEP Hedefleri</span>
-                <span class="analysis-card-sub">Bireysel eğitim planı</span>
-            </button>
-            <button class="analysis-card" onclick="goToSkills()">
-                <span class="analysis-card-icon">🗺️</span>
-                <span class="analysis-card-label">Beceri Haritası</span>
-                <span class="analysis-card-sub">Kazanım takibi</span>
-            </button>
-            <button class="analysis-card" onclick="goToBehavior()">
-                <span class="analysis-card-icon">📈</span>
-                <span class="analysis-card-label">Davranış Kaydı</span>
-                <span class="analysis-card-sub">Gözlem ve kayıt</span>
-            </button>
-            <button class="analysis-card" onclick="openMatchingEditor()">
-                <span class="analysis-card-icon">✏️</span>
-                <span class="analysis-card-label">Eşleştirme Editörü</span>
-                <span class="analysis-card-sub">Özel oyun oluştur</span>
-            </button>
+        <h2 class="analysis-title">📊 BEP Analiz</h2>
+        <div class="analysis-student-badge" id="analysisStudentBadge"></div>
+
+        <!-- Öğrenci Profili -->
+        <div class="bep-section">
+            <h3 class="bep-section-title">Öğrenci Profili</h3>
+
+            <div class="bep-field-label">Eğitim Kademesi</div>
+            <div class="bep-radio-group">
+                <label class="bep-radio">
+                    <input type="radio" name="bepCategory" value="ogreti">
+                    <span>Hafif Düzey – Öğretilebilir</span>
+                </label>
+                <label class="bep-radio">
+                    <input type="radio" name="bepCategory" value="egit">
+                    <span>Orta Düzey – Eğitilebilir</span>
+                </label>
+                <label class="bep-radio">
+                    <input type="radio" name="bepCategory" value="destekli">
+                    <span>Ağır/İleri – Desteklenen</span>
+                </label>
+            </div>
+
+            <div class="bep-field-label" style="margin-top:14px">Eşlik Eden Durumlar</div>
+            <div class="bep-checkbox-group">
+                <label class="bep-check">
+                    <input type="checkbox" class="bep-condition-check" value="ekolali">
+                    <span>Ekolali</span>
+                </label>
+                <label class="bep-check">
+                    <input type="checkbox" class="bep-condition-check" value="stereotipik">
+                    <span>Stereotipik Hareketler</span>
+                </label>
+                <label class="bep-check">
+                    <input type="checkbox" class="bep-condition-check" value="dehb">
+                    <span>DEHB / Anksiyete</span>
+                </label>
+            </div>
+
+            <button class="bep-save-btn" onclick="saveBepProfile()">Kaydet</button>
+            <span class="bep-save-status" id="bepSaveStatus"></span>
+        </div>
+
+        <!-- Son Seanslar -->
+        <div class="bep-section">
+            <h3 class="bep-section-title">Son Seanslar</h3>
+            <div id="analysisSessionList">
+                <p class="analysis-empty">Yükleniyor...</p>
+            </div>
+        </div>
+
+        <!-- Rapor Butonu -->
+        <button class="bep-report-btn" id="bepReportBtn" onclick="generateBepReport()">
+            📝 BEP Gelişim Raporu Oluştur
+        </button>
+
+        <!-- Rapor Çıktısı -->
+        <div class="bep-report-output" id="bepReportOutput" style="display:none">
+            <div class="bep-report-header">📝 BEP Dönemsel Gelişim Raporu</div>
+            <textarea class="bep-report-text" id="bepReportText" readonly></textarea>
+            <button class="bep-copy-btn" onclick="copyBepReport()">📋 Metni Kopyala</button>
         </div>
     </div>
 </div>

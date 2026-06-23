@@ -3543,10 +3543,144 @@ function goToLogin() {
 }
 
 // =============================================
-// ANALİZ EKRANI
+// ANALİZ / BEP EKRANI
 // =============================================
-function goToAnalysis() {
+async function goToAnalysis() {
     showOnly('analysis-screen');
+
+    const badge = document.getElementById('analysisStudentBadge');
+    if (badge) badge.textContent = activeStudentName ? `👤 ${activeStudentName}` : '';
+
+    await loadBepProfile();
+    await loadAnalysisSessions();
+}
+
+async function loadBepProfile() {
+    const userId = await getCurrentUserId();
+    if (!userId) return;
+    const profile = await DB.get('bep_profile_' + userId) || {};
+
+    if (profile.category) {
+        const radio = document.querySelector(`input[name="bepCategory"][value="${profile.category}"]`);
+        if (radio) radio.checked = true;
+    }
+    document.querySelectorAll('.bep-condition-check').forEach(cb => {
+        cb.checked = (profile.conditions || []).includes(cb.value);
+    });
+}
+
+async function saveBepProfile() {
+    const userId = await getCurrentUserId();
+    if (!userId) return;
+
+    const category = document.querySelector('input[name="bepCategory"]:checked')?.value || '';
+    const conditions = [...document.querySelectorAll('.bep-condition-check:checked')].map(c => c.value);
+
+    await DB.set('bep_profile_' + userId, { category, conditions });
+
+    const status = document.getElementById('bepSaveStatus');
+    if (status) {
+        status.textContent = 'Kaydedildi ✓';
+        setTimeout(() => { status.textContent = ''; }, 2000);
+    }
+}
+
+async function loadAnalysisSessions() {
+    const list = document.getElementById('analysisSessionList');
+    if (!list) return;
+
+    const history = await loadReportHistory();
+    if (!history.length) {
+        list.innerHTML = '<p class="analysis-empty">Henüz kayıtlı seans yok.</p>';
+        return;
+    }
+
+    list.innerHTML = history.slice(0, 10).map(h => `
+        <div class="analysis-session-row">
+            <span class="analysis-session-date">${formatHistoryDate(h.dateKey)}</span>
+            <span class="analysis-session-module">Konuşma Terapisi</span>
+            <span class="analysis-session-stat">${h.durationMin} dk · ${h.totalTurns} yanıt</span>
+        </div>
+    `).join('');
+}
+
+async function generateBepReport() {
+    const btn = document.getElementById('bepReportBtn');
+    const output = document.getElementById('bepReportOutput');
+    const textEl = document.getElementById('bepReportText');
+
+    btn.disabled = true;
+    btn.textContent = '⏳ Rapor hazırlanıyor...';
+
+    const userId = await getCurrentUserId();
+    const profile = await DB.get('bep_profile_' + userId) || {};
+    const history = await loadReportHistory();
+
+    const categoryLabels = {
+        ogreti: 'Hafif Düzey (Öğretilebilir)',
+        egit: 'Orta Düzey (Eğitilebilir)',
+        destekli: 'Ağır/İleri Düzey (Desteklenen)'
+    };
+    const conditionLabels = { ekolali: 'Ekolali', stereotipik: 'Stereotipik Hareketler', dehb: 'DEHB / Anksiyete' };
+
+    const profileText = `Öğrenci Adı: ${activeStudentName || 'Belirtilmemiş'}
+Eğitim Kademesi: ${categoryLabels[profile.category] || 'Belirtilmemiş'}
+Eşlik Eden Durumlar: ${(profile.conditions || []).map(c => conditionLabels[c] || c).join(', ') || 'Yok'}`;
+
+    const sessionText = history.slice(0, 10).map(h =>
+        `• ${formatHistoryDate(h.dateKey)}: ${h.durationMin} dakika, ${h.totalTurns} yanıt, ${h.totalMic} mikrofon kullanımı`
+    ).join('\n') || 'Kayıtlı seans verisi yok.';
+
+    const systemPrompt = `Sen özel eğitim kurumları ve RAM için çalışan uzman bir BEP (Bireyselleştirilmiş Eğitim Programı) hazırlama asistanısın. Görevin, sana ham olarak verilen öğrenci etkileşim verilerini resmi bir "Gelişim Özet Raporu"na dönüştürmektir.
+
+YAZIM KURALLARI:
+1. Kesinlikle "Tıbbi Model" dili kullanma. "Sosyal Model" dilini esas al: toplumsal katılım, akran etkileşimi ve sosyal uyum odaklı yaz.
+2. Eğer öğrencide "Ekolali" veya "Stereotipik hareket" varsa, yapay zekanın sönümlendirme ve bağımsızlaştırma etkisini vurgula.
+3. Çıktıyı doğrudan MEB BEP dosyalarına kopyalanabilecek resmi, gözlemlenebilir ve performans odaklı cümlelerle kur.
+4. Raporu Türkçe yaz. 300-400 kelime arası tut.`;
+
+    const userPrompt = `Aşağıdaki öğrenci profili ve seans verilerini kullanarak resmi bir BEP Dönemsel Gelişim Raporu oluştur:
+
+ÖĞRENCİ PROFİLİ:
+${profileText}
+
+SON SEANSLAR (${Math.min(history.length, 10)} seans):
+${sessionText}
+
+Raporu "📝 Bireyselleştirilmiş Eğitim Programı (BEP) Dönemsel Gelişim Raporu" başlığıyla başlat. Öğrenci Kademesi, Gelişim Özeti ve Sonraki Dönem Hedefleri bölümlerini içersin.`;
+
+    try {
+        const res = await fetch('/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                system_instruction: { parts: [{ text: systemPrompt }] },
+                contents: [{ role: 'user', parts: [{ text: userPrompt }] }]
+            }),
+            signal: AbortSignal.timeout(30000)
+        });
+
+        const data = await res.json();
+        const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || 'Rapor oluşturulamadı. Gemini API yanıt vermedi.';
+        textEl.value = text;
+        output.style.display = 'flex';
+        output.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } catch (err) {
+        textEl.value = 'Hata: ' + err.message;
+        output.style.display = 'flex';
+    }
+
+    btn.disabled = false;
+    btn.textContent = '📝 BEP Gelişim Raporu Oluştur';
+}
+
+function copyBepReport() {
+    const text = document.getElementById('bepReportText').value;
+    navigator.clipboard.writeText(text).then(() => {
+        const btn = document.querySelector('.bep-copy-btn');
+        btn.textContent = '✓ Kopyalandı!';
+        setTimeout(() => { btn.textContent = '📋 Metni Kopyala'; }, 2000);
+    });
 }
 
 // =============================================
@@ -3995,6 +4129,9 @@ window.selectLoginEmoji = selectLoginEmoji;
 window.createStudentFromLogin = createStudentFromLogin;
 window.selectStudentLogin = selectStudentLogin;
 window.goToAnalysis = goToAnalysis;
+window.saveBepProfile = saveBepProfile;
+window.generateBepReport = generateBepReport;
+window.copyBepReport = copyBepReport;
 window.goToIep = goToIep;
 window.iepBack = iepBack;
 window.showIepGoalForm = showIepGoalForm;

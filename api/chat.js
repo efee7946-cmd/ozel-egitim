@@ -6,15 +6,18 @@ export default async function handler(req, res) {
         return res.status(405).json({ error: 'Sadece POST isteği atılabilir.' });
     }
 
-    const { contents } = req.body;
-    
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=${GEMINI_KEY}`;
+    const { contents, system_instruction } = req.body;
+
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=${GEMINI_KEY}`;
+
+    const requestBody = { contents };
+    if (system_instruction) requestBody.system_instruction = system_instruction;
 
     try {
         const response = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ contents })
+            body: JSON.stringify(requestBody)
         });
 
         const data = await response.json();
