@@ -4211,13 +4211,12 @@ body.a11y-reduce-motion * { transition: none !important; animation: none !import
     width: 100%; padding: 0 20px 8px;
     display: flex; justify-content: center; gap: 10px;
 }
-.menu-logout-btn, .menu-student-btn {
+.menu-logout-btn {
     background: none; border: 2px solid #dde3ee; border-radius: 14px;
     padding: 10px 20px; font-size: 0.82rem; font-weight: 700; color: #7a8fa8;
     cursor: pointer; transition: all 0.18s;
 }
 .menu-logout-btn:hover { border-color: #ffb3b3; color: #c0392b; }
-.menu-student-btn:hover { border-color: #a8c8ff; color: #1a2f4a; }
 .auth-emoji-picker {
     display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px;
 }
