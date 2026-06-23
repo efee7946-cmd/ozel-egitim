@@ -9,8 +9,10 @@ let _pool = null;
 function getPool() {
     if (!_pool) {
         if (!process.env.DATABASE_URL) throw new Error('DATABASE_URL tanımlı değil');
+        // sslmode parametresini URL'den çıkar — SSL'i aşağıda direkt yapılandırıyoruz
+        const connectionString = process.env.DATABASE_URL.replace(/([?&])sslmode=[^&]*/g, '$1').replace(/[?&]$/, '');
         _pool = new Pool({
-            connectionString: process.env.DATABASE_URL,
+            connectionString,
             ssl: { rejectUnauthorized: false },
             max: 3,
             idleTimeoutMillis: 20000,
