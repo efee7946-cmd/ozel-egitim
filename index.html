@@ -313,7 +313,12 @@ document.addEventListener('DOMContentLoaded', function(){
             <button onclick="rereadQuestion()" class="btn-reread" title="Tekrar Dinle">🔊</button>
         </div>
         <div class="btns therapy-session-ui">
-            <button onclick="rec()" id="micBtn" class="btn-mic" disabled>🎙️</button>
+            <div class="mic-wrapper">
+                <div class="mic-ring"></div>
+                <div class="mic-ring"></div>
+                <div class="mic-ring"></div>
+                <button onclick="rec()" id="micBtn" class="btn-mic" disabled>🎙️</button>
+            </div>
             <button onclick="loadNext()" id="nextBtn" class="btn-next">➡️</button>
         </div>
         <div id="info" class="therapy-session-ui">Lütfen bekleyin...</div>

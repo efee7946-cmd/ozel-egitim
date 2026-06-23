@@ -1322,7 +1322,26 @@ video { width: 100%; height: 100%; object-fit: cover; }
     box-shadow: 0 8px 24px rgba(76, 175, 80, 0.35);
 }
 .btn-mic:disabled { background: #ccc; opacity: 0.6; cursor: not-allowed; }
-.listening { background: #FF5252 !important; animation: pulse 1s infinite; }
+.listening { background: #FF5252 !important; }
+
+.mic-wrapper {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.mic-ring {
+    position: absolute;
+    width: 100px; height: 100px;
+    border-radius: 50%;
+    border: 3px solid #FF5252;
+    opacity: 0;
+    transform: scale(1);
+    pointer-events: none;
+    will-change: transform, opacity;
+}
+.mic-ring:nth-child(2) { border-color: rgba(255, 82, 82, 0.6); }
+.mic-ring:nth-child(3) { border-color: rgba(255, 82, 82, 0.35); }
 
 .btn-next { 
     width: 70px; height: 70px; border-radius: 20px; border: none; 
@@ -2213,6 +2232,7 @@ video { width: 100%; height: 100%; object-fit: cover; }
     .footer { display: none !important; }
     .question-bar { font-size: 1.1rem; padding: 10px; }
     .btn-mic { width: 70px; height: 70px; font-size: 2.2rem; }
+    .mic-ring { width: 70px; height: 70px; }
     .matching-columns { grid-template-columns: 1fr 1fr; gap: 12px; }
     .matching-card { padding: 14px 10px; font-size: 1rem; min-height: 110px; }
     .matching-label-card { font-size: 1.1rem; }

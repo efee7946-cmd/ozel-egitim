@@ -2369,9 +2369,50 @@ async function rec() {
         });
     }
 
+    var _volStream = null, _volCtx = null, _volFrame = null;
+
+    function _startVolumeRings() {
+        var rings = document.querySelectorAll('.mic-ring');
+        navigator.mediaDevices.getUserMedia({ audio: true, video: false }).then(function(stream) {
+            _volStream = stream;
+            _volCtx = new (window.AudioContext || window.webkitAudioContext)();
+            var source = _volCtx.createMediaStreamSource(stream);
+            var analyser = _volCtx.createAnalyser();
+            analyser.fftSize = 256;
+            source.connect(analyser);
+            var data = new Uint8Array(analyser.frequencyBinCount);
+
+            function tick() {
+                analyser.getByteFrequencyData(data);
+                var sum = 0;
+                for (var i = 0; i < data.length; i++) sum += data[i];
+                var vol = sum / data.length; // 0–128 arası tipik
+                rings.forEach(function(ring, i) {
+                    var scale = 1 + (vol / 128) * (0.55 + i * 0.35);
+                    var opacity = Math.min(vol / 60, 1) * (1 - i * 0.28);
+                    ring.style.transform = 'scale(' + scale + ')';
+                    ring.style.opacity = opacity;
+                });
+                _volFrame = requestAnimationFrame(tick);
+            }
+            tick();
+        }).catch(function() { /* izin reddedildi veya zaten kullanımda — sessizce geç */ });
+    }
+
+    function _stopVolumeRings() {
+        if (_volFrame) { cancelAnimationFrame(_volFrame); _volFrame = null; }
+        if (_volStream) { _volStream.getTracks().forEach(function(t) { t.stop(); }); _volStream = null; }
+        if (_volCtx) { _volCtx.close(); _volCtx = null; }
+        document.querySelectorAll('.mic-ring').forEach(function(r) {
+            r.style.transform = 'scale(1)';
+            r.style.opacity = 0;
+        });
+    }
+
     recognition.onstart = function() {
         document.getElementById('micBtn').classList.add('listening');
         document.getElementById('info').innerText = "Seni dinliyorum... 🎙️";
+        _startVolumeRings();
     };
 
     recognition.onresult = function(e) {
@@ -2395,6 +2436,7 @@ async function rec() {
 
     recognition.onerror = function(err) {
         clearTimeout(_silenceTimer);
+        _stopVolumeRings();
         document.getElementById('micBtn').disabled = false;
         document.getElementById('micBtn').classList.remove('listening');
         if (err.error === 'not-allowed') document.getElementById('info').innerText = "Mikrofon izni gerekli.";
@@ -2407,6 +2449,7 @@ async function rec() {
 
     recognition.onend = function() {
         clearTimeout(_silenceTimer);
+        _stopVolumeRings();
         document.getElementById('micBtn').classList.remove('listening');
         // Buffer'da metin varsa gönder (tarayıcı kendi kapattıysa)
         if (_speechBuffer.trim() && _recognized) {
