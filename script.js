@@ -2312,18 +2312,19 @@ async function rec() {
     document.getElementById('info').innerText = "Dinlemeye hazırlanıyorum...";
     var recognition = new SpeechRecognition();
     recognition.lang = "tr-TR";
-    recognition.interimResults = false;
+    recognition.interimResults = true;   // anlık metin gösterimi için
     recognition.maxAlternatives = 1;
-    recognition.continuous = false;
-    recognition.onstart = function() {
-        document.getElementById('micBtn').classList.add('listening');
-        document.getElementById('info').innerText = "Seni dinliyorum...";
-    };
-    recognition.onresult = async function(e) {
-        var speech = e.results[0][0].transcript;
+    recognition.continuous = true;       // duraksayınca kapanmasın
+    var _speechBuffer = '';
+    var _silenceTimer = null;
+    var _recognized = false;
+
+    async function _finalizeSpeech() {
+        recognition.stop();
+        const speech = _speechBuffer.trim();
+        if (!speech) return;
+        _speechBuffer = '';
         addMessage(speech, "user");
-        sessionData.micUsedInTherapy++;
-        turnCount++;
         if (turnCount >= 7) {
             var final = "Seninle konuşmak harikaydı " + childName + "! Hadi şimdi yeni bir videoya bakalım!";
             addMessage(final, "ai");
@@ -2337,7 +2338,6 @@ async function rec() {
         document.getElementById('info').innerText = "Düşünüyorum...";
         var aiRes = await getGemmaResponse(speech);
         addMessage(aiRes, "ai");
-        // Veriyi kaydet
         const currentLocation = CITY_LOCATIONS[currentCityLocationKey];
         sessionData.therapyTurns.push({
             location: currentLocation ? currentLocation.label : '',
@@ -2355,21 +2355,56 @@ async function rec() {
             resetIdleTimer();
             document.getElementById('info').innerText = "Konuşmak için mikrofona bas!";
         });
+    }
+
+    recognition.onstart = function() {
+        document.getElementById('micBtn').classList.add('listening');
+        document.getElementById('info').innerText = "Seni dinliyorum... 🎙️";
     };
+
+    recognition.onresult = function(e) {
+        clearTimeout(_silenceTimer);
+        var interim = '';
+        for (var i = e.resultIndex; i < e.results.length; i++) {
+            if (e.results[i].isFinal) {
+                _speechBuffer += e.results[i][0].transcript + ' ';
+                _recognized = true;
+            } else {
+                interim = e.results[i][0].transcript;
+            }
+        }
+        // Anlık metni göster — öğrenci duyulduğunu hisseder
+        var display = (_speechBuffer + interim).trim();
+        if (display) document.getElementById('info').innerText = '🎙️ ' + display;
+
+        // 2.5 sn sessizlik sonrası gönder
+        _silenceTimer = setTimeout(_finalizeSpeech, 2500);
+    };
+
     recognition.onerror = function(err) {
+        clearTimeout(_silenceTimer);
         document.getElementById('micBtn').disabled = false;
         document.getElementById('micBtn').classList.remove('listening');
         if (err.error === 'not-allowed') document.getElementById('info').innerText = "Mikrofon izni gerekli.";
-        else if (err.error === 'no-speech') document.getElementById('info').innerText = "Ses algılanamadı, tekrar dene!";
-        else document.getElementById('info').innerText = "Duyamadım, tekrar eder misin?";
+        else if (err.error === 'no-speech') {
+            // Ses gelmedi ama buffer'da bir şey varsa gönder
+            if (_speechBuffer.trim()) { _finalizeSpeech(); return; }
+            document.getElementById('info').innerText = "Sesi duymadım, tekrar dene!";
+        } else document.getElementById('info').innerText = "Duyamadım, tekrar eder misin?";
     };
+
     recognition.onend = function() {
+        clearTimeout(_silenceTimer);
         document.getElementById('micBtn').classList.remove('listening');
-        if (document.getElementById('micBtn').disabled && isWaiting) {
+        // Buffer'da metin varsa gönder (tarayıcı kendi kapattıysa)
+        if (_speechBuffer.trim() && _recognized) {
+            _finalizeSpeech();
+        } else if (document.getElementById('micBtn').disabled && isWaiting) {
             document.getElementById('micBtn').disabled = false;
             document.getElementById('info').innerText = "Konuşmak için mikrofona bas!";
         }
     };
+
     try { recognition.start(); } catch(e) {
         document.getElementById('micBtn').disabled = false;
         document.getElementById('info').innerText = "Tekrar dene!";
