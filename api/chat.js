@@ -8,7 +8,7 @@ export default async function handler(req, res) {
 
     const { contents, system_instruction } = req.body;
 
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=${GEMINI_KEY}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=${GEMINI_KEY}`;
 
     const requestBody = { contents };
     if (system_instruction) requestBody.system_instruction = system_instruction;
