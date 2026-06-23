@@ -28,6 +28,8 @@ const sessionData = {
     micUsedInTherapy: 0,
     repeatUsed: 0,
     simplifyUsed: 0,
+    simplifyByCategory: {},
+    noResponseByCategory: {},
     reportEntryId: null,
 };
 
@@ -263,6 +265,8 @@ async function startApp(resetSession) {
         sessionData.micUsedInTherapy = 0;
         sessionData.repeatUsed = 0;
         sessionData.simplifyUsed = 0;
+        sessionData.simplifyByCategory = {};
+        sessionData.noResponseByCategory = {};
         sessionData.reportEntryId = null;
     }
 
@@ -1131,8 +1135,38 @@ async function loadReportHistory() {
     return data.slice(0, 180).map(mapHistoryRow);
 }
 
+function updateAdaptiveState() {
+    if (!activeStudentId || !hasSessionActivity()) return;
+    const key = 'adaptive_' + activeStudentId;
+    const existing = DB.getSync(key) || {};
+    const catStats = existing.categoryStats || {};
+
+    sessionData.therapyTurns.forEach(t => {
+        const c = t.category || 'Diğer';
+        if (!catStats[c]) catStats[c] = { turns: 0, simplify: 0, noResponse: 0 };
+        catStats[c].turns++;
+    });
+    Object.entries(sessionData.simplifyByCategory || {}).forEach(([c, n]) => {
+        if (!catStats[c]) catStats[c] = { turns: 0, simplify: 0, noResponse: 0 };
+        catStats[c].simplify += n;
+    });
+    Object.entries(sessionData.noResponseByCategory || {}).forEach(([c, n]) => {
+        if (!catStats[c]) catStats[c] = { turns: 0, simplify: 0, noResponse: 0 };
+        catStats[c].noResponse += n;
+    });
+
+    DB.set(key, {
+        categoryStats: catStats,
+        simplifyTotal: (existing.simplifyTotal || 0) + (sessionData.simplifyUsed || 0),
+        totalTurns: (existing.totalTurns || 0) + sessionData.therapyTurns.length,
+        totalSessions: (existing.totalSessions || 0) + 1,
+        updatedAt: new Date().toISOString(),
+    });
+}
+
 async function persistSessionSnapshot() {
     if (!hasSessionActivity()) return loadReportHistory();
+    updateAdaptiveState();
 
     const userId = await getCurrentUserId();
     if (!userId) return [];
@@ -1421,6 +1455,43 @@ async function goToReport() {
     await generateAIEvaluation(durationMin, totalMic, storyPct, totalTurns);
 }
 
+function _buildAdaptiveContextText() {
+    if (!activeStudentId) return null;
+    const adaptive = DB.getSync('adaptive_' + activeStudentId) || {};
+    const cats = Object.entries(adaptive.categoryStats || {}).filter(([, s]) => s.turns > 0);
+    if (!cats.length) return null;
+    return cats.map(([cat, s]) => {
+        const simPct = Math.round((s.simplify / s.turns) * 100);
+        const nrPct  = Math.round((s.noResponse / s.turns) * 100);
+        return `- ${cat}: ${s.turns} tur, %${simPct} dil desteği ihtiyacı, %${nrPct} yanıtsız`;
+    }).join('\n');
+}
+
+function _buildIEPContextText() {
+    if (!activeStudentId) return null;
+    const goals = DB.getSync('iep_' + activeStudentId) || [];
+    if (!goals.length) return null;
+    return goals.slice(0, 6).map(g => {
+        const trials = DB.getSync('trials_' + g.id) || [];
+        const pct = calcGoalPct(trials);
+        const domain = IEP_DOMAINS.find(d => d.id === g.domain);
+        return `- ${domain ? domain.label : 'Alan'}: "${g.goalText}" → %${pct} (hedef: %${g.targetPct})`;
+    }).join('\n');
+}
+
+function _buildSkillsContextText() {
+    if (!activeStudentId) return null;
+    const map = DB.getSync('skills_' + activeStudentId) || {};
+    if (!Object.keys(map).length) return null;
+    const lines = Object.entries(SKILL_MAP).map(([domainId, domain]) => {
+        const mastered = domain.skills.filter((_, i) => map[`${domainId}:${i}`] === 'mastered').length;
+        const learning = domain.skills.filter((_, i) => map[`${domainId}:${i}`] === 'learning').length;
+        if (mastered + learning === 0) return null;
+        return `- ${domain.label}: ${mastered} kazanıldı, ${learning} öğreniliyor (${domain.skills.length} beceriden)`;
+    }).filter(Boolean);
+    return lines.length ? lines.join('\n') : null;
+}
+
 async function generateAIEvaluation(durationMin, totalMic, storyPct, totalTurns) {
     const choices = sessionData.storyChoices.map(c =>
         `- "${c.sceneLabel}" sahnesinde "${c.choice}" seçti`).join('\n') || 'Henüz hikaye oturumu yok.';
@@ -1428,7 +1499,16 @@ async function generateAIEvaluation(durationMin, totalMic, storyPct, totalTurns)
     const therapySample = sessionData.therapyTurns.slice(0, 5).map(t =>
         `Soru: "${t.question}" → Cevap: "${t.answer}"`).join('\n') || 'Terapi oturumu yok.';
 
-    const prompt = `Sen özel eğitim ve konuşma terapisi alanında uzman, empati dolu bir asistansın. 
+    const _adaptiveText = _buildAdaptiveContextText();
+    const _iepText      = _buildIEPContextText();
+    const _skillsText   = _buildSkillsContextText();
+
+    let _contextBlock = '';
+    if (_adaptiveText) _contextBlock += `\nKATEGORİ PERFORMANSI (geçmiş seans toplamı):\n${_adaptiveText}\n`;
+    if (_iepText)      _contextBlock += `\nIEP/BEP HEDEFLERİ:\n${_iepText}\n`;
+    if (_skillsText)   _contextBlock += `\nBECERİ HARİTASI:\n${_skillsText}\n`;
+
+    const prompt = `Sen özel eğitim ve konuşma terapisi alanında uzman, empati dolu bir asistansın.
 Aşağıdaki veriler, "${childName}" adlı bir çocuğun Yıldız Can uygulamasındaki oturum verisidir.
 
 Oturum süresi: ${durationMin} dakika
@@ -1436,7 +1516,7 @@ Toplam yanıt sayısı: ${totalTurns}
 Mikrofon kullanım sayısı: ${totalMic}
 Hikaye ilerlemesi: ${storyPct}
 Hikaye tamamlandı mı: ${sessionData.storyCompleted ? 'Evet' : 'Hayır'}
-
+${_contextBlock}
 Hikayede yapılan seçimler:
 ${choices}
 
@@ -1447,7 +1527,7 @@ Lütfen veliye hitap ederek, 3-4 paragraf halinde şunları içeren sevecen ve p
 1. Çocuğun bu oturumdaki genel katılımı ve motivasyonu
 2. Hikayedeki seçimlerden gözlemlenen sosyal/duygusal ipuçları
 3. Konuşma ve iletişim açısından dikkat çeken noktalar
-4. Aileye somut öneriler ve teşvik edici bir kapanış
+4. ${_adaptiveText || _iepText ? 'Kategori/hedef verilerini referans alarak aileye kategori düzeyinde somut öneriler (ör. hangi temalar evde pekiştirilmeli) ve teşvik edici bir kapanış' : 'Aileye somut öneriler ve teşvik edici bir kapanış'}
 
 Kesinlikle emoji kullanma. Sıcak, profesyonel ve umut verici bir dil kullan.`;
 
@@ -2074,6 +2154,8 @@ async function askAIMode(mode) {
         speakFallback(currentObj.q, () => {});
     } else if (mode === 'simplify') {
         sessionData.simplifyUsed++;
+        const _sCat = getCurrentTherapyCategory().label;
+        sessionData.simplifyByCategory[_sCat] = (sessionData.simplifyByCategory[_sCat] || 0) + 1;
         const simplePrompt = `Şu soruyu, 4-8 yaş arası özel eğitim desteği alan bir çocuk için çok basit 1-2 kelimeyle açıkla: "${currentObj.q}". Maksimum 1 kısa cümle.`;
         const res = await getGemmaResponse(simplePrompt);
         addMessage(res, 'ai');
@@ -2443,6 +2525,8 @@ async function rec() {
         else if (err.error === 'no-speech') {
             // Ses gelmedi ama buffer'da bir şey varsa gönder
             if (_speechBuffer.trim()) { _finalizeSpeech(); return; }
+            const _nrCat = getCurrentTherapyCategory().label;
+            sessionData.noResponseByCategory[_nrCat] = (sessionData.noResponseByCategory[_nrCat] || 0) + 1;
             document.getElementById('info').innerText = "Sesi duymadım, tekrar dene!";
         } else document.getElementById('info').innerText = "Duyamadım, tekrar eder misin?";
     };
