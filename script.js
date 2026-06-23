@@ -3336,13 +3336,7 @@ async function handleLogin(e) {
     setAuthLoading(false);
 
     if (res.fallback) {
-        // Sunucu yoksa → demo mod (sadece memory, localStorage'a yazılmaz)
-        _authToken = 'demo_' + username;
-        _authUser  = { username, displayName: username };
-        const note = document.getElementById('authOfflineNote');
-        if (note) note.style.display = '';
-        onAuthSuccess();
-        return;
+        return showAuthError('Sunucu bağlantısı kurulamadı. Vercel KV yapılandırmasını kontrol et.');
     }
     if (!res.ok) return showAuthError(res.error || 'Giriş başarısız');
     _authToken = res.token;
@@ -3366,13 +3360,7 @@ async function handleRegister(e) {
     setAuthLoading(false);
 
     if (res.fallback) {
-        // Sunucu yoksa → demo mod (sadece memory, localStorage'a yazılmaz)
-        _authToken = 'demo_' + username;
-        _authUser  = { username, displayName: username };
-        const note = document.getElementById('authOfflineNote');
-        if (note) note.style.display = '';
-        onAuthSuccess();
-        return;
+        return showAuthError('Sunucu bağlantısı kurulamadı. Vercel KV yapılandırmasını kontrol et.');
     }
     if (!res.ok) return showAuthError(res.error || 'Kayıt başarısız');
     _authToken = res.token;
