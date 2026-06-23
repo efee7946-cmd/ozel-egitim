@@ -1580,6 +1580,7 @@ const CITY_LOCATIONS = {
 
 let currentTherapyCategoryKey = 'daily_life';
 let currentCityLocationKey = 'school';
+let _useLocationQuestions = true;
 let unaskedQuestions = [...CITY_LOCATIONS[currentCityLocationKey].questions];
 let currentObj = null;
 let isWaiting = false;
@@ -2020,9 +2021,11 @@ function getCurrentCityLocation() {
 }
 
 function getActiveTherapyQuestions() {
-    const location = getCurrentCityLocation();
-    if (location && Array.isArray(location.questions) && location.questions.length) {
-        return location.questions;
+    if (_useLocationQuestions) {
+        const location = getCurrentCityLocation();
+        if (location && Array.isArray(location.questions) && location.questions.length) {
+            return location.questions;
+        }
     }
     return getCurrentTherapyCategory().questions;
 }
@@ -2079,6 +2082,7 @@ function renderCityScene() {
 function setTherapyCategory(categoryKey, shouldReload = true) {
     if (!THERAPY_CATEGORIES[categoryKey]) return;
     currentTherapyCategoryKey = categoryKey;
+    _useLocationQuestions = false;
     turnCount = 0;
     currentObj = null;
     chatHistory = [];
@@ -2098,6 +2102,7 @@ function focusCityLocation(locationKey) {
     if (!location) return;
     currentCityLocationKey = locationKey;
     currentTherapyCategoryKey = location.category;
+    _useLocationQuestions = true;
     resetTherapyQuestionPool();
     renderCityScene();
 }
