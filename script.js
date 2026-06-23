@@ -2402,16 +2402,18 @@ async function rec() {
         document.getElementById('micBtn').disabled = true;
         return;
     }
+    var _isSafari = !window.SpeechRecognition && !!window.webkitSpeechRecognition;
     document.getElementById('micBtn').disabled = true;
     document.getElementById('info').innerText = "Dinlemeye hazırlanıyorum...";
     var recognition = new SpeechRecognition();
     recognition.lang = "tr-TR";
-    recognition.interimResults = true;   // anlık metin gösterimi için
+    recognition.interimResults = !_isSafari;
     recognition.maxAlternatives = 1;
-    recognition.continuous = true;       // duraksayınca kapanmasın
+    recognition.continuous = !_isSafari;
     var _speechBuffer = '';
     var _silenceTimer = null;
     var _recognized = false;
+    var _safariActive = false;
 
     async function _finalizeSpeech() {
         recognition.stop();
@@ -2492,6 +2494,7 @@ async function rec() {
     }
 
     recognition.onstart = function() {
+        _safariActive = true;
         document.getElementById('micBtn').classList.add('listening');
         document.getElementById('info').innerText = "Seni dinliyorum... 🎙️";
         _startVolumeRings();
@@ -2508,12 +2511,15 @@ async function rec() {
                 interim = e.results[i][0].transcript;
             }
         }
-        // Anlık metni göster — öğrenci duyulduğunu hisseder
         var display = (_speechBuffer + interim).trim();
         if (display) document.getElementById('info').innerText = '🎙️ ' + display;
 
-        // 2.5 sn sessizlik sonrası gönder
-        _silenceTimer = setTimeout(_finalizeSpeech, 2500);
+        if (_isSafari && _recognized) {
+            _safariActive = false;
+            _finalizeSpeech();
+        } else {
+            _silenceTimer = setTimeout(_finalizeSpeech, 2500);
+        }
     };
 
     recognition.onerror = function(err) {
@@ -2533,9 +2539,14 @@ async function rec() {
 
     recognition.onend = function() {
         clearTimeout(_silenceTimer);
+        // Safari: continuous=false olduğu için her utterance sonrası onend gelir;
+        // konuşma bitmemişse yeniden başlat
+        if (_isSafari && _safariActive && !_recognized) {
+            try { recognition.start(); return; } catch(e) {}
+        }
+        _safariActive = false;
         _stopVolumeRings();
         document.getElementById('micBtn').classList.remove('listening');
-        // Buffer'da metin varsa gönder (tarayıcı kendi kapattıysa)
         if (_speechBuffer.trim() && _recognized) {
             _finalizeSpeech();
         } else if (document.getElementById('micBtn').disabled && isWaiting) {
