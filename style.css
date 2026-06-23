@@ -4725,10 +4725,11 @@ body.a11y-reduce-motion * { transition: none !important; animation: none !import
 .bep-report-btn:hover { opacity: .9; transform: translateY(-1px); }
 .bep-report-btn:disabled { opacity: .6; cursor: default; transform: none; }
 .bep-report-output {
-    background: #fff; border-radius: 20px;
-    box-shadow: 0 4px 20px rgba(44,62,100,.10);
-    padding: 28px 24px 24px;
-    display: flex; flex-direction: column; gap: 18px;
+    background: #f7f9fc; border-radius: 16px;
+    border: 1px solid #e8ecf4;
+    padding: 20px 18px 18px;
+    display: flex; flex-direction: column; gap: 14px;
+    margin-top: 14px;
 }
 .bep-report-header {
     font-size: 1.05rem; font-weight: 800; color: #2d3a5c;
@@ -4753,6 +4754,62 @@ body.a11y-reduce-motion * { transition: none !important; animation: none !import
     text-align: center;
 }
 .bep-copy-btn:hover { opacity: .88; }
+
+/* =============================================
+   ANALİZ EKRANI – AZ VE ÖZ KARTLAR
+   ============================================= */
+.az-card {
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 2px 14px rgba(44,62,100,.09);
+    padding: 22px 20px 18px;
+}
+.az-card-title {
+    font-size: 1rem; font-weight: 800; color: #2d3a5c;
+    margin: 0 0 4px;
+}
+.az-card-sub {
+    font-size: 0.82rem; color: #7a8ba8; margin: 0 0 16px; line-height: 1.4;
+}
+.az-identity-card { display: flex; flex-direction: column; gap: 10px; }
+.az-identity-top { display: flex; align-items: center; gap: 14px; }
+.az-identity-icon { font-size: 2rem; }
+.az-identity-title { font-size: 1rem; font-weight: 800; color: #2d3a5c; }
+.az-identity-sub { font-size: 1.15rem; font-weight: 700; color: #4a5e8a; }
+.az-identity-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.az-tag {
+    font-size: 0.76rem; font-weight: 700; padding: 4px 10px;
+    border-radius: 30px; white-space: nowrap;
+}
+.az-tag-level { background: #e8f4fd; color: #2980b9; }
+.az-tag-cond { background: #fef9e7; color: #b7770d; }
+.az-tag-empty { font-size: 0.78rem; color: #b0bec5; font-style: italic; }
+.az-session-meta { font-size: 0.78rem; color: #a0b0c8; }
+.az-metric { margin-bottom: 18px; }
+.az-metric:last-of-type { margin-bottom: 12px; }
+.az-metric-label {
+    display: flex; justify-content: space-between; align-items: baseline;
+    margin-bottom: 5px;
+    font-size: 0.88rem; font-weight: 700; color: #2d3a5c;
+}
+.az-metric-val { font-size: 1.05rem; font-weight: 800; }
+.az-bar-track {
+    height: 10px; background: #eef1f7; border-radius: 8px; overflow: hidden;
+}
+.az-bar-fill {
+    height: 100%; border-radius: 8px;
+    transition: width 0.7s cubic-bezier(.4,0,.2,1);
+    width: 0%;
+}
+.az-bar-green { background: linear-gradient(90deg, #00b894, #55efc4); }
+.az-bar-yellow { background: linear-gradient(90deg, #f9ca24, #f0932b); }
+.az-bar-orange { background: linear-gradient(90deg, #e17055, #d63031); }
+.az-metric-hint { font-size: 0.73rem; color: #9aa5b8; margin-top: 3px; }
+.az-insight {
+    background: #f0f4ff; border-radius: 12px;
+    padding: 12px 14px; font-size: 0.85rem; color: #2d3a5c;
+    line-height: 1.55; font-weight: 500; margin-top: 4px;
+}
 
 /* =============================================
    AUTH EKRANI (GİRİŞ / KAYIT)

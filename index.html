@@ -701,30 +701,62 @@ document.addEventListener('DOMContentLoaded', function(){
 <div id="analysis-screen">
     <div class="analysis-wrapper">
         <button class="btn-back" onclick="goToMenu()">← Menü</button>
-        <h2 class="analysis-title">📊 BEP Analiz</h2>
-        <div class="analysis-student-badge" id="analysisStudentBadge"></div>
 
-        <!-- Öğrenci Profili Özeti -->
-        <div class="bep-section" id="bepProfileSummary"></div>
-
-        <!-- Son Seanslar -->
-        <div class="bep-section">
-            <h3 class="bep-section-title">Son Seanslar</h3>
-            <div id="analysisSessionList">
-                <p class="analysis-empty">Yükleniyor...</p>
+        <!-- 1. Öğrenci Kimlik Kartı -->
+        <div class="az-card az-identity-card">
+            <div class="az-identity-top">
+                <span class="az-identity-icon">📊</span>
+                <div>
+                    <div class="az-identity-title">Konuşma Terapisi Performans Analizi</div>
+                    <div class="az-identity-sub" id="azStudentName"></div>
+                </div>
             </div>
+            <div class="az-identity-tags" id="azStudentTags"></div>
+            <div class="az-session-meta" id="azSessionMeta"></div>
         </div>
 
-        <!-- Rapor Butonu -->
-        <button class="bep-report-btn" id="bepReportBtn" onclick="generateBepReport()">
-            📝 BEP Gelişim Raporu Oluştur
-        </button>
+        <!-- 2. İletişim Bağımsızlığı Metrikleri -->
+        <div class="az-card">
+            <h3 class="az-card-title">Dil ve Sosyal Uyum Göstergeleri</h3>
+            <div class="az-metric">
+                <div class="az-metric-label">
+                    <span>İletişim Bağımsızlığı</span>
+                    <span class="az-metric-val" id="azIndependentPct">—</span>
+                </div>
+                <div class="az-bar-track"><div class="az-bar-fill az-bar-green" id="azIndependentBar"></div></div>
+                <div class="az-metric-hint">Hiçbir yardım almadan doğrudan mikrofona konuştu</div>
+            </div>
+            <div class="az-metric">
+                <div class="az-metric-label">
+                    <span>Tekrar Dinleme İhtiyacı</span>
+                    <span class="az-metric-val" id="azRepeatPct">—</span>
+                </div>
+                <div class="az-bar-track"><div class="az-bar-fill az-bar-yellow" id="azRepeatBar"></div></div>
+                <div class="az-metric-hint">"Tekrar Et" butonuna basarak soruyu yeniden dinledi</div>
+            </div>
+            <div class="az-metric">
+                <div class="az-metric-label">
+                    <span>Dil Adaptasyon İhtiyacı</span>
+                    <span class="az-metric-val" id="azSimplifyPct">—</span>
+                </div>
+                <div class="az-bar-track"><div class="az-bar-fill az-bar-orange" id="azSimplifyBar"></div></div>
+                <div class="az-metric-hint">"Daha Basit" butonu ile dili hafifletmesini istedi</div>
+            </div>
+            <div class="az-insight" id="azInsightText"></div>
+        </div>
 
-        <!-- Rapor Çıktısı -->
-        <div class="bep-report-output" id="bepReportOutput" style="display:none">
-            <div class="bep-report-header">📝 BEP Dönemsel Gelişim Raporu</div>
-            <textarea class="bep-report-text" id="bepReportText" readonly></textarea>
-            <button class="bep-copy-btn" onclick="copyBepReport()">📋 Metni Kopyala</button>
+        <!-- 3. BEP Rapor Üretici -->
+        <div class="az-card">
+            <h3 class="az-card-title">Dönemsel BEP Gelişim Metni</h3>
+            <p class="az-card-sub">Öğrenci profili ve seans verileriyle MEB BEP formatında resmi metin üretilir.</p>
+            <button class="bep-report-btn" id="bepReportBtn" onclick="generateBepReport()">
+                ⚡ Yapay Zeka BEP Metni Oluştur
+            </button>
+            <div class="bep-report-output" id="bepReportOutput" style="display:none">
+                <div class="bep-report-header">📝 BEP Dönemsel Gelişim Raporu</div>
+                <textarea class="bep-report-text" id="bepReportText" readonly></textarea>
+                <button class="bep-copy-btn" onclick="copyBepReport()">📋 Metni Kopyala</button>
+            </div>
         </div>
     </div>
 </div>

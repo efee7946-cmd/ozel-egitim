@@ -18,14 +18,16 @@ let studentsCache = [];
 // Oturum verisi — tüm modüller buraya yazar
 const sessionData = {
     startTime: null,
-    therapyTurns: [],       // { question, answer } dizisi
-    storyChoices: [],       // { scene, sceneLabel, choice, response } dizisi
+    therapyTurns: [],
+    storyChoices: [],
     storyCompleted: false,
     storyName: '',
     totalScenesReached: 0,
     totalScenes: 0,
     micUsedInStory: 0,
     micUsedInTherapy: 0,
+    repeatUsed: 0,
+    simplifyUsed: 0,
     reportEntryId: null,
 };
 
@@ -259,6 +261,8 @@ async function startApp(resetSession) {
         sessionData.totalScenes = 0;
         sessionData.micUsedInStory = 0;
         sessionData.micUsedInTherapy = 0;
+        sessionData.repeatUsed = 0;
+        sessionData.simplifyUsed = 0;
         sessionData.reportEntryId = null;
     }
 
@@ -430,6 +434,8 @@ function mapHistoryRow(row) {
         totalScenes: row.total_scenes || 0,
         micUsedInStory: row.mic_used_in_story || 0,
         micUsedInTherapy: row.mic_used_in_therapy || 0,
+        repeatUsed: row.repeat_used || 0,
+        simplifyUsed: row.simplify_used || 0,
         therapyTurns: Array.isArray(row.therapy_turns) ? row.therapy_turns : [],
         storyChoices: Array.isArray(row.story_choices) ? row.story_choices : [],
     };
@@ -1098,6 +1104,8 @@ function buildSessionSnapshot(userId, durationMin, totalMic, storyPct, totalTurn
         total_scenes: sessionData.totalScenes,
         mic_used_in_story: sessionData.micUsedInStory,
         mic_used_in_therapy: sessionData.micUsedInTherapy,
+        repeat_used: sessionData.repeatUsed,
+        simplify_used: sessionData.simplifyUsed,
         therapy_turns: sessionData.therapyTurns.slice(),
         story_choices: sessionData.storyChoices.slice(),
     };
@@ -2059,9 +2067,11 @@ function rereadQuestion() {
 async function askAIMode(mode) {
     if (!currentObj) return;
     if (mode === 'repeat') {
+        sessionData.repeatUsed++;
         addMessage('Soruyu tekrar okuyorum...', 'ai');
         speakFallback(currentObj.q, () => {});
     } else if (mode === 'simplify') {
+        sessionData.simplifyUsed++;
         const simplePrompt = `Şu soruyu, 4-8 yaş arası özel eğitim desteği alan bir çocuk için çok basit 1-2 kelimeyle açıkla: "${currentObj.q}". Maksimum 1 kısa cümle.`;
         const res = await getGemmaResponse(simplePrompt);
         addMessage(res, 'ai');
@@ -3645,50 +3655,85 @@ const BEP_CONDITION_LABELS = {
 
 async function goToAnalysis() {
     showOnly('analysis-screen');
-
-    const badge = document.getElementById('analysisStudentBadge');
-    if (badge) badge.textContent = activeStudentName ? `👤 ${activeStudentName}` : '';
-
-    await renderBepProfileSummary();
-    await loadAnalysisSessions();
-}
-
-async function renderBepProfileSummary() {
-    const el = document.getElementById('bepProfileSummary');
-    if (!el) return;
     const userId = await getCurrentUserId();
-    if (!userId) { el.style.display = 'none'; return; }
-    const profile = await DB.get('bep_profile_' + userId) || {};
-    if (!profile.category && !(profile.conditions || []).length) { el.style.display = 'none'; return; }
-
-    const condText = (profile.conditions || [])
-        .map(c => BEP_CONDITION_LABELS[c] || c).join(' · ') || '—';
-    el.style.display = '';
-    el.innerHTML = `
-        <h3 class="bep-section-title">Öğrenci Profili</h3>
-        <div class="bep-profile-row"><span class="bep-profile-key">Kademe</span><span class="bep-profile-val">${BEP_CATEGORY_LABELS[profile.category] || '—'}</span></div>
-        <div class="bep-profile-row"><span class="bep-profile-key">Tanı</span><span class="bep-profile-val">${condText}</span></div>
-    `;
+    const profile = userId ? (await DB.get('bep_profile_' + userId) || {}) : {};
+    const history = await loadReportHistory();
+    _renderAzIdentityCard(profile);
+    _renderAzMetrics(history);
 }
 
-async function loadAnalysisSessions() {
-    const list = document.getElementById('analysisSessionList');
-    if (!list) return;
+function _renderAzIdentityCard(profile) {
+    const nameEl = document.getElementById('azStudentName');
+    const tagsEl = document.getElementById('azStudentTags');
+    const metaEl = document.getElementById('azSessionMeta');
 
-    const history = await loadReportHistory();
-    if (!history.length) {
-        list.innerHTML = '<p class="analysis-empty">Henüz kayıtlı seans yok.</p>';
-        return;
+    if (nameEl) nameEl.textContent = activeStudentName || 'Öğrenci';
+
+    if (tagsEl) {
+        const levelTag = profile.category
+            ? `<span class="az-tag az-tag-level">${BEP_CATEGORY_LABELS[profile.category] || profile.category}</span>`
+            : '';
+        const condTags = (profile.conditions || [])
+            .map(c => `<span class="az-tag az-tag-cond">${BEP_CONDITION_LABELS[c] || c}</span>`)
+            .join('');
+        tagsEl.innerHTML = levelTag + condTags || '<span class="az-tag-empty">Profil girilmemiş</span>';
     }
 
-    list.innerHTML = history.slice(0, 10).map(h => `
-        <div class="analysis-session-row">
-            <span class="analysis-session-date">${formatHistoryDate(h.dateKey)}</span>
-            <span class="analysis-session-module">Konuşma Terapisi</span>
-            <span class="analysis-session-stat">${h.durationMin} dk · ${h.totalTurns} yanıt</span>
-        </div>
-    `).join('');
+    if (metaEl) {
+        const now = new Date().toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' });
+        metaEl.textContent = `Analiz tarihi: ${now}`;
+    }
 }
+
+function _renderAzMetrics(history) {
+    // Aggregate across all sessions
+    let totalMicSum = 0, totalRepeat = 0, totalSimplify = 0;
+    history.forEach(h => {
+        totalMicSum += (h.micUsedInTherapy || 0);
+        totalRepeat += (h.repeatUsed || 0);
+        totalSimplify += (h.simplifyUsed || 0);
+    });
+    const total = totalMicSum + totalRepeat + totalSimplify;
+
+    const indPct = total > 0 ? Math.round((totalMicSum / total) * 100) : null;
+    const repPct = total > 0 ? Math.round((totalRepeat / total) * 100) : null;
+    const simPct = total > 0 ? Math.round((totalSimplify / total) * 100) : null;
+
+    function setMetric(pctId, barId, pct) {
+        const pctEl = document.getElementById(pctId);
+        const barEl = document.getElementById(barId);
+        if (!pctEl || !barEl) return;
+        if (pct === null) { pctEl.textContent = '—'; barEl.style.width = '0%'; return; }
+        pctEl.textContent = '%' + pct;
+        barEl.style.width = Math.min(pct, 100) + '%';
+    }
+
+    setMetric('azIndependentPct', 'azIndependentBar', indPct);
+    setMetric('azRepeatPct', 'azRepeatBar', repPct);
+    setMetric('azSimplifyPct', 'azSimplifyBar', simPct);
+
+    const insightEl = document.getElementById('azInsightText');
+    if (insightEl) {
+        if (!history.length) {
+            insightEl.textContent = 'Henüz seans kaydı yok. İlk konuşma terapisi seansını tamamladıktan sonra veriler burada görünür.';
+        } else if (indPct === null) {
+            insightEl.textContent = `${history.length} seans kaydı var. Bağımsız konuşma verisi toplanıyor.`;
+        } else {
+            const name = activeStudentName || 'Öğrenci';
+            insightEl.textContent = `${name}, son ${history.length} seansta %${indPct} oranında tamamen bağımsız konuştu` +
+                (repPct ? `, %${repPct} oranında tekrar dinlemeye` : '') +
+                (simPct ? ` ve %${simPct} oranında dili basitleştirmeye` : '') +
+                ' ihtiyaç duydu.';
+        }
+    }
+
+    // Store for BEP report use
+    window._azMetrics = { totalMicSum, totalRepeat, totalSimplify, total, indPct, repPct, simPct, sessionCount: history.length };
+}
+
+// Keep old function names as no-ops for safety
+async function renderBepProfileSummary() {}
+async function loadAnalysisSessions() {}
 
 async function generateBepReport() {
     const btn = document.getElementById('bepReportBtn');
@@ -3714,8 +3759,13 @@ Eğitim Kademesi: ${categoryLabels[profile.category] || 'Belirtilmemiş'}
 Eşlik Eden Durumlar: ${(profile.conditions || []).map(c => conditionLabels[c] || c).join(', ') || 'Yok'}`;
 
     const sessionText = history.slice(0, 10).map(h =>
-        `• ${formatHistoryDate(h.dateKey)}: ${h.durationMin} dakika, ${h.totalTurns} yanıt, ${h.totalMic} mikrofon kullanımı`
+        `• ${formatHistoryDate(h.dateKey)}: ${h.durationMin} dk, ${h.totalTurns} yanıt, ${h.micUsedInTherapy || 0} bağımsız mikrofon, ${h.repeatUsed || 0} tekrar, ${h.simplifyUsed || 0} basitleştirme`
     ).join('\n') || 'Kayıtlı seans verisi yok.';
+
+    const m = window._azMetrics || {};
+    const metricsText = m.total > 0
+        ? `İletişim Bağımsızlığı: %${m.indPct} (bağımsız mikrofon kullanımı)\nTekrar Dinleme İhtiyacı: %${m.repPct}\nDil Adaptasyon İhtiyacı: %${m.simPct}`
+        : 'Metrik verisi henüz toplanmamış.';
 
     const systemPrompt = `Sen özel eğitim kurumları ve RAM için çalışan uzman bir BEP (Bireyselleştirilmiş Eğitim Programı) hazırlama asistanısın. Görevin, sana ham olarak verilen öğrenci etkileşim verilerini resmi bir "Gelişim Özet Raporu"na dönüştürmektir.
 
@@ -3725,15 +3775,18 @@ YAZIM KURALLARI:
 3. Çıktıyı doğrudan MEB BEP dosyalarına kopyalanabilecek resmi, gözlemlenebilir ve performans odaklı cümlelerle kur.
 4. Raporu Türkçe yaz. 300-400 kelime arası tut.`;
 
-    const userPrompt = `Aşağıdaki öğrenci profili ve seans verilerini kullanarak resmi bir BEP Dönemsel Gelişim Raporu oluştur:
+    const userPrompt = `Aşağıdaki öğrenci profili, bağımsızlık metrikleri ve seans verilerini kullanarak resmi bir BEP Dönemsel Gelişim Raporu oluştur:
 
 ÖĞRENCİ PROFİLİ:
 ${profileText}
 
+İLETİŞİM BAĞIMSIZLIK METRİKLERİ (${m.sessionCount || history.length} seans toplamı):
+${metricsText}
+
 SON SEANSLAR (${Math.min(history.length, 10)} seans):
 ${sessionText}
 
-Raporu "📝 Bireyselleştirilmiş Eğitim Programı (BEP) Dönemsel Gelişim Raporu" başlığıyla başlat. Öğrenci Kademesi, Gelişim Özeti ve Sonraki Dönem Hedefleri bölümlerini içersin.`;
+Raporu "📝 Bireyselleştirilmiş Eğitim Programı (BEP) Dönemsel Gelişim Raporu" başlığıyla başlat. Şu bölümleri içersin: 1) Öğrenci Kademesi ve Tanı Özeti, 2) İletişim Bağımsızlığı Gelişimi (metrikleri yorumla), 3) Gözlemlenen Güçlü Yönler, 4) Sonraki Dönem Hedefleri. Metrikleri açıklarken somut rakamlar kullan.`;
 
     try {
         const res = await fetch('/api/chat', {
