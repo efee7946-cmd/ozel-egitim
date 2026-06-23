@@ -3298,10 +3298,18 @@ async function checkAuthSession() {
 }
 
 function onAuthSuccess() {
-    // Topbar'daki kullanıcı bilgisini güncelle
+    // Farklı kullanıcı giriş yaptıysa paylaşılan eski 'students' anahtarını temizle
+    const prevUser = localStorage.getItem('lms_last_user');
+    const curUser  = _authUser?.username || '';
+    if (prevUser !== curUser) {
+        DB.del('students'); // eski paylaşılan anahtar
+        activeStudentId   = null;
+        activeStudentName = '';
+        localStorage.setItem('lms_last_user', curUser);
+    }
+
     const greetEl = document.getElementById('menu-greeting');
     if (greetEl) greetEl.textContent = `Merhaba, ${_authUser?.displayName || ''}! 🌟`;
-    // Öğrenci seçim ekranına geç
     initLoginScreen();
     showOnly('login-screen');
 }
@@ -3398,14 +3406,19 @@ async function initLoginScreen() {
     applyA11yClasses(settings);
 }
 
+function studentsKey() {
+    return _authUser ? 'students_' + _authUser.username : 'students';
+}
+
 async function loadStudents() {
-    let list = DB.getSync('students');
-    if (!list) list = await DB.get('students');
+    const key = studentsKey();
+    let list = DB.getSync(key);
+    if (!list) list = await DB.get(key);
     return list || [];
 }
 
 async function saveStudents(list) {
-    DB.set('students', list);
+    DB.set(studentsKey(), list);
 }
 
 function renderLoginStudents(students) {
