@@ -3134,6 +3134,7 @@ video { width: 100%; height: 100%; object-fit: cover; }
 .tile-aac      { background: linear-gradient(140deg, #48dbfb 0%, #0abde3 100%); border-color: transparent; box-shadow: 0 8px 24px rgba(72,219,251,0.28); color: white; }
 .tile-token    { background: linear-gradient(140deg, #feca57 0%, #ff9f43 100%); border-color: transparent; box-shadow: 0 8px 24px rgba(254,202,87,0.28); color: white; }
 .tile-sequence { background: linear-gradient(140deg, #a29bfe 0%, #6c5ce7 100%); border-color: transparent; box-shadow: 0 8px 24px rgba(162,155,254,0.28); color: white; }
+.tile-analysis { background: linear-gradient(140deg, #00b894 0%, #00cec9 100%); border-color: transparent; box-shadow: 0 8px 24px rgba(0,184,148,0.28); color: white; }
 
 /* Erişilebilirlik topbar butonu */
 .icon-btn-a11y {
@@ -4530,6 +4531,44 @@ body.a11y-reduce-motion * { transition: none !important; animation: none !import
     border-radius: 6px;
 }
 .behavior-delete-btn:hover { background: #fde8e8; color: #e74c3c; }
+
+/* =============================================
+   ANALİZ EKRANI
+   ============================================= */
+#analysis-screen {
+    min-height: 100vh; background: #f4f6fb;
+    padding: 20px 16px 40px;
+}
+.analysis-wrapper {
+    max-width: 540px; margin: 0 auto;
+}
+.analysis-title {
+    font-size: 1.4rem; font-weight: 800; color: #2d3a5c;
+    margin: 12px 0 24px; text-align: center;
+}
+.analysis-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+.analysis-card {
+    background: #fff; border: none; border-radius: 18px;
+    box-shadow: 0 2px 12px rgba(44,62,100,.08);
+    padding: 22px 16px; cursor: pointer;
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    transition: transform .15s, box-shadow .15s;
+    text-align: center;
+}
+.analysis-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(44,62,100,.13);
+}
+.analysis-card-icon { font-size: 2rem; }
+.analysis-card-label {
+    font-size: 0.95rem; font-weight: 700; color: #2d3a5c;
+}
+.analysis-card-sub {
+    font-size: 0.75rem; color: #8892a4;
+}
 
 /* =============================================
    AUTH EKRANI (GİRİŞ / KAYIT)

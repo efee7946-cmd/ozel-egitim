@@ -106,81 +106,6 @@
                 <button type="button" class="login-cancel-btn" onclick="hideLoginAddForm()">İptal</button>
             </div>
         </div>
-        <!-- Öğretmen girişi -->
-        <button type="button" class="login-teacher-btn" onclick="openTeacherPanel()">
-            👨‍🏫 Öğretmen Girişi
-        </button>
-    </div>
-</div>
-
-<!-- ===================== ÖĞRETMEN PANELİ (OVERLAY) ===================== -->
-<div id="teacherOverlay" class="teacher-overlay" style="display:none">
-    <div class="teacher-overlay-inner">
-        <!-- PIN giriş görünümü -->
-        <div id="teacherPinView">
-            <h3>👨‍🏫 Öğretmen Girişi</h3>
-            <p class="teacher-pin-hint">PIN kodunuzu girin</p>
-            <div class="teacher-pin-dots" id="teacherPinDots">
-                <span></span><span></span><span></span><span></span>
-            </div>
-            <div class="teacher-pin-pad">
-                <button type="button" onclick="pinTap(1)">1</button>
-                <button type="button" onclick="pinTap(2)">2</button>
-                <button type="button" onclick="pinTap(3)">3</button>
-                <button type="button" onclick="pinTap(4)">4</button>
-                <button type="button" onclick="pinTap(5)">5</button>
-                <button type="button" onclick="pinTap(6)">6</button>
-                <button type="button" onclick="pinTap(7)">7</button>
-                <button type="button" onclick="pinTap(8)">8</button>
-                <button type="button" onclick="pinTap(9)">9</button>
-                <button type="button" class="pin-clear" onclick="pinClear()">⌫</button>
-                <button type="button" onclick="pinTap(0)">0</button>
-                <button type="button" class="pin-cancel" onclick="closeTeacherOverlay()">✕</button>
-            </div>
-            <div class="teacher-pin-error" id="teacherPinError"></div>
-            <p class="teacher-pin-setup-hint">
-                İlk kez giriş yapıyorsanız PIN: <strong>1234</strong>
-            </p>
-        </div>
-        <!-- Öğretmen panel menüsü (PIN doğru sonrası) -->
-        <div id="teacherPanelMenu" style="display:none">
-            <div class="teacher-panel-head">
-                <h3>👨‍🏫 Öğretmen Paneli</h3>
-                <button type="button" class="teacher-panel-close" onclick="closeTeacherOverlay()">✕</button>
-            </div>
-            <div class="teacher-student-name" id="teacherStudentName"></div>
-            <div class="teacher-tools-grid">
-                <button type="button" class="teacher-tool-card" onclick="goToIep()">
-                    <span>📋</span><span>IEP Hedefleri</span>
-                </button>
-                <button type="button" class="teacher-tool-card" onclick="goToSkills()">
-                    <span>🗺️</span><span>Beceri Haritası</span>
-                </button>
-                <button type="button" class="teacher-tool-card" onclick="goToBehavior()">
-                    <span>📊</span><span>Davranış Kaydı</span>
-                </button>
-                <button type="button" class="teacher-tool-card" onclick="goToReport(); closeTeacherOverlay();">
-                    <span>📄</span><span>Seans Raporu</span>
-                </button>
-                <button type="button" class="teacher-tool-card" onclick="openStudentSetup(); closeTeacherOverlay();">
-                    <span>👥</span><span>Öğrenciler</span>
-                </button>
-                <button type="button" class="teacher-tool-card teacher-tool-editor" onclick="openMatchingEditor(); closeTeacherOverlay();">
-                    <span>✏️</span><span>Eşleştirme Editörü</span>
-                </button>
-                <button type="button" class="teacher-tool-card teacher-tool-lock" onclick="lockTeacher()">
-                    <span>🔒</span><span>Kilitle</span>
-                </button>
-            </div>
-            <button type="button" class="teacher-change-pin-btn" onclick="showChangePinForm()">
-                Şifre Değiştir
-            </button>
-            <div id="changePinForm" style="display:none">
-                <input type="password" id="newPinInput" placeholder="Yeni 4 haneli PIN"
-                    maxlength="4" inputmode="numeric">
-                <button type="button" onclick="saveNewPin()">Kaydet</button>
-            </div>
-        </div>
     </div>
 </div>
 
@@ -233,7 +158,6 @@
                 <span id="active-student-name">Öğrenci seç</span>
                 <span class="pill-chevron">›</span>
             </button>
-            <button class="icon-btn-teacher" type="button" onclick="openTeacherPanel()" title="Öğretmen Paneli">👨‍🏫</button>
             <button class="icon-btn-a11y" type="button" onclick="toggleA11yPanel()" title="Erişilebilirlik Ayarları">⚙️</button>
         </div>
         <!-- JS uyumluluğu için gizli elementler -->
@@ -284,6 +208,10 @@
             <span class="tile-icon">🧩</span>
             <span class="tile-label">Eşleştirme</span>
         </button>
+        <button class="menu-tile tile-analysis" type="button" onclick="goToAnalysis()">
+            <span class="tile-icon">📊</span>
+            <span class="tile-label">Analiz</span>
+        </button>
     </div>
 
     <!-- Alt çubuk -->
@@ -306,7 +234,7 @@ document.addEventListener('DOMContentLoaded', function(){
     const hide = id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; };
     ['start-screen','student-setup-screen','menu-screen','report-screen','game-container',
      'matching-screen','schedule-screen','aac-screen','token-screen','sequence-screen',
-     'iep-screen','skills-screen','behavior-screen','login-screen'].forEach(hide);
+     'iep-screen','skills-screen','behavior-screen','login-screen','analysis-screen'].forEach(hide);
     const authEl = document.getElementById('auth-screen');
     if (authEl) authEl.style.display = 'flex';
 });
@@ -349,7 +277,7 @@ document.addEventListener('DOMContentLoaded', function(){
 
 <!-- ===================== VELİ RAPORU EKRANI ===================== -->
 <div id="report-screen">
-    <button class="btn-back" onclick="goToMenu()">← Menü</button>
+    <button class="btn-back" onclick="goToAnalysis()">← Analiz</button>
 
     <div class="report-wrapper" id="reportWrapper">
         <!-- Başlık -->
@@ -708,6 +636,41 @@ document.addEventListener('DOMContentLoaded', function(){
     <div class="sequence-wrapper">
         <div id="sequenceMenu"></div>
         <div id="sequenceGame" style="display:none"></div>
+    </div>
+</div>
+
+<!-- ===================== ANALİZ EKRANI ===================== -->
+<div id="analysis-screen">
+    <div class="analysis-wrapper">
+        <button class="btn-back" onclick="goToMenu()">← Menü</button>
+        <h2 class="analysis-title">📊 Analiz</h2>
+        <div class="analysis-grid">
+            <button class="analysis-card" onclick="goToReport()">
+                <span class="analysis-card-icon">📄</span>
+                <span class="analysis-card-label">Seans Raporu</span>
+                <span class="analysis-card-sub">Geçmiş seans istatistikleri</span>
+            </button>
+            <button class="analysis-card" onclick="goToIep()">
+                <span class="analysis-card-icon">📋</span>
+                <span class="analysis-card-label">IEP Hedefleri</span>
+                <span class="analysis-card-sub">Bireysel eğitim planı</span>
+            </button>
+            <button class="analysis-card" onclick="goToSkills()">
+                <span class="analysis-card-icon">🗺️</span>
+                <span class="analysis-card-label">Beceri Haritası</span>
+                <span class="analysis-card-sub">Kazanım takibi</span>
+            </button>
+            <button class="analysis-card" onclick="goToBehavior()">
+                <span class="analysis-card-icon">📈</span>
+                <span class="analysis-card-label">Davranış Kaydı</span>
+                <span class="analysis-card-sub">Gözlem ve kayıt</span>
+            </button>
+            <button class="analysis-card" onclick="openMatchingEditor()">
+                <span class="analysis-card-icon">✏️</span>
+                <span class="analysis-card-label">Eşleştirme Editörü</span>
+                <span class="analysis-card-sub">Özel oyun oluştur</span>
+            </button>
+        </div>
     </div>
 </div>
 

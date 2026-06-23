@@ -188,7 +188,7 @@ function celebrateCorrectAnswer() {
 function showOnly(id) {
     const screens = ['start-screen','student-setup-screen','menu-screen','game-container','report-screen','matching-screen',
                       'schedule-screen','aac-screen','token-screen','sequence-screen',
-                      'login-screen','iep-screen','skills-screen','behavior-screen','auth-screen','splash-screen'];
+                      'login-screen','iep-screen','skills-screen','behavior-screen','auth-screen','splash-screen','analysis-screen'];
     screens.forEach(s => {
         const el = document.getElementById(s);
         if (el) el.style.display = 'none';
@@ -3543,97 +3543,10 @@ function goToLogin() {
 }
 
 // =============================================
-// ÖĞRETMEN PANELİ (PIN KORUMALII)
+// ANALİZ EKRANI
 // =============================================
-let _teacherUnlocked = false;
-let _pinBuffer = '';
-const DEFAULT_TEACHER_PIN = '1234';
-
-function openTeacherPanel() {
-    const overlay = document.getElementById('teacherOverlay');
-    if (!overlay) return;
-    overlay.style.display = 'flex';
-    if (_teacherUnlocked) {
-        showTeacherPanelMenu();
-    } else {
-        showTeacherPinView();
-    }
-}
-
-function closeTeacherOverlay() {
-    const overlay = document.getElementById('teacherOverlay');
-    if (overlay) overlay.style.display = 'none';
-    _pinBuffer = '';
-    updatePinDots();
-}
-
-function showTeacherPinView() {
-    document.getElementById('teacherPinView').style.display = '';
-    document.getElementById('teacherPanelMenu').style.display = 'none';
-    document.getElementById('teacherPinError').textContent = '';
-    _pinBuffer = '';
-    updatePinDots();
-}
-
-function showTeacherPanelMenu() {
-    document.getElementById('teacherPinView').style.display = 'none';
-    document.getElementById('teacherPanelMenu').style.display = '';
-    const studentEl = document.getElementById('teacherStudentName');
-    if (studentEl) studentEl.textContent = activeStudentName
-        ? `👤 ${activeStudentName}`
-        : '(Öğrenci seçili değil)';
-}
-
-function pinTap(digit) {
-    if (_pinBuffer.length >= 4) return;
-    _pinBuffer += String(digit);
-    updatePinDots();
-    if (_pinBuffer.length === 4) {
-        setTimeout(checkPin, 150);
-    }
-}
-
-function pinClear() {
-    _pinBuffer = _pinBuffer.slice(0, -1);
-    updatePinDots();
-}
-
-function updatePinDots() {
-    const dots = document.querySelectorAll('#teacherPinDots span');
-    dots.forEach((d, i) => {
-        d.style.background = i < _pinBuffer.length ? '#6c5ce7' : '#dde3ee';
-    });
-}
-
-async function checkPin() {
-    const storedPin = DB.getSync('teacher_pin') || DEFAULT_TEACHER_PIN;
-    if (_pinBuffer === storedPin) {
-        _teacherUnlocked = true;
-        showTeacherPanelMenu();
-    } else {
-        document.getElementById('teacherPinError').textContent = '❌ Yanlış PIN';
-        _pinBuffer = '';
-        updatePinDots();
-    }
-}
-
-function lockTeacher() {
-    _teacherUnlocked = false;
-    closeTeacherOverlay();
-}
-
-function showChangePinForm() {
-    document.getElementById('changePinForm').style.display = '';
-    document.getElementById('newPinInput').focus();
-}
-
-function saveNewPin() {
-    const val = document.getElementById('newPinInput').value.trim();
-    if (!val || val.length < 4) return;
-    DB.set('teacher_pin', val.slice(0, 4));
-    document.getElementById('changePinForm').style.display = 'none';
-    document.getElementById('newPinInput').value = '';
-    alert('PIN güncellendi!');
+function goToAnalysis() {
+    showOnly('analysis-screen');
 }
 
 // =============================================
@@ -3652,13 +3565,11 @@ let _iepCurrentTrials = [];
 let _iepSelectedDomain = 'communication';
 
 function iepBack() {
-    closeTeacherOverlay();
-    showOnly('menu-screen');
-    renderCityScene();
+    showOnly('analysis-screen');
 }
 
 function goToIep() {
-    closeTeacherOverlay();
+
     showOnly('iep-screen');
     document.getElementById('iepStudentBadge').textContent = activeStudentName || '';
     hideIepGoalForm();
@@ -3926,13 +3837,10 @@ const SKILL_MAP = {
 let _skillsDomain = 'communication';
 
 function skillsBack() {
-    closeTeacherOverlay();
-    showOnly('menu-screen');
-    renderCityScene();
+    showOnly('analysis-screen');
 }
 
 function goToSkills() {
-    closeTeacherOverlay();
     showOnly('skills-screen');
     document.getElementById('skillsStudentBadge').textContent = activeStudentName || '';
     renderSkillsDomainTabs();
@@ -3997,13 +3905,11 @@ function cycleSkill(key) {
 let _behaviorCount = 1;
 
 function behaviorBack() {
-    closeTeacherOverlay();
-    showOnly('menu-screen');
-    renderCityScene();
+    showOnly('analysis-screen');
 }
 
 function goToBehavior() {
-    closeTeacherOverlay();
+
     showOnly('behavior-screen');
     document.getElementById('behaviorStudentBadge').textContent = activeStudentName || '';
     _behaviorCount = 1;
@@ -4088,13 +3994,7 @@ window.hideLoginAddForm = hideLoginAddForm;
 window.selectLoginEmoji = selectLoginEmoji;
 window.createStudentFromLogin = createStudentFromLogin;
 window.selectStudentLogin = selectStudentLogin;
-window.openTeacherPanel = openTeacherPanel;
-window.closeTeacherOverlay = closeTeacherOverlay;
-window.pinTap = pinTap;
-window.pinClear = pinClear;
-window.lockTeacher = lockTeacher;
-window.showChangePinForm = showChangePinForm;
-window.saveNewPin = saveNewPin;
+window.goToAnalysis = goToAnalysis;
 window.goToIep = goToIep;
 window.iepBack = iepBack;
 window.showIepGoalForm = showIepGoalForm;
