@@ -8,8 +8,7 @@ export default async function handler(req, res) {
 
     const { contents } = req.body;
     
-    // 🔥 MODEL İSMİ GÜNCELLENDİ: gemma-3-27b-it
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemma-3-27b-it:generateContent?key=${GEMINI_KEY}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${GEMINI_KEY}`;
 
     try {
         const response = await fetch(url, {
