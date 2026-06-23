@@ -2383,12 +2383,6 @@ function startQuestion() {
 
 async function rec() {
     clearTimeout(idleTimer);
-    var isIOS = /iP(hone|ad|od)/.test(navigator.userAgent);
-    var isChrome = /CriOS/.test(navigator.userAgent);
-    if (isIOS && isChrome) {
-        document.getElementById('info').innerText = "iOS Chrome'da desteklenmiyor. Safari kullan.";
-        return;
-    }
     var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
         document.getElementById('info').innerText = "Tarayıcı ses tanımayı desteklemiyor. Chrome veya Edge kullanmayı dene.";
