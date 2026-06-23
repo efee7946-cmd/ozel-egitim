@@ -2319,7 +2319,10 @@ async function loadNext() {
     }
 
     try {
-        const r = await fetch('/api/video?query=' + currentObj.query);
+        const _videoCtrl = new AbortController();
+        const _videoFetchTimer = setTimeout(() => _videoCtrl.abort(), 6000);
+        const r = await fetch('/api/video?query=' + currentObj.query, { signal: _videoCtrl.signal });
+        clearTimeout(_videoFetchTimer);
         const d = await r.json();
         if (d.videos && d.videos[0]) {
             const videoUrl = getBestVideoUrl(d.videos[0].video_files);
@@ -2617,11 +2620,15 @@ async function speakWithLipsync(text, onEnd, emotion = CharacterEmotion.NEUTRAL)
     setCharacterEmotion(emotion);
 
     try {
+        const _ttsCtrl = new AbortController();
+        const _ttsFetchTimer = setTimeout(() => _ttsCtrl.abort(), 8000);
         const res = await fetch('/api/tts', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ text })
+            body: JSON.stringify({ text }),
+            signal: _ttsCtrl.signal
         });
+        clearTimeout(_ttsFetchTimer);
 
         if (!res.ok) {
             setCharacterEmotion(CharacterEmotion.NEUTRAL);
