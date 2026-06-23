@@ -188,7 +188,7 @@ function celebrateCorrectAnswer() {
 function showOnly(id) {
     const screens = ['start-screen','student-setup-screen','menu-screen','game-container','report-screen','matching-screen',
                       'schedule-screen','aac-screen','token-screen','sequence-screen',
-                      'login-screen','iep-screen','skills-screen','behavior-screen','auth-screen'];
+                      'login-screen','iep-screen','skills-screen','behavior-screen','auth-screen','splash-screen'];
     screens.forEach(s => {
         const el = document.getElementById(s);
         if (el) el.style.display = 'none';
@@ -3272,6 +3272,11 @@ async function authApi(action, body = {}) {
     }
 }
 
+function hideSplash() {
+    const splash = document.getElementById('splash-screen');
+    if (splash) splash.style.display = 'none';
+}
+
 async function checkAuthSession() {
     const savedToken = DB.getSync(authStorageKey());
     const savedUser  = DB.getSync(authUserStorageKey());
@@ -3281,20 +3286,21 @@ async function checkAuthSession() {
         if (res.valid) {
             _authToken = savedToken;
             _authUser  = { username: res.username, displayName: res.displayName };
+            hideSplash();
             onAuthSuccess();
             return;
         } else if (res.fallback && !savedToken.startsWith('demo_')) {
-            // API geçici olarak erişilemez ama gerçek bir token var → kabul et
             _authToken = savedToken;
             _authUser  = savedUser;
+            hideSplash();
             onAuthSuccess();
             return;
         }
-        // Token geçersiz veya demo token → sil, auth ekranını göster
         DB.del(authStorageKey());
         DB.del(authUserStorageKey());
     }
 
+    hideSplash();
     showOnly('auth-screen');
 }
 
