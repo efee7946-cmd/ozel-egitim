@@ -2363,11 +2363,16 @@ GENEL KURALLAR:
     try {
         var res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
         var data = await res.json();
-        var reply = data.candidates[0].content.parts[0].text;
+        var reply = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (!reply) {
+            console.error('Gemini yanıt boş:', JSON.stringify(data));
+            return 'Yapay zeka şu an yanıt veremiyor, biraz bekle.';
+        }
         chatHistory.push({ role: "model", parts: [{ text: reply }] });
         return reply;
     } catch (e) {
-        return `${childName}, çok güzel anlattın. ${currentCategory.label} ile ilgili başka ne söylemek istersin?`;
+        console.error('Gemini hata:', e);
+        return 'Yapay zeka şu an yanıt veremiyor, biraz bekle.';
     }
 }
 
