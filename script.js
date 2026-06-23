@@ -251,6 +251,7 @@ async function startApp(resetSession) {
         warmup.volume = 0;
         window.speechSynthesis.speak(warmup);
     } catch(e) {}
+    try { initAudioContext(); audioCtx.resume(); } catch(e) {}
 
     // Oturumu başlat
     if (!appStarted || resetSession) {
@@ -2642,11 +2643,17 @@ async function speakWithLipsync(text, onEnd, emotion = CharacterEmotion.NEUTRAL)
 
         startLipsync();
         source.start(0);
-        source.onended = () => {
+        const _durMs = Math.ceil(audioBuf.duration * 1000) + 300;
+        let _endFired = false;
+        const _fireEnd = () => {
+            if (_endFired) return;
+            _endFired = true;
             stopLipsync();
             setCharacterEmotion(CharacterEmotion.NEUTRAL);
             if (onEnd) onEnd();
         };
+        source.onended = _fireEnd;
+        setTimeout(_fireEnd, _durMs);
     } catch (e) {
         console.warn('Lipsync TTS hatasi, fallback:', e);
         setCharacterEmotion(CharacterEmotion.NEUTRAL);
