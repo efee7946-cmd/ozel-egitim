@@ -3,7 +3,7 @@ export default async function handler(req, res) {
     const { query } = req.query;
 
     try {
-        const response = await fetch(`https://api.pexels.com/videos/search?query=${query}&per_page=1`, {
+        const response = await fetch(`https://api.pexels.com/videos/search?query=${query}&per_page=5`, {
             headers: { Authorization: PEXELS_KEY }
         });
         const data = await response.json();

@@ -2345,8 +2345,9 @@ async function loadNext() {
         const r = await fetch('/api/video?query=' + currentObj.query, { signal: _videoCtrl.signal });
         clearTimeout(_videoFetchTimer);
         const d = await r.json();
-        if (d.videos && d.videos[0]) {
-            const videoUrl = getBestVideoUrl(d.videos[0].video_files);
+        if (d.videos && d.videos.length) {
+            const _pick = d.videos[Math.floor(Math.random() * d.videos.length)];
+            const videoUrl = getBestVideoUrl(_pick.video_files);
             if (!videoUrl) { startQuestion(); return; }
             vEl.muted = true;
             vEl.setAttribute('playsinline', '');
