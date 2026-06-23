@@ -226,10 +226,7 @@
             <span class="tile-icon">🗣️</span>
             <span class="tile-label">AAC Panosu</span>
         </button>
-        <button class="menu-tile tile-token" type="button" onclick="goToTokens()">
-            <span class="tile-icon">⭐</span>
-            <span class="tile-label">Ödül Sistemi</span>
-        </button>
+
         <button class="menu-tile tile-sequence" type="button" onclick="goToSequence()">
             <span class="tile-icon">🔢</span>
             <span class="tile-label">Sıralama Oyunları</span>
@@ -263,7 +260,7 @@
 document.addEventListener('DOMContentLoaded', function(){
     const hide = id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; };
     ['start-screen','student-setup-screen','menu-screen','report-screen','game-container',
-     'matching-screen','schedule-screen','aac-screen','token-screen','sequence-screen',
+     'matching-screen','schedule-screen','aac-screen','sequence-screen',
      'iep-screen','skills-screen','behavior-screen','login-screen','analysis-screen'].forEach(hide);
     const authEl = document.getElementById('auth-screen');
     if (authEl) authEl.style.display = 'flex';
@@ -632,62 +629,6 @@ document.addEventListener('DOMContentLoaded', function(){
     </div>
 </div>
 
-<!-- ===================== ÖDÜL SİSTEMİ ===================== -->
-<div id="token-screen">
-    <button class="btn-back" onclick="goToMenu()">← Menü</button>
-    <div class="token-wrapper">
-
-        <!-- Kurulum formu: hedef + ödül + puan sayısı -->
-        <div class="token-setup-form" id="tokenSetupForm">
-            <h3>🎯 Hedef Belirle</h3>
-            <p class="token-setup-hint">Öğrenci hangi davranış için puan kazanacak?</p>
-            <div class="token-setup-field">
-                <label>Davranış / Hedef</label>
-                <input type="text" id="tokenGoalInput" maxlength="80"
-                    placeholder="Örn: Derste sessiz oturma, Yemek yeme...">
-            </div>
-            <div class="token-setup-field">
-                <label>Kazanılacak Ödül</label>
-                <div class="token-reward-select" id="tokenRewardSelect"></div>
-            </div>
-            <div class="token-setup-field">
-                <label>Kaç puan gerekli?</label>
-                <div class="token-max-select">
-                    <button type="button" class="token-target-btn" onclick="selectTokenMax(3)">3</button>
-                    <button type="button" class="token-target-btn" onclick="selectTokenMax(5)">5</button>
-                    <button type="button" class="token-target-btn" onclick="selectTokenMax(7)">7</button>
-                    <button type="button" class="token-target-btn" onclick="selectTokenMax(10)">10</button>
-                </div>
-            </div>
-            <button type="button" class="token-start-btn" onclick="commitTokenSetup()">✓ Başlat</button>
-        </div>
-
-        <!-- Aktif token tahtası -->
-        <div class="token-active" id="tokenActive" style="display:none">
-            <div class="token-goal-card" id="tokenGoalCard"></div>
-            <div class="token-board" id="tokenBoard"></div>
-            <div class="token-count-label" id="tokenCount">0 / 5</div>
-            <div class="token-actions">
-                <button type="button" class="token-award-btn" onclick="awardToken()">🌟 Puan Ver</button>
-                <button type="button" class="token-remove-btn" onclick="removeToken()">↩ Geri Al</button>
-            </div>
-            <button type="button" class="token-change-goal-btn" onclick="changeTokenGoal()">✎ Hedefi Değiştir</button>
-        </div>
-
-        <!-- Kutlama -->
-        <div class="token-celebration" id="tokenCelebration" style="display:none">
-            <div class="token-celebration-inner">
-                <div class="token-celebration-emoji">🎉</div>
-                <h3 id="tokenCelebrationTitle">Tebrikler!</h3>
-                <p id="tokenCelebrationMsg"></p>
-                <button type="button" class="token-reward-big-btn" onclick="completeTokenReward()">
-                    ✓ Harika!
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
 <!-- ===================== SIRALAMA OYUNLARI ===================== -->
 <div id="sequence-screen">
     <button class="btn-back" onclick="goToMenu()">← Menü</button>
@@ -905,6 +846,16 @@ document.addEventListener('DOMContentLoaded', function(){
             <h3>Geçmiş Kayıtlar</h3>
             <div id="behaviorLogList"></div>
         </div>
+    </div>
+</div>
+
+<!-- ===================== YILDIZ ÖDÜL MODALI ===================== -->
+<div id="starRewardModal" style="display:none" class="star-modal-overlay" onclick="closeStarModal()">
+    <div class="star-modal-card" onclick="event.stopPropagation()">
+        <div class="star-modal-stars" id="starModalStars"></div>
+        <div class="star-modal-title" id="starModalTitle"></div>
+        <div class="star-modal-sub" id="starModalSub"></div>
+        <button class="star-modal-btn" onclick="closeStarModal()">Harika! ✨</button>
     </div>
 </div>
 

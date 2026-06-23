@@ -189,7 +189,7 @@ function celebrateCorrectAnswer() {
 // =============================================
 function showOnly(id) {
     const screens = ['start-screen','student-setup-screen','menu-screen','game-container','report-screen','matching-screen',
-                      'schedule-screen','aac-screen','token-screen','sequence-screen',
+                      'schedule-screen','aac-screen','sequence-screen',
                       'login-screen','iep-screen','skills-screen','behavior-screen','auth-screen','splash-screen','analysis-screen'];
     screens.forEach(s => {
         const el = document.getElementById(s);
@@ -320,6 +320,7 @@ function setTherapySelectionMode(isSelecting) {
 function goToMenu() {
     window.speechSynthesis.cancel();
     clearTimeout(idleTimer);
+    const hadTherapy = sessionData.micUsedInTherapy > 0 || sessionData.therapyTurns.length > 0;
     persistSessionSnapshot();
     setTherapySelectionMode(false);
     syncCityEntryPlacement(false);
@@ -327,6 +328,7 @@ function goToMenu() {
     if (cityShell) cityShell.style.display = '';
     showOnly('menu-screen');
     renderCityScene();
+    if (hadTherapy) _showStarReward();
 }
 
 let currentTopic = '';
@@ -2798,173 +2800,53 @@ function clearAacSentence() {
 // =============================================
 // ÖDÜL SİSTEMİ (TOKEN ECONOMY)
 // =============================================
-// Goal-based: teacher sets a specific behavior goal + desired reward before using.
-const TOKEN_REWARDS = [
-    { emoji: '🎮', label: 'Tablet Zamanı' },
-    { emoji: '🍬', label: 'Şeker' },
-    { emoji: '🎨', label: 'Boyama' },
-    { emoji: '📺', label: 'Çizgi Film' },
-    { emoji: '🎵', label: 'Müzik Dinleme' },
-    { emoji: '🌳', label: 'Bahçe Oyunu' },
-    { emoji: '📖', label: 'Hikaye Okuma' },
-    { emoji: '🧸', label: 'Oyuncak Seçimi' },
-];
+// GİZLİ YILDIZ ÖDÜL — seans sonu otomatik
+// =============================================
+function _showStarReward() {
+    const mic = sessionData.micUsedInTherapy || 0;
+    const repeat = sessionData.repeatUsed || 0;
+    const simplify = sessionData.simplifyUsed || 0;
+    const total = mic + repeat + simplify;
+    if (total === 0) return;
 
-function tokenSetupKey() { return `tok_setup_${activeStudentId || 'default'}`; }
-function tokenCountKey() { return `tok_count_${activeStudentId || 'default'}`; }
-
-function loadTokenSetup() {
-    const raw = localStorage.getItem(tokenSetupKey());
-    if (raw) { try { return JSON.parse(raw); } catch(e) {} }
-    return null;
-}
-function saveTokenSetup(setup) {
-    localStorage.setItem(tokenSetupKey(), JSON.stringify(setup));
-}
-function loadTokenCount() {
-    return parseInt(localStorage.getItem(tokenCountKey()) || '0', 10);
-}
-function saveTokenCount(n) {
-    localStorage.setItem(tokenCountKey(), String(n));
-}
-
-let _tokenSetupMax = 5;
-let _tokenSetupRewardIdx = 0;
-
-function goToTokens() {
-    showOnly('token-screen');
-    document.getElementById('tokenCelebration').style.display = 'none';
-    const setup = loadTokenSetup();
-    if (setup) {
-        showTokenActive(setup);
+    const indPct = Math.round((mic / total) * 100);
+    let stars, title, sub;
+    if (indPct >= 75) {
+        stars = 5;
+        title = 'Muhteşemsin! 🎉';
+        sub = 'Bu seans kendi başına çok güzel konuştun!';
+    } else if (indPct >= 45) {
+        stars = 3;
+        title = 'Aferin! ⭐';
+        sub = 'Harika bir seans geçirdin, her gün daha iyisin!';
     } else {
-        openTokenSetupForm(null);
+        stars = 1;
+        title = 'Eline sağlık! 💪';
+        sub = 'Bugün de konuşmak için çaba gösterdin, bu çok değerli!';
     }
-}
 
-function openTokenSetupForm(prefill) {
-    _tokenSetupMax = prefill?.max || 5;
-    _tokenSetupRewardIdx = prefill?.rewardIndex ?? 0;
-    document.getElementById('tokenSetupForm').style.display = '';
-    document.getElementById('tokenActive').style.display = 'none';
-    if (prefill?.goal) document.getElementById('tokenGoalInput').value = prefill.goal;
-    else document.getElementById('tokenGoalInput').value = '';
+    const starsEl = document.getElementById('starModalStars');
+    const titleEl = document.getElementById('starModalTitle');
+    const subEl = document.getElementById('starModalSub');
+    const modal = document.getElementById('starRewardModal');
+    if (!modal) return;
 
-    document.getElementById('tokenRewardSelect').innerHTML = TOKEN_REWARDS.map((r, i) => `
-        <button type="button" class="token-reward-opt ${i === _tokenSetupRewardIdx ? 'selected' : ''}"
-            onclick="pickSetupReward(${i})">
-            <span>${escapeHtml(r.emoji)}</span>
-            <span>${escapeHtml(r.label)}</span>
-        </button>
-    `).join('');
-    updateTokenMaxButtons();
-}
+    starsEl.innerHTML = Array.from({ length: 5 }, (_, i) =>
+        `<span class="star-icon ${i < stars ? 'star-on' : 'star-off'}" style="animation-delay:${i * 0.12}s">⭐</span>`
+    ).join('');
+    titleEl.textContent = title;
+    subEl.textContent = sub;
+    modal.style.display = 'flex';
 
-function pickSetupReward(i) {
-    _tokenSetupRewardIdx = i;
-    document.querySelectorAll('.token-reward-opt').forEach((btn, idx) => {
-        btn.classList.toggle('selected', idx === i);
-    });
-}
-
-function selectTokenMax(n) {
-    _tokenSetupMax = n;
-    updateTokenMaxButtons();
-}
-
-function updateTokenMaxButtons() {
-    document.querySelectorAll('.token-max-select .token-target-btn').forEach(btn => {
-        btn.classList.toggle('active', parseInt(btn.textContent) === _tokenSetupMax);
-    });
-}
-
-function commitTokenSetup() {
-    const goal = document.getElementById('tokenGoalInput').value.trim();
-    if (!goal) {
-        const inp = document.getElementById('tokenGoalInput');
-        inp.style.borderColor = '#e74c3c';
-        inp.focus();
-        setTimeout(() => { inp.style.borderColor = ''; }, 1800);
-        return;
+    if (typeof confetti === 'function' && stars >= 3) {
+        setTimeout(() => confetti({ particleCount: stars === 5 ? 140 : 70, spread: 80, origin: { y: 0.45 } }), 400);
     }
-    const setup = { goal, rewardIndex: _tokenSetupRewardIdx, max: _tokenSetupMax };
-    saveTokenSetup(setup);
-    saveTokenCount(0);
-    showTokenActive(setup);
+    speakFallback(title + ' ' + sub);
 }
 
-function showTokenActive(setup) {
-    document.getElementById('tokenSetupForm').style.display = 'none';
-    document.getElementById('tokenActive').style.display = '';
-    const reward = TOKEN_REWARDS[setup.rewardIndex] || TOKEN_REWARDS[0];
-    document.getElementById('tokenGoalCard').innerHTML = `
-        <div class="token-goal-behavior">
-            <span class="token-goal-tag">Hedef Davranış</span>
-            <span class="token-goal-text">${escapeHtml(setup.goal)}</span>
-        </div>
-        <div class="token-goal-arrow">→</div>
-        <div class="token-goal-reward">
-            <span class="token-goal-tag">Ödül</span>
-            <span class="token-goal-reward-val">${escapeHtml(reward.emoji)} ${escapeHtml(reward.label)}</span>
-        </div>
-    `;
-    renderTokenBoard(setup);
-}
-
-function renderTokenBoard(setup) {
-    if (!setup) setup = loadTokenSetup();
-    if (!setup) return;
-    const max = setup.max;
-    const count = Math.min(loadTokenCount(), max);
-    document.getElementById('tokenCount').textContent = `${count} / ${max}`;
-    let html = '';
-    for (let i = 0; i < max; i++) {
-        html += `<div class="token-slot ${i < count ? 'filled' : ''}">${i < count ? '⭐' : ''}</div>`;
-    }
-    document.getElementById('tokenBoard').innerHTML = html;
-}
-
-function awardToken() {
-    const setup = loadTokenSetup();
-    if (!setup) return;
-    const count = loadTokenCount();
-    if (count >= setup.max) return;
-    const next = count + 1;
-    saveTokenCount(next);
-    speakFallback('Aferin! Bir yıldız kazandın!');
-    renderTokenBoard(setup);
-    if (next >= setup.max) {
-        setTimeout(() => showTokenCelebration(setup), 600);
-    }
-}
-
-function removeToken() {
-    const count = loadTokenCount();
-    if (count <= 0) return;
-    saveTokenCount(count - 1);
-    renderTokenBoard();
-}
-
-function showTokenCelebration(setup) {
-    if (typeof confetti === 'function') {
-        confetti({ particleCount: 120, spread: 80, origin: { y: 0.5 } });
-    }
-    const reward = TOKEN_REWARDS[setup.rewardIndex] || TOKEN_REWARDS[0];
-    document.getElementById('tokenCelebrationTitle').textContent = 'Tebrikler! 🎉';
-    document.getElementById('tokenCelebrationMsg').textContent =
-        `"${setup.goal}" için tüm puanları topladın!\nÖdülün: ${reward.emoji} ${reward.label}`;
-    speakFallback(`Tebrikler! ${setup.goal} için tüm puanları topladın! Ödülün: ${reward.label}`);
-    document.getElementById('tokenCelebration').style.display = 'flex';
-}
-
-function completeTokenReward() {
-    saveTokenCount(0);
-    document.getElementById('tokenCelebration').style.display = 'none';
-    renderTokenBoard();
-}
-
-function changeTokenGoal() {
-    openTokenSetupForm(loadTokenSetup());
+function closeStarModal() {
+    const modal = document.getElementById('starRewardModal');
+    if (modal) modal.style.display = 'none';
 }
 
 // =============================================
@@ -3308,14 +3190,7 @@ window.tapAacCard = tapAacCard;
 window.removeAacWord = removeAacWord;
 window.speakAacSentence = speakAacSentence;
 window.clearAacSentence = clearAacSentence;
-window.goToTokens = goToTokens;
-window.pickSetupReward = pickSetupReward;
-window.selectTokenMax = selectTokenMax;
-window.commitTokenSetup = commitTokenSetup;
-window.awardToken = awardToken;
-window.removeToken = removeToken;
-window.completeTokenReward = completeTokenReward;
-window.changeTokenGoal = changeTokenGoal;
+window.closeStarModal = closeStarModal;
 window.goToSequence = goToSequence;
 window.startSequenceGame = startSequenceGame;
 window.tapSequenceCard = tapSequenceCard;
