@@ -77,10 +77,17 @@ function init() {
         if (eyesMesh) startBlinkLoop();
     });
 
-    (function renderLoop() {
+    (function renderLoop(t) {
         requestAnimationFrame(renderLoop);
+        // TEST: ağız morph target çalışıyor mu? Sine dalgasıyla otomatik açıp kapatır.
+        // Onaylandıktan sonra bu satırı sil.
+        if (mouth) {
+            const keys = mouth.morphTargetDictionary;
+            const key  = 'viseme_aa' in keys ? 'viseme_aa' : 'mouth_open' in keys ? 'mouth_open' : null;
+            if (key) mouth.morphTargetInfluences[keys[key]] = (Math.sin(t * 0.003) + 1) / 2;
+        }
         renderer.render(scene, camera);
-    })();
+    })(0);
 }
 
 function startBlinkLoop() {
