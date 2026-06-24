@@ -6,6 +6,15 @@
     <title>Yıldız Sınıfı | Yıldız Can AI</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.163.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.163.0/examples/jsm/"
+      }
+    }
+    </script>
+    <script type="module" src="avatar3d.js"></script>
     <!-- LMS veri katmanı (script.js'den önce yüklenmeli) -->
     <script src="db-client.js"></script>
 </head>
@@ -324,7 +333,7 @@ document.addEventListener('DOMContentLoaded', function(){
         <div id="info" class="therapy-session-ui">Lütfen bekleyin...</div>
     </div><!-- /.main-card -->
     <div class="side-card" id="therapySideCard">
-        <img src="avatar.png" class="side-avatar" alt="Yıldız Can">
+        <canvas id="avatarCanvas"></canvas>
         <div id="chat-bubbles"></div>
         <div class="ai-mode-btns">
             <button type="button" class="ai-mode-btn" onclick="askAIMode('repeat')" title="Soruyu tekrar dinle">🔄 Tekrar Et</button>

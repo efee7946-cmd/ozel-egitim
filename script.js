@@ -138,9 +138,8 @@ function initAudioContext() {
 }
 
 function startLipsync() {
+    if (!analyserNode) return;
     const { wrapper, lipOuter, lipInner } = getActiveLipsyncElements();
-    if (!lipOuter || !analyserNode) return;
-
     const dataArray = new Uint8Array(analyserNode.frequencyBinCount);
 
     function animate() {
@@ -152,21 +151,32 @@ function startLipsync() {
         let viseme = 'closed';
         if (openAmount > 5.3) viseme = 'open';
         else if (openAmount > 2.2) viseme = 'mid';
+
+        // 3D avatar morph targets
+        if (window.avatar3d) {
+            window.avatar3d.clearVisemes();
+            if (viseme === 'open') window.avatar3d.setViseme('viseme_aa', Math.min(1, openAmount / 8));
+            else if (viseme === 'mid') window.avatar3d.setViseme('viseme_aa', Math.min(0.45, openAmount / 5));
+        }
+
+        // SVG fallback (eğer varsa)
         if (wrapper) wrapper.dataset.viseme = viseme;
-
-        const rx = viseme === 'open' ? 13 : (viseme === 'mid' ? 11.2 : 10);
-        const ry = viseme === 'open' ? 10.5 : (viseme === 'mid' ? 6 : 3.2);
-
-        lipOuter.setAttribute('ry', ry.toFixed(1));
-        lipOuter.setAttribute('rx', rx.toFixed(1));
-        lipInner.setAttribute('ry', viseme === 'open' ? '6.8' : (viseme === 'mid' ? '3.2' : '0.8'));
-        lipInner.style.opacity = viseme === 'closed' ? '0' : '1';
+        if (lipOuter && lipInner) {
+            const rx = viseme === 'open' ? 13 : (viseme === 'mid' ? 11.2 : 10);
+            const ry = viseme === 'open' ? 10.5 : (viseme === 'mid' ? 6 : 3.2);
+            lipOuter.setAttribute('ry', ry.toFixed(1));
+            lipOuter.setAttribute('rx', rx.toFixed(1));
+            lipInner.setAttribute('ry', viseme === 'open' ? '6.8' : (viseme === 'mid' ? '3.2' : '0.8'));
+            lipInner.style.opacity = viseme === 'closed' ? '0' : '1';
+        }
     }
     animate();
 }
 
 function stopLipsync() {
     if (lipsyncRaf) cancelAnimationFrame(lipsyncRaf);
+    lipsyncRaf = null;
+    if (window.avatar3d) window.avatar3d.clearVisemes();
     const { wrapper, lipOuter, lipInner } = getActiveLipsyncElements();
     if (wrapper) wrapper.dataset.viseme = 'closed';
     if (lipOuter) { lipOuter.setAttribute('ry', '3'); lipOuter.setAttribute('rx', '10'); }

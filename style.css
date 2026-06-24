@@ -1081,9 +1081,17 @@ body {
 .main-card { flex: 2.5; } 
 .side-card { flex: 1.2; align-items: center; overflow: hidden; }
 
-.side-avatar { 
-    width: 120px; height: 120px; border-radius: 50%; 
-    margin-bottom: 15px; border: 4px solid var(--soft-purple); object-fit: cover; 
+.side-avatar {
+    width: 120px; height: 120px; border-radius: 50%;
+    margin-bottom: 15px; border: 4px solid var(--soft-purple); object-fit: cover;
+}
+
+#avatarCanvas {
+    width: 100%;
+    height: 240px;
+    display: block;
+    border-radius: 20px;
+    margin-bottom: 10px;
 }
 
 .avatar-lipsync-wrap {
