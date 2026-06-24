@@ -29,19 +29,17 @@ function init() {
         const model = gltf.scene;
         scene.add(model);
 
-        // Modeli kameraya döndür (Blender -Y → Three.js +Z uyumsuzluğu)
-        model.rotation.y = Math.PI;
-
         const box    = new THREE.Box3().setFromObject(model);
         const center = box.getCenter(new THREE.Vector3());
         const size   = box.getSize(new THREE.Vector3());
-        const headY  = box.max.y - size.y * 0.25;  // yüz merkezi
-        const dist   = size.y * 1.1;               // yeterli mesafe
-        camera.position.set(center.x, headY, center.z + dist);
+        const headY  = box.max.y - size.y * 0.25;
+        const dist   = size.y * 1.1;
+
+        // Blender export modeli -Z'ye baktırır → kamera -Z tarafında olmalı
+        camera.position.set(center.x, headY, center.z - dist);
         camera.lookAt(center.x, headY, center.z);
 
-        // Debug: console'da bounding box değerlerini gör
-        console.log('Avatar box:', { size, center, headY, dist });
+        console.log('Avatar box:', JSON.stringify({ sizeY: size.y.toFixed(2), headY: headY.toFixed(2), dist: dist.toFixed(2) }));
 
         // Kullanıcının yazdığı traverse kodu
         gltf.scene.traverse((o) => {
