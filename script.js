@@ -340,6 +340,7 @@ function goToMenu() {
 }
 
 let currentTopic = '';
+let sessionTotalQuestions = 0;
 
 function goToTherapy() {
     showOnly('game-container');
@@ -384,6 +385,7 @@ async function startTherapyWithTopic() {
     } catch {
         unaskedQuestions = [{ q: `${currentTopic} hakkında ne düşünüyorsun?`, query: currentTopic, goal: currentTopic }];
     }
+    sessionTotalQuestions = unaskedQuestions.length;
 
     chatHistory = [];
     turnCount = 0;
@@ -2154,8 +2156,7 @@ function showMatchingComplete() {
 // İLERLEME & YARDIMCI FONKSIYONLAR
 // =============================================
 function updateProgressBar() {
-    const allQuestions = getActiveTherapyQuestions();
-    const total = allQuestions.length;
+    const total = (currentTopic && sessionTotalQuestions) ? sessionTotalQuestions : getActiveTherapyQuestions().length;
     const answered = total - unaskedQuestions.length;
     const pct = total > 0 ? Math.round((answered / total) * 100) : 0;
 
