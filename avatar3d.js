@@ -64,15 +64,23 @@ function init() {
         resize();
         frameObject(model, camera, 1.3);
 
-        // Morph target mesh'lerini bul + konsola yaz
+        // Tüm morph target'ları logla, isim ne olursa olsun bul
         gltf.scene.traverse((o) => {
             if (!o.morphTargetDictionary) return;
-            console.log('Mesh:', o.name, Object.keys(o.morphTargetDictionary));
-            if ('viseme_aa' in o.morphTargetDictionary || 'mouth_open' in o.morphTargetDictionary) mouth = o;
-            if ('blink'     in o.morphTargetDictionary) eyesMesh = o;
+            const keys = Object.keys(o.morphTargetDictionary);
+            console.log('Mesh:', o.name, keys);
+
+            // Ağız: ismi "mouth", "jaw", "open", "viseme" geçen ilk key
+            const mouthKey = keys.find(k => /mouth|jaw|open|viseme/i.test(k));
+            if (mouthKey && !mouth) { mouth = o; mouth._mouthKey = mouthKey; }
+
+            // Göz: ismi "blink", "eye" geçen
+            const blinkKey = keys.find(k => /blink|eye/i.test(k));
+            if (blinkKey && !eyesMesh) { eyesMesh = o; eyesMesh._blinkKey = blinkKey; }
         });
 
-        console.log('Mouth bulundu mu:', !!mouth, mouth && Object.keys(mouth.morphTargetDictionary));
+        console.log('Mouth:', !!mouth, mouth?._mouthKey);
+        console.log('Eyes:', !!eyesMesh, eyesMesh?._blinkKey);
 
         if (eyesMesh) startBlinkLoop();
     });
@@ -80,11 +88,9 @@ function init() {
     (function renderLoop(t) {
         requestAnimationFrame(renderLoop);
         // TEST: ağız morph target çalışıyor mu? Sine dalgasıyla otomatik açıp kapatır.
-        // Onaylandıktan sonra bu satırı sil.
-        if (mouth) {
-            const keys = mouth.morphTargetDictionary;
-            const key  = 'viseme_aa' in keys ? 'viseme_aa' : 'mouth_open' in keys ? 'mouth_open' : null;
-            if (key) mouth.morphTargetInfluences[keys[key]] = (Math.sin(t * 0.003) + 1) / 2;
+        if (mouth && mouth._mouthKey) {
+            const idx = mouth.morphTargetDictionary[mouth._mouthKey];
+            mouth.morphTargetInfluences[idx] = (Math.sin(t * 0.003) + 1) / 2;
         }
         renderer.render(scene, camera);
     })(0);
@@ -92,8 +98,8 @@ function init() {
 
 function startBlinkLoop() {
     const blink = () => {
-        if (eyesMesh && 'blink' in eyesMesh.morphTargetDictionary) {
-            const idx = eyesMesh.morphTargetDictionary['blink'];
+        if (eyesMesh && eyesMesh._blinkKey) {
+            const idx = eyesMesh.morphTargetDictionary[eyesMesh._blinkKey];
             eyesMesh.morphTargetInfluences[idx] = 1;
             setTimeout(() => { eyesMesh.morphTargetInfluences[idx] = 0; }, 120);
         }
@@ -102,22 +108,14 @@ function startBlinkLoop() {
     blinkTimer = setTimeout(blink, 800 + Math.random() * 1500);
 }
 
-function setViseme(name, value) {
-    if (!mouth) return;
-    // mouth_open veya viseme_aa — hangisi varsa onu kullan
-    const key = name in mouth.morphTargetDictionary ? name
-              : 'mouth_open' in mouth.morphTargetDictionary ? 'mouth_open'
-              : null;
-    if (key !== null) mouth.morphTargetInfluences[mouth.morphTargetDictionary[key]] = value;
+function setViseme(_, value) {
+    if (!mouth || !mouth._mouthKey) return;
+    mouth.morphTargetInfluences[mouth.morphTargetDictionary[mouth._mouthKey]] = value;
 }
 
 function clearVisemes() {
-    if (!mouth) return;
-    for (const k of Object.keys(mouth.morphTargetDictionary)) {
-        if (k.startsWith('viseme_') || k === 'mouth_open') {
-            mouth.morphTargetInfluences[mouth.morphTargetDictionary[k]] = 0;
-        }
-    }
+    if (!mouth || !mouth._mouthKey) return;
+    mouth.morphTargetInfluences[mouth.morphTargetDictionary[mouth._mouthKey]] = 0;
 }
 
 window.avatar3d = { setViseme, clearVisemes };
