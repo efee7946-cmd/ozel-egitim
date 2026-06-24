@@ -29,14 +29,14 @@ function init() {
         const model = gltf.scene;
         scene.add(model);
 
-        // Bounding box ile kamerayı otomatik konumlandır
-        const box = new THREE.Box3().setFromObject(model);
+        // Kafa alanına odaklan (bounding box'ın üst %20'si = yüz)
+        const box    = new THREE.Box3().setFromObject(model);
         const center = box.getCenter(new THREE.Vector3());
         const size   = box.getSize(new THREE.Vector3());
-        const focusY = center.y + size.y * 0.1;
-        const dist   = size.y * 1.2;
-        camera.position.set(center.x, focusY, center.z + dist);
-        camera.lookAt(center.x, focusY, center.z);
+        const headY  = box.max.y - size.y * 0.2;   // yüz/kafa merkezi
+        const dist   = size.y * 0.7;               // yakın çekim
+        camera.position.set(center.x, headY, center.z + dist);
+        camera.lookAt(center.x, headY, center.z);
 
         // Kullanıcının yazdığı traverse kodu
         gltf.scene.traverse((o) => {
