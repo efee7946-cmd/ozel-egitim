@@ -70,8 +70,10 @@ function init() {
             const keys = Object.keys(o.morphTargetDictionary);
             console.log('Mesh:', o.name, keys);
 
-            // Ağız: ismi "mouth", "jaw", "open", "viseme" geçen ilk key
-            const mouthKey = keys.find(k => /mouth|jaw|open|viseme/i.test(k));
+                // Ağız: viseme_aa tercihli, yoksa mouth_open, yoksa pattern'e uyan ilk key
+            const mouthKey = keys.find(k => k === 'viseme_aa')
+                          || keys.find(k => k === 'mouth_open')
+                          || keys.find(k => /mouth|jaw|viseme/i.test(k));
             if (mouthKey && !mouth) { mouth = o; mouth._mouthKey = mouthKey; }
 
             // Göz: ismi "blink", "eye" geçen
@@ -85,15 +87,10 @@ function init() {
         if (eyesMesh) startBlinkLoop();
     });
 
-    (function renderLoop(t) {
+    (function renderLoop() {
         requestAnimationFrame(renderLoop);
-        // TEST: ağız morph target çalışıyor mu? Sine dalgasıyla otomatik açıp kapatır.
-        if (mouth && mouth._mouthKey) {
-            const idx = mouth.morphTargetDictionary[mouth._mouthKey];
-            mouth.morphTargetInfluences[idx] = (Math.sin(t * 0.003) + 1) / 2;
-        }
         renderer.render(scene, camera);
-    })(0);
+    })();
 }
 
 function startBlinkLoop() {
@@ -105,7 +102,7 @@ function startBlinkLoop() {
         }
         blinkTimer = setTimeout(blink, 2500 + Math.random() * 2500);
     };
-    blinkTimer = setTimeout(blink, 800 + Math.random() * 1500);
+    blinkTimer = setTimeout(blink, 2000 + Math.random() * 3000);
 }
 
 function setViseme(_, value) {
