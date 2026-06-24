@@ -14,7 +14,7 @@ function init() {
     renderer.outputColorSpace = THREE.SRGBColorSpace;
 
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 20);
+    const camera = new THREE.PerspectiveCamera(28, 1, 0.1, 20);
 
     scene.add(new THREE.AmbientLight(0xffffff, 1.5));
     const key = new THREE.DirectionalLight(0xfff0d0, 3);
@@ -29,14 +29,19 @@ function init() {
         const model = gltf.scene;
         scene.add(model);
 
-        // Kafa alanına odaklan (bounding box'ın üst %20'si = yüz)
+        // Modeli kameraya döndür (Blender -Y → Three.js +Z uyumsuzluğu)
+        model.rotation.y = Math.PI;
+
         const box    = new THREE.Box3().setFromObject(model);
         const center = box.getCenter(new THREE.Vector3());
         const size   = box.getSize(new THREE.Vector3());
-        const headY  = box.max.y - size.y * 0.2;   // yüz/kafa merkezi
-        const dist   = size.y * 0.7;               // yakın çekim
+        const headY  = box.max.y - size.y * 0.25;  // yüz merkezi
+        const dist   = size.y * 1.1;               // yeterli mesafe
         camera.position.set(center.x, headY, center.z + dist);
         camera.lookAt(center.x, headY, center.z);
+
+        // Debug: console'da bounding box değerlerini gör
+        console.log('Avatar box:', { size, center, headY, dist });
 
         // Kullanıcının yazdığı traverse kodu
         gltf.scene.traverse((o) => {
