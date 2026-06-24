@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Yıldız Sınıfı | Yıldız Can AI</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="aac.css">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script type="importmap">
     {
@@ -17,6 +18,7 @@
     <script type="module" src="avatar3d.js"></script>
     <!-- LMS veri katmanı (script.js'den önce yüklenmeli) -->
     <script src="db-client.js"></script>
+    <script src="aac-data.js"></script>
 </head>
 <body>
 
@@ -627,19 +629,23 @@ document.addEventListener('DOMContentLoaded', function(){
 
 <!-- ===================== AAC PANOSU ===================== -->
 <div id="aac-screen">
-    <button class="btn-back" onclick="goToMenu()">← Menü</button>
-    <div class="aac-wrapper">
+    <div class="aac-board" id="aacBoard">
+        <div class="aac-core-strip" id="aacCoreStrip"></div>
+        <div class="aac-nav" id="aacNav">
+            <button class="aac-nav-btn" onclick="goToMenu()">← Menü</button>
+        </div>
+        <div class="aac-grid-wrap">
+            <div class="aac-grid" id="aacGrid"></div>
+        </div>
         <div class="aac-sentence-bar">
-            <div class="aac-sentence-words" id="aacSentenceWords">
+            <div id="aacSentenceWords" style="display:flex;align-items:center;gap:6px;flex:1;overflow-x:auto;min-width:0;">
                 <span class="aac-sentence-placeholder">Kart seç, cümle oluştur...</span>
             </div>
             <div class="aac-sentence-actions">
-                <button type="button" class="aac-speak-btn" onclick="speakAacSentence()">🔊 Söyle</button>
-                <button type="button" class="aac-clear-btn" onclick="clearAacSentence()">✕</button>
+                <button type="button" class="aac-action-btn speak" id="aacSpeakBtn" onclick="speakAacSentence()" disabled>🔊</button>
+                <button type="button" class="aac-action-btn clear" onclick="clearAacSentence()">✕</button>
             </div>
         </div>
-        <div class="aac-categories" id="aacCategories"></div>
-        <div class="aac-grid" id="aacGrid"></div>
     </div>
 </div>
 

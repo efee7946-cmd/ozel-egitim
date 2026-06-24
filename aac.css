@@ -1,0 +1,637 @@
+/* ============================================================================
+ * aac.css — AAC board runtime + editör stilleri
+ * ----------------------------------------------------------------------------
+ * Scope stratejisi:
+ *   .aac-board   → öğrenci runtime — izole token'lar, erişilebilirlik öncelikli
+ *   .aac-editor  → öğretmen editörü — app token'larını tüketir (var(--token,fallback))
+ *
+ * App token'ları: --primary, --accent, --soft-purple, --bg, --brand-grad
+ * ========================================================================= */
+
+/* ============================================================================
+ * RUNTIME BOARD
+ * ========================================================================= */
+
+/* showOnly() display:flex set eder — board tam ekranı doldurur */
+#aac-screen {
+  padding: 0 !important;
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  align-items: stretch;
+}
+
+.aac-board {
+  --aac-bg:         #f8fafc;
+  --aac-card-bg:    #ffffff;
+  --aac-card-ink:   #0f1a2e;
+  --aac-card-r:     16px;
+  --aac-card-min:   72px;       /* dokunma hedefi min — motor erişim */
+  --aac-gap:        10px;
+  --aac-core-h:     72px;
+  --aac-core-bg:    #1d3b62;
+  --aac-core-ink:   #ffffff;
+  --aac-core-card:  #2a4f82;
+  --aac-nav-bg:     #ffffff;
+  --aac-nav-border: rgba(0,0,0,0.08);
+  --aac-sentence-bg:#f0f4f8;
+  --aac-accent:     #6C63FF;
+  --aac-danger:     #e53e3e;
+
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--aac-bg);
+  font-family: 'Segoe UI', sans-serif;
+  user-select: none;
+  -webkit-user-select: none;
+  overflow: hidden;
+}
+
+/* ---- Çekirdek kelime şeridi ---- */
+.aac-core-strip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: var(--aac-core-bg);
+  min-height: var(--aac-core-h);
+  flex-shrink: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.aac-core-strip::-webkit-scrollbar { display: none; }
+
+.aac-core-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  min-width: 60px;
+  min-height: 56px;
+  padding: 6px 10px;
+  background: var(--aac-core-card);
+  color: var(--aac-core-ink);
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 0.7rem;
+  font-weight: 600;
+  flex-shrink: 0;
+  transition: background 0.12s, transform 0.1s;
+  -webkit-tap-highlight-color: transparent;
+}
+.aac-core-card:active { background: #3b6aaa; transform: scale(0.93); }
+
+.aac-core-card .aac-card-emoji { font-size: 1.4rem; line-height: 1; }
+
+/* ---- Board navigasyon (kategori sekmeleri) ---- */
+.aac-nav {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: var(--aac-nav-bg);
+  border-bottom: 1px solid var(--aac-nav-border);
+  overflow-x: auto;
+  flex-shrink: 0;
+  scrollbar-width: none;
+}
+.aac-nav::-webkit-scrollbar { display: none; }
+
+.aac-nav-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: 2px solid transparent;
+  border-radius: 20px;
+  background: #f0f4f8;
+  color: #4b6079;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.aac-nav-btn.active {
+  background: var(--aac-accent);
+  color: #fff;
+  border-color: var(--aac-accent);
+}
+.aac-nav-btn:not(.active):active { background: #e2e8f0; }
+
+/* ---- Kart grid'i ---- */
+.aac-grid-wrap {
+  flex: 1;
+  padding: var(--aac-gap);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.aac-grid {
+  display: grid;
+  gap: var(--aac-gap);
+  width: 100%;
+  height: 100%;
+  /* row/col sayısı JS'den style attribute olarak gelir:
+     grid-template-columns: repeat(N, 1fr);
+     grid-template-rows:    repeat(N, 1fr); */
+}
+
+/* ---- Kart ---- */
+.aac-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: var(--aac-card-min);
+  padding: 8px 4px;
+  background: var(--aac-card-bg);
+  color: var(--aac-card-ink);
+  border: 2px solid rgba(0,0,0,0.06);
+  border-radius: var(--aac-card-r);
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  transition: transform 0.1s, box-shadow 0.1s, border-color 0.12s;
+  -webkit-tap-highlight-color: transparent;
+  overflow: hidden;
+  word-break: break-word;
+  hyphens: auto;
+}
+.aac-card:active {
+  transform: scale(0.91);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  border-color: var(--aac-accent);
+}
+
+.aac-card-emoji {
+  font-size: clamp(1.6rem, 5vw, 2.4rem);
+  line-height: 1;
+}
+.aac-card img.aac-card-img {
+  width: 100%;
+  max-height: 60%;
+  object-fit: contain;
+  border-radius: 8px;
+}
+.aac-card-text {
+  font-size: clamp(0.65rem, 2vw, 0.82rem);
+  font-weight: 700;
+  text-align: center;
+  line-height: 1.2;
+}
+
+/* Boş slot — editör modunda gösterilir */
+.aac-card.empty {
+  background: transparent;
+  border: 2px dashed rgba(0,0,0,0.15);
+  box-shadow: none;
+  cursor: pointer;
+  opacity: 0.5;
+}
+.aac-card.empty:hover { opacity: 0.85; border-color: var(--aac-accent); }
+.aac-card.empty .aac-card-emoji { font-size: 1.4rem; color: #aaa; }
+
+/* Sınır dışı kart (grid küçültüldüyse — runtime'da görünmez, debug için) */
+.aac-card.out-of-bounds { display: none; }
+
+/* ---- Cümle çubuğu ---- */
+.aac-sentence-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--aac-sentence-bg);
+  border-top: 1px solid var(--aac-nav-border);
+  min-height: 56px;
+  flex-shrink: 0;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.aac-sentence-placeholder {
+  color: #aab4c0;
+  font-size: 0.88rem;
+  font-style: italic;
+}
+
+.aac-word-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 10px;
+  background: #fff;
+  border: 1.5px solid rgba(108,99,255,0.3);
+  border-radius: 20px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #1a2640;
+  white-space: nowrap;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: border-color 0.12s;
+}
+.aac-word-chip:hover { border-color: var(--aac-danger); color: var(--aac-danger); }
+
+/* ---- Cümle aksiyon butonları ---- */
+.aac-sentence-actions {
+  display: flex;
+  gap: 6px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.aac-action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+  transition: transform 0.1s, opacity 0.1s;
+  -webkit-tap-highlight-color: transparent;
+}
+.aac-action-btn:active { transform: scale(0.88); }
+.aac-action-btn.speak   { background: var(--aac-accent); color: #fff; }
+.aac-action-btn.clear   { background: #f0f4f8; color: #4b6079; }
+.aac-action-btn:disabled { opacity: 0.35; pointer-events: none; }
+
+
+/* ============================================================================
+ * EDITÖR — .aac-editor scope
+ * App token'ları tüketilir; fallback'ler uygulamanın genel paletine yakın.
+ * ========================================================================= */
+
+.aac-editor {
+  --ed-primary:  var(--primary,  #4CAF50);
+  --ed-accent:   var(--accent,   #6C63FF);
+  --ed-bg:       var(--bg,       #F0F4F8);
+  --ed-surface:  #ffffff;
+  --ed-border:   rgba(0,0,0,0.09);
+  --ed-ink:      #0f1a2e;
+  --ed-muted:    #4b6079;
+  --ed-danger:   #e53e3e;
+  --ed-radius:   20px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px;
+  font-family: 'Segoe UI', sans-serif;
+  color: var(--ed-ink);
+}
+
+/* Editör üst çubuğu */
+.aac-editor-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.aac-editor-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--ed-ink);
+  margin: 0;
+}
+
+/* Editör mod anahtarı */
+.aac-mode-switch {
+  display: flex;
+  gap: 4px;
+  background: var(--ed-bg);
+  border-radius: 24px;
+  padding: 4px;
+}
+.aac-mode-switch button {
+  padding: 7px 18px;
+  border: none;
+  border-radius: 20px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: transparent;
+  color: var(--ed-muted);
+  transition: background 0.15s, color 0.15s;
+}
+.aac-mode-switch button.active {
+  background: var(--ed-surface);
+  color: var(--ed-ink);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+}
+
+/* Board sekme listesi (editör) */
+.aac-editor-boards {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scrollbar-width: none;
+}
+.aac-editor-boards::-webkit-scrollbar { display: none; }
+
+.aac-editor-board-tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: 2px solid var(--ed-border);
+  border-radius: 16px;
+  background: var(--ed-surface);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  color: var(--ed-muted);
+  transition: border-color 0.15s, color 0.15s;
+}
+.aac-editor-board-tab.active {
+  border-color: var(--ed-accent);
+  color: var(--ed-accent);
+}
+
+.aac-editor-board-tab-add {
+  padding: 8px 14px;
+  border: 2px dashed var(--ed-border);
+  border-radius: 16px;
+  background: transparent;
+  color: var(--ed-muted);
+  font-size: 1rem;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: border-color 0.15s, color 0.15s;
+}
+.aac-editor-board-tab-add:hover { border-color: var(--ed-accent); color: var(--ed-accent); }
+
+/* Editör grid — boş slotlar dahil gösterilir */
+.aac-editor-grid {
+  display: grid;
+  gap: 10px;
+  /* grid-template-columns: repeat(N, 1fr) JS'den */
+}
+
+/* Editör kart — dolu */
+.aac-editor-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 80px;
+  padding: 10px 6px;
+  background: var(--ed-surface);
+  border: 2px solid var(--ed-border);
+  border-radius: 14px;
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  overflow: hidden;
+  word-break: break-word;
+}
+.aac-editor-card:hover {
+  border-color: var(--ed-accent);
+  box-shadow: 0 0 0 3px rgba(108,99,255,0.12);
+}
+.aac-editor-card.is-core {
+  border-color: #1d3b62;
+  background: #f0f4fa;
+}
+
+.aac-editor-card-emoji { font-size: 1.6rem; line-height: 1; }
+.aac-editor-card img.aac-editor-card-img {
+  width: 100%;
+  max-height: 54px;
+  object-fit: contain;
+  border-radius: 6px;
+}
+.aac-editor-card-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-align: center;
+  color: var(--ed-ink);
+}
+.aac-editor-card-spoken {
+  font-size: 0.65rem;
+  color: var(--ed-muted);
+  text-align: center;
+  font-style: italic;
+}
+
+/* Core rozeti */
+.aac-core-badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: #1d3b62;
+  color: #fff;
+  font-size: 0.55rem;
+  font-weight: 700;
+  padding: 2px 5px;
+  border-radius: 8px;
+  line-height: 1.4;
+  letter-spacing: 0.02em;
+}
+
+/* Editör boş slot */
+.aac-editor-slot-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 80px;
+  border: 2px dashed var(--ed-border);
+  border-radius: 14px;
+  cursor: pointer;
+  color: #c0cad6;
+  font-size: 1.5rem;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+.aac-editor-slot-empty:hover {
+  border-color: var(--ed-accent);
+  color: var(--ed-accent);
+  background: rgba(108,99,255,0.04);
+}
+
+/* ---- Kart düzenle panel (modal içi) ---- */
+.aac-card-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.aac-form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.aac-form-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--ed-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.aac-form-input {
+  padding: 10px 13px;
+  border: 1.5px solid var(--ed-border);
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  color: var(--ed-ink);
+  background: var(--ed-bg);
+  transition: border-color 0.15s;
+  outline: none;
+}
+.aac-form-input:focus { border-color: var(--ed-accent); }
+
+/* Görsel seçici */
+.aac-visual-picker {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.aac-visual-preview {
+  width: 64px;
+  height: 64px;
+  border-radius: 12px;
+  border: 2px solid var(--ed-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  background: var(--ed-bg);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.aac-visual-preview img { width: 100%; height: 100%; object-fit: contain; }
+
+.aac-visual-btns {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.aac-visual-btn {
+  padding: 7px 14px;
+  border: 1.5px solid var(--ed-border);
+  border-radius: 10px;
+  background: var(--ed-surface);
+  color: var(--ed-ink);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.12s, background 0.12s;
+}
+.aac-visual-btn:hover { border-color: var(--ed-accent); background: rgba(108,99,255,0.05); }
+
+/* Core işaret kutusu */
+.aac-core-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 0.88rem;
+  color: var(--ed-ink);
+}
+.aac-core-check input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: var(--ed-accent);
+}
+
+/* Tehlikeli aksiyon (sil, taşı) */
+.aac-btn-danger {
+  padding: 8px 18px;
+  border: 2px solid var(--ed-danger);
+  border-radius: 12px;
+  background: transparent;
+  color: var(--ed-danger);
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.aac-btn-danger:hover { background: rgba(229,62,62,0.07); }
+
+/* Kaydet / Birincil aksiyon */
+.aac-btn-primary {
+  padding: 10px 22px;
+  border: none;
+  border-radius: 14px;
+  background: var(--ed-accent);
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.12s, transform 0.1s;
+}
+.aac-btn-primary:active { opacity: 0.85; transform: scale(0.97); }
+
+/* Grid boyutu ayarı */
+.aac-grid-size-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.aac-grid-size-row label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--ed-muted);
+}
+.aac-grid-size-input {
+  width: 54px;
+  padding: 6px 10px;
+  border: 1.5px solid var(--ed-border);
+  border-radius: 10px;
+  font-size: 0.88rem;
+  text-align: center;
+  background: var(--ed-bg);
+  color: var(--ed-ink);
+  outline: none;
+}
+.aac-grid-size-input:focus { border-color: var(--ed-accent); }
+
+/* ---- Responsive ---- */
+@media (max-width: 480px) {
+  .aac-board { --aac-card-min: 60px; --aac-gap: 7px; --aac-card-r: 12px; }
+  .aac-editor { padding: 16px; }
+  .aac-card-text { font-size: 0.62rem; }
+}
+
+@media (min-width: 900px) {
+  .aac-board { --aac-card-min: 88px; --aac-gap: 12px; }
+  .aac-card-emoji { font-size: 2rem; }
+}
+
+/* Yüksek kontrast desteği */
+@media (forced-colors: active) {
+  .aac-card, .aac-core-card, .aac-nav-btn {
+    border: 2px solid ButtonText;
+  }
+  .aac-card:active, .aac-nav-btn.active {
+    background: Highlight;
+    color: HighlightText;
+  }
+}

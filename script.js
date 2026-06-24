@@ -2830,138 +2830,125 @@ function resetSchedule() {
 // =============================================
 // AAC PANOSU
 // =============================================
-const AAC_CATEGORIES = [
-    {
-        id: 'feelings', label: '😊 Duygular', color: '#ff9f43',
-        cards: [
-            { emoji: '😊', text: 'Mutluyum' },
-            { emoji: '😢', text: 'Üzgünüm' },
-            { emoji: '😡', text: 'Kızgınım' },
-            { emoji: '😨', text: 'Korkuyorum' },
-            { emoji: '😴', text: 'Yorgunum' },
-            { emoji: '🤢', text: 'Midem bulanıyor' },
-            { emoji: '😍', text: 'Seviyorum' },
-            { emoji: '😐', text: 'Fark etmez' },
-        ]
-    },
-    {
-        id: 'needs', label: '🙋 İhtiyaçlar', color: '#48dbfb',
-        cards: [
-            { emoji: '🚰', text: 'Su istiyorum' },
-            { emoji: '🍎', text: 'Acıktım' },
-            { emoji: '🚽', text: 'Tuvalet' },
-            { emoji: '😴', text: 'Uyumak istiyorum' },
-            { emoji: '🎮', text: 'Oyun oynamak istiyorum' },
-            { emoji: '🤗', text: 'Sarılmak istiyorum' },
-            { emoji: '🛑', text: 'Dur / Hayır' },
-            { emoji: '✅', text: 'Evet / Tamam' },
-        ]
-    },
-    {
-        id: 'activities', label: '🎯 Etkinlikler', color: '#1dd1a1',
-        cards: [
-            { emoji: '📚', text: 'Okumak istiyorum' },
-            { emoji: '✏️', text: 'Çizmek istiyorum' },
-            { emoji: '🎵', text: 'Müzik dinlemek istiyorum' },
-            { emoji: '📺', text: 'Video izlemek istiyorum' },
-            { emoji: '🧩', text: 'Puzzle yapmak istiyorum' },
-            { emoji: '🏃', text: 'Koşmak istiyorum' },
-            { emoji: '🎨', text: 'Boyama yapmak istiyorum' },
-            { emoji: '🤝', text: 'Yardım istiyorum' },
-        ]
-    },
-    {
-        id: 'places', label: '📍 Yerler', color: '#a29bfe',
-        cards: [
-            { emoji: '🏠', text: 'Eve gitmek istiyorum' },
-            { emoji: '🏫', text: 'Okula gitmek istiyorum' },
-            { emoji: '🌳', text: 'Bahçeye gitmek istiyorum' },
-            { emoji: '🏪', text: 'Markete gitmek istiyorum' },
-            { emoji: '🚗', text: 'Arabaya binmek istiyorum' },
-            { emoji: '🏥', text: 'Doktora gitmek istiyorum' },
-            { emoji: '🛁', text: 'Banyoya gitmek istiyorum' },
-            { emoji: '🛏️', text: 'Odama gitmek istiyorum' },
-        ]
-    },
-];
 
-let aacSentence = [];
-let aacCurrentCategory = 'feelings';
+let _aacBoards = [];
+let _aacCurrentBoardId = null;
+let _aacSentence = []; // [{ label, spoken }]
 
-function goToAac() {
+async function goToAac() {
     showOnly('aac-screen');
-    aacSentence = [];
-    aacCurrentCategory = AAC_CATEGORIES[0].id;
-    renderAacCategories();
-    renderAacGrid();
-    updateAacSentenceBar();
+    _aacSentence = [];
+    const sid = activeStudentId || 'default';
+    await AACData.migrateLegacyIfNeeded(sid);
+    _aacBoards = await AACData.listBoards(sid);
+    _aacCurrentBoardId = _aacBoards[0]?.id || null;
+    await _aacRenderAll();
 }
 
-function renderAacCategories() {
-    const wrap = document.getElementById('aacCategories');
-    wrap.innerHTML = AAC_CATEGORIES.map(cat => `
+async function _aacRenderAll() {
+    const sid = activeStudentId || 'default';
+    const settings = await AACData.getSettings(sid);
+
+    // Çekirdek şerit
+    const coreStrip = document.getElementById('aacCoreStrip');
+    if (settings.coreStrip) {
+        const coreCards = [];
+        for (const b of _aacBoards) {
+            const cards = await AACData.listCards(b.id);
+            coreCards.push(...cards.filter(c => c.isCore));
+        }
+        coreStrip.style.display = coreCards.length ? 'flex' : 'none';
+        coreStrip.innerHTML = coreCards.map(c => `
+            <button type="button" class="aac-core-card" onclick="tapAacCard('${escapeHtml(c.id)}','${escapeHtml(c.spoken || c.label)}','${escapeHtml(c.label)}')">
+                ${_aacVisualHtml(c.visual, 'aac-card-emoji')}
+                <span style="font-size:0.65rem;font-weight:700;">${escapeHtml(c.label)}</span>
+            </button>
+        `).join('');
+    } else {
+        coreStrip.style.display = 'none';
+    }
+
+    // Navigasyon sekmeleri
+    const nav = document.getElementById('aacNav');
+    const backBtn = '<button class="aac-nav-btn" onclick="goToMenu()">← Menü</button>';
+    const tabs = _aacBoards.map(b => `
         <button type="button"
-            class="aac-cat-btn ${cat.id === aacCurrentCategory ? 'active' : ''}"
-            style="--cat-color:${escapeHtml(cat.color)}"
-            onclick="setAacCategory('${escapeHtml(cat.id)}')">
-            ${escapeHtml(cat.label)}
+            class="aac-nav-btn${b.id === _aacCurrentBoardId ? ' active' : ''}"
+            onclick="setAacBoard('${escapeHtml(b.id)}')">
+            ${_aacVisualHtml(b.visual, 'aac-card-emoji', '1rem')} ${escapeHtml(b.label)}
         </button>
     `).join('');
+    nav.innerHTML = backBtn + tabs;
+
+    // Grid
+    if (_aacCurrentBoardId) {
+        const { rows, cols, matrix } = await AACData.buildGrid(sid, _aacCurrentBoardId);
+        const grid = document.getElementById('aacGrid');
+        grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+        grid.style.gridTemplateRows    = `repeat(${rows}, 1fr)`;
+        grid.innerHTML = matrix.flat().map(card => {
+            if (!card) return '<div class="aac-card empty"></div>';
+            return `
+                <button type="button" class="aac-card"
+                    onclick="tapAacCard('${escapeHtml(card.id)}','${escapeHtml(card.spoken || card.label)}','${escapeHtml(card.label)}')">
+                    ${_aacVisualHtml(card.visual, 'aac-card-emoji')}
+                    <span class="aac-card-text">${escapeHtml(card.label)}</span>
+                </button>
+            `;
+        }).join('');
+    }
+
+    _aacUpdateSentenceBar();
 }
 
-function setAacCategory(id) {
-    aacCurrentCategory = id;
-    renderAacCategories();
-    renderAacGrid();
+function _aacVisualHtml(visual, cls, size) {
+    if (!visual) return `<span class="${cls}">❓</span>`;
+    if (visual.type === 'image' && visual.value) {
+        const s = size ? `style="width:${size};height:${size};object-fit:contain;"` : '';
+        return `<img class="aac-card-img" src="${escapeHtml(visual.value)}" alt="" ${s}>`;
+    }
+    const s = size ? `style="font-size:${size}"` : '';
+    return `<span class="${cls}" ${s}>${escapeHtml(visual.value || '❓')}</span>`;
 }
 
-function renderAacGrid() {
-    const cat = AAC_CATEGORIES.find(c => c.id === aacCurrentCategory);
-    if (!cat) return;
-    const grid = document.getElementById('aacGrid');
-    grid.innerHTML = cat.cards.map((card, i) => `
-        <button type="button" class="aac-card" onclick="tapAacCard(${i})"
-            style="--cat-color:${escapeHtml(cat.color)}">
-            <span class="aac-card-emoji">${escapeHtml(card.emoji)}</span>
-            <span class="aac-card-text">${escapeHtml(card.text)}</span>
-        </button>
-    `).join('');
+async function setAacBoard(boardId) {
+    _aacCurrentBoardId = boardId;
+    await _aacRenderAll();
 }
 
-function tapAacCard(index) {
-    const cat = AAC_CATEGORIES.find(c => c.id === aacCurrentCategory);
-    if (!cat) return;
-    const card = cat.cards[index];
-    if (!card) return;
-    aacSentence.push(card.text);
-    updateAacSentenceBar();
-    speakFallback(card.text);
+function tapAacCard(cardId, spoken, label) {
+    _aacSentence.push({ label, spoken });
+    _aacUpdateSentenceBar();
+    speakFallback(spoken);
 }
 
-function updateAacSentenceBar() {
+function _aacUpdateSentenceBar() {
     const wrap = document.getElementById('aacSentenceWords');
-    if (!aacSentence.length) {
+    const speakBtn = document.getElementById('aacSpeakBtn');
+    if (!_aacSentence.length) {
         wrap.innerHTML = '<span class="aac-sentence-placeholder">Kart seç, cümle oluştur...</span>';
+        if (speakBtn) speakBtn.disabled = true;
         return;
     }
-    wrap.innerHTML = aacSentence.map((w, i) => `
-        <span class="aac-word-chip" onclick="removeAacWord(${i})">${escapeHtml(w)} ✕</span>
+    wrap.innerHTML = _aacSentence.map((w, i) => `
+        <span class="aac-word-chip" onclick="removeAacWord(${i})">${escapeHtml(w.label)} ✕</span>
     `).join('');
+    if (speakBtn) speakBtn.disabled = false;
 }
 
 function removeAacWord(index) {
-    aacSentence.splice(index, 1);
-    updateAacSentenceBar();
+    _aacSentence.splice(index, 1);
+    _aacUpdateSentenceBar();
 }
 
 function speakAacSentence() {
-    if (!aacSentence.length) return;
-    speakFallback(aacSentence.join('. '));
+    if (!_aacSentence.length) return;
+    speakFallback(_aacSentence.map(w => w.spoken).join('. '));
 }
 
 function clearAacSentence() {
-    aacSentence = [];
-    updateAacSentenceBar();
+    _aacSentence = [];
+    _aacUpdateSentenceBar();
 }
 
 // =============================================
