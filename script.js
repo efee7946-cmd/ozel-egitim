@@ -3396,30 +3396,40 @@ function hideSplash() {
 }
 
 async function checkAuthSession() {
-    const savedToken = DB.getSync(authStorageKey());
-    const savedUser  = DB.getSync(authUserStorageKey());
+    const timer = setTimeout(() => hideSplash(), 10000); // her koşulda 10s sonra splash kapanır
+    try {
+        const savedToken = DB.getSync(authStorageKey());
+        const savedUser  = DB.getSync(authUserStorageKey());
 
-    if (savedToken && savedUser) {
-        const res = await authApi('verify', { token: savedToken });
-        if (res.valid) {
-            _authToken = savedToken;
-            _authUser  = { username: res.username, displayName: res.displayName };
-            hideSplash();
-            onAuthSuccess();
-            return;
-        } else if (res.fallback && !savedToken.startsWith('demo_')) {
-            _authToken = savedToken;
-            _authUser  = savedUser;
-            hideSplash();
-            onAuthSuccess();
-            return;
+        if (savedToken && savedUser) {
+            const res = await authApi('verify', { token: savedToken });
+            if (res.valid) {
+                _authToken = savedToken;
+                _authUser  = { username: res.username, displayName: res.displayName };
+                clearTimeout(timer);
+                hideSplash();
+                onAuthSuccess();
+                return;
+            } else if (res.fallback && !savedToken.startsWith('demo_')) {
+                _authToken = savedToken;
+                _authUser  = savedUser;
+                clearTimeout(timer);
+                hideSplash();
+                onAuthSuccess();
+                return;
+            }
+            DB.del(authStorageKey());
+            DB.del(authUserStorageKey());
         }
-        DB.del(authStorageKey());
-        DB.del(authUserStorageKey());
-    }
 
-    hideSplash();
-    showOnly('auth-screen');
+        clearTimeout(timer);
+        hideSplash();
+        showOnly('auth-screen');
+    } catch (e) {
+        clearTimeout(timer);
+        hideSplash();
+        showOnly('auth-screen');
+    }
 }
 
 function onAuthSuccess() {
