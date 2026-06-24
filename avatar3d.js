@@ -6,16 +6,16 @@ let eyesMesh = null;
 let blinkTimer = null;
 
 function frameObject(object, camera, fitOffset = 1.3) {
-    const box = new THREE.Box3().setFromObject(object);
-    const size = box.getSize(new THREE.Vector3());
+    const box    = new THREE.Box3().setFromObject(object);
+    const size   = box.getSize(new THREE.Vector3());
     const center = box.getCenter(new THREE.Vector3());
 
     object.position.sub(center);
 
-    const maxSize = Math.max(size.x, size.y, size.z);
+    const maxSize           = Math.max(size.x, size.y, size.z);
     const fitHeightDistance = maxSize / (2 * Math.atan((Math.PI * camera.fov) / 360));
     const fitWidthDistance  = fitHeightDistance / camera.aspect;
-    const distance = fitOffset * Math.max(fitHeightDistance, fitWidthDistance);
+    const distance          = fitOffset * Math.max(fitHeightDistance, fitWidthDistance);
 
     camera.position.set(0, 0, distance);
     camera.near = distance / 100;
@@ -28,13 +28,11 @@ function init() {
     const canvas = document.getElementById('avatarCanvas');
     if (!canvas) return;
 
-    const container = canvas.parentElement;
-
     const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.outputColorSpace = THREE.SRGBColorSpace;
 
-    const scene = new THREE.Scene();
+    const scene  = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(28, 1, 0.1, 1000);
 
     scene.add(new THREE.AmbientLight(0xffffff, 1.5));
@@ -53,24 +51,28 @@ function init() {
         camera.updateProjectionMatrix();
     }
     resize();
-
-    const ro = new ResizeObserver(resize);
-    ro.observe(canvas);
+    new ResizeObserver(resize).observe(canvas);
 
     const loader = new GLTFLoader();
     loader.load('/bear_avatar.glb', (gltf) => {
         const model = gltf.scene;
+
+        // Hiç rotasyon verme — model zaten +Z'ye bakıyor
+        model.rotation.set(0, 0, 0);
         scene.add(model);
 
         resize();
         frameObject(model, camera, 1.3);
 
+        // Morph target mesh'lerini bul + konsola yaz
         gltf.scene.traverse((o) => {
-            if (o.morphTargetDictionary) {
-                if ('viseme_aa' in o.morphTargetDictionary) mouth = o;
-                if ('blink'     in o.morphTargetDictionary) eyesMesh = o;
-            }
+            if (!o.morphTargetDictionary) return;
+            console.log('Mesh:', o.name, Object.keys(o.morphTargetDictionary));
+            if ('viseme_aa' in o.morphTargetDictionary || 'mouth_open' in o.morphTargetDictionary) mouth = o;
+            if ('blink'     in o.morphTargetDictionary) eyesMesh = o;
         });
+
+        console.log('Mouth bulundu mu:', !!mouth, mouth && Object.keys(mouth.morphTargetDictionary));
 
         if (eyesMesh) startBlinkLoop();
     });
@@ -94,14 +96,20 @@ function startBlinkLoop() {
 }
 
 function setViseme(name, value) {
-    if (!mouth || !(name in mouth.morphTargetDictionary)) return;
-    mouth.morphTargetInfluences[mouth.morphTargetDictionary[name]] = value;
+    if (!mouth) return;
+    // mouth_open veya viseme_aa — hangisi varsa onu kullan
+    const key = name in mouth.morphTargetDictionary ? name
+              : 'mouth_open' in mouth.morphTargetDictionary ? 'mouth_open'
+              : null;
+    if (key !== null) mouth.morphTargetInfluences[mouth.morphTargetDictionary[key]] = value;
 }
 
 function clearVisemes() {
     if (!mouth) return;
-    for (const key of Object.keys(mouth.morphTargetDictionary)) {
-        if (key.startsWith('viseme_')) mouth.morphTargetInfluences[mouth.morphTargetDictionary[key]] = 0;
+    for (const k of Object.keys(mouth.morphTargetDictionary)) {
+        if (k.startsWith('viseme_') || k === 'mouth_open') {
+            mouth.morphTargetInfluences[mouth.morphTargetDictionary[k]] = 0;
+        }
     }
 }
 
