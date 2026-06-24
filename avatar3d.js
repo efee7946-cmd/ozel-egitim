@@ -5,16 +5,37 @@ let mouth = null;
 let eyesMesh = null;
 let blinkTimer = null;
 
+function frameObject(object, camera, fitOffset = 1.3) {
+    const box = new THREE.Box3().setFromObject(object);
+    const size = box.getSize(new THREE.Vector3());
+    const center = box.getCenter(new THREE.Vector3());
+
+    object.position.sub(center);
+
+    const maxSize = Math.max(size.x, size.y, size.z);
+    const fitHeightDistance = maxSize / (2 * Math.atan((Math.PI * camera.fov) / 360));
+    const fitWidthDistance  = fitHeightDistance / camera.aspect;
+    const distance = fitOffset * Math.max(fitHeightDistance, fitWidthDistance);
+
+    camera.position.set(0, 0, distance);
+    camera.near = distance / 100;
+    camera.far  = distance * 100;
+    camera.updateProjectionMatrix();
+    camera.lookAt(0, 0, 0);
+}
+
 function init() {
     const canvas = document.getElementById('avatarCanvas');
     if (!canvas) return;
+
+    const container = canvas.parentElement;
 
     const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.outputColorSpace = THREE.SRGBColorSpace;
 
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(28, 1, 0.1, 20);
+    const camera = new THREE.PerspectiveCamera(28, 1, 0.1, 1000);
 
     scene.add(new THREE.AmbientLight(0xffffff, 1.5));
     const key = new THREE.DirectionalLight(0xfff0d0, 3);
@@ -24,24 +45,26 @@ function init() {
     fill.position.set(-3, 1, 2);
     scene.add(fill);
 
+    function resize() {
+        const w = canvas.clientWidth  || 160;
+        const h = canvas.clientHeight || 160;
+        renderer.setSize(w, h, false);
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+    }
+    resize();
+
+    const ro = new ResizeObserver(resize);
+    ro.observe(canvas);
+
     const loader = new GLTFLoader();
     loader.load('/bear_avatar.glb', (gltf) => {
         const model = gltf.scene;
         scene.add(model);
 
-        const box    = new THREE.Box3().setFromObject(model);
-        const center = box.getCenter(new THREE.Vector3());
-        const size   = box.getSize(new THREE.Vector3());
-        const headY  = box.max.y - size.y * 0.25;
-        const dist   = size.y * 1.1;
+        resize();
+        frameObject(model, camera, 1.3);
 
-        // Blender export modeli -Z'ye baktırır → kamera -Z tarafında olmalı
-        camera.position.set(center.x, headY, center.z - dist);
-        camera.lookAt(center.x, headY, center.z);
-
-        console.log('Avatar box:', JSON.stringify({ sizeY: size.y.toFixed(2), headY: headY.toFixed(2), dist: dist.toFixed(2) }));
-
-        // Kullanıcının yazdığı traverse kodu
         gltf.scene.traverse((o) => {
             if (o.morphTargetDictionary) {
                 if ('viseme_aa' in o.morphTargetDictionary) mouth = o;
@@ -52,23 +75,12 @@ function init() {
         if (eyesMesh) startBlinkLoop();
     });
 
-    function resize() {
-        const w = canvas.clientWidth  || 200;
-        const h = canvas.clientHeight || 260;
-        renderer.setSize(w, h, false);
-        camera.aspect = w / h;
-        camera.updateProjectionMatrix();
-    }
-    resize();
-    window.addEventListener('resize', resize);
-
     (function renderLoop() {
         requestAnimationFrame(renderLoop);
         renderer.render(scene, camera);
     })();
 }
 
-// Kullanıcının yazdığı blink döngüsü
 function startBlinkLoop() {
     const blink = () => {
         if (eyesMesh && 'blink' in eyesMesh.morphTargetDictionary) {
@@ -93,7 +105,6 @@ function clearVisemes() {
     }
 }
 
-// script.js'in erişebilmesi için global
 window.avatar3d = { setViseme, clearVisemes };
 
 document.addEventListener('DOMContentLoaded', init);
