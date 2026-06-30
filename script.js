@@ -3354,7 +3354,7 @@ function _showSortComplete() {
     const gameSection = document.getElementById('sortGameSection');
     if (!gameSection) return;
     confetti({ particleCount: 120, spread: 90 });
-    speakFallback(t('sort_complete_title') + ' Çok güzel yaptın!', () => {});
+    speakFallback(t('sort_complete_title') + ' ' + (_lang === 'en' ? 'Well done!' : 'Çok güzel yaptın!'), () => {});
     gameSection.innerHTML = `
         <div class="sort-complete">
             <div class="sort-complete-icon">🏆</div>
@@ -3396,13 +3396,15 @@ async function askAIMode(mode) {
     if (!currentObj) return;
     if (mode === 'repeat') {
         sessionData.repeatUsed++;
-        addMessage('Soruyu tekrar okuyorum...', 'ai');
+        addMessage(_lang === 'en' ? 'Reading the question again...' : 'Soruyu tekrar okuyorum...', 'ai');
         speakFallback(currentObj.q, () => {});
     } else if (mode === 'simplify') {
         sessionData.simplifyUsed++;
         const _sCat = getCurrentTherapyCategory().label;
         sessionData.simplifyByCategory[_sCat] = (sessionData.simplifyByCategory[_sCat] || 0) + 1;
-        const simplePrompt = `Şu soruyu, 4-8 yaş arası özel eğitim desteği alan bir çocuk için çok basit 1-2 kelimeyle açıkla: "${currentObj.q}". Maksimum 1 kısa cümle.`;
+        const simplePrompt = _lang === 'en'
+            ? `Explain this question in very simple words (1-2 words max) for a child aged 4-8 with special education needs: "${currentObj.q}". Maximum 1 short sentence.`
+            : `Şu soruyu, 4-8 yaş arası özel eğitim desteği alan bir çocuk için çok basit 1-2 kelimeyle açıkla: "${currentObj.q}". Maksimum 1 kısa cümle.`;
         const res = await getGemmaResponse(simplePrompt);
         addMessage(res, 'ai');
         speakFallback(res, () => {});
@@ -3622,9 +3624,9 @@ async function rec() {
     }
     var _isSafari = !window.SpeechRecognition && !!window.webkitSpeechRecognition;
     document.getElementById('micBtn').disabled = true;
-    document.getElementById('info').innerText = "Dinlemeye hazırlanıyorum...";
+    document.getElementById('info').innerText = _lang === 'en' ? 'Getting ready to listen...' : 'Dinlemeye hazırlanıyorum...';
     var recognition = new SpeechRecognition();
-    recognition.lang = "tr-TR";
+    recognition.lang = _lang === 'en' ? 'en-US' : 'tr-TR';
     recognition.interimResults = !_isSafari;
     recognition.maxAlternatives = 1;
     recognition.continuous = !_isSafari;
@@ -3783,9 +3785,18 @@ async function getGemmaResponse(text) {
     var url = "/api/chat";
     chatHistory.push({ role: "user", parts: [{ text: text }] });
     const currentCategory = getCurrentTherapyCategory();
-    const currentGoal = currentObj && currentObj.goal ? currentObj.goal : 'kısa ve anlaşılır konuşma';
+    const currentGoal = currentObj && currentObj.goal ? currentObj.goal : (_lang === 'en' ? 'clear and concise communication' : 'kısa ve anlaşılır konuşma');
     const currentLocation = CITY_LOCATIONS[currentCityLocationKey];
-    var instructions = `Sen özel eğitim öğrencileriyle sosyal uyum, kurallar ve günlük yaşam rutinleri çalışan, çok kısa ve somut konuşan bir AAC (Alternatif İletişim) oyun arkadaşı botsun. Adın Yıldız Can. Çalışılan konu: ${currentTopic || currentCategory.label}. Bu sorunun hedefi: ${currentGoal}. Öğrencinin dikkat ve sözel anlama sınırlılıklarını asla unutma.
+    var instructions = _lang === 'en'
+        ? `You are a friendly AAC (Augmentative and Alternative Communication) companion bot working with special-education students on social skills, daily routines, and community life. Your name is Yıldız Can. Current topic: ${currentTopic || currentCategory.label}. Goal for this question: ${currentGoal}. Always remember the student's limited attention and verbal comprehension.
+
+STRICT INTERACTION RULES:
+1. ONE-SENTENCE RULE: Every reply must be MAXIMUM 1 short sentence (6-7 words max). No long paragraphs, lectures, or conditional advice.
+2. EMOJI SUPPORT: Add one appropriate emoji at the end of your sentence to support comprehension (e.g. ⚽ 🟥 🤫 👋).
+3. INAPPROPRIATE LANGUAGE: If the student uses swearing or rude words, NEVER repeat, criticize, or comment on them. Ignore the behavior entirely and redirect.
+4. NO ANSWERING FOR THE CHILD: Never generate confirmations or statements on the child's behalf. Always keep control with the student.
+5. PEER-LANGUAGE REDIRECTION: If the student persists with negative behavior, briefly acknowledge the feeling, offer a short peer-appropriate alternative, and change the scene. (e.g. "Getting mad at a game is normal! ⚽ You can say 'I disagree with that call'.") Reply in English only.`
+        : `Sen özel eğitim öğrencileriyle sosyal uyum, kurallar ve günlük yaşam rutinleri çalışan, çok kısa ve somut konuşan bir AAC (Alternatif İletişim) oyun arkadaşı botsun. Adın Yıldız Can. Çalışılan konu: ${currentTopic || currentCategory.label}. Bu sorunun hedefi: ${currentGoal}. Öğrencinin dikkat ve sözel anlama sınırlılıklarını asla unutma.
 
 KATI ETKİLEŞİM VE DİL KURALLARI:
 1. TEK CÜMLE KURALI: Her cevabın MAKSİMUM 1 kısa cümleden oluşmalıdır (En fazla 6-7 kelime). Asla uzun paragraflar, didaktik açıklamalar veya şartlı nasihatler yapma.
@@ -3797,7 +3808,7 @@ KATI ETKİLEŞİM VE DİL KURALLARI:
     var payload = {
         contents: [
             { role: "user", parts: [{ text: "GÖREV: " + instructions }] },
-            { role: "model", parts: [{ text: "Tamam! Sohbeti başlatıyorum." }] }
+            { role: "model", parts: [{ text: _lang === 'en' ? "Got it! Starting the conversation." : "Tamam! Sohbeti başlatıyorum." }] }
         ].concat(chatHistory)
     };
     try {
@@ -3806,13 +3817,13 @@ KATI ETKİLEŞİM VE DİL KURALLARI:
         var reply = data?.candidates?.[0]?.content?.parts?.[0]?.text;
         if (!reply) {
             console.error('Gemini yanıt boş:', JSON.stringify(data));
-            return 'Yapay zeka şu an yanıt veremiyor, biraz bekle.';
+            return _lang === 'en' ? 'AI is not responding right now, please wait.' : 'Yapay zeka şu an yanıt veremiyor, biraz bekle.';
         }
         chatHistory.push({ role: "model", parts: [{ text: reply }] });
         return reply;
     } catch (e) {
         console.error('Gemini hata:', e);
-        return 'Yapay zeka şu an yanıt veremiyor, biraz bekle.';
+        return _lang === 'en' ? 'AI is not responding right now, please wait.' : 'Yapay zeka şu an yanıt veremiyor, biraz bekle.';
     }
 }
 
@@ -3828,7 +3839,7 @@ function addMessage(text, type) {
 function speakFallback(t, callback) {
     window.speechSynthesis.cancel();
     var u = new SpeechSynthesisUtterance(t);
-    u.lang = 'tr-TR'; u.pitch = 1.2; u.rate = 0.7;
+    u.lang = _lang === 'en' ? 'en-US' : 'tr-TR'; u.pitch = 1.2; u.rate = 0.7;
     var ended = false;
     var safeEnd = function() { if (ended) return; ended = true; if (callback) callback(); };
     u.onend = safeEnd;
@@ -5131,7 +5142,7 @@ async function selectStudentLogin(id) {
     const nameEl = document.getElementById('active-student-name');
     if (nameEl) nameEl.textContent = student.name;
     document.getElementById('menu-greeting').textContent = `Merhaba, ${student.name}! 🌟`;
-    speakFallback(`Merhaba ${student.name}! Hoş geldin!`);
+    speakFallback(_lang === 'en' ? `Hello ${student.name}! Welcome!` : `Merhaba ${student.name}! Hoş geldin!`);
     showOnly('menu-screen');
     renderCityScene();
 }
