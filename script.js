@@ -3711,6 +3711,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // WINDOW EXPORT (HTML onclick için)
 // =============================================
 window.setLang = setLang;
+window.continueAsGuest = continueAsGuest;
 window.goToMenu = goToMenu;
 window.goToTherapy = goToTherapy;
 window.setTopicChip = setTopicChip;
@@ -3831,6 +3832,13 @@ async function checkAuthSession() {
         hideSplash();
         showOnly('auth-screen');
     }
+}
+
+function continueAsGuest() {
+    _authToken = 'demo_' + Date.now();
+    _authUser = { username: 'guest', displayName: _lang === 'en' ? 'Guest' : 'Misafir' };
+    DB.initEncryption(_authToken).catch(() => {});
+    onAuthSuccess();
 }
 
 function onAuthSuccess() {
