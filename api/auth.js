@@ -102,6 +102,17 @@ export default async function handler(req, res) {
             return res.json({ ok: true });
         }
 
+        /* ---- HESAP SİL ---- */
+        if (action === 'delete') {
+            if (!token) return res.status(400).json({ error: 'Token gerekli' });
+            const rows = await query('SELECT username FROM sessions WHERE token = $1 AND expires_at > now()', [token]);
+            if (!rows.length) return res.status(401).json({ error: 'Geçersiz oturum' });
+            const { username } = rows[0];
+            await query('DELETE FROM sessions WHERE username = $1', [username]);
+            await query('DELETE FROM users WHERE username = $1', [username]);
+            return res.json({ ok: true });
+        }
+
         return res.status(400).json({ error: 'Geçersiz action' });
 
     } catch (err) {

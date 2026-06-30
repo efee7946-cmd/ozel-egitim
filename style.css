@@ -4934,3 +4934,82 @@ body.a11y-reduce-motion * { transition: none !important; animation: none !import
     .auth-card { padding: 32px 20px 24px; }
 }
 
+
+/* =============================================
+   KVKK & HESAP AYARLARI
+   ============================================= */
+.kvkk-consent-row {
+    margin: 12px 0 8px;
+    padding: 12px 14px;
+    background: #f0f6ff;
+    border-radius: 10px;
+    border: 1px solid #c8dcf5;
+}
+.kvkk-consent-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    color: #4a5568;
+    line-height: 1.5;
+}
+.kvkk-consent-label input[type="checkbox"] {
+    margin-top: 2px;
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    cursor: pointer;
+}
+.kvkk-consent-label a { color: #3b7dd8; text-decoration: underline; }
+
+.kvkk-modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.55);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 9999; padding: 16px;
+}
+.kvkk-modal-box {
+    background: white; border-radius: 18px; max-width: 560px; width: 100%;
+    max-height: 80vh; display: flex; flex-direction: column;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.2);
+}
+.kvkk-modal-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 20px 24px 16px; border-bottom: 1px solid #eef2f7;
+}
+.kvkk-modal-head h3 { font-size: 1.05rem; color: #1a2744; margin: 0; }
+.kvkk-modal-close {
+    background: none; border: none; font-size: 1.2rem;
+    cursor: pointer; color: #8899aa; padding: 4px 8px;
+}
+.kvkk-modal-body {
+    padding: 20px 24px; overflow-y: auto; font-size: 0.88rem;
+    color: #4a5568; line-height: 1.65;
+}
+.kvkk-modal-body h4 {
+    color: #1a2744; margin: 16px 0 6px; font-size: 0.95rem;
+}
+.kvkk-modal-body p { margin: 0 0 10px; }
+
+.a11y-section-title {
+    font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+    color: #8899bb; letter-spacing: 0.06em; margin-bottom: 10px;
+}
+.a11y-account-section {
+    padding: 14px 0 16px;
+    border-bottom: 1px solid #eef2f7;
+    margin-bottom: 12px;
+}
+.a11y-account-user {
+    font-size: 0.9rem; color: #3b7dd8; font-weight: 600; margin-bottom: 10px;
+}
+.a11y-account-actions { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
+.a11y-account-btn {
+    padding: 10px 14px; border-radius: 10px; font-size: 0.88rem;
+    font-weight: 600; cursor: pointer; border: 1.5px solid #dce8f4;
+    background: white; color: #4a5568; text-align: left; transition: background 0.15s;
+}
+.a11y-account-btn:hover { background: #f0f6ff; }
+.a11y-danger-btn { border-color: #fdd; color: #c0392b; }
+.a11y-danger-btn:hover { background: #fff5f5; }
+.a11y-kvkk-link { font-size: 0.8rem; color: #8899aa; text-decoration: underline; }

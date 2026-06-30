@@ -116,6 +116,15 @@
                     <label class="reg-chip"><input type="checkbox" class="reg-cond" value="stereotipik"> Stereotipik Hareket</label>
                 </div>
             </div>
+            <div class="kvkk-consent-row">
+                <label class="kvkk-consent-label">
+                    <input type="checkbox" id="kvkkConsent" required>
+                    <span>
+                        <a href="#" onclick="openKvkkModal(event)">Aydınlatma Metni</a>'ni ve
+                        <a href="#" onclick="openKvkkModal(event)">Gizlilik Politikası</a>'nı okudum, kabul ediyorum.
+                    </span>
+                </label>
+            </div>
             <button type="submit" class="auth-submit-btn" id="registerBtn">Kayıt Ol</button>
         </form>
 
@@ -523,12 +532,48 @@ document.addEventListener('DOMContentLoaded', function(){
     </div>
 </div>
 
+<!-- ===================== KVKK MODALİ ===================== -->
+<div id="kvkk-modal" class="kvkk-modal-overlay" style="display:none" onclick="closeKvkkModal(event)">
+    <div class="kvkk-modal-box">
+        <div class="kvkk-modal-head">
+            <h3>Gizlilik ve KVKK Bilgilendirmesi</h3>
+            <button type="button" class="kvkk-modal-close" onclick="document.getElementById('kvkk-modal').style.display='none'">✕</button>
+        </div>
+        <div class="kvkk-modal-body">
+            <h4>Aydınlatma Metni</h4>
+            <p><strong>Veri Sorumlusu:</strong> Yıldız Sınıfı uygulaması</p>
+            <p><strong>Toplanan Veriler:</strong> Kullanıcı adı, öğrenci adı ve soyadı, eğitim kademesi, tanı bilgileri, beceri ve davranış takip verileri, oturum bilgileri.</p>
+            <p><strong>İşleme Amacı:</strong> Özel eğitim süreçlerinin takibi, BEP hazırlama, beceri ve davranış değerlendirmesi, yapay zeka destekli geri bildirim oluşturulması.</p>
+            <p><strong>Saklama Süresi:</strong> Hesap silinene kadar. Hesap silme talebi üzerine tüm veriler 30 gün içinde kalıcı olarak silinir.</p>
+            <p><strong>Aktarılan Taraflar:</strong> Vercel (barındırma altyapısı), Aiven (veritabanı), Google Gemini (yapay zeka), ElevenLabs (ses sentezi), Pexels (görsel içerik). Bu hizmetler yalnızca teknik işleme amacıyla kullanılmakta olup kişisel verileriniz pazarlama amaçlı üçüncü taraflarla paylaşılmamaktadır.</p>
+            <p><strong>Haklarınız (KVKK Md. 11):</strong> Verilerinize erişim, düzeltme, silme, işlemeyi kısıtlama ve taşıma haklarına sahipsiniz. Talepleriniz için uygulama içi "Hesabı Sil" veya "Verilerimi İndir" özelliklerini kullanabilirsiniz.</p>
+
+            <h4>Gizlilik Politikası</h4>
+            <p>Yıldız Sınıfı, 6698 sayılı Kişisel Verilerin Korunması Kanunu (KVKK) kapsamında kişisel verilerinizi korumayı taahhüt eder. Çocuklara ait veriler yalnızca eğitim amacıyla işlenir, hiçbir koşulda satılmaz veya reklam amacıyla kullanılmaz.</p>
+            <p>Uygulama, tarayıcı yerel deposunu (localStorage) oturum ve tercih bilgilerini saklamak için kullanır. Bu veriler cihazınızda kalır ve sunucuya aktarılmaz.</p>
+            <p>Sorularınız için: yildizsiniflari@gmail.com</p>
+
+            <h4>Çerez / Yerel Depolama Politikası</h4>
+            <p>Uygulama; oturum belirteci, kullanıcı tercihleri ve öğrenci verilerini cihazınızdaki localStorage'da saklar. Üçüncü taraf çerez kullanılmaz. Tarayıcı verilerini temizlediğinizde yerel veriler de silinir.</p>
+        </div>
+    </div>
+</div>
+
 <!-- ===================== ERİŞİLEBİLİRLİK PANELİ ===================== -->
 <div id="a11y-panel" class="a11y-panel" style="display:none" role="dialog" aria-label="Erişilebilirlik Ayarları">
     <div class="a11y-panel-inner">
         <div class="a11y-panel-head">
             <h3>⚙️ Erişilebilirlik</h3>
             <button type="button" class="a11y-close-btn" onclick="toggleA11yPanel()">✕</button>
+        </div>
+        <div class="a11y-account-section" id="a11yAccountSection" style="display:none">
+            <div class="a11y-section-title">Hesap</div>
+            <div class="a11y-account-user" id="a11yAccountUser"></div>
+            <div class="a11y-account-actions">
+                <button type="button" class="a11y-account-btn" onclick="exportMyData()">📥 Verilerimi İndir</button>
+                <button type="button" class="a11y-account-btn a11y-danger-btn" onclick="deleteAccount()">🗑️ Hesabı Sil</button>
+            </div>
+            <a href="#" class="a11y-kvkk-link" onclick="openKvkkModal(event)">Gizlilik Politikası & KVKK</a>
         </div>
         <div class="a11y-settings-list">
             <label class="a11y-setting-row">

@@ -3285,6 +3285,7 @@ function toggleA11yPanel() {
     if (!panel) return;
     const isOpen = panel.style.display !== 'none';
     panel.style.display = isOpen ? 'none' : 'flex';
+    if (!isOpen) updateA11yAccountSection();
     if (!isOpen) {
         const settings = loadA11ySettings();
         const map = {
@@ -3533,6 +3534,7 @@ async function handleRegister(e) {
     const password2   = document.getElementById('regPassword2').value;
     const studentName = document.getElementById('regStudentName').value.trim();
     const emoji       = document.getElementById('regStudentEmoji').value || '🌟';
+    if (!document.getElementById('kvkkConsent').checked) return showAuthError('Devam etmek için Aydınlatma Metni\'ni kabul etmelisiniz');
     if (!username || !password || !studentName) return showAuthError('Tüm alanları doldurun');
     if (password !== password2) return showAuthError('Şifreler uyuşmuyor');
     if (password.length < 6) return showAuthError('Şifre en az 6 karakter olmalı');
@@ -3576,6 +3578,74 @@ async function authLogout() {
     document.getElementById('authError').textContent = '';
     switchAuthTab('login');
 }
+
+function openKvkkModal(e) {
+    if (e) e.preventDefault();
+    document.getElementById('kvkk-modal').style.display = 'flex';
+}
+
+function closeKvkkModal(e) {
+    if (e.target === document.getElementById('kvkk-modal')) {
+        document.getElementById('kvkk-modal').style.display = 'none';
+    }
+}
+
+async function exportMyData() {
+    if (!_authUser) return;
+    const data = {
+        kullanici: _authUser,
+        ogrenciler: await DB.get('lms_students') || [],
+        verme_tarihi: new Date().toISOString(),
+    };
+    const keys = Object.keys(localStorage).filter(k => k.startsWith('lms_'));
+    for (const k of keys) {
+        try { data[k] = JSON.parse(localStorage.getItem(k)); } catch { data[k] = localStorage.getItem(k); }
+    }
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `yildiz-siniflari-verilerim-${Date.now()}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+async function deleteAccount() {
+    const confirmed = confirm('Hesabınız ve tüm verileriniz kalıcı olarak silinecek. Bu işlem geri alınamaz. Emin misiniz?');
+    if (!confirmed) return;
+    const confirmed2 = confirm('Son kez onaylıyın: tüm öğrenci verileri, BEP kayıtları ve ilerleme bilgileri silinecek.');
+    if (!confirmed2) return;
+
+    if (_authToken && !_authToken.startsWith('demo_')) {
+        await authApi('delete', { token: _authToken });
+    }
+    const keys = Object.keys(localStorage).filter(k => k.startsWith('lms_'));
+    keys.forEach(k => localStorage.removeItem(k));
+    DB.del(authStorageKey());
+    DB.del(authUserStorageKey());
+    _authToken = null;
+    _authUser = null;
+    alert('Hesabınız silindi. İyi günler.');
+    showOnly('auth-screen');
+    switchAuthTab('login');
+}
+
+function updateA11yAccountSection() {
+    const section = document.getElementById('a11yAccountSection');
+    const userEl = document.getElementById('a11yAccountUser');
+    if (!section) return;
+    if (_authUser) {
+        section.style.display = 'block';
+        if (userEl) userEl.textContent = '@' + _authUser.username;
+    } else {
+        section.style.display = 'none';
+    }
+}
+
+window.openKvkkModal = openKvkkModal;
+window.closeKvkkModal = closeKvkkModal;
+window.exportMyData = exportMyData;
+window.deleteAccount = deleteAccount;
 
 // =============================================
 // GİRİŞ EKRANI (LOGIN)
