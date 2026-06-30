@@ -5112,3 +5112,60 @@ body.has-bottom-nav #behavior-screen {
         padding-bottom: 0;
     }
 }
+
+/* =============================================
+   SKELETON / LOADING STATES
+   ============================================= */
+@keyframes skeleton-shine {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+.skeleton {
+    background: linear-gradient(90deg,
+        #ececec 25%, #d8d8d8 50%, #ececec 75%);
+    background-size: 200% 100%;
+    animation: skeleton-shine 1.4s ease infinite;
+    border-radius: 10px;
+    color: transparent !important;
+    pointer-events: none;
+    user-select: none;
+}
+.skeleton * { visibility: hidden !important; }
+
+/* Öğrenci kartı iskeleti */
+.login-student-card.skeleton {
+    height: 100px;
+    width: 100%;
+    border-radius: 16px;
+}
+
+/* Analiz metrik barı iskeleti */
+.az-metric-label.skeleton,
+.az-bar-track.skeleton {
+    border-radius: 8px;
+    height: 18px;
+}
+.az-bar-track.skeleton { height: 10px; margin: 6px 0; }
+
+/* Terapi sorusu iskeleti */
+.question-bar.skeleton {
+    min-height: 64px;
+    border-radius: 16px;
+}
+
+/* Genel yardımcılar */
+.skel-line {
+    height: 16px;
+    border-radius: 8px;
+    margin: 6px 0;
+}
+.skel-line.skel-short { width: 45%; }
+.skel-line.skel-med   { width: 70%; }
+.skel-line.skel-full  { width: 100%; }
+
+/* Yükleme durumunda soluk kart */
+.az-card.az-loading {
+    opacity: 0.6;
+    pointer-events: none;
+}

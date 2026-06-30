@@ -2826,7 +2826,7 @@ async function goToReport() {
     }
 
     // AI değerlendirmesi
-    document.getElementById('aiEvalLoading').style.display = 'flex';
+    document.getElementById('aiEvalLoading').style.display = 'block';
     document.getElementById('aiEvalText').style.display = 'none';
     await generateAIEvaluation(durationMin, totalMic, storyPct, totalTurns);
 }
@@ -3623,7 +3623,9 @@ async function loadNext() {
     clearTimeout(idleTimer);
     document.getElementById('nextBtn').classList.remove('pulse-anim');
     document.getElementById('micBtn').disabled = true;
-    document.getElementById('qBar').innerText = t('therapy_hint');
+    const _qBar = document.getElementById('qBar');
+    _qBar.textContent = '';
+    _qBar.classList.add('skeleton');
     document.getElementById('info').innerText = t('video_loading');
 
     if (unaskedQuestions.length === 0) resetTherapyQuestionPool();
@@ -3678,7 +3680,9 @@ function startQuestion() {
     vEl.pause();
     isWaiting = true;
     chatHistory.push({ role: "model", parts: [{ text: currentObj.q }] });
-    document.getElementById('qBar').innerText = currentObj.q;
+    const _qBarEl = document.getElementById('qBar');
+    _qBarEl.classList.remove('skeleton');
+    _qBarEl.innerText = currentObj.q;
     addMessage(currentObj.q, "ai");
     speak(currentObj.q, function() {
         document.getElementById('micBtn').disabled = false;
@@ -5129,6 +5133,12 @@ const STUDENT_EMOJIS = [
 ];
 
 async function initLoginScreen() {
+    const wrap = document.getElementById('loginStudents');
+    if (wrap) {
+        wrap.innerHTML = Array(3).fill(0).map(() =>
+            `<div class="login-student-card skeleton" aria-hidden="true"></div>`
+        ).join('');
+    }
     const students = await loadStudents();
     renderLoginStudents(students);
     const settings = loadA11ySettings();
@@ -5248,9 +5258,16 @@ const BEP_CONDITION_LABELS = {
 
 async function goToAnalysis() {
     showOnly('analysis-screen');
+    document.querySelectorAll('.az-card').forEach(c => c.classList.add('az-loading'));
+    const insightEl = document.getElementById('azInsightText');
+    if (insightEl) insightEl.innerHTML = `
+        <div class="skel-line skel-full skeleton"></div>
+        <div class="skel-line skel-med skeleton"></div>
+        <div class="skel-line skel-short skeleton"></div>`;
     const userId = await getCurrentUserId();
     const profile = userId ? (await DB.get('bep_profile_' + userId) || {}) : {};
     const history = await loadReportHistory();
+    document.querySelectorAll('.az-card').forEach(c => c.classList.remove('az-loading'));
     _renderAzIdentityCard(profile);
     _renderAzMetrics(history);
 }
