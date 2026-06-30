@@ -50,12 +50,12 @@
             <div class="auth-field">
                 <label>Kullanıcı Adı</label>
                 <input type="text" id="loginUsername" autocomplete="username"
-                    placeholder="kullaniciadi" required>
+                    placeholder="kullaniciadi" data-i18n-placeholder="login_username" required>
             </div>
             <div class="auth-field">
                 <label>Şifre</label>
                 <input type="password" id="loginPassword" autocomplete="current-password"
-                    placeholder="••••••" required>
+                    placeholder="••••••" data-i18n-placeholder="login_password" required>
             </div>
             <button type="submit" class="auth-submit-btn" id="loginBtn" data-i18n="login_btn">Giriş Yap</button>
         </form>
@@ -129,6 +129,7 @@
         </form>
 
         <div class="auth-error" id="authError"></div>
+        <button type="button" class="auth-guest-btn" id="guestBtn" data-i18n="guest_btn">Misafir olarak devam et</button>
     </div>
 </div>
 
@@ -501,7 +502,7 @@ document.addEventListener('DOMContentLoaded', function(){
             </div>
             <div class="sort-items-area" id="sortItemsArea"></div>
             <div class="sort-baskets-area" id="sortBasketsArea"></div>
-            <button type="button" class="menu-ghost-btn sort-back-btn" onclick="renderSortMenu()">← Oyun Seçimine Dön</button>
+            <button type="button" class="menu-ghost-btn sort-back-btn" onclick="renderSortMenu()"><span data-i18n="sort_back">← Oyun Seçimine Dön</span></button>
         </div>
     </div>
 </div>
@@ -544,10 +545,10 @@ document.addEventListener('DOMContentLoaded', function(){
             <div class="a11y-section-title">Hesap</div>
             <div class="a11y-account-user" id="a11yAccountUser"></div>
             <div class="a11y-account-actions">
-                <button type="button" class="a11y-account-btn" onclick="exportMyData()">📥 Verilerimi İndir</button>
-                <button type="button" class="a11y-account-btn a11y-danger-btn" onclick="deleteAccount()">🗑️ Hesabı Sil</button>
+                <button type="button" class="a11y-account-btn" onclick="exportMyData()"><span data-i18n="a11y_export">📥 Verilerimi İndir</span></button>
+                <button type="button" class="a11y-account-btn a11y-danger-btn" onclick="deleteAccount()"><span data-i18n="a11y_delete">🗑️ Hesabı Sil</span></button>
             </div>
-            <a href="#" class="a11y-kvkk-link" onclick="openKvkkModal(event)">Gizlilik Politikası & KVKK</a>
+            <a href="#" class="a11y-kvkk-link" onclick="openKvkkModal(event)"><span data-i18n="a11y_privacy">Gizlilik Politikası & KVKK</span></a>
         </div>
         <div class="a11y-settings-list">
             <label class="a11y-setting-row">
