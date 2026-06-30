@@ -2844,6 +2844,8 @@ async function goToAac() {
     _aacSentence = [];
     const sid = activeStudentId || 'default';
     await AACData.migrateLegacyIfNeeded(sid);
+    const addedNew = await AACData.migrateV2IfNeeded(sid);
+    if (addedNew) localStorage.removeItem('aac_enriched_' + sid);
     _aacBoards = await AACData.listBoards(sid);
     _aacCurrentBoardId = _aacBoards[0]?.id || null;
     await _aacRenderAll();

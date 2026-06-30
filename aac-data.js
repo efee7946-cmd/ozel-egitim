@@ -369,60 +369,180 @@
     { label: 'Git',       spoken: 'Git',           visual: { type: 'emoji', value: '🚶' }, isCore: true },
   ];
 
-  const LEGACY_BOARDS = [
+  const ALL_BOARDS = [
+    {
+      label: 'Çekirdek', visual: { type: 'emoji', value: '⭐' },
+      cards: [
+        { label: 'Evet',        spoken: 'Evet',                 visual: { type: 'emoji', value: '✅' }, isCore: true },
+        { label: 'Hayır',       spoken: 'Hayır',                visual: { type: 'emoji', value: '❌' }, isCore: true },
+        { label: 'İstiyorum',   spoken: 'İstiyorum',            visual: { type: 'emoji', value: '🤲' }, isCore: true },
+        { label: 'Daha',        spoken: 'Daha istiyorum',       visual: { type: 'emoji', value: '➕' }, isCore: true },
+        { label: 'Dur',         spoken: 'Dur',                  visual: { type: 'emoji', value: '✋' }, isCore: true },
+        { label: 'Bitti',       spoken: 'Bitti',                visual: { type: 'emoji', value: '🏁' }, isCore: true },
+        { label: 'Yardım',      spoken: 'Yardım istiyorum',     visual: { type: 'emoji', value: '🆘' }, isCore: true },
+        { label: 'Ver',         spoken: 'Ver',                  visual: { type: 'emoji', value: '🤝' }, isCore: true },
+        { label: 'Ben',         spoken: 'Ben',                  visual: { type: 'emoji', value: '🙋' }, isCore: true },
+        { label: 'Sen',         spoken: 'Sen',                  visual: { type: 'emoji', value: '👉' }, isCore: true },
+        { label: 'Seviyorum',   spoken: 'Seni seviyorum',       visual: { type: 'emoji', value: '❤️' }, isCore: true },
+        { label: 'Git',         spoken: 'Git',                  visual: { type: 'emoji', value: '🚶' }, isCore: true },
+      ],
+    },
     {
       label: 'Duygular', visual: { type: 'emoji', value: '😊' },
       cards: [
-        { label: 'Mutluyum',         spoken: 'Mutluyum',              visual: { type: 'emoji', value: '😊' } },
-        { label: 'Üzgünüm',          spoken: 'Üzgünüm',              visual: { type: 'emoji', value: '😢' } },
-        { label: 'Kızgınım',         spoken: 'Kızgınım',             visual: { type: 'emoji', value: '😡' } },
-        { label: 'Korkuyorum',       spoken: 'Korkuyorum',           visual: { type: 'emoji', value: '😨' } },
-        { label: 'Yorgunum',         spoken: 'Yorgunum',             visual: { type: 'emoji', value: '😴' } },
-        { label: 'Midem bulanıyor',  spoken: 'Midem bulanıyor',      visual: { type: 'emoji', value: '🤢' } },
-        { label: 'Seviyorum',        spoken: 'Seni seviyorum',       visual: { type: 'emoji', value: '😍' } },
-        { label: 'Fark etmez',       spoken: 'Fark etmez',           visual: { type: 'emoji', value: '😐' } },
+        { label: 'Mutluyum',        spoken: 'Mutluyum',             visual: { type: 'emoji', value: '😊' } },
+        { label: 'Üzgünüm',         spoken: 'Üzgünüm',              visual: { type: 'emoji', value: '😢' } },
+        { label: 'Kızgınım',        spoken: 'Kızgınım',             visual: { type: 'emoji', value: '😡' } },
+        { label: 'Korkuyorum',      spoken: 'Korkuyorum',           visual: { type: 'emoji', value: '😨' } },
+        { label: 'Yorgunum',        spoken: 'Yorgunum',             visual: { type: 'emoji', value: '😴' } },
+        { label: 'Hasta',           spoken: 'Hastayım',             visual: { type: 'emoji', value: '🤒' } },
+        { label: 'Heyecanlı',       spoken: 'Heyecanlıyım',         visual: { type: 'emoji', value: '🤩' } },
+        { label: 'Şaşırdım',        spoken: 'Şaşırdım',             visual: { type: 'emoji', value: '😲' } },
+        { label: 'Sıkıldım',        spoken: 'Sıkıldım',             visual: { type: 'emoji', value: '😑' } },
+        { label: 'Utandım',         spoken: 'Utandım',              visual: { type: 'emoji', value: '😳' } },
+        { label: 'Midem bulanıyor', spoken: 'Midem bulanıyor',      visual: { type: 'emoji', value: '🤢' } },
+        { label: 'Fark etmez',      spoken: 'Fark etmez',           visual: { type: 'emoji', value: '😐' } },
       ],
     },
     {
       label: 'İhtiyaçlar', visual: { type: 'emoji', value: '🙋' },
       cards: [
-        { label: 'Su',               spoken: 'Su istiyorum',                  visual: { type: 'emoji', value: '🚰' } },
-        { label: 'Acıktım',          spoken: 'Acıktım',                       visual: { type: 'emoji', value: '🍎' } },
-        { label: 'Tuvalet',          spoken: 'Tuvalete gitmek istiyorum',     visual: { type: 'emoji', value: '🚽' } },
-        { label: 'Uyumak',           spoken: 'Uyumak istiyorum',              visual: { type: 'emoji', value: '😴' } },
-        { label: 'Oyun',             spoken: 'Oyun oynamak istiyorum',        visual: { type: 'emoji', value: '🎮' } },
-        { label: 'Sarılmak',         spoken: 'Sarılmak istiyorum',            visual: { type: 'emoji', value: '🤗' } },
-        { label: 'Dur / Hayır',      spoken: 'Dur, hayır',                    visual: { type: 'emoji', value: '🛑' } },
-        { label: 'Evet / Tamam',     spoken: 'Evet, tamam',                   visual: { type: 'emoji', value: '✅' } },
+        { label: 'Su',          spoken: 'Su istiyorum',                 visual: { type: 'emoji', value: '🚰' } },
+        { label: 'Acıktım',     spoken: 'Acıktım, yemek istiyorum',     visual: { type: 'emoji', value: '🍎' } },
+        { label: 'Tuvalet',     spoken: 'Tuvalete gitmek istiyorum',    visual: { type: 'emoji', value: '🚽' } },
+        { label: 'Uyumak',      spoken: 'Uyumak istiyorum',             visual: { type: 'emoji', value: '😴' } },
+        { label: 'Oyun',        spoken: 'Oyun oynamak istiyorum',       visual: { type: 'emoji', value: '🎮' } },
+        { label: 'Sarılmak',    spoken: 'Sarılmak istiyorum',           visual: { type: 'emoji', value: '🤗' } },
+        { label: 'Soğuğum',     spoken: 'Üşüyorum, soğuğum',           visual: { type: 'emoji', value: '🥶' } },
+        { label: 'Sıcağım',     spoken: 'Çok sıcak, bunaldım',         visual: { type: 'emoji', value: '🥵' } },
+        { label: 'Ağrıyor',     spoken: 'Bir yerim ağrıyor',           visual: { type: 'emoji', value: '🤕' } },
+        { label: 'Dinlenmek',   spoken: 'Dinlenmek istiyorum',         visual: { type: 'emoji', value: '🛋️' } },
+        { label: 'Müzik',       spoken: 'Müzik dinlemek istiyorum',    visual: { type: 'emoji', value: '🎵' } },
+        { label: 'Telefon',     spoken: 'Telefon kullanmak istiyorum', visual: { type: 'emoji', value: '📱' } },
+      ],
+    },
+    {
+      label: 'Yiyecekler', visual: { type: 'emoji', value: '🍽️' },
+      cards: [
+        { label: 'Ekmek',       spoken: 'Ekmek istiyorum',             visual: { type: 'emoji', value: '🍞' } },
+        { label: 'Meyve',       spoken: 'Meyve istiyorum',             visual: { type: 'emoji', value: '🍎' } },
+        { label: 'Sebze',       spoken: 'Sebze istiyorum',             visual: { type: 'emoji', value: '🥦' } },
+        { label: 'Et',          spoken: 'Et yemek istiyorum',          visual: { type: 'emoji', value: '🍖' } },
+        { label: 'Makarna',     spoken: 'Makarna istiyorum',           visual: { type: 'emoji', value: '🍝' } },
+        { label: 'Pilav',       spoken: 'Pilav istiyorum',             visual: { type: 'emoji', value: '🍚' } },
+        { label: 'Çorba',       spoken: 'Çorba istiyorum',             visual: { type: 'emoji', value: '🍲' } },
+        { label: 'Süt',         spoken: 'Süt içmek istiyorum',         visual: { type: 'emoji', value: '🥛' } },
+        { label: 'Meyve suyu',  spoken: 'Meyve suyu içmek istiyorum', visual: { type: 'emoji', value: '🧃' } },
+        { label: 'Bisküvi',     spoken: 'Bisküvi istiyorum',           visual: { type: 'emoji', value: '🍪' } },
+        { label: 'Çikolata',    spoken: 'Çikolata istiyorum',          visual: { type: 'emoji', value: '🍫' } },
+        { label: 'Dondurma',    spoken: 'Dondurma istiyorum',          visual: { type: 'emoji', value: '🍦' } },
       ],
     },
     {
       label: 'Etkinlikler', visual: { type: 'emoji', value: '🎯' },
       cards: [
-        { label: 'Okumak',           spoken: 'Okumak istiyorum',              visual: { type: 'emoji', value: '📚' } },
-        { label: 'Çizmek',           spoken: 'Çizmek istiyorum',              visual: { type: 'emoji', value: '✏️' } },
-        { label: 'Müzik',            spoken: 'Müzik dinlemek istiyorum',      visual: { type: 'emoji', value: '🎵' } },
-        { label: 'Video',            spoken: 'Video izlemek istiyorum',       visual: { type: 'emoji', value: '📺' } },
-        { label: 'Puzzle',           spoken: 'Puzzle yapmak istiyorum',       visual: { type: 'emoji', value: '🧩' } },
-        { label: 'Koşmak',           spoken: 'Koşmak istiyorum',              visual: { type: 'emoji', value: '🏃' } },
-        { label: 'Boyama',           spoken: 'Boyama yapmak istiyorum',       visual: { type: 'emoji', value: '🎨' } },
-        { label: 'Yardım',           spoken: 'Yardım istiyorum',              visual: { type: 'emoji', value: '🤝' } },
+        { label: 'Okumak',      spoken: 'Okumak istiyorum',            visual: { type: 'emoji', value: '📚' } },
+        { label: 'Çizmek',      spoken: 'Çizmek istiyorum',            visual: { type: 'emoji', value: '✏️' } },
+        { label: 'Boyama',      spoken: 'Boyama yapmak istiyorum',     visual: { type: 'emoji', value: '🎨' } },
+        { label: 'Puzzle',      spoken: 'Puzzle yapmak istiyorum',     visual: { type: 'emoji', value: '🧩' } },
+        { label: 'Video',       spoken: 'Video izlemek istiyorum',     visual: { type: 'emoji', value: '📺' } },
+        { label: 'Koşmak',      spoken: 'Koşmak istiyorum',            visual: { type: 'emoji', value: '🏃' } },
+        { label: 'Dans',        spoken: 'Dans etmek istiyorum',        visual: { type: 'emoji', value: '💃' } },
+        { label: 'Şarkı',       spoken: 'Şarkı söylemek istiyorum',   visual: { type: 'emoji', value: '🎤' } },
+        { label: 'Yüzmek',      spoken: 'Yüzmek istiyorum',            visual: { type: 'emoji', value: '🏊' } },
+        { label: 'Bisiklet',    spoken: 'Bisiklete binmek istiyorum',  visual: { type: 'emoji', value: '🚴' } },
+        { label: 'Salıncak',    spoken: 'Salıncağa binmek istiyorum',  visual: { type: 'emoji', value: '🛝' } },
+        { label: 'Top oynamak', spoken: 'Top oynamak istiyorum',       visual: { type: 'emoji', value: '⚽' } },
       ],
     },
     {
       label: 'Yerler', visual: { type: 'emoji', value: '📍' },
       cards: [
-        { label: 'Eve',              spoken: 'Eve gitmek istiyorum',          visual: { type: 'emoji', value: '🏠' } },
-        { label: 'Okula',            spoken: 'Okula gitmek istiyorum',        visual: { type: 'emoji', value: '🏫' } },
-        { label: 'Bahçeye',          spoken: 'Bahçeye gitmek istiyorum',      visual: { type: 'emoji', value: '🌳' } },
-        { label: 'Markete',          spoken: 'Markete gitmek istiyorum',      visual: { type: 'emoji', value: '🏪' } },
-        { label: 'Arabaya',          spoken: 'Arabaya binmek istiyorum',      visual: { type: 'emoji', value: '🚗' } },
-        { label: 'Doktora',          spoken: 'Doktora gitmek istiyorum',      visual: { type: 'emoji', value: '🏥' } },
-        { label: 'Banyoya',          spoken: 'Banyoya gitmek istiyorum',      visual: { type: 'emoji', value: '🛁' } },
-        { label: 'Odama',            spoken: 'Odama gitmek istiyorum',        visual: { type: 'emoji', value: '🛏️' } },
+        { label: 'Eve',         spoken: 'Eve gitmek istiyorum',        visual: { type: 'emoji', value: '🏠' } },
+        { label: 'Okula',       spoken: 'Okula gitmek istiyorum',      visual: { type: 'emoji', value: '🏫' } },
+        { label: 'Bahçeye',     spoken: 'Bahçeye gitmek istiyorum',    visual: { type: 'emoji', value: '🌳' } },
+        { label: 'Parka',       spoken: 'Parka gitmek istiyorum',      visual: { type: 'emoji', value: '🏞️' } },
+        { label: 'Markete',     spoken: 'Markete gitmek istiyorum',    visual: { type: 'emoji', value: '🏪' } },
+        { label: 'Arabaya',     spoken: 'Arabaya binmek istiyorum',    visual: { type: 'emoji', value: '🚗' } },
+        { label: 'Doktora',     spoken: 'Doktora gitmek istiyorum',    visual: { type: 'emoji', value: '🏥' } },
+        { label: 'Banyoya',     spoken: 'Banyoya gitmek istiyorum',    visual: { type: 'emoji', value: '🛁' } },
+        { label: 'Odama',       spoken: 'Odama gitmek istiyorum',      visual: { type: 'emoji', value: '🛏️' } },
+        { label: 'Mutfağa',     spoken: 'Mutfağa gitmek istiyorum',    visual: { type: 'emoji', value: '🍳' } },
+        { label: 'Parka gidek', spoken: 'Oyun parkına gidelim',        visual: { type: 'emoji', value: '🎡' } },
+        { label: 'Kütüphane',   spoken: 'Kütüphaneye gitmek istiyorum',visual: { type: 'emoji', value: '📖' } },
+      ],
+    },
+    {
+      label: 'Aile', visual: { type: 'emoji', value: '👨‍👩‍👧' },
+      cards: [
+        { label: 'Anne',        spoken: 'Anne',                        visual: { type: 'emoji', value: '👩' } },
+        { label: 'Baba',        spoken: 'Baba',                        visual: { type: 'emoji', value: '👨' } },
+        { label: 'Kardeş',      spoken: 'Kardeş',                      visual: { type: 'emoji', value: '👶' } },
+        { label: 'Abla',        spoken: 'Abla',                        visual: { type: 'emoji', value: '👧' } },
+        { label: 'Abi',         spoken: 'Abi',                         visual: { type: 'emoji', value: '👦' } },
+        { label: 'Nine',        spoken: 'Nine',                        visual: { type: 'emoji', value: '👵' } },
+        { label: 'Dede',        spoken: 'Dede',                        visual: { type: 'emoji', value: '👴' } },
+        { label: 'Öğretmen',    spoken: 'Öğretmenim',                  visual: { type: 'emoji', value: '👩‍🏫' } },
+        { label: 'Arkadaş',     spoken: 'Arkadaşım',                   visual: { type: 'emoji', value: '👫' } },
+        { label: 'Doktor',      spoken: 'Doktor',                      visual: { type: 'emoji', value: '👨‍⚕️' } },
+        { label: 'Ben',         spoken: 'Ben',                         visual: { type: 'emoji', value: '🙋' } },
+        { label: 'Herkes',      spoken: 'Hepimiz',                     visual: { type: 'emoji', value: '👨‍👩‍👧‍👦' } },
+      ],
+    },
+    {
+      label: 'Hayvanlar', visual: { type: 'emoji', value: '🐾' },
+      cards: [
+        { label: 'Kedi',        spoken: 'Kedi',                        visual: { type: 'emoji', value: '🐱' } },
+        { label: 'Köpek',       spoken: 'Köpek',                       visual: { type: 'emoji', value: '🐶' } },
+        { label: 'Kuş',         spoken: 'Kuş',                         visual: { type: 'emoji', value: '🐦' } },
+        { label: 'Balık',       spoken: 'Balık',                       visual: { type: 'emoji', value: '🐟' } },
+        { label: 'Tavşan',      spoken: 'Tavşan',                      visual: { type: 'emoji', value: '🐰' } },
+        { label: 'At',          spoken: 'At',                          visual: { type: 'emoji', value: '🐴' } },
+        { label: 'İnek',        spoken: 'İnek',                        visual: { type: 'emoji', value: '🐄' } },
+        { label: 'Koyun',       spoken: 'Koyun',                       visual: { type: 'emoji', value: '🐑' } },
+        { label: 'Aslan',       spoken: 'Aslan',                       visual: { type: 'emoji', value: '🦁' } },
+        { label: 'Fil',         spoken: 'Fil',                         visual: { type: 'emoji', value: '🐘' } },
+        { label: 'Maymun',      spoken: 'Maymun',                      visual: { type: 'emoji', value: '🐵' } },
+        { label: 'Kelebek',     spoken: 'Kelebek',                     visual: { type: 'emoji', value: '🦋' } },
+      ],
+    },
+    {
+      label: 'Renkler', visual: { type: 'emoji', value: '🌈' },
+      cards: [
+        { label: 'Kırmızı',    spoken: 'Kırmızı',                      visual: { type: 'emoji', value: '🔴' } },
+        { label: 'Mavi',        spoken: 'Mavi',                        visual: { type: 'emoji', value: '🔵' } },
+        { label: 'Yeşil',       spoken: 'Yeşil',                       visual: { type: 'emoji', value: '🟢' } },
+        { label: 'Sarı',        spoken: 'Sarı',                        visual: { type: 'emoji', value: '🟡' } },
+        { label: 'Turuncu',     spoken: 'Turuncu',                     visual: { type: 'emoji', value: '🟠' } },
+        { label: 'Mor',         spoken: 'Mor',                         visual: { type: 'emoji', value: '🟣' } },
+        { label: 'Pembe',       spoken: 'Pembe',                       visual: { type: 'emoji', value: '🩷' } },
+        { label: 'Siyah',       spoken: 'Siyah',                       visual: { type: 'emoji', value: '⬛' } },
+        { label: 'Beyaz',       spoken: 'Beyaz',                       visual: { type: 'emoji', value: '⬜' } },
+        { label: 'Kahverengi',  spoken: 'Kahverengi',                  visual: { type: 'emoji', value: '🟫' } },
+        { label: 'Gri',         spoken: 'Gri',                         visual: { type: 'emoji', value: '🩶' } },
+        { label: 'Gökkuşağı',   spoken: 'Gökkuşağı rengi',             visual: { type: 'emoji', value: '🌈' } },
+      ],
+    },
+    {
+      label: 'Vücut', visual: { type: 'emoji', value: '🫀' },
+      cards: [
+        { label: 'Baş',         spoken: 'Başım ağrıyor',               visual: { type: 'emoji', value: '🤯' } },
+        { label: 'Göz',         spoken: 'Gözlerim',                    visual: { type: 'emoji', value: '👀' } },
+        { label: 'Kulak',       spoken: 'Kulağım',                     visual: { type: 'emoji', value: '👂' } },
+        { label: 'Burun',       spoken: 'Burnum',                      visual: { type: 'emoji', value: '👃' } },
+        { label: 'Ağız',        spoken: 'Ağzım',                       visual: { type: 'emoji', value: '👄' } },
+        { label: 'El',          spoken: 'Ellerim',                     visual: { type: 'emoji', value: '🖐️' } },
+        { label: 'Ayak',        spoken: 'Ayaklarım',                   visual: { type: 'emoji', value: '🦶' } },
+        { label: 'Karın',       spoken: 'Karnım ağrıyor',              visual: { type: 'emoji', value: '🤰' } },
+        { label: 'Sırt',        spoken: 'Sırtım ağrıyor',              visual: { type: 'emoji', value: '🪬' } },
+        { label: 'Diz',         spoken: 'Dizim',                       visual: { type: 'emoji', value: '🦵' } },
+        { label: 'Saç',         spoken: 'Saçım',                       visual: { type: 'emoji', value: '💇' } },
+        { label: 'Diş',         spoken: 'Dişim ağrıyor',               visual: { type: 'emoji', value: '🦷' } },
       ],
     },
   ];
+
+  const LEGACY_BOARDS = ALL_BOARDS;
 
   async function importBoard(studentId, { label, visual, cards = [] } = {}) {
     const board = await createBoard(studentId, { label, visual });
@@ -460,11 +580,21 @@
     try {
       const existing = await listBoards(studentId);
       if (existing.length > 0) return false;
-      for (const b of LEGACY_BOARDS) await importBoard(studentId, b);
+      for (const b of ALL_BOARDS) await importBoard(studentId, b);
       return true;
     } finally {
       delete _migrating[studentId];
     }
+  }
+
+  async function migrateV2IfNeeded(studentId) {
+    const existing = await listBoards(studentId);
+    if (!existing.length) return false;
+    const existingLabels = new Set(existing.map(b => b.label));
+    const missing = ALL_BOARDS.filter(b => !existingLabels.has(b.label));
+    if (!missing.length) return false;
+    for (const b of missing) await importBoard(studentId, b);
+    return true;
   }
 
   /* ---- Dışa aktarım ------------------------------------------------------ */
@@ -474,7 +604,7 @@
     listCards, placeCard, updateCard, clearSlot, moveCard, cardAt,
     buildGrid,
     imageFileToDataURL, supportsWebP,
-    importBoard, migrateLegacyIfNeeded,
+    importBoard, migrateLegacyIfNeeded, migrateV2IfNeeded,
     inBounds, AACError,
     _keys: k,
     _defaults: DEFAULTS,
