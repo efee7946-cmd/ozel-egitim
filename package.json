@@ -23,14 +23,15 @@
   },
   "homepage": "https://github.com/efee7946-cmd/ozel-egitim#readme",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "express": "^5.2.1",
     "pg": "^8.13.3"
   },
   "devDependencies": {
     "@capacitor/android": "^7.6.7",
+    "@capacitor/cli": "^7.0.0",
     "@capacitor/core": "^7.0.0",
     "@capacitor/ios": "^7.0.0",
-    "@capacitor/cli": "^7.0.0",
     "@playwright/test": "^1.59.1"
   }
 }

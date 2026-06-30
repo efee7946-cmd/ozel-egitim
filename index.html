@@ -151,6 +151,10 @@
             <div class="login-emoji-picker" id="loginEmojiPicker"></div>
             <input type="text" id="loginNameInput" class="login-name-input"
                 placeholder="Öğrenci adı" maxlength="30">
+            <label class="veli-consent-label">
+                <input type="checkbox" id="loginVeliConsent">
+                <span>Bu öğrencinin velisi KVKK kapsamında bilgilendirildi ve rıza verdi.</span>
+            </label>
             <div class="login-form-btns">
                 <button type="button" class="login-save-btn" onclick="createStudentFromLogin()">Kaydet</button>
                 <button type="button" class="login-cancel-btn" onclick="hideLoginAddForm()">İptal</button>
@@ -185,6 +189,10 @@
                     <label>Not</label>
                     <textarea id="studentNotesInput" rows="2" placeholder="Destek notu, ilgi alanı..."></textarea>
                 </div>
+                <label class="veli-consent-label">
+                    <input type="checkbox" id="setupVeliConsent">
+                    <span>Bu öğrencinin velisi KVKK kapsamında bilgilendirildi ve rıza verdi.</span>
+                </label>
                 <button type="button" class="btn-primary-gradient" id="createStudentBtn" onclick="createStudent()">
                     Oluştur
                 </button>
@@ -236,7 +244,7 @@
     <div class="menu-tiles">
         <button class="menu-tile tile-primary" type="button" onclick="goToTherapy()">
             <span class="tile-icon">🎤</span>
-            <span class="tile-label">Konuşma Terapisi</span>
+            <span class="tile-label">Konuşma Pratiği</span>
         </button>
         <button class="menu-tile tile-schedule" type="button" onclick="goToSchedule()">
             <span class="tile-icon">📅</span>
@@ -451,9 +459,9 @@ document.addEventListener('DOMContentLoaded', function(){
 
         <!-- Konuşma Terapisi Özeti -->
         <div class="report-section">
-            <h3>🎙️ Konuşma Terapisi Özeti</h3>
+            <h3>🎙️ Konuşma Pratiği Özeti</h3>
             <div id="therapyLog" class="therapy-log">
-                <p class="report-empty">Henüz terapist oturumu yapılmadı.</p>
+                <p class="report-empty">Henüz oturum yapılmadı.</p>
             </div>
         </div>
 
@@ -544,8 +552,8 @@ document.addEventListener('DOMContentLoaded', function(){
         </div>
         <div class="kvkk-modal-body">
             <h4>Aydınlatma Metni</h4>
-            <p><strong>Veri Sorumlusu:</strong> YıldızCan uygulaması</p>
-            <p><strong>Toplanan Veriler:</strong> Kullanıcı adı, öğrenci adı ve soyadı, eğitim kademesi, tanı bilgileri, beceri ve davranış takip verileri, oturum bilgileri.</p>
+            <p><strong>Veri Sorumlusu:</strong> [Ad Soyad / Kurum Adı] — [Adres] — yildizsiniflari@gmail.com</p>
+            <p><strong>Toplanan Veriler:</strong> Kullanıcı adı, öğrenci adı, eğitim kademesi, destek ihtiyacı bilgileri, beceri ve davranış takip verileri, oturum bilgileri. Öğrenci verilerinin işlenmesi için veli/yasal temsilci onayı zorunludur.</p>
             <p><strong>İşleme Amacı:</strong> Özel eğitim süreçlerinin takibi, BEP hazırlama, beceri ve davranış değerlendirmesi, yapay zeka destekli geri bildirim oluşturulması.</p>
             <p><strong>Saklama Süresi:</strong> Hesap silinene kadar. Hesap silme talebi üzerine tüm veriler 30 gün içinde kalıcı olarak silinir.</p>
             <p><strong>Aktarılan Taraflar:</strong> Vercel (barındırma altyapısı), Aiven (veritabanı), Google Gemini (yapay zeka), ElevenLabs (ses sentezi), Pexels (görsel içerik). Bu hizmetler yalnızca teknik işleme amacıyla kullanılmakta olup kişisel verileriniz pazarlama amaçlı üçüncü taraflarla paylaşılmamaktadır.</p>
@@ -721,7 +729,7 @@ document.addEventListener('DOMContentLoaded', function(){
             <div class="az-identity-top">
                 <span class="az-identity-icon">📊</span>
                 <div>
-                    <div class="az-identity-title">Konuşma Terapisi Performans Analizi</div>
+                    <div class="az-identity-title">Konuşma Pratiği Performans Analizi</div>
                     <div class="az-identity-sub" id="azStudentName"></div>
                 </div>
             </div>
@@ -761,13 +769,14 @@ document.addEventListener('DOMContentLoaded', function(){
 
         <!-- 3. BEP Rapor Üretici -->
         <div class="az-card">
-            <h3 class="az-card-title">Dönemsel BEP Gelişim Metni</h3>
-            <p class="az-card-sub">Öğrenci profili ve seans verileriyle MEB BEP formatında resmi metin üretilir.</p>
+            <h3 class="az-card-title">Dönemsel BEP Taslağı</h3>
+            <p class="az-card-sub">Seans verileri kullanılarak BEP'e aktarılabilecek bir taslak metin oluşturulur. Yetkili ekip tarafından gözden geçirilmesi gerekir.</p>
             <button class="bep-report-btn" id="bepReportBtn" onclick="generateBepReport()">
-                ⚡ Yapay Zeka BEP Metni Oluştur
+                ⚡ Yapay Zeka BEP Taslağı Oluştur
             </button>
             <div class="bep-report-output" id="bepReportOutput" style="display:none">
-                <div class="bep-report-header">📝 BEP Dönemsel Gelişim Raporu</div>
+                <div class="bep-report-header">📝 BEP Dönemsel Gelişim Taslağı</div>
+                <div class="bep-disclaimer">⚠️ Bu metin bir taslaktır. Resmi BEP için yetkili ekip (öğretmen, uzman, veli) tarafından incelenmeli ve onaylanmalıdır.</div>
                 <textarea class="bep-report-text" id="bepReportText" readonly></textarea>
                 <button class="bep-copy-btn" onclick="copyBepReport()">📋 Metni Kopyala</button>
             </div>

@@ -1,21 +1,25 @@
 // Kullanıcı kimlik doğrulama — Aiven PostgreSQL üzerinde çalışır.
-// SHA-256 + salt ile şifre hash'i, 32-byte random session token'ı.
+// bcrypt ile şifre hash'i, 32-byte random session token'ı.
 // DATABASE_URL env var'ı gereklidir.
 
 import crypto from 'crypto';
+import bcrypt from 'bcryptjs';
 import { query } from './_db.js';
 
 const SESSION_DAYS = 14;
+const BCRYPT_ROUNDS = 12;
 
 function cors(res) {
-    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Origin', process.env.ALLOWED_ORIGIN || 'https://yildizsiniflari.vercel.app');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 }
 
-function hashPw(password, salt) {
+// Legacy SHA-256 — kullanıcı geçişi sırasında kontrol için korunuyor
+function _legacyHash(password, salt) {
+    const pepper = process.env.AUTH_PEPPER || 'yz2026';
     return crypto.createHash('sha256')
-        .update(salt + ':' + password + ':yz2026')
+        .update(salt + ':' + password + ':' + pepper)
         .digest('hex');
 }
 
@@ -47,12 +51,12 @@ export default async function handler(req, res) {
             if (existing.length > 0)
                 return res.status(409).json({ error: 'Bu kullanıcı adı zaten alınmış' });
 
-            const salt = crypto.randomBytes(16).toString('hex');
-            const hash = hashPw(password, salt);
+            // bcrypt ile yeni kayıt
+            const hash = await bcrypt.hash(password, BCRYPT_ROUNDS);
             const displayName = username.trim();
             await query(
                 'INSERT INTO users (username, display_name, hash, salt) VALUES ($1, $2, $3, $4)',
-                [u, displayName, hash, salt]
+                [u, displayName, hash, '']  // bcrypt hash'i salt içeriyor, ayrı sütun boş
             );
 
             const tok = crypto.randomBytes(32).toString('hex');
@@ -74,8 +78,26 @@ export default async function handler(req, res) {
                 return res.status(401).json({ error: 'Kullanıcı adı veya şifre yanlış' });
 
             const user = rows[0];
-            if (hashPw(password, user.salt) !== user.hash)
+            let valid = false;
+            let needsMigration = false;
+
+            if (user.hash.startsWith('$2')) {
+                // Yeni format: bcrypt
+                valid = await bcrypt.compare(password, user.hash);
+            } else {
+                // Eski format: SHA-256 — doğrulayıp bcrypt'e geçir
+                valid = _legacyHash(password, user.salt) === user.hash;
+                if (valid) needsMigration = true;
+            }
+
+            if (!valid)
                 return res.status(401).json({ error: 'Kullanıcı adı veya şifre yanlış' });
+
+            // SHA-256 kullanan eski hesabı bcrypt'e geçir
+            if (needsMigration) {
+                const newHash = await bcrypt.hash(password, BCRYPT_ROUNDS);
+                await query('UPDATE users SET hash = $1, salt = $2 WHERE username = $3', [newHash, '', u]);
+            }
 
             const tok = crypto.randomBytes(32).toString('hex');
             await query(
@@ -107,9 +129,9 @@ export default async function handler(req, res) {
             if (!token) return res.status(400).json({ error: 'Token gerekli' });
             const rows = await query('SELECT username FROM sessions WHERE token = $1 AND expires_at > now()', [token]);
             if (!rows.length) return res.status(401).json({ error: 'Geçersiz oturum' });
-            const { username } = rows[0];
-            await query('DELETE FROM sessions WHERE username = $1', [username]);
-            await query('DELETE FROM users WHERE username = $1', [username]);
+            const { username: uname } = rows[0];
+            await query('DELETE FROM sessions WHERE username = $1', [uname]);
+            await query('DELETE FROM users WHERE username = $1', [uname]);
             return res.json({ ok: true });
         }
 

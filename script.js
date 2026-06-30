@@ -1027,6 +1027,12 @@ async function createStudent() {
     const userId = await getCurrentUserId();
     if (!nameEl || !yearEl || !notesEl || !statusEl || !createBtn || !userId) return;
 
+    const veliConsent = document.getElementById('setupVeliConsent');
+    if (veliConsent && !veliConsent.checked) {
+        statusEl.textContent = 'Veli onayını işaretleyin.';
+        return;
+    }
+
     const fullName = nameEl.value.trim();
     const birthYearRaw = yearEl.value.trim();
     const supportNotes = notesEl.value.trim();
@@ -1519,7 +1525,7 @@ async function generateAIEvaluation(durationMin, totalMic, storyPct, totalTurns)
     if (_skillsText)   _contextBlock += `\nBECERİ HARİTASI:\n${_skillsText}\n`;
 
     const prompt = `Sen özel eğitim ve konuşma terapisi alanında uzman, empati dolu bir asistansın.
-Aşağıdaki veriler, "${childName}" adlı bir çocuğun Yıldız Can uygulamasındaki oturum verisidir.
+Aşağıdaki veriler, bir öğrencinin Yıldız Can uygulamasındaki oturum verisidir.
 
 Oturum süresi: ${durationMin} dakika
 Toplam yanıt sayısı: ${totalTurns}
@@ -2424,7 +2430,7 @@ async function rec() {
         _speechBuffer = '';
         addMessage(speech, "user");
         if (turnCount >= 7) {
-            var final = "Seninle konuşmak harikaydı " + childName + "! Hadi şimdi yeni bir videoya bakalım!";
+            var final = "Seninle konuşmak harikaydı! Hadi şimdi yeni bir videoya bakalım!";
             addMessage(final, "ai");
             speak(final, function() {
                 document.getElementById('nextBtn').classList.add('pulse-anim');
@@ -2569,7 +2575,7 @@ async function getGemmaResponse(text) {
     const currentCategory = getCurrentTherapyCategory();
     const currentGoal = currentObj && currentObj.goal ? currentObj.goal : 'kısa ve anlaşılır konuşma';
     const currentLocation = CITY_LOCATIONS[currentCityLocationKey];
-    var instructions = `Sen özel eğitim öğrencileriyle sosyal uyum, kurallar ve günlük yaşam rutinleri çalışan, çok kısa ve somut konuşan bir AAC (Alternatif İletişim) oyun arkadaşı botsun. Adın Yıldız Can. Öğrencinin adı ${childName}. Çalışılan konu: ${currentTopic || currentCategory.label}. Bu sorunun hedefi: ${currentGoal}. Öğrencinin dikkat ve sözel anlama sınırlılıklarını asla unutma.
+    var instructions = `Sen özel eğitim öğrencileriyle sosyal uyum, kurallar ve günlük yaşam rutinleri çalışan, çok kısa ve somut konuşan bir AAC (Alternatif İletişim) oyun arkadaşı botsun. Adın Yıldız Can. Çalışılan konu: ${currentTopic || currentCategory.label}. Bu sorunun hedefi: ${currentGoal}. Öğrencinin dikkat ve sözel anlama sınırlılıklarını asla unutma.
 
 KATI ETKİLEŞİM VE DİL KURALLARI:
 1. TEK CÜMLE KURALI: Her cevabın MAKSİMUM 1 kısa cümleden oluşmalıdır (En fazla 6-7 kelime). Asla uzun paragraflar, didaktik açıklamalar veya şartlı nasihatler yapma.
@@ -3591,6 +3597,7 @@ async function checkAuthSession() {
             if (res.valid) {
                 _authToken = savedToken;
                 _authUser  = { username: res.username, displayName: res.displayName };
+                await DB.initEncryption(savedToken);
                 clearTimeout(timer);
                 hideSplash();
                 onAuthSuccess();
@@ -3598,6 +3605,7 @@ async function checkAuthSession() {
             } else if (res.fallback && !savedToken.startsWith('demo_')) {
                 _authToken = savedToken;
                 _authUser  = savedUser;
+                await DB.initEncryption(savedToken);
                 clearTimeout(timer);
                 hideSplash();
                 onAuthSuccess();
@@ -3691,6 +3699,7 @@ async function handleLogin(e) {
     if (!res.ok) return showAuthError(res.error || 'Giriş başarısız');
     _authToken = res.token;
     _authUser  = { username: username.toLowerCase(), displayName: res.displayName };
+    await DB.initEncryption(res.token);
     DB.set(authStorageKey(), _authToken);
     DB.set(authUserStorageKey(), _authUser);
     localStorage.setItem('lms_last_user', _authUser.username);
@@ -3729,6 +3738,7 @@ async function handleRegister(e) {
     if (!res.ok) return showAuthError(res.error || 'Kayıt başarısız');
     _authToken = res.token;
     _authUser  = { username: username.toLowerCase(), displayName: res.displayName };
+    await DB.initEncryption(res.token);
     DB.set(authStorageKey(), _authToken);
     DB.set(authUserStorageKey(), _authUser);
 
@@ -3898,6 +3908,11 @@ function selectLoginEmoji(emoji, btn) {
 async function createStudentFromLogin() {
     const name = document.getElementById('loginNameInput').value.trim();
     if (!name) { document.getElementById('loginNameInput').focus(); return; }
+    const veliConsent = document.getElementById('loginVeliConsent');
+    if (veliConsent && !veliConsent.checked) {
+        alert('Devam etmek için velinin KVKK kapsamında bilgilendirildiğini onaylayın.');
+        return;
+    }
     const selectedBtn = document.querySelector('.emoji-pick-btn.selected');
     const emoji = selectedBtn ? selectedBtn.textContent : '🌟';
     const students = await loadStudents();
@@ -4034,7 +4049,7 @@ async function generateBepReport() {
     const textEl = document.getElementById('bepReportText');
 
     btn.disabled = true;
-    btn.textContent = '⏳ Rapor hazırlanıyor...';
+    btn.textContent = '⏳ Taslak hazırlanıyor...';
 
     const userId = await getCurrentUserId();
     const profile = await DB.get('bep_profile_' + userId) || {};
@@ -4045,11 +4060,18 @@ async function generateBepReport() {
         egit: 'Orta Düzey (Eğitilebilir)',
         destekli: 'Ağır/İleri Düzey (Desteklenen)'
     };
-    const conditionLabels = { ekolali: 'Ekolali', stereotipik: 'Stereotipik Hareketler', dehb: 'DEHB / Anksiyete' };
+    const conditionBehaviors = {
+        ekolali: 'sözel tekrarlama örüntüleri gözlemleniyor',
+        stereotipik: 'tekrarlayıcı hareket örüntüleri gözlemleniyor',
+        dehb: 'dikkat süresi ve dürtü kontrolünde güçlük gözlemleniyor',
+        dil: 'dil ve konuşma gelişiminde destek ihtiyacı var',
+        down: 'bilişsel ve dil gelişiminde bireyselleştirilmiş destek gerekiyor',
+        cp: 'motor koordinasyon desteği gerekiyor',
+        oog: 'özgül öğrenme güçlüğüne yönelik destek uygulanıyor'
+    };
 
-    const profileText = `Öğrenci Adı: ${activeStudentName || 'Belirtilmemiş'}
-Eğitim Kademesi: ${categoryLabels[profile.category] || 'Belirtilmemiş'}
-Eşlik Eden Durumlar: ${(profile.conditions || []).map(c => conditionLabels[c] || c).join(', ') || 'Yok'}`;
+    const profileText = `Öğrenci Destek Düzeyi: ${categoryLabels[profile.category] || 'Belirtilmemiş'}
+Gözlemlenen Özellikler: ${(profile.conditions || []).map(c => conditionBehaviors[c] || c).join('; ') || 'Belirtilmemiş'}`;
 
     const sessionText = history.slice(0, 10).map(h =>
         `• ${formatHistoryDate(h.dateKey)}: ${h.durationMin} dk, ${h.totalTurns} yanıt, ${h.micUsedInTherapy || 0} bağımsız mikrofon, ${h.repeatUsed || 0} tekrar, ${h.simplifyUsed || 0} basitleştirme`
@@ -4060,15 +4082,15 @@ Eşlik Eden Durumlar: ${(profile.conditions || []).map(c => conditionLabels[c] |
         ? `İletişim Bağımsızlığı: %${m.indPct} (bağımsız mikrofon kullanımı)\nTekrar Dinleme İhtiyacı: %${m.repPct}\nDil Adaptasyon İhtiyacı: %${m.simPct}`
         : 'Metrik verisi henüz toplanmamış.';
 
-    const systemPrompt = `Sen özel eğitim kurumları ve RAM için çalışan uzman bir BEP (Bireyselleştirilmiş Eğitim Programı) hazırlama asistanısın. Görevin, sana ham olarak verilen öğrenci etkileşim verilerini resmi bir "Gelişim Özet Raporu"na dönüştürmektir.
+    const systemPrompt = `Sen özel eğitim kurumları için çalışan bir BEP (Bireyselleştirilmiş Eğitim Programı) taslak hazırlama asistanısın. Görevin, ham etkileşim verilerini BEP'e girdi olabilecek gözlem odaklı bir taslak metne dönüştürmektir. Bu taslak yetkili BEP ekibi tarafından incelenmeden resmi belge olarak kullanılamaz.
 
 YAZIM KURALLARI:
-1. Kesinlikle "Tıbbi Model" dili kullanma. "Sosyal Model" dilini esas al: toplumsal katılım, akran etkileşimi ve sosyal uyum odaklı yaz.
+1. "Tıbbi Model" dili kullanma. "Sosyal Model" dilini esas al: toplumsal katılım, akran etkileşimi ve sosyal uyum odaklı yaz.
 2. Eğer öğrencide "Ekolali" veya "Stereotipik hareket" varsa, yapay zekanın sönümlendirme ve bağımsızlaştırma etkisini vurgula.
-3. Çıktıyı doğrudan MEB BEP dosyalarına kopyalanabilecek resmi, gözlemlenebilir ve performans odaklı cümlelerle kur.
-4. Raporu Türkçe yaz. 300-400 kelime arası tut.`;
+3. Gözlemlenebilir, performans odaklı cümleler kur. "Kesin tanı" veya "resmi teşhis" ifadesi kullanma.
+4. Türkçe yaz. 300-400 kelime arası tut.`;
 
-    const userPrompt = `Aşağıdaki öğrenci profili, bağımsızlık metrikleri ve seans verilerini kullanarak resmi bir BEP Dönemsel Gelişim Raporu oluştur:
+    const userPrompt = `Aşağıdaki profil, bağımsızlık metrikleri ve seans verilerini kullanarak bir BEP Dönemsel Gelişim Taslağı oluştur:
 
 ÖĞRENCİ PROFİLİ:
 ${profileText}
@@ -4079,7 +4101,7 @@ ${metricsText}
 SON SEANSLAR (${Math.min(history.length, 10)} seans):
 ${sessionText}
 
-Raporu "📝 Bireyselleştirilmiş Eğitim Programı (BEP) Dönemsel Gelişim Raporu" başlığıyla başlat. Şu bölümleri içersin: 1) Öğrenci Kademesi ve Tanı Özeti, 2) İletişim Bağımsızlığı Gelişimi (metrikleri yorumla), 3) Gözlemlenen Güçlü Yönler, 4) Sonraki Dönem Hedefleri. Metrikleri açıklarken somut rakamlar kullan.`;
+Taslağı "📝 BEP Dönemsel Gelişim Taslağı" başlığıyla başlat. Şu bölümleri içersin: 1) Öğrenci Kademesi ve Gözlem Özeti, 2) İletişim Bağımsızlığı Gelişimi (metrikleri yorumla), 3) Gözlemlenen Güçlü Yönler, 4) Sonraki Dönem Önerileri. Metrikleri açıklarken somut rakamlar kullan.`;
 
     try {
         const res = await fetch(API_BASE + '/api/chat', {
@@ -4093,8 +4115,9 @@ Raporu "📝 Bireyselleştirilmiş Eğitim Programı (BEP) Dönemsel Gelişim Ra
         });
 
         const data = await res.json();
-        const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || 'Rapor oluşturulamadı. Gemini API yanıt vermedi.';
-        textEl.value = text;
+        const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text || 'Taslak oluşturulamadı. Gemini API yanıt vermedi.';
+        const disclaimer = '⚠️ TASLAK BELGE — Bu metin yapay zeka tarafından oluşturulmuştur. Resmi BEP belgesi olarak kullanılabilmesi için yetkili BEP ekibi (öğretmen, uzman, okul idaresi, veli) tarafından incelenmeli ve onaylanmalıdır.\n\n';
+        textEl.value = disclaimer + rawText;
         output.style.display = 'flex';
         output.scrollIntoView({ behavior: 'smooth', block: 'start' });
     } catch (err) {
@@ -4103,7 +4126,7 @@ Raporu "📝 Bireyselleştirilmiş Eğitim Programı (BEP) Dönemsel Gelişim Ra
     }
 
     btn.disabled = false;
-    btn.textContent = '📝 BEP Gelişim Raporu Oluştur';
+    btn.textContent = '📝 BEP Taslağı Oluştur';
 }
 
 function copyBepReport() {
