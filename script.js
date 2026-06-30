@@ -141,6 +141,132 @@ const STRINGS = {
     data_saved: 'Kaydedildi',
     copy_success: 'Kopyalandı',
     no_student: 'Öğrenci seçilmedi',
+    // Schedule ekranı
+    schedule_empty: 'Henüz etkinlik eklenmedi.',
+    schedule_help: '"+ Etkinlik Ekle" butonuyla bu öğrencinin programını oluşturun.',
+    schedule_progress: '{done} / {total} tamamlandı',
+    schedule_activity_done: '{label} tamamlandı!',
+    schedule_undo: 'Geri al',
+    schedule_mark_done: 'Tamamlandı işaretle',
+    schedule_delete: 'Sil',
+    schedule_activity_ph: 'Etkinlik adı',
+    // Skills ekranı
+    skill_mastered: 'Kazanıldı!',
+    skill_learning_status: 'Öğreniliyor',
+    skill_reset: 'Sıfırlandı',
+    skill_legend_not_started: '⬜ Başlanmadı',
+    skill_legend_learning: '🔄 Öğreniliyor',
+    skill_legend_mastered: '✅ Kazanıldı',
+    // Behavior ekranı
+    behavior_empty: 'Henüz kayıt yok.',
+    behavior_added: 'Kayıt eklendi!',
+    behavior_duration_unit: '{duration} dk',
+    behavior_delete: 'Sil',
+    behavior_label: 'Davranış',
+    behavior_what_happened_ph: 'Ne oldu?',
+    behavior_antecedent_label: 'Öncesi (A)',
+    behavior_consequence_label: 'Sonrası (C)',
+    behavior_frequency_label: 'Sıklık',
+    behavior_duration_label: 'Süre (dk)',
+    // BEP/IEP ekranı
+    bep_preparing: '⏳ Taslak hazırlanıyor...',
+    bep_draft_failed: 'Taslak oluşturulamadı. Gemini API yanıt vermedi.',
+    bep_error_prefix: 'Hata: ',
+    bep_copied_btn: '✓ Kopyalandı!',
+    bep_copy_btn: '📋 Metni Kopyala',
+    bep_periodic_title: 'Dönemsel BEP Taslağı',
+    bep_periodic_sub: "Seans verileri kullanılarak BEP'e aktarılabilecek bir taslak metin oluşturulur. Yetkili ekip tarafından gözden geçirilmesi gerekir.",
+    bep_disclaimer_short: '⚠️ Bu metin bir taslaktır. Resmi BEP için yetkili ekip (öğretmen, uzman, veli) tarafından incelenmeli ve onaylanmalıdır.',
+    bep_disclaimer_full: '⚠️ TASLAK BELGE — Bu metin yapay zeka tarafından oluşturulmuştur. Resmi BEP belgesi olarak kullanılabilmesi için yetkili BEP ekibi (öğretmen, uzman, okul idaresi, veli) tarafından incelenmeli ve onaylanmalıdır.',
+    // Report ekranı
+    report_generated_at: 'Rapor oluşturulma tarihi: {date}',
+    report_minutes: '{minutes} dk',
+    report_no_usage_days: 'Henüz kayıtlı bir kullanım günü yok.',
+    report_no_city_sessions: 'Henüz şehir temelli terapi oturumu yapılmadı.',
+    report_general_area: 'Genel alan',
+    report_top_area: 'En yoğun alan',
+    report_top_area_summary: '{count} soru ile bu alan en çok çalışılan konuşma noktası oldu.',
+    report_location_count: '{count} farklı mekân',
+    report_general_speech: 'Genel konuşma',
+    report_question_prefix: 'Soru: ',
+    report_no_records: 'Kayıt yok',
+    report_no_session_for_day: 'Bu gün için kayıtlı bir oturum yok.',
+    report_session_summary: '{count} oturum kaydı • {minutes} dk toplam süre • {turns} toplam yanıt • {mic} mikrofon kullanımı',
+    report_speech_practice: 'Konuşma çalışması',
+    report_story_speech_practice: '{story} + konuşma çalışması',
+    report_session_detail: '{minutes} dk • {turns} yanıt • {mic} mikrofon • Hikaye ilerleme: {progress}',
+    report_completed: 'Tamamlandı',
+    report_records_count: '{count} kayıt',
+    report_title_full: 'Veli Gelişim Raporu',
+    report_history_section_title: 'Takvimli Kullanım Geçmişi',
+    report_history_section_sub: 'Hangi günlerde kullanıldığını ve her güne ait oturum detaylarını buradan inceleyebilirsin.',
+    report_learning_area_plan: '📚 Gelişim Alanı Planı',
+    report_city_summary: '🏙️ Şehir Özeti',
+    weekday_mon: 'Pzt', weekday_tue: 'Sal', weekday_wed: 'Çar', weekday_thu: 'Per',
+    weekday_fri: 'Cum', weekday_sat: 'Cmt', weekday_sun: 'Paz',
+    // AAC ekranı
+    aac_sentence_placeholder: 'Kart seç, cümle oluştur...',
+    aac_searching: 'Aranıyor...',
+    aac_no_results: 'Sonuç bulunamadı. Farklı bir kelime deneyin.',
+    aac_connection_error: 'Bağlantı hatası. İnternet bağlantınızı kontrol edin.',
+    aac_search_ph: '🔍 Kart ara...',
+    aac_cat_feelings: 'Duygular',
+    aac_cat_foods: 'Yiyecekler',
+    aac_cat_activities: 'Etkinlikler',
+    aac_cat_people: 'İnsanlar',
+    aac_cat_animals: 'Hayvanlar',
+    aac_cat_places: 'Yerler',
+    aac_cat_symbols: 'Semboller',
+    // Teacher panel / Student setup
+    setup_select_student: 'Öğrenci Seç',
+    setup_name_label: 'Ad',
+    setup_birth_year_label: 'Doğum Yılı',
+    setup_note_label: 'Not',
+    setup_create_btn: 'Oluştur',
+    setup_add_new_divider: 'Yeni öğrenci ekle',
+    veli_consent_label: 'Bu öğrencinin velisi KVKK kapsamında bilgilendirildi ve rıza verdi.',
+    // Accessibility panel
+    a11y_export_label: '📥 Verilerimi İndir',
+    a11y_delete_label: '🗑️ Hesabı Sil',
+    a11y_privacy_label: 'Gizlilik Politikası & KVKK',
+    a11y_large_text_label: 'Büyük Metin',
+    a11y_large_text_hint: 'Yazı boyutunu artırır',
+    a11y_high_contrast_label: 'Yüksek Kontrast',
+    a11y_high_contrast_hint: 'Renkleri belirginleştirir',
+    a11y_large_touch_label: 'Büyük Dokunma Hedefi',
+    a11y_large_touch_hint: 'Butonları daha kolay tıklanır hale getirir',
+    a11y_reduce_motion_label: 'Animasyonları Azalt',
+    a11y_reduce_motion_hint: 'Hareket ve geçişleri kapatır',
+    a11y_voice_label_label: 'Sesli Etiket',
+    a11y_voice_label_hint: 'Her butona basıldığında sesli okur',
+    // Genel / dağınık string'ler
+    menu_greeting_named: 'Merhaba, {name}! 🌟',
+    profile_not_entered: 'Profil girilmemiş',
+    update_info_btn: 'Bilgileri Güncelle',
+    // Alert/Confirm/Status mesajları
+    confirm_delete_account_1: 'Hesabınız ve tüm verileriniz kalıcı olarak silinecek. Bu işlem geri alınamaz. Emin misiniz?',
+    confirm_delete_account_2: 'Son kez onaylıyın: tüm öğrenci verileri, BEP kayıtları ve ilerleme bilgileri silinecek.',
+    account_deleted_msg: 'Hesabınız silindi. İyi günler.',
+    kvkk_confirm_required: 'Devam etmek için velinin KVKK kapsamında bilgilendirildiğini onaylayın.',
+    consent_required: 'Veli onayını işaretleyin.',
+    student_name_required: 'Öğrenci adı zorunlu.',
+    creating_student: 'Öğrenci oluşturuluyor...',
+    update_name_required: 'Güncelleme için öğrenci adı zorunlu.',
+    updating_student: 'Öğrenci bilgileri güncelleniyor...',
+    student_updated: 'Öğrenci bilgileri güncellendi.',
+    no_students_yet: 'Henüz öğrenci eklenmemiş. Devam etmek için ilk öğrencini oluştur.',
+    select_or_add_student: 'Bir öğrenciyi seçebilir ya da yeni öğrenci ekleyebilirsin.',
+    // Sıra kartı oyunu geri bildirimleri
+    seq_correct_order: '🎉 Harika! Doğru sıraladın!',
+    seq_correct_order_speak: 'Harika! Doğru sıraladın!',
+    seq_wrong_order: '❌ Bu doğru sıra değil, tekrar dene!',
+    seq_try_again_speak: 'Tekrar dene!',
+    seq_select_cause_first: 'Önce bir sebep seç!',
+    seq_correct_match: '✅ Doğru eşleştirme!',
+    seq_correct_match_speak: 'Doğru! Aferin!',
+    seq_all_pairs_found: '🎉 Tüm çiftleri buldun!',
+    seq_all_pairs_found_speak: 'Tüm çiftleri buldun! Harika!',
+    seq_wrong_match: '❌ Bu doğru eşleşme değil!',
   },
   en: {
     back_menu: '← Menu',
@@ -280,6 +406,132 @@ const STRINGS = {
     data_saved: 'Saved',
     copy_success: 'Copied',
     no_student: 'No student selected',
+    // Schedule screen
+    schedule_empty: 'No activities added yet.',
+    schedule_help: 'Use the "+ Add Activity" button to build this student\'s schedule.',
+    schedule_progress: '{done} / {total} completed',
+    schedule_activity_done: '{label} completed!',
+    schedule_undo: 'Undo',
+    schedule_mark_done: 'Mark as completed',
+    schedule_delete: 'Delete',
+    schedule_activity_ph: 'Activity name',
+    // Skills screen
+    skill_mastered: 'Mastered!',
+    skill_learning_status: 'Learning',
+    skill_reset: 'Reset',
+    skill_legend_not_started: '⬜ Not started',
+    skill_legend_learning: '🔄 Learning',
+    skill_legend_mastered: '✅ Mastered',
+    // Behavior screen
+    behavior_empty: 'No records yet.',
+    behavior_added: 'Record added!',
+    behavior_duration_unit: '{duration} min',
+    behavior_delete: 'Delete',
+    behavior_label: 'Behavior',
+    behavior_what_happened_ph: 'What happened?',
+    behavior_antecedent_label: 'Antecedent (A)',
+    behavior_consequence_label: 'Consequence (C)',
+    behavior_frequency_label: 'Frequency',
+    behavior_duration_label: 'Duration (min)',
+    // BEP/IEP screen
+    bep_preparing: '⏳ Preparing draft...',
+    bep_draft_failed: 'Could not generate draft. The Gemini API did not respond.',
+    bep_error_prefix: 'Error: ',
+    bep_copied_btn: '✓ Copied!',
+    bep_copy_btn: '📋 Copy Text',
+    bep_periodic_title: 'Periodic IEP Draft',
+    bep_periodic_sub: 'Generates a draft text that can be transferred into the IEP using session data. It must be reviewed by the authorized team.',
+    bep_disclaimer_short: '⚠️ This text is a draft. It must be reviewed and approved by the authorized team (teacher, specialist, parent) for the official IEP.',
+    bep_disclaimer_full: '⚠️ DRAFT DOCUMENT — This text was generated by AI. It must be reviewed by the authorized IEP team (teacher, specialist, school administration, parent) before it can be used as an official IEP document.',
+    // Report screen
+    report_generated_at: 'Report generated on: {date}',
+    report_minutes: '{minutes} min',
+    report_no_usage_days: 'No recorded usage days yet.',
+    report_no_city_sessions: 'No city-based therapy session has been done yet.',
+    report_general_area: 'General area',
+    report_top_area: 'Most active area',
+    report_top_area_summary: 'With {count} questions, this area was the most worked-on conversation point.',
+    report_location_count: '{count} different places',
+    report_general_speech: 'General conversation',
+    report_question_prefix: 'Question: ',
+    report_no_records: 'No records',
+    report_no_session_for_day: 'No recorded session for this day.',
+    report_session_summary: '{count} session records • {minutes} min total duration • {turns} total responses • {mic} microphone uses',
+    report_speech_practice: 'Speech practice',
+    report_story_speech_practice: '{story} + speech practice',
+    report_session_detail: '{minutes} min • {turns} responses • {mic} microphone • Story progress: {progress}',
+    report_completed: 'Completed',
+    report_records_count: '{count} records',
+    report_title_full: 'Parent Progress Report',
+    report_history_section_title: 'Usage History Calendar',
+    report_history_section_sub: 'You can review which days the app was used and the session details for each day here.',
+    report_learning_area_plan: '📚 Learning Area Plan',
+    report_city_summary: '🏙️ City Summary',
+    weekday_mon: 'Mon', weekday_tue: 'Tue', weekday_wed: 'Wed', weekday_thu: 'Thu',
+    weekday_fri: 'Fri', weekday_sat: 'Sat', weekday_sun: 'Sun',
+    // AAC screen
+    aac_sentence_placeholder: 'Pick a card, build a sentence...',
+    aac_searching: 'Searching...',
+    aac_no_results: 'No results found. Try a different word.',
+    aac_connection_error: 'Connection error. Please check your internet connection.',
+    aac_search_ph: '🔍 Search cards...',
+    aac_cat_feelings: 'Feelings',
+    aac_cat_foods: 'Foods',
+    aac_cat_activities: 'Activities',
+    aac_cat_people: 'People',
+    aac_cat_animals: 'Animals',
+    aac_cat_places: 'Places',
+    aac_cat_symbols: 'Symbols',
+    // Teacher panel / Student setup
+    setup_select_student: 'Select Student',
+    setup_name_label: 'Name',
+    setup_birth_year_label: 'Birth Year',
+    setup_note_label: 'Note',
+    setup_create_btn: 'Create',
+    setup_add_new_divider: 'Add new student',
+    veli_consent_label: "I confirm that this student's parent/guardian has been informed and has given consent under KVKK.",
+    // Accessibility panel
+    a11y_export_label: '📥 Export My Data',
+    a11y_delete_label: '🗑️ Delete Account',
+    a11y_privacy_label: 'Privacy Policy & KVKK',
+    a11y_large_text_label: 'Large Text',
+    a11y_large_text_hint: 'Increases font size',
+    a11y_high_contrast_label: 'High Contrast',
+    a11y_high_contrast_hint: 'Makes colors more distinct',
+    a11y_large_touch_label: 'Large Touch Target',
+    a11y_large_touch_hint: 'Makes buttons easier to tap',
+    a11y_reduce_motion_label: 'Reduce Motion',
+    a11y_reduce_motion_hint: 'Turns off animations and transitions',
+    a11y_voice_label_label: 'Voice Label',
+    a11y_voice_label_hint: 'Reads aloud whenever a button is pressed',
+    // General / misc strings
+    menu_greeting_named: 'Hello, {name}! 🌟',
+    profile_not_entered: 'Profile not entered',
+    update_info_btn: 'Update Information',
+    // Alert/Confirm/Status messages
+    confirm_delete_account_1: 'Your account and all your data will be permanently deleted. This action cannot be undone. Are you sure?',
+    confirm_delete_account_2: 'Final confirmation: all student data, IEP records, and progress information will be deleted.',
+    account_deleted_msg: 'Your account has been deleted. Have a nice day.',
+    kvkk_confirm_required: 'To continue, please confirm that the parent has been informed under KVKK.',
+    consent_required: 'Please check the parental consent.',
+    student_name_required: 'Student name is required.',
+    creating_student: 'Creating student...',
+    update_name_required: 'Student name is required to update.',
+    updating_student: 'Updating student information...',
+    student_updated: 'Student information updated.',
+    no_students_yet: 'No students added yet. Create your first student to continue.',
+    select_or_add_student: 'You can select a student or add a new one.',
+    // Sequence game feedback
+    seq_correct_order: '🎉 Great! You sequenced it correctly!',
+    seq_correct_order_speak: 'Great! You sequenced it correctly!',
+    seq_wrong_order: '❌ That\'s not the right order, try again!',
+    seq_try_again_speak: 'Try again!',
+    seq_select_cause_first: 'Select a cause first!',
+    seq_correct_match: '✅ Correct match!',
+    seq_correct_match_speak: 'Correct! Well done!',
+    seq_all_pairs_found: '🎉 You found all the pairs!',
+    seq_all_pairs_found_speak: 'You found all the pairs! Great job!',
+    seq_wrong_match: '❌ That\'s not the right match!',
   }
 };
 
@@ -595,7 +847,7 @@ async function startApp(resetSession) {
         sessionData.reportEntryId = null;
     }
 
-    document.getElementById('menu-greeting').textContent = `Merhaba, ${childName}! 🌟`;
+    document.getElementById('menu-greeting').textContent = t('menu_greeting_named').replace('{name}', childName);
     appStarted = true;
     // Auth kontrolü: oturum var mı?
     checkAuthSession();
@@ -804,7 +1056,7 @@ function ensureStudentEnhancements() {
         updateBtn.type = 'button';
         updateBtn.id = 'updateStudentBtn';
         updateBtn.className = 'menu-ghost-btn student-secondary-btn';
-        updateBtn.textContent = 'Bilgileri Güncelle';
+        updateBtn.textContent = t('update_info_btn');
         updateBtn.style.display = 'none';
         updateBtn.onclick = updateStudent;
         createBtn.insertAdjacentElement('afterend', updateBtn);
@@ -1224,7 +1476,7 @@ async function renderStudentDetailPanel() {
 
     const student = studentsCache.find(item => item.id === activeStudentId);
     if (!student) {
-        titleEl.textContent = 'Öğrenci seçilmedi';
+        titleEl.textContent = t('no_student');
         subtitleEl.textContent = 'Bir öğrenci seçtiğinde güçlü yönler, destek notları ve oturum özeti burada görünür.';
         notesEl.textContent = 'Henüz destek notu eklenmedi.';
         goalEl.textContent = 'Destek notlarına göre odak alanı burada özetlenir.';
@@ -1274,11 +1526,11 @@ function renderStudentList() {
 
     if (!studentsCache.length) {
         listEl.innerHTML = '';
-        statusEl.textContent = 'Henüz öğrenci eklenmemiş. Devam etmek için ilk öğrencini oluştur.';
+        statusEl.textContent = t('no_students_yet');
         return;
     }
 
-    statusEl.textContent = 'Bir öğrenciyi seçebilir ya da yeni öğrenci ekleyebilirsin.';
+    statusEl.textContent = t('select_or_add_student');
     listEl.innerHTML = studentsCache.map(student => `
         <button type="button" class="student-card ${student.id === activeStudentId ? 'active' : ''}" onclick="selectStudent('${escapeHtml(student.id)}')">
             <h4>${escapeHtml(student.full_name) || 'İsimsiz öğrenci'}</h4>
@@ -1346,7 +1598,7 @@ async function createStudent() {
 
     const veliConsent = document.getElementById('setupVeliConsent');
     if (veliConsent && !veliConsent.checked) {
-        statusEl.textContent = 'Veli onayını işaretleyin.';
+        statusEl.textContent = t('consent_required');
         return;
     }
 
@@ -1354,12 +1606,12 @@ async function createStudent() {
     const birthYearRaw = yearEl.value.trim();
     const supportNotes = notesEl.value.trim();
     if (!fullName) {
-        statusEl.textContent = 'Öğrenci adı zorunlu.';
+        statusEl.textContent = t('student_name_required');
         return;
     }
 
     createBtn.disabled = true;
-    statusEl.textContent = 'Öğrenci oluşturuluyor...';
+    statusEl.textContent = t('creating_student');
     const birthYear = birthYearRaw ? Number(birthYearRaw) : null;
 
     const newStudent = {
@@ -1402,12 +1654,12 @@ async function updateStudent() {
     const birthYearRaw = yearEl.value.trim();
     const supportNotes = notesEl.value.trim();
     if (!fullName) {
-        statusEl.textContent = 'Güncelleme için öğrenci adı zorunlu.';
+        statusEl.textContent = t('update_name_required');
         return;
     }
 
     updateBtn.disabled = true;
-    statusEl.textContent = 'Öğrenci bilgileri güncelleniyor...';
+    statusEl.textContent = t('updating_student');
     const birthYear = birthYearRaw ? Number(birthYearRaw) : null;
     const userId = await getCurrentUserId();
 
@@ -1420,7 +1672,7 @@ async function updateStudent() {
     }
 
     updateBtn.disabled = false;
-    statusEl.textContent = 'Öğrenci bilgileri güncellendi.';
+    statusEl.textContent = t('student_updated');
     await ensureActiveStudent();
     await renderStudentDetailPanel();
 }
@@ -1535,7 +1787,7 @@ function renderHistoryDetails(history, dateKey) {
 
     const entries = getEntriesForDate(history, dateKey);
     if (!entries.length) {
-        detailEl.innerHTML = '<p class="report-empty">Bu gün için kayıtlı bir oturum yok.</p>';
+        detailEl.innerHTML = `<p class="report-empty">${t('report_no_session_for_day')}</p>`;
         return;
     }
 
@@ -1547,18 +1799,26 @@ function renderHistoryDetails(history, dateKey) {
         <div class="history-detail-card">
             <h4>${formatHistoryDate(dateKey)}</h4>
             <div class="history-detail-meta">
-                ${entries.length} oturum kaydı • ${totalMinutes} dk toplam süre • ${totalTurns} toplam yanıt • ${totalMic} mikrofon kullanımı
+                ${t('report_session_summary')
+                    .replace('{count}', entries.length)
+                    .replace('{minutes}', totalMinutes)
+                    .replace('{turns}', totalTurns)
+                    .replace('{mic}', totalMic)}
             </div>
         </div>
         <div class="history-session-list">
             ${entries.map(entry => `
                 <div class="history-session-item">
                     <div class="history-session-top">
-                        <strong>${entry.storyName ? `${escapeHtml(entry.storyName)} + konuşma çalışması` : 'Konuşma çalışması'}</strong>
+                        <strong>${entry.storyName ? t('report_story_speech_practice').replace('{story}', escapeHtml(entry.storyName)) : t('report_speech_practice')}</strong>
                         <span class="history-session-time">${new Date(entry.createdAt).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}</span>
                     </div>
                     <div class="history-session-summary">
-                        ${entry.durationMin} dk • ${entry.totalTurns} yanıt • ${entry.totalMic} mikrofon • Hikaye ilerleme: ${entry.storyCompleted ? 'Tamamlandı' : entry.storyPct}
+                        ${t('report_session_detail')
+                            .replace('{minutes}', entry.durationMin)
+                            .replace('{turns}', entry.totalTurns)
+                            .replace('{mic}', entry.totalMic)
+                            .replace('{progress}', entry.storyCompleted ? t('report_completed') : entry.storyPct)}
                     </div>
                 </div>
             `).join('')}
@@ -1606,7 +1866,7 @@ function renderHistoryCalendar(history) {
         };
         btn.innerHTML = `
             <span class="calendar-day-number">${day}</span>
-            <span class="calendar-day-meta">${useCount ? `${useCount} kayıt` : ''}</span>
+            <span class="calendar-day-meta">${useCount ? t('report_records_count').replace('{count}', useCount) : ''}</span>
         `;
         gridEl.appendChild(btn);
     }
@@ -1618,8 +1878,8 @@ function renderReportHistory(history) {
         const detailEl = document.getElementById('historyDayDetails');
         const monthLabel = document.getElementById('historyMonthLabel');
         if (gridEl) gridEl.innerHTML = '';
-        if (monthLabel) monthLabel.textContent = 'Kayıt yok';
-        if (detailEl) detailEl.innerHTML = '<p class="report-empty">Henüz kayıtlı bir kullanım günü yok.</p>';
+        if (monthLabel) monthLabel.textContent = t('report_no_records');
+        if (detailEl) detailEl.innerHTML = `<p class="report-empty">${t('report_no_usage_days')}</p>`;
         return;
     }
 
@@ -1642,13 +1902,13 @@ function renderCitySessionSummary() {
 
     const turns = sessionData.therapyTurns || [];
     if (!turns.length) {
-        container.innerHTML = '<p class="report-empty">Henüz şehir temelli terapi oturumu yapılmadı.</p>';
+        container.innerHTML = `<p class="report-empty">${t('report_no_city_sessions')}</p>`;
         return;
     }
 
     const locationMap = new Map();
     turns.forEach((turn) => {
-        const key = turn.location || 'Genel alan';
+        const key = turn.location || t('report_general_area');
         const current = locationMap.get(key) || { count: 0, categories: new Set(), sample: '' };
         current.count += 1;
         if (turn.category) current.categories.add(turn.category);
@@ -1662,17 +1922,17 @@ function renderCitySessionSummary() {
     container.innerHTML = `
         <div class="city-session-hero">
             <div>
-                <span class="city-session-kicker">En yoğun alan</span>
+                <span class="city-session-kicker">${t('report_top_area')}</span>
                 <strong>${topLocation[0]}</strong>
-                <p>${topLocation[1].count} soru ile bu alan en çok çalışılan konuşma noktası oldu.</p>
+                <p>${t('report_top_area_summary').replace('{count}', topLocation[1].count)}</p>
             </div>
-            <div class="city-session-meta">${sortedLocations.length} farklı mekân</div>
+            <div class="city-session-meta">${t('report_location_count').replace('{count}', sortedLocations.length)}</div>
         </div>
         <div class="city-session-grid">
             ${sortedLocations.map(([label, data]) => `
                 <article class="city-session-card">
                     <h4>${label}</h4>
-                    <p>${data.count} soru • ${[...data.categories].join(', ') || 'Genel konuşma'}</p>
+                    <p>${data.count} soru • ${[...data.categories].join(', ') || t('report_general_speech')}</p>
                     <span>${data.sample || 'Bu alanda yeni sorular çalışıldı.'}</span>
                 </article>
             `).join('')}
@@ -1702,12 +1962,12 @@ async function goToReport() {
     document.getElementById('reportSubtitle').textContent =
         `${childName} • ${now.toLocaleDateString('tr-TR', { day:'numeric', month:'long', year:'numeric' })}`;
     document.getElementById('reportDate').textContent =
-        `Rapor oluşturulma tarihi: ${now.toLocaleString('tr-TR')}`;
+        t('report_generated_at').replace('{date}', now.toLocaleString('tr-TR'));
 
     // Süre
     const durationMs = sessionData.startTime ? Date.now() - sessionData.startTime : 0;
     const durationMin = Math.max(1, Math.round(durationMs / 60000));
-    document.getElementById('statDuration').textContent = durationMin + ' dk';
+    document.getElementById('statDuration').textContent = t('report_minutes').replace('{minutes}', durationMin);
 
     // Mikrofon sayısı
     const totalMic = sessionData.micUsedInTherapy + sessionData.micUsedInStory;
@@ -1774,10 +2034,10 @@ async function goToReport() {
     const therapyEl = document.getElementById('therapyLog');
     if (sessionData.therapyTurns.length > 0) {
         therapyEl.innerHTML = '';
-        sessionData.therapyTurns.forEach(t => {
+        sessionData.therapyTurns.forEach(turn => {
             const entry = document.createElement('div');
             entry.className = 'therapy-entry';
-            entry.innerHTML = `<div class="therapy-q">🎙️ ${t.location ? `${escapeHtml(t.location)} • ` : ''}${t.category ? `${escapeHtml(t.category)} • ` : ''}Soru: ${escapeHtml(t.question)}</div>${escapeHtml(t.answer)}`;
+            entry.innerHTML = `<div class="therapy-q">🎙️ ${turn.location ? `${escapeHtml(turn.location)} • ` : ''}${turn.category ? `${escapeHtml(turn.category)} • ` : ''}${t('report_question_prefix')}${escapeHtml(turn.question)}</div>${escapeHtml(turn.answer)}`;
             therapyEl.appendChild(entry);
         });
     }
@@ -2996,8 +3256,8 @@ function renderSchedule() {
         list.innerHTML = `
             <div class="schedule-empty">
                 <span>📋</span>
-                <p>Henüz etkinlik eklenmedi.</p>
-                <p><strong>"+ Etkinlik Ekle"</strong> butonuyla bu öğrencinin programını oluşturun.</p>
+                <p>${t('schedule_empty')}</p>
+                <p><strong>${t('schedule_help')}</strong></p>
             </div>`;
         progressWrap.style.display = 'none';
         resetBtn.style.display = 'none';
@@ -3008,20 +3268,21 @@ function renderSchedule() {
     resetBtn.style.display = '';
     const doneCount = activities.filter(a => done[a.id]).length;
     const pct = Math.round((doneCount / activities.length) * 100);
-    document.getElementById('scheduleProgress').textContent = `${doneCount} / ${activities.length} tamamlandı`;
+    document.getElementById('scheduleProgress').textContent =
+        t('schedule_progress').replace('{done}', doneCount).replace('{total}', activities.length);
     document.getElementById('scheduleProgressFill').style.width = pct + '%';
 
     list.innerHTML = activities.map(a => `
         <div class="schedule-item ${done[a.id] ? 'done' : ''}">
             <button class="schedule-check-btn" onclick="toggleScheduleActivity('${escapeHtml(a.id)}')"
-                aria-label="${done[a.id] ? 'Geri al' : 'Tamamlandı işaretle'}">
+                aria-label="${done[a.id] ? t('schedule_undo') : t('schedule_mark_done')}">
                 ${done[a.id] ? '✅' : '⬜'}
             </button>
             <span class="schedule-item-emoji">${escapeHtml(a.emoji)}</span>
             <span class="schedule-item-label">${escapeHtml(a.label)}</span>
             ${a.time ? `<span class="schedule-item-time">${escapeHtml(a.time)}</span>` : ''}
             <button class="schedule-delete-btn" onclick="deleteScheduleActivity('${escapeHtml(a.id)}')"
-                aria-label="Sil">✕</button>
+                aria-label="${t('schedule_delete')}">✕</button>
         </div>
     `).join('');
 }
@@ -3067,7 +3328,7 @@ function toggleScheduleActivity(id) {
     saveScheduleCompletion(done);
     if (!wasDone) {
         const act = loadScheduleActivities().find(a => a.id === id);
-        if (act) speakFallback(act.label + ' tamamlandı!');
+        if (act) speakFallback(t('schedule_activity_done').replace('{label}', act.label));
     }
     renderSchedule();
 }
@@ -3181,7 +3442,7 @@ function _aacUpdateSentenceBar() {
     const wrap = document.getElementById('aacSentenceWords');
     const speakBtn = document.getElementById('aacSpeakBtn');
     if (!_aacSentence.length) {
-        wrap.innerHTML = '<span class="aac-sentence-placeholder">Kart seç, cümle oluştur...</span>';
+        wrap.innerHTML = `<span class="aac-sentence-placeholder">${t('aac_sentence_placeholder')}</span>`;
         if (speakBtn) speakBtn.disabled = true;
         return;
     }
@@ -3227,6 +3488,15 @@ const _aacEmojiCats = {
     'Yerler':      ['🏠','🏫','🌳','🏥','🚗','🛁','🛏️','🍳','📖','🎡','🏪','🚌','✈️','🏖️','🏞️','🌆'],
     'Semboller':   ['✅','❌','✋','➕','🏁','🆘','🤝','🚶','❤️','⭐','🌈','👍','👎','🔴','🔵','🟢','🟡','🟠','🟣','⬛','⬜'],
 };
+const _aacEmojiCatLabelKeys = {
+    'Duygular': 'aac_cat_feelings',
+    'Yiyecekler': 'aac_cat_foods',
+    'Etkinlikler': 'aac_cat_activities',
+    'İnsanlar': 'aac_cat_people',
+    'Hayvanlar': 'aac_cat_animals',
+    'Yerler': 'aac_cat_places',
+    'Semboller': 'aac_cat_symbols',
+};
 let _aacPickedEmoji = '';
 
 function openAacSearch() {
@@ -3261,12 +3531,12 @@ async function searchAacPhoto() {
     const q = (document.getElementById('aacPhotoQuery').value || '').trim();
     if (!q) return;
     const grid = document.getElementById('aacPhotoGrid');
-    grid.innerHTML = '<p class="aac-photo-hint">Aranıyor...</p>';
+    grid.innerHTML = `<p class="aac-photo-hint">${t('aac_searching')}</p>`;
     try {
         const r = await fetch(API_BASE + '/api/photo?query=' + encodeURIComponent(q));
         const d = await r.json();
         if (!d.photos || !d.photos.length) {
-            grid.innerHTML = '<p class="aac-photo-hint">Sonuç bulunamadı. Farklı bir kelime deneyin.</p>';
+            grid.innerHTML = `<p class="aac-photo-hint">${t('aac_no_results')}</p>`;
             return;
         }
         grid.innerHTML = d.photos.map(p => {
@@ -3277,7 +3547,7 @@ async function searchAacPhoto() {
             </button>`;
         }).join('');
     } catch {
-        grid.innerHTML = '<p class="aac-photo-hint">Bağlantı hatası. İnternet bağlantınızı kontrol edin.</p>';
+        grid.innerHTML = `<p class="aac-photo-hint">${t('aac_connection_error')}</p>`;
     }
 }
 
@@ -3293,12 +3563,12 @@ function selectAacPhoto(url, alt) {
 function _aacRenderEmojiTabs() {
     const tabs = document.getElementById('aacEmojiTabs');
     tabs.innerHTML = Object.keys(_aacEmojiCats).map((cat, i) =>
-        `<button type="button" class="aac-emoji-tab${i === 0 ? ' active' : ''}" onclick="_aacShowEmojiCat('${escapeHtml(cat)}')">${cat}</button>`
+        `<button type="button" class="aac-emoji-tab${i === 0 ? ' active' : ''}" data-cat="${escapeHtml(cat)}" onclick="_aacShowEmojiCat('${escapeHtml(cat)}')">${t(_aacEmojiCatLabelKeys[cat])}</button>`
     ).join('');
 }
 
 function _aacShowEmojiCat(cat) {
-    document.querySelectorAll('.aac-emoji-tab').forEach(t => t.classList.toggle('active', t.textContent === cat));
+    document.querySelectorAll('.aac-emoji-tab').forEach(tabEl => tabEl.classList.toggle('active', tabEl.dataset.cat === cat));
     const emojis = _aacEmojiCats[cat] || [];
     document.getElementById('aacEmojiGrid').innerHTML = emojis.map(e =>
         `<button type="button" class="aac-emoji-btn" onclick="selectAacEmoji('${e}')">${e}</button>`
@@ -3538,8 +3808,8 @@ function tapSequenceCard(cardIndex) {
 
         if (seqState.placed.length === seqState.game.items.length) {
             setTimeout(() => {
-                document.getElementById('seqFeedback').textContent = '🎉 Harika! Doğru sıraladın!';
-                speakFallback('Harika! Doğru sıraladın!');
+                document.getElementById('seqFeedback').textContent = t('seq_correct_order');
+                speakFallback(t('seq_correct_order_speak'));
                 if (typeof confetti === 'function') confetti({ particleCount: 80, spread: 60, origin: {y: 0.6} });
             }, 300);
         }
@@ -3547,8 +3817,8 @@ function tapSequenceCard(cardIndex) {
         seqState.errors++;
         if (cardEl) cardEl.classList.add('shake');
         setTimeout(() => { if (cardEl) cardEl.classList.remove('shake'); }, 500);
-        document.getElementById('seqFeedback').textContent = '❌ Bu doğru sıra değil, tekrar dene!';
-        speakFallback('Tekrar dene!');
+        document.getElementById('seqFeedback').textContent = t('seq_wrong_order');
+        speakFallback(t('seq_try_again_speak'));
     }
 }
 
@@ -3604,7 +3874,7 @@ function selectCause(i) {
 
 function selectEffect(i) {
     if (seqState.selectedCause === null) {
-        document.getElementById('seqFeedback').textContent = 'Önce bir sebep seç!';
+        document.getElementById('seqFeedback').textContent = t('seq_select_cause_first');
         return;
     }
     const causePair = seqState.pairs[seqState.selectedCause];
@@ -3617,12 +3887,12 @@ function selectEffect(i) {
         if (effectEl) { effectEl.classList.add('used'); effectEl.disabled = true; }
         seqState.matched++;
         seqState.selectedCause = null;
-        document.getElementById('seqFeedback').textContent = '✅ Doğru eşleştirme!';
-        speakFallback('Doğru! Aferin!');
+        document.getElementById('seqFeedback').textContent = t('seq_correct_match');
+        speakFallback(t('seq_correct_match_speak'));
         if (seqState.matched === seqState.pairs.length) {
             setTimeout(() => {
-                document.getElementById('seqFeedback').textContent = '🎉 Tüm çiftleri buldun!';
-                speakFallback('Tüm çiftleri buldun! Harika!');
+                document.getElementById('seqFeedback').textContent = t('seq_all_pairs_found');
+                speakFallback(t('seq_all_pairs_found_speak'));
                 if (typeof confetti === 'function') confetti({ particleCount: 80, spread: 60, origin: {y: 0.6} });
             }, 300);
         }
@@ -3630,8 +3900,8 @@ function selectEffect(i) {
         seqState.errors++;
         const effectEl = document.getElementById('effectCard_' + i);
         if (effectEl) { effectEl.classList.add('shake'); setTimeout(() => effectEl.classList.remove('shake'), 500); }
-        document.getElementById('seqFeedback').textContent = '❌ Bu doğru eşleşme değil!';
-        speakFallback('Tekrar dene!');
+        document.getElementById('seqFeedback').textContent = t('seq_wrong_match');
+        speakFallback(t('seq_try_again_speak'));
     }
 }
 
@@ -4017,9 +4287,9 @@ async function exportMyData() {
 }
 
 async function deleteAccount() {
-    const confirmed = confirm('Hesabınız ve tüm verileriniz kalıcı olarak silinecek. Bu işlem geri alınamaz. Emin misiniz?');
+    const confirmed = confirm(t('confirm_delete_account_1'));
     if (!confirmed) return;
-    const confirmed2 = confirm('Son kez onaylıyın: tüm öğrenci verileri, BEP kayıtları ve ilerleme bilgileri silinecek.');
+    const confirmed2 = confirm(t('confirm_delete_account_2'));
     if (!confirmed2) return;
 
     if (_authToken && !_authToken.startsWith('demo_')) {
@@ -4033,7 +4303,7 @@ async function deleteAccount() {
     ssKeys.forEach(k => sessionStorage.removeItem(k));
     _authToken = null;
     _authUser = null;
-    alert('Hesabınız silindi. İyi günler.');
+    alert(t('account_deleted_msg'));
     showOnly('auth-screen');
     switchAuthTab('login');
 }
@@ -4128,7 +4398,7 @@ async function createStudentFromLogin() {
     if (!name) { document.getElementById('loginNameInput').focus(); return; }
     const veliConsent = document.getElementById('loginVeliConsent');
     if (veliConsent && !veliConsent.checked) {
-        alert('Devam etmek için velinin KVKK kapsamında bilgilendirildiğini onaylayın.');
+        alert(t('kvkk_confirm_required'));
         return;
     }
     const selectedBtn = document.querySelector('.emoji-pick-btn.selected');
@@ -4202,7 +4472,7 @@ function _renderAzIdentityCard(profile) {
         const condTags = (profile.conditions || [])
             .map(c => `<span class="az-tag az-tag-cond">${BEP_CONDITION_LABELS[c] || c}</span>`)
             .join('');
-        tagsEl.innerHTML = levelTag + condTags || '<span class="az-tag-empty">Profil girilmemiş</span>';
+        tagsEl.innerHTML = levelTag + condTags || `<span class="az-tag-empty">${t('profile_not_entered')}</span>`;
     }
 
     if (metaEl) {
@@ -4267,7 +4537,7 @@ async function generateBepReport() {
     const textEl = document.getElementById('bepReportText');
 
     btn.disabled = true;
-    btn.textContent = '⏳ Taslak hazırlanıyor...';
+    btn.textContent = t('bep_preparing');
 
     const userId = await getCurrentUserId();
     const profile = await DB.get('bep_profile_' + userId) || {};
@@ -4333,26 +4603,26 @@ Taslağı "📝 BEP Dönemsel Gelişim Taslağı" başlığıyla başlat. Şu b�
         });
 
         const data = await res.json();
-        const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text || 'Taslak oluşturulamadı. Gemini API yanıt vermedi.';
-        const disclaimer = '⚠️ TASLAK BELGE — Bu metin yapay zeka tarafından oluşturulmuştur. Resmi BEP belgesi olarak kullanılabilmesi için yetkili BEP ekibi (öğretmen, uzman, okul idaresi, veli) tarafından incelenmeli ve onaylanmalıdır.\n\n';
+        const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text || t('bep_draft_failed');
+        const disclaimer = t('bep_disclaimer_full') + '\n\n';
         textEl.value = disclaimer + rawText;
         output.style.display = 'flex';
         output.scrollIntoView({ behavior: 'smooth', block: 'start' });
     } catch (err) {
-        textEl.value = 'Hata: ' + err.message;
+        textEl.value = t('bep_error_prefix') + err.message;
         output.style.display = 'flex';
     }
 
     btn.disabled = false;
-    btn.textContent = '📝 BEP Taslağı Oluştur';
+    btn.textContent = '📝 ' + t('bep_generate_btn');
 }
 
 function copyBepReport() {
     const text = document.getElementById('bepReportText').value;
     navigator.clipboard.writeText(text).then(() => {
         const btn = document.querySelector('.bep-copy-btn');
-        btn.textContent = '✓ Kopyalandı!';
-        setTimeout(() => { btn.textContent = '📋 Metni Kopyala'; }, 2000);
+        btn.textContent = t('bep_copied_btn');
+        setTimeout(() => { btn.textContent = t('bep_copy_btn'); }, 2000);
     });
 }
 
@@ -4702,7 +4972,7 @@ function cycleSkill(key) {
     map[key] = next;
     DB.set(skillsKey(), map);
     renderSkillsGrid();
-    const label = next === 'mastered' ? 'Kazanıldı!' : next === 'learning' ? 'Öğreniliyor' : 'Sıfırlandı';
+    const label = next === 'mastered' ? t('skill_mastered') : next === 'learning' ? t('skill_learning_status') : t('skill_reset');
     speakFallback(label);
 }
 
@@ -4756,14 +5026,14 @@ function saveBehaviorEntry() {
     _behaviorCount = 1;
     document.getElementById('behaviorCount').textContent = '1';
     renderBehaviorLog();
-    speakFallback('Kayıt eklendi!');
+    speakFallback(t('behavior_added'));
 }
 
 function renderBehaviorLog() {
     const log = loadBehaviorSync();
     const el = document.getElementById('behaviorLogList');
     if (!log.length) {
-        el.innerHTML = '<p class="behavior-empty">Henüz kayıt yok.</p>';
+        el.innerHTML = `<p class="behavior-empty">${t('behavior_empty')}</p>`;
         return;
     }
     el.innerHTML = log.slice(0, 20).map(e => {
@@ -4779,9 +5049,9 @@ function renderBehaviorLog() {
             ${e.consequence ? `<div class="behavior-log-abc"><span>C:</span> ${escapeHtml(e.consequence)}</div>` : ''}
             <div class="behavior-log-stats">
                 <span>×${e.frequency}</span>
-                ${e.duration ? `<span>${e.duration} dk</span>` : ''}
+                ${e.duration ? `<span>${t('behavior_duration_unit').replace('{duration}', e.duration)}</span>` : ''}
             </div>
-            <button class="behavior-delete-btn" onclick="deleteBehaviorEntry('${escapeHtml(e.id)}')">Sil</button>
+            <button class="behavior-delete-btn" onclick="deleteBehaviorEntry('${escapeHtml(e.id)}')">${t('behavior_delete')}</button>
         </div>`;
     }).join('');
 }

@@ -151,10 +151,10 @@
         <div class="login-add-form" id="loginAddForm" style="display:none">
             <div class="login-emoji-picker" id="loginEmojiPicker"></div>
             <input type="text" id="loginNameInput" class="login-name-input"
-                placeholder="Öğrenci adı" maxlength="30">
+                data-i18n-placeholder="student_placeholder" placeholder="Öğrenci adı" maxlength="30">
             <label class="veli-consent-label">
                 <input type="checkbox" id="loginVeliConsent">
-                <span>Bu öğrencinin velisi KVKK kapsamında bilgilendirildi ve rıza verdi.</span>
+                <span data-i18n="veli_consent_label">Bu öğrencinin velisi KVKK kapsamında bilgilendirildi ve rıza verdi.</span>
             </label>
             <div class="login-form-btns">
                 <button type="button" class="login-save-btn" onclick="createStudentFromLogin()">Kaydet</button>
@@ -170,31 +170,31 @@
         <div class="setup-panel">
             <div class="setup-head">
                 <img src="avatar.png" class="setup-logo" alt="">
-                <h2>Öğrenci Seç</h2>
+                <h2 data-i18n="setup_select_student">Öğrenci Seç</h2>
             </div>
             <div class="student-status" id="studentStatus">Yükleniyor...</div>
             <div class="student-list" id="studentList"></div>
-            <div class="setup-divider"><span>Yeni öğrenci ekle</span></div>
+            <div class="setup-divider"><span data-i18n="setup_add_new_divider">Yeni öğrenci ekle</span></div>
             <div class="student-form-card">
                 <div class="student-form-grid">
                     <div class="field">
-                        <label>Ad</label>
-                        <input type="text" id="studentNameInput" placeholder="Öğrenci adı">
+                        <label data-i18n="setup_name_label">Ad</label>
+                        <input type="text" id="studentNameInput" data-i18n-placeholder="student_placeholder" placeholder="Öğrenci adı">
                     </div>
                     <div class="field">
-                        <label>Doğum Yılı</label>
+                        <label data-i18n="setup_birth_year_label">Doğum Yılı</label>
                         <input type="number" id="studentBirthYearInput" placeholder="2019" min="2000" max="2099">
                     </div>
                 </div>
                 <div class="field">
-                    <label>Not</label>
+                    <label data-i18n="setup_note_label">Not</label>
                     <textarea id="studentNotesInput" rows="2" placeholder="Destek notu, ilgi alanı..."></textarea>
                 </div>
                 <label class="veli-consent-label">
                     <input type="checkbox" id="setupVeliConsent">
-                    <span>Bu öğrencinin velisi KVKK kapsamında bilgilendirildi ve rıza verdi.</span>
+                    <span data-i18n="veli_consent_label">Bu öğrencinin velisi KVKK kapsamında bilgilendirildi ve rıza verdi.</span>
                 </label>
-                <button type="button" class="btn-primary-gradient" id="createStudentBtn" onclick="createStudent()">
+                <button type="button" class="btn-primary-gradient" id="createStudentBtn" onclick="createStudent()" data-i18n="setup_create_btn">
                     Oluştur
                 </button>
             </div>
@@ -377,7 +377,7 @@ document.addEventListener('DOMContentLoaded', function(){
         <div class="report-header">
             <img src="avatar.png" class="report-avatar" alt="Yıldız Can">
             <div class="report-title-block">
-                <h2>Veli Gelişim Raporu</h2>
+                <h2 data-i18n="report_title_full">Veli Gelişim Raporu</h2>
                 <p id="reportSubtitle">Hazırlanıyor...</p>
             </div>
             <button class="btn-print" onclick="window.print()">🖨️ Yazdır</button>
@@ -414,8 +414,8 @@ document.addEventListener('DOMContentLoaded', function(){
 
         <div class="report-section report-history-section">
             <div class="report-history-header">
-                <h3>Takvimli Kullanım Geçmişi</h3>
-                <p>Hangi günlerde kullanıldığını ve her güne ait oturum detaylarını buradan inceleyebilirsin.</p>
+                <h3 data-i18n="report_history_section_title">Takvimli Kullanım Geçmişi</h3>
+                <p data-i18n="report_history_section_sub">Hangi günlerde kullanıldığını ve her güne ait oturum detaylarını buradan inceleyebilirsin.</p>
             </div>
             <div class="history-calendar-card">
                 <div class="history-calendar-top">
@@ -424,30 +424,30 @@ document.addEventListener('DOMContentLoaded', function(){
                     <button class="calendar-nav-btn" type="button" onclick="changeHistoryMonth(1)">→</button>
                 </div>
                 <div class="history-weekdays">
-                    <span>Pzt</span>
-                    <span>Sal</span>
-                    <span>Çar</span>
-                    <span>Per</span>
-                    <span>Cum</span>
-                    <span>Cmt</span>
-                    <span>Paz</span>
+                    <span data-i18n="weekday_mon">Pzt</span>
+                    <span data-i18n="weekday_tue">Sal</span>
+                    <span data-i18n="weekday_wed">Çar</span>
+                    <span data-i18n="weekday_thu">Per</span>
+                    <span data-i18n="weekday_fri">Cum</span>
+                    <span data-i18n="weekday_sat">Cmt</span>
+                    <span data-i18n="weekday_sun">Paz</span>
                 </div>
                 <div class="history-calendar-grid" id="historyCalendarGrid"></div>
             </div>
             <div class="history-day-details" id="historyDayDetails">
-                <p class="report-empty">Henüz kayıtlı bir kullanım günü yok.</p>
+                <p class="report-empty" data-i18n="report_no_usage_days">Henüz kayıtlı bir kullanım günü yok.</p>
             </div>
         </div>
 
         <div class="report-section">
-            <h3>📚 Gelişim Alanı Planı</h3>
+            <h3 data-i18n="report_learning_area_plan">📚 Gelişim Alanı Planı</h3>
             <div id="learningAreaPlan" class="learning-area-plan"></div>
         </div>
 
         <div class="report-section">
-            <h3>🏙️ Şehir Özeti</h3>
+            <h3 data-i18n="report_city_summary">🏙️ Şehir Özeti</h3>
             <div id="citySessionSummary" class="city-session-summary">
-                <p class="report-empty">Henüz şehir temelli terapi oturumu yapılmadı.</p>
+                <p class="report-empty" data-i18n="report_no_city_sessions">Henüz şehir temelli terapi oturumu yapılmadı.</p>
             </div>
         </div>
 
@@ -555,8 +555,8 @@ document.addEventListener('DOMContentLoaded', function(){
                 <span class="a11y-setting-label">
                     <span class="a11y-setting-icon">🔡</span>
                     <span>
-                        <strong>Büyük Metin</strong>
-                        <small>Yazı boyutunu artırır</small>
+                        <strong data-i18n="a11y_large_text_label">Büyük Metin</strong>
+                        <small data-i18n="a11y_large_text_hint">Yazı boyutunu artırır</small>
                     </span>
                 </span>
                 <input type="checkbox" id="a11y-large-text" class="a11y-toggle" onchange="applyA11y()">
@@ -565,8 +565,8 @@ document.addEventListener('DOMContentLoaded', function(){
                 <span class="a11y-setting-label">
                     <span class="a11y-setting-icon">🌓</span>
                     <span>
-                        <strong>Yüksek Kontrast</strong>
-                        <small>Renkleri belirginleştirir</small>
+                        <strong data-i18n="a11y_high_contrast_label">Yüksek Kontrast</strong>
+                        <small data-i18n="a11y_high_contrast_hint">Renkleri belirginleştirir</small>
                     </span>
                 </span>
                 <input type="checkbox" id="a11y-high-contrast" class="a11y-toggle" onchange="applyA11y()">
@@ -575,8 +575,8 @@ document.addEventListener('DOMContentLoaded', function(){
                 <span class="a11y-setting-label">
                     <span class="a11y-setting-icon">👆</span>
                     <span>
-                        <strong>Büyük Dokunma Hedefi</strong>
-                        <small>Butonları daha kolay tıklanır hale getirir</small>
+                        <strong data-i18n="a11y_large_touch_label">Büyük Dokunma Hedefi</strong>
+                        <small data-i18n="a11y_large_touch_hint">Butonları daha kolay tıklanır hale getirir</small>
                     </span>
                 </span>
                 <input type="checkbox" id="a11y-large-touch" class="a11y-toggle" onchange="applyA11y()">
@@ -585,8 +585,8 @@ document.addEventListener('DOMContentLoaded', function(){
                 <span class="a11y-setting-label">
                     <span class="a11y-setting-icon">🔕</span>
                     <span>
-                        <strong>Animasyonları Azalt</strong>
-                        <small>Hareket ve geçişleri kapatır</small>
+                        <strong data-i18n="a11y_reduce_motion_label">Animasyonları Azalt</strong>
+                        <small data-i18n="a11y_reduce_motion_hint">Hareket ve geçişleri kapatır</small>
                     </span>
                 </span>
                 <input type="checkbox" id="a11y-reduce-motion" class="a11y-toggle" onchange="applyA11y()">
@@ -595,8 +595,8 @@ document.addEventListener('DOMContentLoaded', function(){
                 <span class="a11y-setting-label">
                     <span class="a11y-setting-icon">🔊</span>
                     <span>
-                        <strong>Sesli Etiket</strong>
-                        <small>Her butona basıldığında sesli okur</small>
+                        <strong data-i18n="a11y_voice_label_label">Sesli Etiket</strong>
+                        <small data-i18n="a11y_voice_label_hint">Her butona basıldığında sesli okur</small>
                     </span>
                 </span>
                 <input type="checkbox" id="a11y-voice-label" class="a11y-toggle" onchange="applyA11y()">
@@ -628,7 +628,7 @@ document.addEventListener('DOMContentLoaded', function(){
                 <input type="text" id="scheduleEmojiInput" class="schedule-emoji-input"
                     placeholder="📌" maxlength="4">
                 <input type="text" id="scheduleLabelInput" class="schedule-label-input"
-                    placeholder="Etkinlik adı" maxlength="60">
+                    data-i18n-placeholder="schedule_activity_ph" placeholder="Etkinlik adı" maxlength="60">
                 <input type="time" id="scheduleTimeInput" class="schedule-time-input">
             </div>
             <div class="schedule-form-actions">
@@ -656,7 +656,7 @@ document.addEventListener('DOMContentLoaded', function(){
         </div>
         <div class="aac-toolbar">
             <input type="search" id="aacCardSearch" class="aac-card-search"
-                   placeholder="🔍 Kart ara..." oninput="filterAacCards(this.value)" autocomplete="off">
+                   data-i18n-placeholder="aac_search_ph" placeholder="🔍 Kart ara..." oninput="filterAacCards(this.value)" autocomplete="off">
             <button type="button" class="aac-add-symbol-btn" onclick="openAacSearch()">+ Sembol Ekle</button>
         </div>
         <div class="aac-grid-wrap">
@@ -664,7 +664,7 @@ document.addEventListener('DOMContentLoaded', function(){
         </div>
         <div class="aac-sentence-bar">
             <div id="aacSentenceWords" style="display:flex;align-items:center;gap:6px;flex:1;overflow-x:auto;min-width:0;">
-                <span class="aac-sentence-placeholder">Kart seç, cümle oluştur...</span>
+                <span class="aac-sentence-placeholder" data-i18n="aac_sentence_placeholder">Kart seç, cümle oluştur...</span>
             </div>
             <div class="aac-sentence-actions">
                 <button type="button" class="aac-action-btn speak" id="aacSpeakBtn" onclick="speakAacSentence()" disabled>🔊</button>
@@ -733,16 +733,16 @@ document.addEventListener('DOMContentLoaded', function(){
 
         <!-- 3. BEP Rapor Üretici -->
         <div class="az-card">
-            <h3 class="az-card-title">Dönemsel BEP Taslağı</h3>
-            <p class="az-card-sub">Seans verileri kullanılarak BEP'e aktarılabilecek bir taslak metin oluşturulur. Yetkili ekip tarafından gözden geçirilmesi gerekir.</p>
+            <h3 class="az-card-title" data-i18n="bep_periodic_title">Dönemsel BEP Taslağı</h3>
+            <p class="az-card-sub" data-i18n="bep_periodic_sub">Seans verileri kullanılarak BEP'e aktarılabilecek bir taslak metin oluşturulur. Yetkili ekip tarafından gözden geçirilmesi gerekir.</p>
             <button class="bep-report-btn" id="bepReportBtn" onclick="generateBepReport()">
                 ⚡ Yapay Zeka BEP Taslağı Oluştur
             </button>
             <div class="bep-report-output" id="bepReportOutput" style="display:none">
                 <div class="bep-report-header">📝 BEP Dönemsel Gelişim Taslağı</div>
-                <div class="bep-disclaimer">⚠️ Bu metin bir taslaktır. Resmi BEP için yetkili ekip (öğretmen, uzman, veli) tarafından incelenmeli ve onaylanmalıdır.</div>
+                <div class="bep-disclaimer" data-i18n="bep_disclaimer_short">⚠️ Bu metin bir taslaktır. Resmi BEP için yetkili ekip (öğretmen, uzman, veli) tarafından incelenmeli ve onaylanmalıdır.</div>
                 <textarea class="bep-report-text" id="bepReportText" readonly></textarea>
-                <button class="bep-copy-btn" onclick="copyBepReport()">📋 Metni Kopyala</button>
+                <button class="bep-copy-btn" onclick="copyBepReport()" data-i18n="bep_copy_btn">📋 Metni Kopyala</button>
             </div>
         </div>
     </div>
@@ -837,9 +837,9 @@ document.addEventListener('DOMContentLoaded', function(){
             <span class="skills-student-badge" id="skillsStudentBadge"></span>
         </div>
         <div class="skills-legend">
-            <span>⬜ Başlanmadı</span>
-            <span>🔄 Öğreniliyor</span>
-            <span>✅ Kazanıldı</span>
+            <span data-i18n="skill_legend_not_started">⬜ Başlanmadı</span>
+            <span data-i18n="skill_legend_learning">🔄 Öğreniliyor</span>
+            <span data-i18n="skill_legend_mastered">✅ Kazanıldı</span>
         </div>
         <div class="skills-domain-tabs" id="skillsDomainTabs"></div>
         <div class="skills-grid" id="skillsGrid"></div>
@@ -858,22 +858,22 @@ document.addEventListener('DOMContentLoaded', function(){
         <div class="behavior-quick-form">
             <h3>Yeni Kayıt</h3>
             <div class="behavior-form-field">
-                <label>Davranış</label>
-                <input type="text" id="behaviorText" placeholder="Ne oldu?" maxlength="100">
+                <label data-i18n="behavior_label">Davranış</label>
+                <input type="text" id="behaviorText" data-i18n-placeholder="behavior_what_happened_ph" placeholder="Ne oldu?" maxlength="100">
             </div>
             <div class="behavior-form-row">
                 <div class="behavior-form-field">
-                    <label>Öncesi (A)</label>
+                    <label data-i18n="behavior_antecedent_label">Öncesi (A)</label>
                     <input type="text" id="behaviorAntecedent" placeholder="Ne tetikledi?" maxlength="80">
                 </div>
                 <div class="behavior-form-field">
-                    <label>Sonrası (C)</label>
+                    <label data-i18n="behavior_consequence_label">Sonrası (C)</label>
                     <input type="text" id="behaviorConsequence" placeholder="Ne yapıldı?" maxlength="80">
                 </div>
             </div>
             <div class="behavior-form-row">
                 <div class="behavior-form-field">
-                    <label>Sıklık</label>
+                    <label data-i18n="behavior_frequency_label">Sıklık</label>
                     <div class="behavior-counter">
                         <button type="button" onclick="behaviorCountChange(-1)">−</button>
                         <span id="behaviorCount">1</span>
@@ -881,7 +881,7 @@ document.addEventListener('DOMContentLoaded', function(){
                     </div>
                 </div>
                 <div class="behavior-form-field">
-                    <label>Süre (dk)</label>
+                    <label data-i18n="behavior_duration_label">Süre (dk)</label>
                     <input type="number" id="behaviorDuration" placeholder="0" min="0" max="120">
                 </div>
             </div>
