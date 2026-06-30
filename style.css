@@ -4930,3 +4930,23 @@ body.a11y-reduce-motion * { transition: none !important; animation: none !import
     font-weight: 700; cursor: pointer; flex-shrink: 0; transition: opacity 0.15s;
 }
 .aac-emoji-add-btn:hover { opacity: 0.88; }
+
+/* =============================================
+   DİL TOGGLE BUTONU
+   ============================================= */
+.lang-toggle-btn {
+    background: rgba(255,255,255,0.92);
+    border: 1.5px solid #e0e7ff;
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #6C63FF;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+    backdrop-filter: blur(8px);
+    transition: background 0.15s, transform 0.12s;
+    touch-action: manipulation;
+    flex-shrink: 0;
+}
+.lang-toggle-btn:hover { background: #f0eeff; transform: scale(1.05); }

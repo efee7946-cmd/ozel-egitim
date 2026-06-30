@@ -1,3 +1,187 @@
+// =============================================
+// I18N — Çok Dil Desteği
+// =============================================
+const STRINGS = {
+  tr: {
+    back_menu: '← Menü',
+    back: '← Geri',
+    save: 'Kaydet',
+    cancel: 'İptal',
+    delete: 'Sil',
+    yes: 'Evet',
+    no: 'Hayır',
+    close: 'Kapat',
+    ok: 'Tamam',
+    loading: 'Yükleniyor...',
+    error: 'Hata',
+    login_title: 'Yıldız Sınıfı',
+    login_subtitle: 'Özel eğitimde dijital destek',
+    login_username: 'Kullanıcı adı',
+    login_password: 'Şifre',
+    login_btn: 'Giriş Yap',
+    register_btn: 'Kayıt Ol',
+    guest_btn: 'Misafir olarak devam et',
+    login_tab: 'Giriş',
+    register_tab: 'Kayıt',
+    consent_label: 'Öğrenci verilerini işlemek için veli/yasal temsilci onayını aldım',
+    setup_title: 'Öğrenci Bilgileri',
+    setup_name: 'Öğrenci adı',
+    setup_age: 'Yaş',
+    setup_level: 'Destek düzeyi',
+    setup_btn: 'Başla',
+    menu_greeting_default: 'Merhaba!',
+    menu_therapy: 'Konuşma Pratiği',
+    menu_schedule: 'Günlük Plan',
+    menu_skills: 'Beceri Takibi',
+    menu_behavior: 'Davranış',
+    menu_bep: 'BEP',
+    menu_report: 'Rapor',
+    menu_aac: 'AAC',
+    menu_sequence: 'Sıralama Oyunları',
+    menu_sort: 'Sınıflandırma',
+    menu_analysis: 'Analiz',
+    therapy_title: 'Konuşma Pratiği',
+    therapy_hint: 'Hazırlanıyorum...',
+    sort_title: 'Sınıflandırma',
+    sort_subtitle: 'Nesneleri doğru sepete sürükle!',
+    sort_back: '← Oyun Seçimine Dön',
+    sort_correct: 'Harika!',
+    sort_wrong: 'Tekrar dene!',
+    sort_complete_title: 'Tebrikler!',
+    sort_complete_msg: 'Tüm nesneleri doğru sepete koydun!',
+    sort_play_again: 'Tekrar Oyna',
+    sort_other_game: 'Başka Oyun',
+    sort_perfect: '🌟 Mükemmel!',
+    report_title: 'Rapor',
+    report_generate: 'Rapor Oluştur',
+    bep_title: 'Dönemsel BEP Taslağı',
+    bep_generate: 'BEP Taslağı Oluştur',
+    bep_disclaimer: '⚠️ Bu taslak yalnızca rehberlik amaçlıdır. Lisanslı özel eğitim uzmanı tarafından gözden geçirilmelidir.',
+    aac_title: 'AAC Panosu',
+    sequence_title: 'Sıralama Oyunları',
+    skills_title: 'Beceri Takibi',
+    behavior_title: 'Davranış Takibi',
+    a11y_title: '⚙️ Erişilebilirlik',
+    a11y_large_text: 'Büyük Metin',
+    a11y_large_text_desc: 'Yazı boyutunu artırır',
+    a11y_high_contrast: 'Yüksek Kontrast',
+    a11y_high_contrast_desc: 'Renk kontrastını artırır',
+    a11y_reduce_motion: 'Hareketi Azalt',
+    a11y_reduce_motion_desc: 'Animasyonları kapatır',
+    a11y_large_touch: 'Büyük Dokunma',
+    a11y_large_touch_desc: 'Buton boyutunu artırır',
+    a11y_export: '📥 Verilerimi İndir',
+    a11y_delete: '🗑️ Hesabı Sil',
+    a11y_privacy: 'Gizlilik Politikası & KVKK',
+    lang_toggle: 'EN',
+  },
+  en: {
+    back_menu: '← Menu',
+    back: '← Back',
+    save: 'Save',
+    cancel: 'Cancel',
+    delete: 'Delete',
+    yes: 'Yes',
+    no: 'No',
+    close: 'Close',
+    ok: 'OK',
+    loading: 'Loading...',
+    error: 'Error',
+    login_title: 'Star Class',
+    login_subtitle: 'Digital support for special education',
+    login_username: 'Username',
+    login_password: 'Password',
+    login_btn: 'Sign In',
+    register_btn: 'Register',
+    guest_btn: 'Continue as guest',
+    login_tab: 'Sign In',
+    register_tab: 'Register',
+    consent_label: 'I have obtained parental/guardian consent to process student data',
+    setup_title: 'Student Information',
+    setup_name: 'Student name',
+    setup_age: 'Age',
+    setup_level: 'Support level',
+    setup_btn: 'Start',
+    menu_greeting_default: 'Hello!',
+    menu_therapy: 'Speech Practice',
+    menu_schedule: 'Daily Schedule',
+    menu_skills: 'Skill Tracking',
+    menu_behavior: 'Behavior',
+    menu_bep: 'IEP',
+    menu_report: 'Report',
+    menu_aac: 'AAC',
+    menu_sequence: 'Sorting Games',
+    menu_sort: 'Sorting',
+    menu_analysis: 'Analysis',
+    therapy_title: 'Speech Practice',
+    therapy_hint: 'Getting ready...',
+    sort_title: 'Sorting',
+    sort_subtitle: 'Drag objects into the correct basket!',
+    sort_back: '← Game Selection',
+    sort_correct: 'Great!',
+    sort_wrong: 'Try again!',
+    sort_complete_title: 'Congratulations!',
+    sort_complete_msg: 'You sorted all objects correctly!',
+    sort_play_again: 'Play Again',
+    sort_other_game: 'Other Game',
+    sort_perfect: '🌟 Perfect!',
+    report_title: 'Report',
+    report_generate: 'Generate Report',
+    bep_title: 'IEP Draft',
+    bep_generate: 'Generate IEP Draft',
+    bep_disclaimer: '⚠️ This draft is for guidance only. It must be reviewed by a licensed special education specialist.',
+    aac_title: 'AAC Board',
+    sequence_title: 'Sorting Games',
+    skills_title: 'Skill Tracking',
+    behavior_title: 'Behavior Tracking',
+    a11y_title: '⚙️ Accessibility',
+    a11y_large_text: 'Large Text',
+    a11y_large_text_desc: 'Increases font size',
+    a11y_high_contrast: 'High Contrast',
+    a11y_high_contrast_desc: 'Increases color contrast',
+    a11y_reduce_motion: 'Reduce Motion',
+    a11y_reduce_motion_desc: 'Disables animations',
+    a11y_large_touch: 'Large Touch',
+    a11y_large_touch_desc: 'Increases button size',
+    a11y_export: '📥 Export My Data',
+    a11y_delete: '🗑️ Delete Account',
+    a11y_privacy: 'Privacy Policy & KVKK',
+    lang_toggle: 'TR',
+  }
+};
+
+let _lang = localStorage.getItem('lms_lang') || 'tr';
+
+function t(key) {
+  return (STRINGS[_lang] && STRINGS[_lang][key]) || (STRINGS.tr[key]) || key;
+}
+
+function setLang(lang) {
+  _lang = lang;
+  localStorage.setItem('lms_lang', lang);
+  applyLang();
+}
+
+function applyLang() {
+  document.documentElement.lang = _lang;
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    const val = t(key);
+    if (el.tagName === 'INPUT' && el.placeholder !== undefined) {
+      el.placeholder = val;
+    } else {
+      el.textContent = val;
+    }
+  });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+    el.placeholder = t(el.getAttribute('data-i18n-placeholder'));
+  });
+  const langBtn = document.getElementById('langToggleBtn');
+  if (langBtn) langBtn.textContent = t('lang_toggle');
+}
+
+// =============================================
+
 function escapeHtml(str) {
     if (!str) return '';
     return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
@@ -1916,7 +2100,7 @@ function startSortGame(key) {
             </div>
             <div class="sort-items-area" id="sortItemsArea"></div>
             <div class="sort-baskets-area" id="sortBasketsArea"></div>
-            <button type="button" class="menu-ghost-btn sort-back-btn" onclick="renderSortMenu()">← Oyun Seçimine Dön</button>
+            <button type="button" class="menu-ghost-btn sort-back-btn" onclick="renderSortMenu()">${t('sort_back')}</button>
         `;
     }
     const titleEl = document.getElementById('sortGameTitle');
@@ -2051,13 +2235,13 @@ function _checkSortDrop(idx, cat) {
     if (!item) return;
     if (item.cat === cat) {
         _sortSorted[idx] = cat;
-        speakFallback('Harika! ' + item.label + '!', () => {});
+        speakFallback(t('sort_correct') + ' ' + item.label + '!', () => {});
         confetti({ particleCount: 25, spread: 40, origin: { y: 0.7 }, scalar: 0.8 });
         renderSortGame();
         if (Object.keys(_sortSorted).length === _sortItems.length) setTimeout(_showSortComplete, 600);
     } else {
         _sortErrors++;
-        speakFallback('Tekrar dene!', () => {});
+        speakFallback(t('sort_wrong'), () => {});
         const el = document.querySelector(`.sort-item[data-index="${idx}"]`);
         if (el) { el.classList.add('sort-item-shake'); setTimeout(() => el.classList.remove('sort-item-shake'), 500); }
     }
@@ -2067,19 +2251,19 @@ function _showSortComplete() {
     const gameSection = document.getElementById('sortGameSection');
     if (!gameSection) return;
     confetti({ particleCount: 120, spread: 90 });
-    speakFallback('Tebrikler! Çok güzel yaptın!', () => {});
+    speakFallback(t('sort_complete_title') + ' Çok güzel yaptın!', () => {});
     gameSection.innerHTML = `
         <div class="sort-complete">
             <div class="sort-complete-icon">🏆</div>
-            <h2>Tebrikler!</h2>
-            <p>Tüm nesneleri doğru sepete koydun!</p>
+            <h2>${t('sort_complete_title')}</h2>
+            <p>${t('sort_complete_msg')}</p>
             <div class="sort-complete-stats">
                 <span>✓ ${_sortItems.length} nesne</span>
-                ${_sortErrors > 0 ? `<span>↺ ${_sortErrors} deneme</span>` : '<span>🌟 Mükemmel!</span>'}
+                ${_sortErrors > 0 ? `<span>↺ ${_sortErrors} deneme</span>` : `<span>${t('sort_perfect')}</span>`}
             </div>
             <div class="sort-complete-btns">
-                <button type="button" class="btn-primary-gradient" onclick="startSortGame('${_sortGame.key}')">Tekrar Oyna</button>
-                <button type="button" class="menu-ghost-btn" onclick="renderSortMenu()">Başka Oyun</button>
+                <button type="button" class="btn-primary-gradient" onclick="startSortGame('${_sortGame.key}')">${t('sort_play_again')}</button>
+                <button type="button" class="menu-ghost-btn" onclick="renderSortMenu()">${t('sort_other_game')}</button>
             </div>
         </div>
     `;
@@ -3387,11 +3571,13 @@ function toggleA11yPanel() {
 document.addEventListener('DOMContentLoaded', function() {
     const settings = loadA11ySettings();
     applyA11yClasses(settings);
+    applyLang();
 });
 
 // =============================================
 // WINDOW EXPORT (HTML onclick için)
 // =============================================
+window.setLang = setLang;
 window.goToMenu = goToMenu;
 window.goToTherapy = goToTherapy;
 window.setTopicChip = setTopicChip;

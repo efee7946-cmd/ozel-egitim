@@ -40,9 +40,9 @@
         <!-- Sekmeler -->
         <div class="auth-tabs">
             <button type="button" class="auth-tab active" id="tabLogin"
-                onclick="switchAuthTab('login')">Giriş Yap</button>
+                onclick="switchAuthTab('login')" data-i18n="login_tab">Giriş Yap</button>
             <button type="button" class="auth-tab" id="tabRegister"
-                onclick="switchAuthTab('register')">Kayıt Ol</button>
+                onclick="switchAuthTab('register')" data-i18n="register_tab">Kayıt Ol</button>
         </div>
 
         <!-- Giriş formu -->
@@ -57,7 +57,7 @@
                 <input type="password" id="loginPassword" autocomplete="current-password"
                     placeholder="••••••" required>
             </div>
-            <button type="submit" class="auth-submit-btn" id="loginBtn">Giriş Yap</button>
+            <button type="submit" class="auth-submit-btn" id="loginBtn" data-i18n="login_btn">Giriş Yap</button>
         </form>
 
         <!-- Kayıt formu (gizli) -->
@@ -125,7 +125,7 @@
                     </span>
                 </label>
             </div>
-            <button type="submit" class="auth-submit-btn" id="registerBtn">Kayıt Ol</button>
+            <button type="submit" class="auth-submit-btn" id="registerBtn" data-i18n="register_btn">Kayıt Ol</button>
         </form>
 
         <div class="auth-error" id="authError"></div>
@@ -216,6 +216,7 @@
                 <span id="active-student-name">Öğrenci seç</span>
                 <span class="pill-chevron">›</span>
             </button>
+            <button id="langToggleBtn" class="lang-toggle-btn" type="button" onclick="setLang(document.documentElement.lang==='en'?'tr':'en')">EN</button>
             <button class="icon-btn-a11y" type="button" onclick="toggleA11yPanel()" title="Erişilebilirlik Ayarları">⚙️</button>
         </div>
         <!-- JS uyumluluğu için gizli elementler -->
@@ -244,28 +245,28 @@
     <div class="menu-tiles">
         <button class="menu-tile tile-primary" type="button" onclick="goToTherapy()">
             <span class="tile-icon">🎤</span>
-            <span class="tile-label">Konuşma Pratiği</span>
+            <span class="tile-label" data-i18n="menu_therapy">Konuşma Pratiği</span>
         </button>
         <button class="menu-tile tile-schedule" type="button" onclick="goToSchedule()">
             <span class="tile-icon">📅</span>
-            <span class="tile-label">Günlük Program</span>
+            <span class="tile-label" data-i18n="menu_schedule">Günlük Program</span>
         </button>
         <button class="menu-tile tile-aac" type="button" onclick="goToAac()">
             <span class="tile-icon">🗣️</span>
-            <span class="tile-label">AAC Panosu</span>
+            <span class="tile-label" data-i18n="menu_aac">AAC Panosu</span>
         </button>
 
         <button class="menu-tile tile-sequence" type="button" onclick="goToSequence()">
             <span class="tile-icon">🔢</span>
-            <span class="tile-label">Sıralama Oyunları</span>
+            <span class="tile-label" data-i18n="menu_sequence">Sıralama Oyunları</span>
         </button>
         <button class="menu-tile" type="button" onclick="goToSort()">
             <span class="tile-icon">🗂️</span>
-            <span class="tile-label">Sınıflandırma</span>
+            <span class="tile-label" data-i18n="menu_sort">Sınıflandırma</span>
         </button>
         <button class="menu-tile tile-analysis" type="button" onclick="goToAnalysis()">
             <span class="tile-icon">📊</span>
-            <span class="tile-label">Analiz</span>
+            <span class="tile-label" data-i18n="menu_analysis">Analiz</span>
         </button>
     </div>
 
@@ -300,7 +301,7 @@ document.addEventListener('DOMContentLoaded', function(){
     <!-- Konu Seçim Overlay -->
     <div id="topicOverlay" class="topic-overlay">
         <div class="topic-card">
-            <button class="btn-back topic-back-btn" onclick="goToMenu()">← Menü</button>
+            <button class="btn-back topic-back-btn" onclick="goToMenu()"><span data-i18n="back_menu">← Menü</span></button>
             <div class="topic-card-icon">🎤</div>
             <h2 class="topic-card-title">Hangi konuyu çalışalım?</h2>
             <p class="topic-card-sub">Bir konu yaz, Yıldız Can o konuyla ilgili sorular soracak.</p>
@@ -326,7 +327,7 @@ document.addEventListener('DOMContentLoaded', function(){
     </div>
 
     <div class="main-card" id="therapyMainCard" style="display:none">
-        <button class="btn-back" onclick="goToMenu()">← Menü</button>
+        <button class="btn-back" onclick="goToMenu()"><span data-i18n="back_menu">← Menü</span></button>
         <div id="therapyCityHost"></div>
         <div class="therapy-topic-badge" id="therapyTopicBadge"></div>
         <div class="therapy-progress-wrap therapy-session-ui">
@@ -368,7 +369,7 @@ document.addEventListener('DOMContentLoaded', function(){
 
 <!-- ===================== VELİ RAPORU EKRANI ===================== -->
 <div id="report-screen">
-    <button class="btn-back" onclick="goToAnalysis()">← Analiz</button>
+    <button class="btn-back" onclick="goToAnalysis()"><span data-i18n="back">← Analiz</span></button>
 
     <div class="report-wrapper" id="reportWrapper">
         <!-- Başlık -->
@@ -484,12 +485,12 @@ document.addEventListener('DOMContentLoaded', function(){
 
 <!-- ===================== SINIFLANDIRMA OYUNU ===================== -->
 <div id="sort-screen">
-    <button class="btn-back" onclick="goToMenu()">← Menü</button>
+    <button class="btn-back" onclick="goToMenu()"><span data-i18n="back_menu">← Menü</span></button>
     <div class="sort-wrapper">
         <div id="sortMenuSection">
             <div class="sort-menu-header">
-                <h2>🗂️ Sınıflandırma</h2>
-                <p>Nesneleri doğru sepete sürükle!</p>
+                <h2>🗂️ <span data-i18n="sort_title">Sınıflandırma</span></h2>
+                <p data-i18n="sort_subtitle">Nesneleri doğru sepete sürükle!</p>
             </div>
             <div class="sort-menu-grid" id="sortMenuGrid"></div>
         </div>
@@ -605,7 +606,7 @@ document.addEventListener('DOMContentLoaded', function(){
 
 <!-- ===================== GÜNLÜK PROGRAM ===================== -->
 <div id="schedule-screen">
-    <button class="btn-back" onclick="goToMenu()">← Menü</button>
+    <button class="btn-back" onclick="goToMenu()"><span data-i18n="back_menu">← Menü</span></button>
     <div class="schedule-wrapper">
         <div class="schedule-header">
             <div class="schedule-title-row">
@@ -674,7 +675,7 @@ document.addEventListener('DOMContentLoaded', function(){
 
 <!-- ===================== SIRALAMA OYUNLARI ===================== -->
 <div id="sequence-screen">
-    <button class="btn-back" onclick="goToMenu()">← Menü</button>
+    <button class="btn-back" onclick="goToMenu()"><span data-i18n="back_menu">← Menü</span></button>
     <div class="sequence-wrapper">
         <div id="sequenceMenu"></div>
         <div id="sequenceGame" style="display:none"></div>
@@ -684,7 +685,7 @@ document.addEventListener('DOMContentLoaded', function(){
 <!-- ===================== ANALİZ / BEP EKRANI ===================== -->
 <div id="analysis-screen">
     <div class="analysis-wrapper">
-        <button class="btn-back" onclick="goToMenu()">← Menü</button>
+        <button class="btn-back" onclick="goToMenu()"><span data-i18n="back_menu">← Menü</span></button>
 
         <!-- 1. Öğrenci Kimlik Kartı -->
         <div class="az-card az-identity-card">
@@ -748,7 +749,7 @@ document.addEventListener('DOMContentLoaded', function(){
 
 <!-- ===================== IEP HEDEFLERİ ===================== -->
 <div id="iep-screen">
-    <button class="btn-back" onclick="iepBack()">← Geri</button>
+    <button class="btn-back" onclick="iepBack()"><span data-i18n="back">← Geri</span></button>
     <div class="iep-wrapper">
         <div class="iep-header">
             <h2>📋 IEP Hedefleri</h2>
@@ -828,7 +829,7 @@ document.addEventListener('DOMContentLoaded', function(){
 
 <!-- ===================== BECERİ HARİTASI ===================== -->
 <div id="skills-screen">
-    <button class="btn-back" onclick="skillsBack()">← Geri</button>
+    <button class="btn-back" onclick="skillsBack()"><span data-i18n="back">← Geri</span></button>
     <div class="skills-wrapper">
         <div class="skills-header">
             <h2>🗺️ Beceri Haritası</h2>
@@ -846,7 +847,7 @@ document.addEventListener('DOMContentLoaded', function(){
 
 <!-- ===================== DAVRANIŞ KAYDI ===================== -->
 <div id="behavior-screen">
-    <button class="btn-back" onclick="behaviorBack()">← Geri</button>
+    <button class="btn-back" onclick="behaviorBack()"><span data-i18n="back">← Geri</span></button>
     <div class="behavior-wrapper">
         <div class="behavior-header">
             <h2>📊 Davranış Kaydı</h2>
