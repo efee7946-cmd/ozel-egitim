@@ -1189,8 +1189,25 @@ body {
     border-radius: 25px;
     overflow: hidden;
     margin-top: 8px;
+    position: relative;
 }
 video { width: 100%; height: 100%; object-fit: cover; }
+
+.pexels-credit {
+    position: absolute;
+    bottom: 6px;
+    right: 10px;
+    font-size: 0.65rem;
+    color: rgba(255,255,255,0.6);
+    text-decoration: none;
+    background: rgba(0,0,0,0.28);
+    padding: 2px 7px;
+    border-radius: 6px;
+    letter-spacing: 0.02em;
+    pointer-events: auto;
+    transition: color 0.15s;
+}
+.pexels-credit:hover { color: rgba(255,255,255,0.95); }
 
 /* ── Konu Seçim Overlay ── */
 .topic-overlay {
