@@ -679,6 +679,11 @@ document.addEventListener('DOMContentLoaded', function(){
         <div class="aac-nav" id="aacNav">
             <button class="aac-nav-btn" onclick="goToMenu()">← Menü</button>
         </div>
+        <div class="aac-toolbar">
+            <input type="search" id="aacCardSearch" class="aac-card-search"
+                   placeholder="🔍 Kart ara..." oninput="filterAacCards(this.value)" autocomplete="off">
+            <button type="button" class="aac-add-symbol-btn" onclick="openAacSearch()">+ Sembol Ekle</button>
+        </div>
         <div class="aac-grid-wrap">
             <div class="aac-grid" id="aacGrid"></div>
         </div>
@@ -921,6 +926,24 @@ document.addEventListener('DOMContentLoaded', function(){
         <div class="star-modal-title" id="starModalTitle"></div>
         <div class="star-modal-sub" id="starModalSub"></div>
         <button class="star-modal-btn" onclick="closeStarModal()">Harika! ✨</button>
+    </div>
+</div>
+
+<!-- ===================== ARASAAC Sembol Arama ===================== -->
+<div id="aac-search-modal" class="aac-search-overlay" style="display:none" onclick="closeAacSearch(event)">
+    <div class="aac-search-box">
+        <div class="aac-search-head">
+            <h3>🔍 Sembol Ara (ARASAAC)</h3>
+            <button type="button" class="aac-search-close" onclick="document.getElementById('aac-search-modal').style.display='none'">✕</button>
+        </div>
+        <div class="aac-search-input-row">
+            <input type="text" id="aacSymbolInput"
+                   placeholder="Türkçe kelime yaz... (yemek, mutlu, tuvalet)"
+                   onkeydown="if(event.key==='Enter') searchAacSymbols()">
+            <button type="button" class="aac-search-go-btn" onclick="searchAacSymbols()">Ara</button>
+        </div>
+        <div id="aacSymbolResults" class="aac-symbol-results"></div>
+        <p class="aac-symbol-credit">Semboller: © ARASAAC (arasaac.org) — CC BY-NC-SA 4.0</p>
     </div>
 </div>
 

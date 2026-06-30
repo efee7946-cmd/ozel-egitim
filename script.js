@@ -2894,12 +2894,15 @@ async function _aacRenderAll() {
             if (!card) return '<div class="aac-card empty"></div>';
             return `
                 <button type="button" class="aac-card"
+                    data-label="${escapeHtml(card.label)}"
                     onclick="tapAacCard('${escapeHtml(card.id)}','${escapeHtml(card.spoken || card.label)}','${escapeHtml(card.label)}')">
                     ${_aacVisualHtml(card.visual, 'aac-card-emoji')}
                     <span class="aac-card-text">${escapeHtml(card.label)}</span>
                 </button>
             `;
         }).join('');
+        const searchInput = document.getElementById('aacCardSearch');
+        if (searchInput && searchInput.value) filterAacCards(searchInput.value);
     }
 
     _aacUpdateSentenceBar();
@@ -2953,6 +2956,91 @@ function speakAacSentence() {
 function clearAacSentence() {
     _aacSentence = [];
     _aacUpdateSentenceBar();
+}
+
+function filterAacCards(q) {
+    const term = q.toLowerCase().trim();
+    document.querySelectorAll('#aacGrid .aac-card').forEach(card => {
+        if (card.classList.contains('empty')) {
+            card.style.visibility = term ? 'hidden' : '';
+            return;
+        }
+        const label = (card.dataset.label || '').toLowerCase();
+        card.style.visibility = (!term || label.includes(term)) ? '' : 'hidden';
+    });
+}
+
+function openAacSearch() {
+    document.getElementById('aac-search-modal').style.display = 'flex';
+    document.getElementById('aacSymbolInput').value = '';
+    document.getElementById('aacSymbolResults').innerHTML = '';
+    setTimeout(() => document.getElementById('aacSymbolInput').focus(), 120);
+}
+
+function closeAacSearch(e) {
+    if (e.target.id === 'aac-search-modal') {
+        document.getElementById('aac-search-modal').style.display = 'none';
+    }
+}
+
+async function searchAacSymbols() {
+    const q = (document.getElementById('aacSymbolInput').value || '').trim();
+    if (!q) return;
+    const resultsEl = document.getElementById('aacSymbolResults');
+    resultsEl.innerHTML = '<p class="aac-symbol-status">Aranıyor...</p>';
+    try {
+        const resp = await fetch(`https://api.arasaac.org/v1/pictograms/tr/search/${encodeURIComponent(q)}`);
+        if (!resp.ok) throw new Error('api');
+        const data = await resp.json();
+        if (!Array.isArray(data) || !data.length) {
+            resultsEl.innerHTML = '<p class="aac-symbol-status">Sonuç bulunamadı. Farklı bir kelime deneyin.</p>';
+            return;
+        }
+        resultsEl.innerHTML = data.slice(0, 24).map(p => {
+            const kw = escapeHtml(p.keywords?.[0]?.keyword || q);
+            const imgUrl = `https://static.arasaac.org/pictograms/${p._id}/${p._id}_500.png`;
+            return `<button type="button" class="aac-symbol-item" onclick="addAacSymbolCard(${p._id},'${kw}')">
+                <img src="${imgUrl}" alt="${kw}" loading="lazy">
+                <span>${kw}</span>
+            </button>`;
+        }).join('');
+    } catch {
+        resultsEl.innerHTML = '<p class="aac-symbol-status">Bağlantı hatası. İnternet bağlantınızı kontrol edin.</p>';
+    }
+}
+
+async function addAacSymbolCard(arasaacId, keyword) {
+    if (!_aacCurrentBoardId) return;
+    const sid = activeStudentId || 'default';
+    const board = _aacBoards.find(b => b.id === _aacCurrentBoardId);
+    if (!board) return;
+
+    const imageUrl = `https://static.arasaac.org/pictograms/${arasaacId}/${arasaacId}_500.png`;
+    const { rows, cols, matrix } = await AACData.buildGrid(sid, _aacCurrentBoardId);
+
+    let targetRow = -1, targetCol = -1;
+    outer: for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+            if (!matrix[r][c]) { targetRow = r; targetCol = c; break outer; }
+        }
+    }
+
+    if (targetRow === -1) {
+        await AACData.growGrid(sid, { rows: rows + 1, cols });
+        targetRow = rows;
+        targetCol = 0;
+    }
+
+    await AACData.placeCard(board, {
+        row: targetRow, col: targetCol,
+        label: keyword,
+        spoken: keyword,
+        visual: { type: 'image', value: imageUrl },
+        isCore: false,
+    });
+
+    document.getElementById('aac-search-modal').style.display = 'none';
+    await _aacRenderAll();
 }
 
 // =============================================

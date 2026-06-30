@@ -5013,3 +5013,107 @@ body.a11y-reduce-motion * { transition: none !important; animation: none !import
 .a11y-danger-btn { border-color: #fdd; color: #c0392b; }
 .a11y-danger-btn:hover { background: #fff5f5; }
 .a11y-kvkk-link { font-size: 0.8rem; color: #8899aa; text-decoration: underline; }
+
+/* =============================================
+   AAC TOOLBAR & ARASAAC SYMBOL SEARCH
+   ============================================= */
+.aac-toolbar {
+    display: flex; align-items: center; gap: 8px;
+    padding: 6px 10px 4px;
+    flex-shrink: 0;
+}
+.aac-card-search {
+    flex: 1; min-width: 0;
+    padding: 8px 12px; border-radius: 20px;
+    border: 2px solid #dce8f4; font-size: 0.95rem;
+    background: #f4f8ff; color: #1f3653; outline: none;
+    transition: border-color 0.18s;
+}
+.aac-card-search:focus { border-color: #4c8dff; background: white; }
+
+.aac-add-symbol-btn {
+    padding: 8px 14px; border-radius: 20px;
+    border: 2px solid #c3d8ff; background: #eef5ff;
+    color: #2d6bc4; font-size: 0.85rem; font-weight: 700;
+    cursor: pointer; white-space: nowrap; flex-shrink: 0;
+    transition: background 0.18s;
+}
+.aac-add-symbol-btn:hover { background: #dceeff; }
+
+/* Modal overlay */
+.aac-search-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.55);
+    display: flex; align-items: flex-end;
+    justify-content: center; z-index: 9000;
+    padding: 0;
+}
+@media (min-width: 520px) {
+    .aac-search-overlay { align-items: center; padding: 16px; }
+}
+
+.aac-search-box {
+    background: white; border-radius: 20px 20px 0 0;
+    width: 100%; max-width: 560px;
+    max-height: 85vh; display: flex; flex-direction: column;
+    box-shadow: 0 -4px 32px rgba(0,0,0,0.18);
+}
+@media (min-width: 520px) {
+    .aac-search-box { border-radius: 20px; }
+}
+
+.aac-search-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 20px 14px; border-bottom: 1px solid #eef2f7; flex-shrink: 0;
+}
+.aac-search-head h3 { margin: 0; font-size: 1rem; color: #1a2744; }
+.aac-search-close {
+    background: none; border: none; font-size: 1.15rem;
+    cursor: pointer; color: #8899aa; padding: 4px 8px; line-height: 1;
+}
+
+.aac-search-input-row {
+    display: flex; gap: 8px; padding: 14px 16px 10px; flex-shrink: 0;
+}
+.aac-search-input-row input[type="text"] {
+    flex: 1; padding: 10px 14px; border-radius: 12px;
+    border: 2px solid #dce8f4; font-size: 1rem; color: #1f3653;
+    background: #f8fbff; outline: none; transition: border-color 0.18s;
+}
+.aac-search-input-row input[type="text"]:focus { border-color: #4c8dff; background: white; }
+.aac-search-go-btn {
+    padding: 10px 18px; border-radius: 12px; border: none;
+    background: #4c8dff; color: white; font-size: 0.95rem;
+    font-weight: 700; cursor: pointer; transition: background 0.18s;
+}
+.aac-search-go-btn:hover { background: #2d6bc4; }
+
+.aac-symbol-results {
+    flex: 1; overflow-y: auto; padding: 8px 14px 4px;
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
+    align-content: start;
+}
+.aac-symbol-status {
+    grid-column: 1 / -1; text-align: center;
+    color: #8899aa; font-size: 0.88rem; padding: 20px 0; margin: 0;
+}
+.aac-symbol-item {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    padding: 8px 4px; border-radius: 12px;
+    border: 2px solid #e3edf7; background: #f8fbff;
+    cursor: pointer; font-size: 0; transition: border-color 0.18s, background 0.18s;
+    min-height: 80px;
+}
+.aac-symbol-item:hover { border-color: #4c8dff; background: #eef5ff; }
+.aac-symbol-item img {
+    width: 56px; height: 56px; object-fit: contain; border-radius: 6px;
+}
+.aac-symbol-item span {
+    font-size: 0.7rem; color: #3d5a78; font-weight: 600;
+    text-align: center; line-height: 1.2; word-break: break-word;
+    max-width: 72px;
+}
+.aac-symbol-credit {
+    text-align: center; font-size: 0.72rem; color: #b0b8c4;
+    padding: 8px 16px; margin: 0; flex-shrink: 0; border-top: 1px solid #f0f4f8;
+}
