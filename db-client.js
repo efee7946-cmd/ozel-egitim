@@ -85,3 +85,5 @@ const DB = (function () {
         isCloud() { return _cloud; },
     };
 })();
+
+window.DB = DB;
