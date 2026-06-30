@@ -494,6 +494,118 @@ const STRINGS = {
     city_hospital_qgoal9: 'durumu değerlendirme',
     city_hospital_q10: 'Hastaneden çıkarken doktora nasıl teşekkür edersin?',
     city_hospital_qgoal10: 'nazik kapanış',
+
+    bep_cat_ogreti: 'Hafif Düzey – Öğretilebilir',
+    bep_cat_egit: 'Orta Düzey – Eğitilebilir',
+    bep_cat_destekli: 'Ağır/İleri – Desteklenen',
+
+    bep_cond_osb: 'OSB',
+    bep_cond_dehb: 'DEHB',
+    bep_cond_dil: 'Dil / Konuşma',
+    bep_cond_down: 'Down Sendromu',
+    bep_cond_cp: 'Serebral Palsi',
+    bep_cond_oog: 'Öz. Öğrenme Güçlüğü',
+    bep_cond_ekolali: 'Ekolali',
+    bep_cond_stereotipik: 'Stereotipik Hareket',
+
+    iep_domain_communication: 'İletişim',
+    iep_domain_academic: 'Akademik',
+    iep_domain_selfcare: 'Öz Bakım',
+    iep_domain_social: 'Sosyal',
+    iep_domain_motor: 'Motor',
+
+    skill_domain_communication: 'İletişim',
+    skill_domain_academic: 'Akademik',
+    skill_domain_selfcare: 'Öz Bakım',
+    skill_domain_social: 'Sosyal',
+    skill_domain_motor: 'Motor',
+
+    skill_comm_0: 'Adını söyleme',
+    skill_comm_1: 'İstek ifade etme',
+    skill_comm_2: 'Hayır diyebilme',
+    skill_comm_3: 'İki kelime cümle',
+    skill_comm_4: 'Soru sorma',
+    skill_comm_5: 'Selamlama',
+    skill_comm_6: 'Sıra bekleme',
+    skill_comm_7: 'Görsel destek kullanma',
+
+    skill_acad_0: 'Rakam tanıma (1-10)',
+    skill_acad_1: 'Harf tanıma',
+    skill_acad_2: 'Renk tanıma',
+    skill_acad_3: 'Şekil tanıma',
+    skill_acad_4: 'Boyut kavramı',
+    skill_acad_5: 'Nesne eşleştirme',
+    skill_acad_6: 'Kategorilere ayırma',
+    skill_acad_7: 'Basit toplama',
+
+    skill_selfcare_0: 'El yıkama',
+    skill_selfcare_1: 'Diş fırçalama',
+    skill_selfcare_2: 'Tuvalet terbiyesi',
+    skill_selfcare_3: 'Giyinme/soyunma',
+    skill_selfcare_4: 'Yemek yeme',
+    skill_selfcare_5: 'Çanta hazırlama',
+    skill_selfcare_6: 'Uyku rutini',
+    skill_selfcare_7: 'Saç tarama',
+
+    skill_social_0: 'Göz teması',
+    skill_social_1: 'Sıra bekleme',
+    skill_social_2: 'Paylaşma',
+    skill_social_3: 'Empati',
+    skill_social_4: 'Grup etkinliğine katılma',
+    skill_social_5: 'Uygun davranış',
+    skill_social_6: 'Kurallara uyma',
+    skill_social_7: 'Duygularını ifade etme',
+
+    skill_motor_0: 'Kalem tutma',
+    skill_motor_1: 'Makas kullanma',
+    skill_motor_2: 'Top yakalama/atma',
+    skill_motor_3: 'Bağcık bağlama',
+    skill_motor_4: 'Düğme ilikleme',
+    skill_motor_5: 'Boyama',
+    skill_motor_6: 'Çizgi takibi',
+    skill_motor_7: 'Denge',
+
+    seq_menu_title: '🔢 Sıralama Oyunları',
+    seq_menu_type_cause: 'Sebep-Sonuç',
+    seq_menu_type_order: 'Sıralama',
+    seq_back_to_menu: '← Oyun Seçimine Dön',
+    seq_order_hint: 'Adımları doğru sıraya diz!',
+    seq_cause_hint: 'Sebebi seç, sonra sonucuna dokun!',
+    seq_cause_col_title: 'Sebep',
+    seq_effect_col_title: 'Sonuç',
+
+    seq_game_morning_title: 'Sabah Rutini',
+    seq_game_morning_item0: 'Uyan',
+    seq_game_morning_item1: 'Diş Fırçala',
+    seq_game_morning_item2: 'Giy',
+    seq_game_morning_item3: 'Kahvaltı Et',
+    seq_game_morning_item4: 'Çantanı Al',
+    seq_game_morning_item5: 'Okula Git',
+
+    seq_game_washing_title: 'El Yıkama',
+    seq_game_washing_item0: 'Musluğu Aç',
+    seq_game_washing_item1: 'Elleri Islatır',
+    seq_game_washing_item2: 'Sabun Al',
+    seq_game_washing_item3: 'Ova Ova Yıka',
+    seq_game_washing_item4: 'Durula',
+    seq_game_washing_item5: 'Kurula',
+
+    seq_game_meal_title: 'Yemek Hazırlığı',
+    seq_game_meal_item0: 'Masaya Otur',
+    seq_game_meal_item1: 'Önlük Tak',
+    seq_game_meal_item2: 'Kaşık Al',
+    seq_game_meal_item3: 'Ye',
+    seq_game_meal_item4: 'Masayı Temizle',
+
+    seq_game_cause_title: 'Sebep-Sonuç',
+    seq_game_cause_pair0_cause: 'Yağmur yağıyor',
+    seq_game_cause_pair0_effect: 'Şemsiye alıyoruz',
+    seq_game_cause_pair1_cause: 'Düşüp acıdı',
+    seq_game_cause_pair1_effect: 'Ağlıyor',
+    seq_game_cause_pair2_cause: 'Çiçeği suladım',
+    seq_game_cause_pair2_effect: 'Çiçek açtı',
+    seq_game_cause_pair3_cause: 'Hava karardı',
+    seq_game_cause_pair3_effect: 'Işık yaktık',
   },
   en: {
     back_menu: '← Menu',
@@ -986,6 +1098,118 @@ const STRINGS = {
     city_hospital_qgoal9: 'assessing a state',
     city_hospital_q10: 'How do you thank the doctor when leaving the hospital?',
     city_hospital_qgoal10: 'polite closing',
+
+    bep_cat_ogreti: 'Mild Level – Educable',
+    bep_cat_egit: 'Moderate Level – Trainable',
+    bep_cat_destekli: 'Severe/Advanced – Supported',
+
+    bep_cond_osb: 'ASD',
+    bep_cond_dehb: 'ADHD',
+    bep_cond_dil: 'Language / Speech',
+    bep_cond_down: 'Down Syndrome',
+    bep_cond_cp: 'Cerebral Palsy',
+    bep_cond_oog: 'Specific Learning Disability',
+    bep_cond_ekolali: 'Echolalia',
+    bep_cond_stereotipik: 'Stereotypic Movement',
+
+    iep_domain_communication: 'Communication',
+    iep_domain_academic: 'Academic',
+    iep_domain_selfcare: 'Self-Care',
+    iep_domain_social: 'Social',
+    iep_domain_motor: 'Motor',
+
+    skill_domain_communication: 'Communication',
+    skill_domain_academic: 'Academic',
+    skill_domain_selfcare: 'Self-Care',
+    skill_domain_social: 'Social',
+    skill_domain_motor: 'Motor',
+
+    skill_comm_0: 'Saying their name',
+    skill_comm_1: 'Expressing a request',
+    skill_comm_2: 'Saying no',
+    skill_comm_3: 'Two-word sentences',
+    skill_comm_4: 'Asking questions',
+    skill_comm_5: 'Greeting',
+    skill_comm_6: 'Taking turns',
+    skill_comm_7: 'Using visual supports',
+
+    skill_acad_0: 'Number recognition (1-10)',
+    skill_acad_1: 'Letter recognition',
+    skill_acad_2: 'Color recognition',
+    skill_acad_3: 'Shape recognition',
+    skill_acad_4: 'Size concept',
+    skill_acad_5: 'Object matching',
+    skill_acad_6: 'Sorting into categories',
+    skill_acad_7: 'Simple addition',
+
+    skill_selfcare_0: 'Handwashing',
+    skill_selfcare_1: 'Toothbrushing',
+    skill_selfcare_2: 'Toilet training',
+    skill_selfcare_3: 'Dressing/undressing',
+    skill_selfcare_4: 'Eating',
+    skill_selfcare_5: 'Packing a bag',
+    skill_selfcare_6: 'Sleep routine',
+    skill_selfcare_7: 'Hair brushing',
+
+    skill_social_0: 'Eye contact',
+    skill_social_1: 'Taking turns',
+    skill_social_2: 'Sharing',
+    skill_social_3: 'Empathy',
+    skill_social_4: 'Joining group activities',
+    skill_social_5: 'Appropriate behavior',
+    skill_social_6: 'Following rules',
+    skill_social_7: 'Expressing emotions',
+
+    skill_motor_0: 'Holding a pencil',
+    skill_motor_1: 'Using scissors',
+    skill_motor_2: 'Catching/throwing a ball',
+    skill_motor_3: 'Tying shoelaces',
+    skill_motor_4: 'Buttoning',
+    skill_motor_5: 'Coloring',
+    skill_motor_6: 'Line tracing',
+    skill_motor_7: 'Balance',
+
+    seq_menu_title: '🔢 Sequencing Games',
+    seq_menu_type_cause: 'Cause-Effect',
+    seq_menu_type_order: 'Sequencing',
+    seq_back_to_menu: '← Back to Game Selection',
+    seq_order_hint: 'Put the steps in the right order!',
+    seq_cause_hint: 'Pick a cause, then tap its effect!',
+    seq_cause_col_title: 'Cause',
+    seq_effect_col_title: 'Effect',
+
+    seq_game_morning_title: 'Morning Routine',
+    seq_game_morning_item0: 'Wake Up',
+    seq_game_morning_item1: 'Brush Teeth',
+    seq_game_morning_item2: 'Get Dressed',
+    seq_game_morning_item3: 'Eat Breakfast',
+    seq_game_morning_item4: 'Grab Your Bag',
+    seq_game_morning_item5: 'Go to School',
+
+    seq_game_washing_title: 'Handwashing',
+    seq_game_washing_item0: 'Turn On the Tap',
+    seq_game_washing_item1: 'Wet Your Hands',
+    seq_game_washing_item2: 'Get Soap',
+    seq_game_washing_item3: 'Scrub Well',
+    seq_game_washing_item4: 'Rinse',
+    seq_game_washing_item5: 'Dry Off',
+
+    seq_game_meal_title: 'Mealtime Prep',
+    seq_game_meal_item0: 'Sit at the Table',
+    seq_game_meal_item1: 'Put on a Bib',
+    seq_game_meal_item2: 'Get a Spoon',
+    seq_game_meal_item3: 'Eat',
+    seq_game_meal_item4: 'Clean the Table',
+
+    seq_game_cause_title: 'Cause-Effect',
+    seq_game_cause_pair0_cause: 'It is raining',
+    seq_game_cause_pair0_effect: 'We grab an umbrella',
+    seq_game_cause_pair1_cause: 'You fell and got hurt',
+    seq_game_cause_pair1_effect: 'You are crying',
+    seq_game_cause_pair2_cause: 'I watered the flower',
+    seq_game_cause_pair2_effect: 'The flower bloomed',
+    seq_game_cause_pair3_cause: 'It got dark out',
+    seq_game_cause_pair3_effect: 'We turned on the light',
   }
 };
 
@@ -4135,48 +4359,48 @@ function closeStarModal() {
 // =============================================
 const SEQUENCE_GAMES = [
     {
-        id: 'morning', title: 'Sabah Rutini', emoji: '🌅',
+        id: 'morning', get title() { return t('seq_game_morning_title'); }, emoji: '🌅',
         type: 'order',
         items: [
-            { emoji: '😴', text: 'Uyan' },
-            { emoji: '🦷', text: 'Diş Fırçala' },
-            { emoji: '👕', text: 'Giy' },
-            { emoji: '🍳', text: 'Kahvaltı Et' },
-            { emoji: '🎒', text: 'Çantanı Al' },
-            { emoji: '🚌', text: 'Okula Git' },
+            { emoji: '😴', get text() { return t('seq_game_morning_item0'); } },
+            { emoji: '🦷', get text() { return t('seq_game_morning_item1'); } },
+            { emoji: '👕', get text() { return t('seq_game_morning_item2'); } },
+            { emoji: '🍳', get text() { return t('seq_game_morning_item3'); } },
+            { emoji: '🎒', get text() { return t('seq_game_morning_item4'); } },
+            { emoji: '🚌', get text() { return t('seq_game_morning_item5'); } },
         ]
     },
     {
-        id: 'washing', title: 'El Yıkama', emoji: '🧼',
+        id: 'washing', get title() { return t('seq_game_washing_title'); }, emoji: '🧼',
         type: 'order',
         items: [
-            { emoji: '🚰', text: 'Musluğu Aç' },
-            { emoji: '💧', text: 'Elleri Islatır' },
-            { emoji: '🧴', text: 'Sabun Al' },
-            { emoji: '🤲', text: 'Ova Ova Yıka' },
-            { emoji: '🚿', text: 'Durula' },
-            { emoji: '🧻', text: 'Kurula' },
+            { emoji: '🚰', get text() { return t('seq_game_washing_item0'); } },
+            { emoji: '💧', get text() { return t('seq_game_washing_item1'); } },
+            { emoji: '🧴', get text() { return t('seq_game_washing_item2'); } },
+            { emoji: '🤲', get text() { return t('seq_game_washing_item3'); } },
+            { emoji: '🚿', get text() { return t('seq_game_washing_item4'); } },
+            { emoji: '🧻', get text() { return t('seq_game_washing_item5'); } },
         ]
     },
     {
-        id: 'meal', title: 'Yemek Hazırlığı', emoji: '🍽️',
+        id: 'meal', get title() { return t('seq_game_meal_title'); }, emoji: '🍽️',
         type: 'order',
         items: [
-            { emoji: '🪑', text: 'Masaya Otur' },
-            { emoji: '🧺', text: 'Önlük Tak' },
-            { emoji: '🥄', text: 'Kaşık Al' },
-            { emoji: '😋', text: 'Ye' },
-            { emoji: '🧹', text: 'Masayı Temizle' },
+            { emoji: '🪑', get text() { return t('seq_game_meal_item0'); } },
+            { emoji: '🧺', get text() { return t('seq_game_meal_item1'); } },
+            { emoji: '🥄', get text() { return t('seq_game_meal_item2'); } },
+            { emoji: '😋', get text() { return t('seq_game_meal_item3'); } },
+            { emoji: '🧹', get text() { return t('seq_game_meal_item4'); } },
         ]
     },
     {
-        id: 'cause', title: 'Sebep-Sonuç', emoji: '🔗',
+        id: 'cause', get title() { return t('seq_game_cause_title'); }, emoji: '🔗',
         type: 'cause',
         pairs: [
-            { cause: { emoji: '🌧️', text: 'Yağmur yağıyor' }, effect: { emoji: '☂️', text: 'Şemsiye alıyoruz' } },
-            { cause: { emoji: '😢', text: 'Düşüp acıdı' }, effect: { emoji: '😭', text: 'Ağlıyor' } },
-            { cause: { emoji: '🌱', text: 'Çiçeği suladım' }, effect: { emoji: '🌸', text: 'Çiçek açtı' } },
-            { cause: { emoji: '🌑', text: 'Hava karardı' }, effect: { emoji: '💡', text: 'Işık yaktık' } },
+            { cause: { emoji: '🌧️', get text() { return t('seq_game_cause_pair0_cause'); } }, effect: { emoji: '☂️', get text() { return t('seq_game_cause_pair0_effect'); } } },
+            { cause: { emoji: '😢', get text() { return t('seq_game_cause_pair1_cause'); } }, effect: { emoji: '😭', get text() { return t('seq_game_cause_pair1_effect'); } } },
+            { cause: { emoji: '🌱', get text() { return t('seq_game_cause_pair2_cause'); } }, effect: { emoji: '🌸', get text() { return t('seq_game_cause_pair2_effect'); } } },
+            { cause: { emoji: '🌑', get text() { return t('seq_game_cause_pair3_cause'); } }, effect: { emoji: '💡', get text() { return t('seq_game_cause_pair3_effect'); } } },
         ]
     },
 ];
@@ -4194,13 +4418,13 @@ function goToSequence() {
 function renderSequenceMenu() {
     const menu = document.getElementById('sequenceMenu');
     menu.innerHTML = `
-        <h2 class="seq-menu-title">🔢 Sıralama Oyunları</h2>
+        <h2 class="seq-menu-title">${t('seq_menu_title')}</h2>
         <div class="seq-menu-grid">
             ${SEQUENCE_GAMES.map((g, i) => `
                 <button type="button" class="seq-menu-card" onclick="startSequenceGame(${i})">
                     <span class="seq-menu-emoji">${escapeHtml(g.emoji)}</span>
                     <span class="seq-menu-label">${escapeHtml(g.title)}</span>
-                    <span class="seq-menu-type">${g.type === 'cause' ? 'Sebep-Sonuç' : 'Sıralama'}</span>
+                    <span class="seq-menu-type">${g.type === 'cause' ? t('seq_menu_type_cause') : t('seq_menu_type_order')}</span>
                 </button>
             `).join('')}
         </div>
@@ -4225,7 +4449,7 @@ function renderOrderingGame(game) {
     el.innerHTML = `
         <div class="seq-game-header">
             <h3>${escapeHtml(game.emoji)} ${escapeHtml(game.title)}</h3>
-            <p class="seq-hint">Adımları doğru sıraya diz!</p>
+            <p class="seq-hint">${t('seq_order_hint')}</p>
         </div>
         <div class="seq-target-slots" id="seqTargetSlots">
             ${game.items.map((_, i) => `<div class="seq-slot" id="seqSlot_${i}">${i+1}</div>`).join('')}
@@ -4240,7 +4464,7 @@ function renderOrderingGame(game) {
             `).join('')}
         </div>
         <div class="seq-feedback" id="seqFeedback"></div>
-        <button type="button" class="seq-back-btn" onclick="goToSequence()">← Oyun Seçimine Dön</button>
+        <button type="button" class="seq-back-btn" onclick="goToSequence()">${t('seq_back_to_menu')}</button>
     `;
 }
 
@@ -4285,11 +4509,11 @@ function renderCauseEffectGame(game) {
     el.innerHTML = `
         <div class="seq-game-header">
             <h3>${escapeHtml(game.emoji)} ${escapeHtml(game.title)}</h3>
-            <p class="seq-hint">Sebebi seç, sonra sonucuna dokun!</p>
+            <p class="seq-hint">${t('seq_cause_hint')}</p>
         </div>
         <div class="cause-effect-area">
             <div class="cause-col">
-                <h4>Sebep</h4>
+                <h4>${t('seq_cause_col_title')}</h4>
                 <div class="cause-cards" id="causeCards">
                     ${pairs.map((p, i) => `
                         <button type="button" class="seq-card cause-card" id="causeCard_${i}"
@@ -4301,7 +4525,7 @@ function renderCauseEffectGame(game) {
                 </div>
             </div>
             <div class="effect-col">
-                <h4>Sonuç</h4>
+                <h4>${t('seq_effect_col_title')}</h4>
                 <div class="effect-cards" id="effectCards">
                     ${effectsShuffled.map((p, i) => `
                         <button type="button" class="seq-card effect-card" id="effectCard_${i}"
@@ -4314,7 +4538,7 @@ function renderCauseEffectGame(game) {
             </div>
         </div>
         <div class="seq-feedback" id="seqFeedback"></div>
-        <button type="button" class="seq-back-btn" onclick="goToSequence()">← Oyun Seçimine Dön</button>
+        <button type="button" class="seq-back-btn" onclick="goToSequence()">${t('seq_back_to_menu')}</button>
     `;
 }
 
@@ -4890,17 +5114,19 @@ function goToLogin() {
 // ANALİZ / BEP EKRANI
 // =============================================
 const BEP_CATEGORY_LABELS = {
-    ogreti: 'Hafif Düzey – Öğretilebilir',
-    egit:   'Orta Düzey – Eğitilebilir',
-    destekli: 'Ağır/İleri – Desteklenen'
+    get ogreti() { return t('bep_cat_ogreti'); },
+    get egit() { return t('bep_cat_egit'); },
+    get destekli() { return t('bep_cat_destekli'); },
 };
 const BEP_CONDITION_LABELS = {
-    osb: 'OSB', dehb: 'DEHB', dil: 'Dil / Konuşma',
-    down: 'Down Sendromu', cp: 'Serebral Palsi',
-    oog: 'Öz. Öğrenme Güçlüğü', ekolali: 'Ekolali',
-    stereotipik: 'Stereotipik Hareket',
-    // eski değerler uyumluluk için
-    ekolali: 'Ekolali', stereotipik: 'Stereotipik Hareket'
+    get osb() { return t('bep_cond_osb'); },
+    get dehb() { return t('bep_cond_dehb'); },
+    get dil() { return t('bep_cond_dil'); },
+    get down() { return t('bep_cond_down'); },
+    get cp() { return t('bep_cond_cp'); },
+    get oog() { return t('bep_cond_oog'); },
+    get ekolali() { return t('bep_cond_ekolali'); },
+    get stereotipik() { return t('bep_cond_stereotipik'); },
 };
 
 async function goToAnalysis() {
@@ -5084,11 +5310,11 @@ function copyBepReport() {
 // IEP HEDEFLERİ
 // =============================================
 const IEP_DOMAINS = [
-    { id: 'communication', label: 'İletişim',   emoji: '🗣️', color: '#48dbfb' },
-    { id: 'academic',      label: 'Akademik',   emoji: '📚', color: '#ff9f43' },
-    { id: 'selfcare',      label: 'Öz Bakım',   emoji: '🧼', color: '#1dd1a1' },
-    { id: 'social',        label: 'Sosyal',      emoji: '🤝', color: '#a29bfe' },
-    { id: 'motor',         label: 'Motor',       emoji: '🏃', color: '#fd79a8' },
+    { id: 'communication', get label() { return t('iep_domain_communication'); }, emoji: '🗣️', color: '#48dbfb' },
+    { id: 'academic',      get label() { return t('iep_domain_academic'); },      emoji: '📚', color: '#ff9f43' },
+    { id: 'selfcare',      get label() { return t('iep_domain_selfcare'); },      emoji: '🧼', color: '#1dd1a1' },
+    { id: 'social',        get label() { return t('iep_domain_social'); },        emoji: '🤝', color: '#a29bfe' },
+    { id: 'motor',         get label() { return t('iep_domain_motor'); },         emoji: '🏃', color: '#fd79a8' },
 ];
 
 let _iepCurrentGoalId = null;
@@ -5334,34 +5560,34 @@ async function submitTrialSession() {
 // =============================================
 const SKILL_MAP = {
     communication: {
-        label: 'İletişim', emoji: '🗣️', color: '#48dbfb',
-        skills: ['Adını söyleme','İstek ifade etme','Hayır diyebilme',
-                 'İki kelime cümle','Soru sorma','Selamlama',
-                 'Sıra bekleme','Görsel destek kullanma'],
+        get label() { return t('skill_domain_communication'); }, emoji: '🗣️', color: '#48dbfb',
+        skills: ['skill_comm_0','skill_comm_1','skill_comm_2',
+                 'skill_comm_3','skill_comm_4','skill_comm_5',
+                 'skill_comm_6','skill_comm_7'],
     },
     academic: {
-        label: 'Akademik', emoji: '📚', color: '#ff9f43',
-        skills: ['Rakam tanıma (1-10)','Harf tanıma','Renk tanıma',
-                 'Şekil tanıma','Boyut kavramı','Nesne eşleştirme',
-                 'Kategorilere ayırma','Basit toplama'],
+        get label() { return t('skill_domain_academic'); }, emoji: '📚', color: '#ff9f43',
+        skills: ['skill_acad_0','skill_acad_1','skill_acad_2',
+                 'skill_acad_3','skill_acad_4','skill_acad_5',
+                 'skill_acad_6','skill_acad_7'],
     },
     selfcare: {
-        label: 'Öz Bakım', emoji: '🧼', color: '#1dd1a1',
-        skills: ['El yıkama','Diş fırçalama','Tuvalet terbiyesi',
-                 'Giyinme/soyunma','Yemek yeme','Çanta hazırlama',
-                 'Uyku rutini','Saç tarama'],
+        get label() { return t('skill_domain_selfcare'); }, emoji: '🧼', color: '#1dd1a1',
+        skills: ['skill_selfcare_0','skill_selfcare_1','skill_selfcare_2',
+                 'skill_selfcare_3','skill_selfcare_4','skill_selfcare_5',
+                 'skill_selfcare_6','skill_selfcare_7'],
     },
     social: {
-        label: 'Sosyal', emoji: '🤝', color: '#a29bfe',
-        skills: ['Göz teması','Sıra bekleme','Paylaşma',
-                 'Empati','Grup etkinliğine katılma','Uygun davranış',
-                 'Kurallara uyma','Duygularını ifade etme'],
+        get label() { return t('skill_domain_social'); }, emoji: '🤝', color: '#a29bfe',
+        skills: ['skill_social_0','skill_social_1','skill_social_2',
+                 'skill_social_3','skill_social_4','skill_social_5',
+                 'skill_social_6','skill_social_7'],
     },
     motor: {
-        label: 'Motor', emoji: '🏃', color: '#fd79a8',
-        skills: ['Kalem tutma','Makas kullanma','Top yakalama/atma',
-                 'Bağcık bağlama','Düğme ilikleme','Boyama',
-                 'Çizgi takibi','Denge'],
+        get label() { return t('skill_domain_motor'); }, emoji: '🏃', color: '#fd79a8',
+        skills: ['skill_motor_0','skill_motor_1','skill_motor_2',
+                 'skill_motor_3','skill_motor_4','skill_motor_5',
+                 'skill_motor_6','skill_motor_7'],
     },
 };
 
@@ -5412,7 +5638,7 @@ function renderSkillsGrid() {
         <button type="button" class="skill-card skill-${status}"
             style="--sc:${domain.color}" onclick="cycleSkill('${key}')">
             <span class="skill-icon">${icon}</span>
-            <span class="skill-label">${escapeHtml(skill)}</span>
+            <span class="skill-label">${escapeHtml(t(skill))}</span>
         </button>`;
     }).join('');
 }
