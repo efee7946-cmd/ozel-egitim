@@ -2844,51 +2844,10 @@ async function goToAac() {
     _aacSentence = [];
     const sid = activeStudentId || 'default';
     await AACData.migrateLegacyIfNeeded(sid);
-    const addedNew = await AACData.migrateV2IfNeeded(sid);
-    if (addedNew) localStorage.removeItem('aac_enriched_' + sid);
+    await AACData.migrateV2IfNeeded(sid);
     _aacBoards = await AACData.listBoards(sid);
     _aacCurrentBoardId = _aacBoards[0]?.id || null;
     await _aacRenderAll();
-    _aacEnrichWithArasaac(sid).catch(() => {});
-}
-
-async function _aacEnrichWithArasaac(sid) {
-    if (localStorage.getItem('aac_enriched_' + sid)) return;
-    const boards = await AACData.listBoards(sid);
-    let anyUpdated = false;
-
-    for (const board of boards) {
-        const cards = await AACData.listCards(board.id);
-        let boardUpdated = false;
-
-        for (const card of cards) {
-            if (card.visual?.type !== 'emoji') continue;
-            const keyword = card.label.split(/[\/,]/)[0].trim();
-            try {
-                const resp = await fetch(
-                    `https://api.arasaac.org/v1/pictograms/tr/search/${encodeURIComponent(keyword)}`,
-                    { signal: AbortSignal.timeout(5000) }
-                );
-                if (!resp.ok) continue;
-                const data = await resp.json();
-                if (!Array.isArray(data) || !data.length) continue;
-                const id = data[0]._id;
-                await AACData.updateCard(board.id, card.id, {
-                    visual: { type: 'image', value: `https://static.arasaac.org/pictograms/${id}/${id}_500.png` },
-                });
-                anyUpdated = true;
-                boardUpdated = true;
-                await new Promise(r => setTimeout(r, 80));
-            } catch { continue; }
-        }
-
-        if (boardUpdated && board.id === _aacCurrentBoardId) await _aacRenderAll();
-    }
-
-    if (anyUpdated) {
-        localStorage.setItem('aac_enriched_' + sid, '1');
-        await _aacRenderAll();
-    }
 }
 
 async function _aacRenderAll() {
@@ -3012,11 +2971,23 @@ function filterAacCards(q) {
     });
 }
 
+const _aacEmojiCats = {
+    'Duygular':    ['😊','😢','😡','😨','😴','🤢','😍','😐','🤩','😲','😑','😳','🤒','🥵','🥶','🤕','🤗','😪','😅','🥹'],
+    'Yiyecekler':  ['🍞','🍎','🥦','🍖','🍝','🍚','🍲','🥛','🧃','🍪','🍫','🍦','🍕','🍔','🥚','🍌','🍇','🍓','🥕','🍋','🍩','🧁','🍉','🫐'],
+    'Etkinlikler': ['📚','✏️','🎨','🧩','📺','🏃','💃','🎤','🏊','🚴','⚽','🎵','🎮','🎲','🏋️','🛝','🎭','🖼️','🎯','🏓'],
+    'İnsanlar':    ['👩','👨','👶','👧','👦','👵','👴','👩‍🏫','👫','👨‍⚕️','🙋','👨‍👩‍👧','🧑','👩‍🍳','👮','🧑‍🎨'],
+    'Hayvanlar':   ['🐱','🐶','🐦','🐟','🐰','🐴','🐄','🐑','🦁','🐘','🐵','🦋','🐸','🦊','🐼','🐧','🦜','🐢','🦄','🐬'],
+    'Yerler':      ['🏠','🏫','🌳','🏥','🚗','🛁','🛏️','🍳','📖','🎡','🏪','🚌','✈️','🏖️','🏞️','🌆'],
+    'Semboller':   ['✅','❌','✋','➕','🏁','🆘','🤝','🚶','❤️','⭐','🌈','👍','👎','🔴','🔵','🟢','🟡','🟠','🟣','⬛','⬜'],
+};
+let _aacPickedEmoji = '';
+
 function openAacSearch() {
     document.getElementById('aac-search-modal').style.display = 'flex';
-    document.getElementById('aacSymbolInput').value = '';
-    document.getElementById('aacSymbolResults').innerHTML = '';
-    setTimeout(() => document.getElementById('aacSymbolInput').focus(), 120);
+    document.getElementById('aacEmojiLabelRow').style.display = 'none';
+    _aacPickedEmoji = '';
+    _aacRenderEmojiTabs();
+    _aacShowEmojiCat(Object.keys(_aacEmojiCats)[0]);
 }
 
 function closeAacSearch(e) {
@@ -3025,48 +2996,47 @@ function closeAacSearch(e) {
     }
 }
 
-async function searchAacSymbols() {
-    const q = (document.getElementById('aacSymbolInput').value || '').trim();
-    if (!q) return;
-    const resultsEl = document.getElementById('aacSymbolResults');
-    resultsEl.innerHTML = '<p class="aac-symbol-status">Aranıyor...</p>';
-    try {
-        const resp = await fetch(`https://api.arasaac.org/v1/pictograms/tr/search/${encodeURIComponent(q)}`);
-        if (!resp.ok) throw new Error('api');
-        const data = await resp.json();
-        if (!Array.isArray(data) || !data.length) {
-            resultsEl.innerHTML = '<p class="aac-symbol-status">Sonuç bulunamadı. Farklı bir kelime deneyin.</p>';
-            return;
-        }
-        resultsEl.innerHTML = data.slice(0, 24).map(p => {
-            const kw = escapeHtml(p.keywords?.[0]?.keyword || q);
-            const imgUrl = `https://static.arasaac.org/pictograms/${p._id}/${p._id}_500.png`;
-            return `<button type="button" class="aac-symbol-item" onclick="addAacSymbolCard(${p._id},'${kw}')">
-                <img src="${imgUrl}" alt="${kw}" loading="lazy">
-                <span>${kw}</span>
-            </button>`;
-        }).join('');
-    } catch {
-        resultsEl.innerHTML = '<p class="aac-symbol-status">Bağlantı hatası. İnternet bağlantınızı kontrol edin.</p>';
-    }
+function _aacRenderEmojiTabs() {
+    const tabs = document.getElementById('aacEmojiTabs');
+    tabs.innerHTML = Object.keys(_aacEmojiCats).map((cat, i) =>
+        `<button type="button" class="aac-emoji-tab${i === 0 ? ' active' : ''}" onclick="_aacShowEmojiCat('${escapeHtml(cat)}')">${cat}</button>`
+    ).join('');
 }
 
-async function addAacSymbolCard(arasaacId, keyword) {
-    if (!_aacCurrentBoardId) return;
+function _aacShowEmojiCat(cat) {
+    document.querySelectorAll('.aac-emoji-tab').forEach(t => t.classList.toggle('active', t.textContent === cat));
+    const emojis = _aacEmojiCats[cat] || [];
+    document.getElementById('aacEmojiGrid').innerHTML = emojis.map(e =>
+        `<button type="button" class="aac-emoji-btn" onclick="selectAacEmoji('${e}')">${e}</button>`
+    ).join('');
+    document.getElementById('aacEmojiLabelRow').style.display = 'none';
+    _aacPickedEmoji = '';
+}
+
+function selectAacEmoji(emoji) {
+    _aacPickedEmoji = emoji;
+    document.getElementById('aacSelectedEmoji').textContent = emoji;
+    document.getElementById('aacEmojiLabel').value = '';
+    document.getElementById('aacEmojiLabelRow').style.display = 'flex';
+    setTimeout(() => document.getElementById('aacEmojiLabel').focus(), 60);
+}
+
+async function addEmojiCard() {
+    if (!_aacPickedEmoji || !_aacCurrentBoardId) return;
+    const label = (document.getElementById('aacEmojiLabel').value || '').trim();
+    if (!label) { document.getElementById('aacEmojiLabel').focus(); return; }
+
     const sid = activeStudentId || 'default';
     const board = _aacBoards.find(b => b.id === _aacCurrentBoardId);
     if (!board) return;
 
-    const imageUrl = `https://static.arasaac.org/pictograms/${arasaacId}/${arasaacId}_500.png`;
     const { rows, cols, matrix } = await AACData.buildGrid(sid, _aacCurrentBoardId);
-
     let targetRow = -1, targetCol = -1;
     outer: for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
             if (!matrix[r][c]) { targetRow = r; targetCol = c; break outer; }
         }
     }
-
     if (targetRow === -1) {
         await AACData.growGrid(sid, { rows: rows + 1, cols });
         targetRow = rows;
@@ -3075,9 +3045,9 @@ async function addAacSymbolCard(arasaacId, keyword) {
 
     await AACData.placeCard(board, {
         row: targetRow, col: targetCol,
-        label: keyword,
-        spoken: keyword,
-        visual: { type: 'image', value: imageUrl },
+        label,
+        spoken: label,
+        visual: { type: 'emoji', value: _aacPickedEmoji },
         isCore: false,
     });
 
