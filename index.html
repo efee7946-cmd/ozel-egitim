@@ -932,15 +932,39 @@ document.addEventListener('DOMContentLoaded', function(){
     </div>
 </div>
 
-<!-- ===================== Emoji Kart Ekle ===================== -->
+<!-- ===================== Kart Ekle Modal ===================== -->
 <div id="aac-search-modal" class="aac-search-overlay" style="display:none" onclick="closeAacSearch(event)">
     <div class="aac-search-box">
         <div class="aac-search-head">
             <h3>➕ Kart Ekle</h3>
             <button type="button" class="aac-search-close" onclick="document.getElementById('aac-search-modal').style.display='none'">✕</button>
         </div>
-        <div class="aac-emoji-tabs" id="aacEmojiTabs"></div>
-        <div class="aac-emoji-grid" id="aacEmojiGrid"></div>
+        <!-- Mod seçici -->
+        <div class="aac-mode-tabs">
+            <button type="button" class="aac-mode-tab active" id="aacModeEmoji" onclick="switchAacMode('emoji')">😊 Emoji</button>
+            <button type="button" class="aac-mode-tab" id="aacModePhoto" onclick="switchAacMode('photo')">📷 Fotoğraf</button>
+        </div>
+
+        <!-- EMOJİ MODU -->
+        <div id="aacEmojiMode">
+            <div class="aac-emoji-tabs" id="aacEmojiTabs"></div>
+            <div class="aac-emoji-grid" id="aacEmojiGrid"></div>
+        </div>
+
+        <!-- FOTOĞRAF MODU -->
+        <div id="aacPhotoMode" style="display:none">
+            <div class="aac-photo-search-row">
+                <input type="text" id="aacPhotoQuery" placeholder="Kelime ara... (elma, köpek, oyun)"
+                       onkeydown="if(event.key==='Enter') searchAacPhoto()">
+                <button type="button" class="aac-photo-search-btn" onclick="searchAacPhoto()">Ara</button>
+            </div>
+            <div class="aac-photo-grid" id="aacPhotoGrid">
+                <p class="aac-photo-hint">Türkçe veya İngilizce kelime yaz, fotoğraflar gelsin.</p>
+            </div>
+            <a class="aac-pexels-credit" href="https://www.pexels.com" target="_blank" rel="noopener">Photos provided by Pexels</a>
+        </div>
+
+        <!-- Seçim + etiket satırı (her iki mod için) -->
         <div class="aac-emoji-label-row" id="aacEmojiLabelRow" style="display:none">
             <span class="aac-selected-emoji" id="aacSelectedEmoji"></span>
             <input type="text" id="aacEmojiLabel" placeholder="Kart adı yaz..."

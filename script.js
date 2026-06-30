@@ -2986,14 +2986,61 @@ function openAacSearch() {
     document.getElementById('aac-search-modal').style.display = 'flex';
     document.getElementById('aacEmojiLabelRow').style.display = 'none';
     _aacPickedEmoji = '';
-    _aacRenderEmojiTabs();
-    _aacShowEmojiCat(Object.keys(_aacEmojiCats)[0]);
+    switchAacMode('emoji');
 }
 
 function closeAacSearch(e) {
     if (e.target.id === 'aac-search-modal') {
         document.getElementById('aac-search-modal').style.display = 'none';
     }
+}
+
+function switchAacMode(mode) {
+    document.getElementById('aacModeEmoji').classList.toggle('active', mode === 'emoji');
+    document.getElementById('aacModePhoto').classList.toggle('active', mode === 'photo');
+    document.getElementById('aacEmojiMode').style.display  = mode === 'emoji' ? '' : 'none';
+    document.getElementById('aacPhotoMode').style.display  = mode === 'photo' ? '' : 'none';
+    document.getElementById('aacEmojiLabelRow').style.display = 'none';
+    _aacPickedEmoji = '';
+    if (mode === 'emoji') {
+        _aacRenderEmojiTabs();
+        _aacShowEmojiCat(Object.keys(_aacEmojiCats)[0]);
+    } else {
+        setTimeout(() => document.getElementById('aacPhotoQuery').focus(), 80);
+    }
+}
+
+async function searchAacPhoto() {
+    const q = (document.getElementById('aacPhotoQuery').value || '').trim();
+    if (!q) return;
+    const grid = document.getElementById('aacPhotoGrid');
+    grid.innerHTML = '<p class="aac-photo-hint">Aranıyor...</p>';
+    try {
+        const r = await fetch(API_BASE + '/api/photo?query=' + encodeURIComponent(q));
+        const d = await r.json();
+        if (!d.photos || !d.photos.length) {
+            grid.innerHTML = '<p class="aac-photo-hint">Sonuç bulunamadı. Farklı bir kelime deneyin.</p>';
+            return;
+        }
+        grid.innerHTML = d.photos.map(p => {
+            const thumb = p.src.small;
+            const alt = escapeHtml(p.alt || q);
+            return `<button type="button" class="aac-photo-item" onclick="selectAacPhoto('${escapeHtml(thumb)}','${alt}')">
+                <img src="${escapeHtml(thumb)}" alt="${alt}" loading="lazy">
+            </button>`;
+        }).join('');
+    } catch {
+        grid.innerHTML = '<p class="aac-photo-hint">Bağlantı hatası. İnternet bağlantınızı kontrol edin.</p>';
+    }
+}
+
+function selectAacPhoto(url, alt) {
+    _aacPickedEmoji = '__photo__' + url;
+    const preview = document.getElementById('aacSelectedEmoji');
+    preview.innerHTML = `<img src="${escapeHtml(url)}" style="width:48px;height:48px;object-fit:cover;border-radius:8px;">`;
+    document.getElementById('aacEmojiLabel').value = alt;
+    document.getElementById('aacEmojiLabelRow').style.display = 'flex';
+    setTimeout(() => document.getElementById('aacEmojiLabel').focus(), 60);
 }
 
 function _aacRenderEmojiTabs() {
@@ -3030,6 +3077,11 @@ async function addEmojiCard() {
     const board = _aacBoards.find(b => b.id === _aacCurrentBoardId);
     if (!board) return;
 
+    const isPhoto = _aacPickedEmoji.startsWith('__photo__');
+    const visual = isPhoto
+        ? { type: 'image', value: _aacPickedEmoji.slice('__photo__'.length) }
+        : { type: 'emoji', value: _aacPickedEmoji };
+
     const { rows, cols, matrix } = await AACData.buildGrid(sid, _aacCurrentBoardId);
     let targetRow = -1, targetCol = -1;
     outer: for (let r = 0; r < rows; r++) {
@@ -3047,7 +3099,7 @@ async function addEmojiCard() {
         row: targetRow, col: targetCol,
         label,
         spoken: label,
-        visual: { type: 'emoji', value: _aacPickedEmoji },
+        visual,
         isCore: false,
     });
 

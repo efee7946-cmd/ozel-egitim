@@ -5089,6 +5089,61 @@ body.a11y-reduce-motion * { transition: none !important; animation: none !import
     cursor: pointer; color: #8899aa; padding: 4px 8px; line-height: 1;
 }
 
+/* Emoji / Fotoğraf mod sekmeleri */
+.aac-mode-tabs {
+    display: flex; gap: 6px; padding: 10px 14px 6px; flex-shrink: 0;
+    border-bottom: 1px solid #eef2f7;
+}
+.aac-mode-tab {
+    flex: 1; padding: 7px; border-radius: 10px;
+    border: 1.5px solid #dce8f4; background: #f4f8ff;
+    color: #4a5568; font-size: 0.85rem; font-weight: 700;
+    cursor: pointer; transition: all 0.15s;
+}
+.aac-mode-tab.active { background: #6C63FF; color: white; border-color: #6C63FF; }
+
+/* Fotoğraf arama */
+.aac-photo-search-row {
+    display: flex; gap: 8px; padding: 10px 14px 6px; flex-shrink: 0;
+}
+.aac-photo-search-row input[type="text"] {
+    flex: 1; padding: 9px 13px; border-radius: 12px;
+    border: 2px solid #dce8f4; font-size: 0.95rem; color: #1f3653;
+    background: #f8fbff; outline: none; transition: border-color 0.18s;
+}
+.aac-photo-search-row input[type="text"]:focus { border-color: #6C63FF; background: white; }
+.aac-photo-search-btn {
+    padding: 9px 18px; border-radius: 12px; border: none;
+    background: #6C63FF; color: white; font-size: 0.9rem;
+    font-weight: 700; cursor: pointer; transition: opacity 0.15s;
+}
+.aac-photo-search-btn:hover { opacity: 0.88; }
+
+.aac-photo-grid {
+    flex: 1; overflow-y: auto; padding: 6px 12px;
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;
+    align-content: start; min-height: 140px;
+}
+.aac-photo-hint {
+    grid-column: 1 / -1; text-align: center;
+    color: #9baabb; font-size: 0.82rem; padding: 24px 0; margin: 0;
+}
+.aac-photo-item {
+    border: 2px solid transparent; border-radius: 10px;
+    background: none; padding: 0; cursor: pointer; overflow: hidden;
+    aspect-ratio: 4/3; transition: border-color 0.15s;
+}
+.aac-photo-item:hover { border-color: #6C63FF; }
+.aac-photo-item img {
+    width: 100%; height: 100%; object-fit: cover; display: block;
+    border-radius: 8px;
+}
+.aac-pexels-credit {
+    display: block; text-align: center; font-size: 0.68rem; color: #b0b8c4;
+    padding: 5px 14px 6px; text-decoration: none; flex-shrink: 0;
+}
+.aac-pexels-credit:hover { color: #6C63FF; }
+
 /* Emoji kategori sekmeleri */
 .aac-emoji-tabs {
     display: flex; gap: 6px; padding: 10px 14px 6px;
