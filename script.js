@@ -606,6 +606,21 @@ const STRINGS = {
     seq_game_cause_pair2_effect: 'Çiçek açtı',
     seq_game_cause_pair3_cause: 'Hava karardı',
     seq_game_cause_pair3_effect: 'Işık yaktık',
+
+    therapy_topic_title: 'Hangi konuyu çalışalım?',
+    therapy_topic_sub: 'Bir konu yaz, Yıldız Can o konuyla ilgili sorular soracak.',
+    therapy_topic_placeholder: 'örn: alışveriş, futbol, okul...',
+    therapy_start_btn: 'Başla →',
+    therapy_loading: 'Sorular hazırlanıyor...',
+    therapy_progress: 'Soru {a} / {t}',
+    therapy_fallback_q: '{topic} hakkında ne düşünüyorsun?',
+    video_loading: 'Video yükleniyor...',
+    topic_shopping: 'Alışveriş',
+    topic_school: 'Okul',
+    topic_football: 'Futbol',
+    topic_friendship: 'Arkadaşlık',
+    topic_food: 'Yemek',
+    topic_emotions: 'Duygular',
   },
   en: {
     back_menu: '← Menu',
@@ -1210,6 +1225,21 @@ const STRINGS = {
     seq_game_cause_pair2_effect: 'The flower bloomed',
     seq_game_cause_pair3_cause: 'It got dark out',
     seq_game_cause_pair3_effect: 'We turned on the light',
+
+    therapy_topic_title: 'What topic shall we work on?',
+    therapy_topic_sub: 'Type a topic and Yıldız Can will ask questions about it.',
+    therapy_topic_placeholder: 'e.g. shopping, sports, school...',
+    therapy_start_btn: 'Start →',
+    therapy_loading: 'Getting questions ready...',
+    therapy_progress: 'Question {a} / {t}',
+    therapy_fallback_q: 'What do you think about {topic}?',
+    video_loading: 'Loading video...',
+    topic_shopping: 'Shopping',
+    topic_school: 'School',
+    topic_football: 'Football',
+    topic_friendship: 'Friendship',
+    topic_food: 'Food',
+    topic_emotions: 'Emotions',
   }
 };
 
@@ -1617,7 +1647,9 @@ async function startTherapyWithTopic() {
     document.getElementById('topicStartBtn').style.display = 'none';
 
     try {
-        const prompt = `Özel eğitim öğrencisi (8-12 yaş, orta düzey) için "${currentTopic}" konusunda 6 kısa soru üret. Her soru günlük yaşam ve sosyal beceriye yönelik olsun. Her soru yeni satırda, maksimum 10 kelime. Sadece soruları yaz.`;
+        const prompt = _lang === 'en'
+            ? `Generate 6 short questions about "${currentTopic}" for a child (age 8-12, special education, intermediate level). Each question should relate to daily life and social skills. One question per line, maximum 10 words each. Write only the questions.`
+            : `Özel eğitim öğrencisi (8-12 yaş, orta düzey) için "${currentTopic}" konusunda 6 kısa soru üret. Her soru günlük yaşam ve sosyal beceriye yönelik olsun. Her soru yeni satırda, maksimum 10 kelime. Sadece soruları yaz.`;
         const res = await fetch(API_BASE + '/api/chat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -1632,9 +1664,9 @@ async function startTherapyWithTopic() {
             .slice(0, 6)
             .map(q => ({ q, query: currentTopic, goal: currentTopic }));
 
-        unaskedQuestions = questions.length ? questions : [{ q: `${currentTopic} hakkında ne düşünüyorsun?`, query: currentTopic, goal: currentTopic }];
+        unaskedQuestions = questions.length ? questions : [{ q: t('therapy_fallback_q').replace('{topic}', currentTopic), query: currentTopic, goal: currentTopic }];
     } catch {
-        unaskedQuestions = [{ q: `${currentTopic} hakkında ne düşünüyorsun?`, query: currentTopic, goal: currentTopic }];
+        unaskedQuestions = [{ q: t('therapy_fallback_q').replace('{topic}', currentTopic), query: currentTopic, goal: currentTopic }];
     }
     sessionTotalQuestions = unaskedQuestions.length;
 
@@ -3351,7 +3383,7 @@ function updateProgressBar() {
     const fill = document.getElementById('therapyProgressFill');
     const label = document.getElementById('therapyProgressLabel');
     if (fill) fill.style.width = pct + '%';
-    if (label) label.textContent = `Soru ${answered} / ${total}`;
+    if (label) label.textContent = t('therapy_progress').replace('{a}', answered).replace('{t}', total);
 }
 
 function rereadQuestion() {
@@ -3516,8 +3548,8 @@ async function loadNext() {
     clearTimeout(idleTimer);
     document.getElementById('nextBtn').classList.remove('pulse-anim');
     document.getElementById('micBtn').disabled = true;
-    document.getElementById('qBar').innerText = "Hazırlanıyorum...";
-    document.getElementById('info').innerText = "Video yükleniyor...";
+    document.getElementById('qBar').innerText = t('therapy_hint');
+    document.getElementById('info').innerText = t('video_loading');
 
     if (unaskedQuestions.length === 0) resetTherapyQuestionPool();
     const rIndex = Math.floor(Math.random() * unaskedQuestions.length);

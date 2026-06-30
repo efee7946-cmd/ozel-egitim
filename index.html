@@ -304,25 +304,26 @@ document.addEventListener('DOMContentLoaded', function(){
         <div class="topic-card">
             <button class="btn-back topic-back-btn" onclick="goToMenu()"><span data-i18n="back_menu">← Menü</span></button>
             <div class="topic-card-icon">🎤</div>
-            <h2 class="topic-card-title">Hangi konuyu çalışalım?</h2>
-            <p class="topic-card-sub">Bir konu yaz, Yıldız Can o konuyla ilgili sorular soracak.</p>
+            <h2 class="topic-card-title" data-i18n="therapy_topic_title">Hangi konuyu çalışalım?</h2>
+            <p class="topic-card-sub" data-i18n="therapy_topic_sub">Bir konu yaz, Yıldız Can o konuyla ilgili sorular soracak.</p>
             <input type="text" id="topicInput" class="topic-input"
+                data-i18n-placeholder="therapy_topic_placeholder"
                 placeholder="örn: alışveriş, futbol, okul..." maxlength="60"
                 onkeydown="if(event.key==='Enter') startTherapyWithTopic()">
             <div class="topic-suggestions">
-                <button type="button" class="topic-chip" onclick="setTopicChip('Alışveriş')">🛒 Alışveriş</button>
-                <button type="button" class="topic-chip" onclick="setTopicChip('Okul')">🏫 Okul</button>
-                <button type="button" class="topic-chip" onclick="setTopicChip('Futbol')">⚽ Futbol</button>
-                <button type="button" class="topic-chip" onclick="setTopicChip('Arkadaşlık')">🤝 Arkadaşlık</button>
-                <button type="button" class="topic-chip" onclick="setTopicChip('Yemek')">🍽️ Yemek</button>
-                <button type="button" class="topic-chip" onclick="setTopicChip('Duygular')">😊 Duygular</button>
+                <button type="button" class="topic-chip" onclick="setTopicChip(t('topic_shopping'))">🛒 <span data-i18n="topic_shopping">Alışveriş</span></button>
+                <button type="button" class="topic-chip" onclick="setTopicChip(t('topic_school'))">🏫 <span data-i18n="topic_school">Okul</span></button>
+                <button type="button" class="topic-chip" onclick="setTopicChip(t('topic_football'))">⚽ <span data-i18n="topic_football">Futbol</span></button>
+                <button type="button" class="topic-chip" onclick="setTopicChip(t('topic_friendship'))">🤝 <span data-i18n="topic_friendship">Arkadaşlık</span></button>
+                <button type="button" class="topic-chip" onclick="setTopicChip(t('topic_food'))">🍽️ <span data-i18n="topic_food">Yemek</span></button>
+                <button type="button" class="topic-chip" onclick="setTopicChip(t('topic_emotions'))">😊 <span data-i18n="topic_emotions">Duygular</span></button>
             </div>
             <button class="topic-start-btn" id="topicStartBtn" onclick="startTherapyWithTopic()">
-                Başla →
+                <span data-i18n="therapy_start_btn">Başla →</span>
             </button>
             <div class="topic-loading" id="topicLoading" style="display:none">
                 <div class="topic-spinner"></div>
-                <span>Sorular hazırlanıyor...</span>
+                <span data-i18n="therapy_loading">Sorular hazırlanıyor...</span>
             </div>
         </div>
     </div>
@@ -332,7 +333,7 @@ document.addEventListener('DOMContentLoaded', function(){
         <div id="therapyCityHost"></div>
         <div class="therapy-topic-badge" id="therapyTopicBadge"></div>
         <div class="therapy-progress-wrap therapy-session-ui">
-            <span id="therapyProgressLabel" class="therapy-progress-label">Soru 0 / 10</span>
+            <span id="therapyProgressLabel" class="therapy-progress-label"></span>
             <div class="therapy-progress-track">
                 <div class="therapy-progress-fill" id="therapyProgressFill"></div>
             </div>
@@ -342,7 +343,7 @@ document.addEventListener('DOMContentLoaded', function(){
             <a class="pexels-credit" href="https://www.pexels.com" target="_blank" rel="noopener">Videos provided by Pexels</a>
         </div>
         <div class="question-bar-wrap therapy-session-ui">
-            <div class="question-bar" id="qBar">Hazırlanıyorum...</div>
+            <div class="question-bar" id="qBar"></div>
             <button onclick="rereadQuestion()" class="btn-reread" title="Tekrar Dinle">🔊</button>
         </div>
         <div class="btns therapy-session-ui">
@@ -354,7 +355,7 @@ document.addEventListener('DOMContentLoaded', function(){
             </div>
             <button onclick="loadNext()" id="nextBtn" class="btn-next">➡️</button>
         </div>
-        <div id="info" class="therapy-session-ui">Lütfen bekleyin...</div>
+        <div id="info" class="therapy-session-ui"></div>
     </div><!-- /.main-card -->
     <div class="side-card" id="therapySideCard">
         <canvas id="avatarCanvas"></canvas>
