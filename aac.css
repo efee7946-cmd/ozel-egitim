@@ -15,13 +15,15 @@
 /* showOnly() display:flex set eder — board tam ekranı doldurur */
 #aac-screen {
   padding: 0 !important;
-  width: 100vw;
+  width: 100vw !important;
+  max-width: none !important;
   height: 100vh;
   position: fixed;
   top: 0;
   left: 0;
   z-index: 10;
   align-items: stretch;
+  background: #f8fafc;
 }
 
 .aac-board {
@@ -127,6 +129,44 @@
 }
 .aac-nav-btn:not(.active):active { background: #e2e8f0; }
 
+/* ---- Arama/ekle toolbar ---- */
+.aac-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px 4px;
+  background: var(--aac-nav-bg);
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--aac-nav-border);
+}
+.aac-card-search {
+  flex: 1;
+  min-width: 0;
+  padding: 7px 12px;
+  border-radius: 20px;
+  border: 1.5px solid rgba(0,0,0,0.12);
+  font-size: 0.9rem;
+  background: var(--aac-bg);
+  color: var(--aac-card-ink);
+  outline: none;
+  transition: border-color 0.15s;
+}
+.aac-card-search:focus { border-color: var(--aac-accent); background: #fff; }
+.aac-add-symbol-btn {
+  padding: 7px 14px;
+  border-radius: 20px;
+  border: 1.5px solid rgba(108,99,255,0.3);
+  background: rgba(108,99,255,0.08);
+  color: var(--aac-accent);
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+.aac-add-symbol-btn:hover { background: rgba(108,99,255,0.16); }
+
 /* ---- Kart grid'i ---- */
 .aac-grid-wrap {
   flex: 1;
@@ -141,6 +181,8 @@
   gap: var(--aac-gap);
   width: 100%;
   height: 100%;
+  padding: 0 !important;
+  overflow: visible !important;
   /* row/col sayısı JS'den style attribute olarak gelir:
      grid-template-columns: repeat(N, 1fr);
      grid-template-rows:    repeat(N, 1fr); */
@@ -190,16 +232,15 @@
   line-height: 1.2;
 }
 
-/* Boş slot — editör modunda gösterilir */
+/* Boş slot — görünmez placeholder */
 .aac-card.empty {
-  background: transparent;
-  border: 2px dashed rgba(0,0,0,0.15);
-  box-shadow: none;
-  cursor: pointer;
-  opacity: 0.5;
+  background: transparent !important;
+  border: 1px dashed rgba(0,0,0,0.08) !important;
+  box-shadow: none !important;
+  cursor: default !important;
+  pointer-events: none;
+  opacity: 0.2;
 }
-.aac-card.empty:hover { opacity: 0.85; border-color: var(--aac-accent); }
-.aac-card.empty .aac-card-emoji { font-size: 1.4rem; color: #aaa; }
 
 /* Sınır dışı kart (grid küçültüldüyse — runtime'da görünmez, debug için) */
 .aac-card.out-of-bounds { display: none; }
