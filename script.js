@@ -2847,6 +2847,46 @@ async function goToAac() {
     _aacBoards = await AACData.listBoards(sid);
     _aacCurrentBoardId = _aacBoards[0]?.id || null;
     await _aacRenderAll();
+    _aacEnrichWithArasaac(sid).catch(() => {});
+}
+
+async function _aacEnrichWithArasaac(sid) {
+    if (localStorage.getItem('aac_enriched_' + sid)) return;
+    const boards = await AACData.listBoards(sid);
+    let anyUpdated = false;
+
+    for (const board of boards) {
+        const cards = await AACData.listCards(board.id);
+        let boardUpdated = false;
+
+        for (const card of cards) {
+            if (card.visual?.type !== 'emoji') continue;
+            const keyword = card.label.split(/[\/,]/)[0].trim();
+            try {
+                const resp = await fetch(
+                    `https://api.arasaac.org/v1/pictograms/tr/search/${encodeURIComponent(keyword)}`,
+                    { signal: AbortSignal.timeout(5000) }
+                );
+                if (!resp.ok) continue;
+                const data = await resp.json();
+                if (!Array.isArray(data) || !data.length) continue;
+                const id = data[0]._id;
+                await AACData.updateCard(board.id, card.id, {
+                    visual: { type: 'image', value: `https://static.arasaac.org/pictograms/${id}/${id}_500.png` },
+                });
+                anyUpdated = true;
+                boardUpdated = true;
+                await new Promise(r => setTimeout(r, 80));
+            } catch { continue; }
+        }
+
+        if (boardUpdated && board.id === _aacCurrentBoardId) await _aacRenderAll();
+    }
+
+    if (anyUpdated) {
+        localStorage.setItem('aac_enriched_' + sid, '1');
+        await _aacRenderAll();
+    }
 }
 
 async function _aacRenderAll() {
