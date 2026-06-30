@@ -622,6 +622,11 @@ const STRINGS = {
     topic_food: 'Yemek',
     topic_emotions: 'Duygular',
     app_name: 'YıldızCan',
+    bottom_nav_home: 'Ana Ekran',
+    bottom_nav_therapy: 'Terapi',
+    bottom_nav_aac: 'AAC',
+    bottom_nav_schedule: 'Program',
+    bottom_nav_analysis: 'Analiz',
     mic_prompt: 'Konuşmak için mikrofona bas!',
     welcome_sub: 'Bugün ne yapmak istersin?',
     logout: 'Çıkış Yap',
@@ -1263,6 +1268,11 @@ const STRINGS = {
     topic_food: 'Food',
     topic_emotions: 'Emotions',
     app_name: 'YildizCan',
+    bottom_nav_home: 'Home',
+    bottom_nav_therapy: 'Therapy',
+    bottom_nav_aac: 'AAC',
+    bottom_nav_schedule: 'Schedule',
+    bottom_nav_analysis: 'Analysis',
     mic_prompt: 'Press the microphone to speak!',
     welcome_sub: 'What would you like to do today?',
     logout: 'Log Out',
@@ -1539,6 +1549,24 @@ function showOnly(id) {
     if (id === 'menu-screen') {
         requestAnimationFrame(() => renderCityScene());
     }
+    _updateBottomNav(id);
+}
+
+function _updateBottomNav(screenId) {
+    const nav = document.getElementById('bottomNav');
+    if (!nav) return;
+    const hideOn = ['auth-screen', 'splash-screen', 'start-screen', 'login-screen', 'student-setup-screen'];
+    nav.style.display = hideOn.includes(screenId) ? 'none' : 'flex';
+    const map = {
+        'menu-screen': 'bnMenu',
+        'game-container': 'bnTherapy',
+        'aac-screen': 'bnAAC',
+        'schedule-screen': 'bnSchedule',
+        'analysis-screen': 'bnAnalysis',
+    };
+    nav.querySelectorAll('.bottom-nav-item').forEach(btn => btn.classList.remove('active'));
+    const activeId = map[screenId];
+    if (activeId) { const el = document.getElementById(activeId); if (el) el.classList.add('active'); }
 }
 
 function updateMenuIdentity() {
@@ -4886,6 +4914,7 @@ function onAuthSuccess() {
         activeStudentId   = null;
         activeStudentName = '';
     }
+    document.body.classList.add('has-bottom-nav');
     initLoginScreen();
     showOnly('login-screen');
 }

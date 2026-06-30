@@ -2,7 +2,10 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0f9d8f">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>YıldızCan | Yıldız Can AI</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="aac.css">
@@ -283,6 +286,29 @@
     <p class="footer">© 2026 Efe Erman</p>
 </div>
 
+<!-- ===================== ALT NAVİGASYON ÇUBUĞU ===================== -->
+<nav class="bottom-nav" id="bottomNav" style="display:none">
+    <button class="bottom-nav-item" id="bnMenu" onclick="goToMenu()">
+        <span class="bottom-nav-icon">🏠</span>
+        <span class="bottom-nav-label" data-i18n="bottom_nav_home">Ana Ekran</span>
+    </button>
+    <button class="bottom-nav-item" id="bnTherapy" onclick="goToTherapy()">
+        <span class="bottom-nav-icon">🎤</span>
+        <span class="bottom-nav-label" data-i18n="bottom_nav_therapy">Terapi</span>
+    </button>
+    <button class="bottom-nav-item" id="bnAAC" onclick="goToAAC()">
+        <span class="bottom-nav-icon">💬</span>
+        <span class="bottom-nav-label" data-i18n="bottom_nav_aac">AAC</span>
+    </button>
+    <button class="bottom-nav-item" id="bnSchedule" onclick="goToSchedule()">
+        <span class="bottom-nav-icon">📅</span>
+        <span class="bottom-nav-label" data-i18n="bottom_nav_schedule">Program</span>
+    </button>
+    <button class="bottom-nav-item" id="bnAnalysis" onclick="goToAnalysis()">
+        <span class="bottom-nav-icon">📊</span>
+        <span class="bottom-nav-label" data-i18n="bottom_nav_analysis">Analiz</span>
+    </button>
+</nav>
 
 <!-- Auto-skip auth: show menu directly on page load -->
 <script>
@@ -370,7 +396,7 @@ document.addEventListener('DOMContentLoaded', function(){
 
 <!-- ===================== VELİ RAPORU EKRANI ===================== -->
 <div id="report-screen">
-    <button class="btn-back" onclick="goToAnalysis()"><span data-i18n="back">← Analiz</span></button>
+    <button class="btn-back" onclick="goToAnalysis()"><span data-i18n="back">← Geri</span></button>
 
     <div class="report-wrapper" id="reportWrapper">
         <!-- Başlık -->
@@ -652,7 +678,7 @@ document.addEventListener('DOMContentLoaded', function(){
     <div class="aac-board" id="aacBoard">
         <div class="aac-core-strip" id="aacCoreStrip"></div>
         <div class="aac-nav" id="aacNav">
-            <button class="aac-nav-btn" onclick="goToMenu()">← Menü</button>
+            <button class="aac-nav-btn" onclick="goToMenu()" data-i18n="back_menu">← Menü</button>
         </div>
         <div class="aac-toolbar">
             <input type="search" id="aacCardSearch" class="aac-card-search"
