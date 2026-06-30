@@ -1907,7 +1907,18 @@ function startSortGame(key) {
     const menuSection = document.getElementById('sortMenuSection');
     const gameSection = document.getElementById('sortGameSection');
     if (menuSection) menuSection.style.display = 'none';
-    if (gameSection) gameSection.style.display = 'block';
+    if (gameSection) {
+        gameSection.style.display = 'block';
+        gameSection.innerHTML = `
+            <div class="sort-header-row">
+                <h3 class="sort-game-title" id="sortGameTitle"></h3>
+                <div class="sort-score" id="sortScore">0 / 0</div>
+            </div>
+            <div class="sort-items-area" id="sortItemsArea"></div>
+            <div class="sort-baskets-area" id="sortBasketsArea"></div>
+            <button type="button" class="menu-ghost-btn sort-back-btn" onclick="renderSortMenu()">← Oyun Seçimine Dön</button>
+        `;
+    }
     const titleEl = document.getElementById('sortGameTitle');
     if (titleEl) titleEl.textContent = _sortGame.title;
     renderSortGame();
