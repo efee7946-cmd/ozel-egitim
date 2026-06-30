@@ -590,7 +590,7 @@ function ensureMenuWorkspace() {
             <div class="sidebar-brand">
                 <img src="avatar.png" class="sidebar-brand-avatar" alt="Yıldız Can">
                 <div>
-                    <strong>Yıldız Sınıfı</strong>
+                    <strong>YıldızCan</strong>
                     <span>Çocuk destek paneli</span>
                 </div>
             </div>
