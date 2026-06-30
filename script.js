@@ -1883,6 +1883,8 @@ async function startMatchingGame(gameKey) {
 
     renderMatchingGame();
     loadMatchingPhotos(currentMatchingGame);
+    const credit = document.getElementById('matchingPexelsCredit');
+    if (credit) credit.style.display = currentMatchingGame.usePhotos ? 'block' : 'none';
     speakFallback(currentMatchingGame.description, () => {});
 }
 
@@ -2854,35 +2856,8 @@ async function goToAac() {
     _aacBoards = await AACData.listBoards(sid);
     _aacCurrentBoardId = _aacBoards[0]?.id || null;
     await _aacRenderAll();
-    _aacClearArasaacImages(sid).catch(() => {});
 }
 
-async function _aacClearArasaacImages(sid) {
-    const flag = 'aac_arasaac_cleared_' + sid;
-    if (localStorage.getItem(flag)) return;
-
-    const lookup = {};
-    (AACData._boards || []).forEach(b =>
-        (b.cards || []).forEach(c => {
-            if (c.visual?.type === 'emoji') lookup[c.label] = c.visual.value;
-        })
-    );
-
-    const boards = await AACData.listBoards(sid);
-    let found = 0;
-    for (const board of boards) {
-        const cards = await AACData.listCards(board.id);
-        for (const card of cards) {
-            if (!card.visual?.value?.includes('arasaac.org')) continue;
-            await AACData.updateCard(board.id, card.id, {
-                visual: { type: 'emoji', value: lookup[card.label] || '❓' },
-            });
-            found++;
-        }
-    }
-    localStorage.setItem(flag, '1');
-    if (found > 0) await _aacRenderAll();
-}
 
 async function _aacRenderAll() {
     const sid = activeStudentId || 'default';
@@ -2947,7 +2922,7 @@ function _aacVisualHtml(visual, cls, size) {
     if (!visual) return `<span class="${cls}">❓</span>`;
     if (visual.type === 'image' && visual.value) {
         const s = size ? `style="width:${size};height:${size};object-fit:contain;"` : '';
-        return `<img class="aac-card-img" src="${escapeHtml(visual.value)}" alt="" ${s}>`;
+        return `<img class="aac-card-img" src="${escapeHtml(visual.value)}" alt="" ${s}><span class="aac-pexels-badge">P</span>`;
     }
     const s = size ? `style="font-size:${size}"` : '';
     return `<span class="${cls}" ${s}>${escapeHtml(visual.value || '❓')}</span>`;
@@ -3809,10 +3784,12 @@ async function deleteAccount() {
     if (_authToken && !_authToken.startsWith('demo_')) {
         await authApi('delete', { token: _authToken });
     }
-    const keys = Object.keys(localStorage).filter(k => k.startsWith('lms_'));
-    keys.forEach(k => localStorage.removeItem(k));
-    DB.del(authStorageKey());
-    DB.del(authUserStorageKey());
+    // localStorage + cloud (KV/PostgreSQL) temizle
+    const lsKeys = [...Object.keys(localStorage)].filter(k => k.startsWith('lms_'));
+    lsKeys.forEach(k => DB.del(k.slice(4)));
+    // sessionStorage temizle
+    const ssKeys = [...Object.keys(sessionStorage)].filter(k => k.startsWith('lms_s_'));
+    ssKeys.forEach(k => sessionStorage.removeItem(k));
     _authToken = null;
     _authUser = null;
     alert('Hesabınız silindi. İyi günler.');
