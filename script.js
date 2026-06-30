@@ -621,6 +621,28 @@ const STRINGS = {
     topic_friendship: 'Arkadaşlık',
     topic_food: 'Yemek',
     topic_emotions: 'Duygular',
+    app_name: 'YıldızCan',
+    mic_prompt: 'Konuşmak için mikrofona bas!',
+    welcome_sub: 'Bugün ne yapmak istersin?',
+    logout: 'Çıkış Yap',
+    repeat_btn: '🔄 Tekrar Et',
+    simplify_btn: '🟢 Daha Basit',
+    analysis_title: 'Konuşma Pratiği Performans Analizi',
+    analysis_date_label: 'Analiz tarihi:',
+    analysis_lang_title: 'Dil ve Sosyal Uyum Göstergeleri',
+    analysis_ind_comm: 'İletişim Bağımsızlığı',
+    analysis_ind_comm_hint: 'Hiçbir yardım almadan doğrudan mikrofona konuştu',
+    analysis_repeat_label: 'Tekrar Dinleme İhtiyacı',
+    analysis_repeat_hint: '"Tekrar Et" butonuna basarak soruyu yeniden dinledi',
+    analysis_simplify_label: 'Dil Adaptasyon İhtiyacı',
+    analysis_simplify_hint: '"Daha Basit" butonu ile dili hafifletmesini istedi',
+    analysis_no_data: 'Henüz seans kaydı yok. İlk konuşma terapisi seansını tamamladıktan sonra veriler burada görünür.',
+    analysis_collecting: '{n} seans kaydı var. Bağımsız konuşma verisi toplanıyor.',
+    analysis_summary: '{name}, son {n} seansta %{ind} oranında tamamen bağımsız konuştu{rep}{sim}.',
+    analysis_summary_rep: ', %{pct} oranında tekrar dinlemeye',
+    analysis_summary_sim: ' ve %{pct} oranında dili basitleştirmeye',
+    analysis_summary_need: ' ihtiyaç duydu',
+    report_eval_fallback: '{name}\'in bu oturumda uygulamaya aktif katılım gösterdiği görülmektedir. Düzenli oturumlar çocuğun konuşma güveni ve ifade becerilerini destekleyecektir. Yıldız Can ile çalışmaya devam etmenizi öneririz.',
   },
   en: {
     back_menu: '← Menu',
@@ -1240,6 +1262,28 @@ const STRINGS = {
     topic_friendship: 'Friendship',
     topic_food: 'Food',
     topic_emotions: 'Emotions',
+    app_name: 'YildizCan',
+    mic_prompt: 'Press the microphone to speak!',
+    welcome_sub: 'What would you like to do today?',
+    logout: 'Log Out',
+    repeat_btn: '🔄 Repeat',
+    simplify_btn: '🟢 Simpler',
+    analysis_title: 'Speech Practice Performance Analysis',
+    analysis_date_label: 'Analysis date:',
+    analysis_lang_title: 'Language and Social Indicators',
+    analysis_ind_comm: 'Communication Independence',
+    analysis_ind_comm_hint: 'Spoke directly into the microphone without any help',
+    analysis_repeat_label: 'Need for Repeat Listening',
+    analysis_repeat_hint: 'Listened to the question again using the "Repeat" button',
+    analysis_simplify_label: 'Language Adaptation Need',
+    analysis_simplify_hint: 'Requested simpler language using the "Simpler" button',
+    analysis_no_data: 'No sessions recorded yet. Complete your first therapy session to see data here.',
+    analysis_collecting: '{n} session(s) recorded. Independent speech data is being collected.',
+    analysis_summary: '{name} spoke fully independently {ind}% of the time across the last {n} session(s){rep}{sim}.',
+    analysis_summary_rep: ', needed to re-listen {pct}%',
+    analysis_summary_sim: ' and requested simpler language {pct}%',
+    analysis_summary_need: '',
+    report_eval_fallback: '{name} showed active engagement with the app during this session. Regular sessions will support the child\'s speech confidence and expressive skills. We recommend continuing to work with Yıldız Can.',
   }
 };
 
@@ -1271,6 +1315,7 @@ function applyLang() {
   });
   const langBtn = document.getElementById('langToggleBtn');
   if (langBtn) langBtn.textContent = t('lang_toggle');
+  document.title = t('app_name') + ' | ' + (t('therapy_title') || 'Speech Practice');
 }
 
 // =============================================
@@ -2670,9 +2715,9 @@ async function goToReport() {
     // Temel bilgiler
     const now = new Date();
     document.getElementById('reportSubtitle').textContent =
-        `${childName} • ${now.toLocaleDateString('tr-TR', { day:'numeric', month:'long', year:'numeric' })}`;
+        `${childName} • ${now.toLocaleDateString(_lang === 'en' ? 'en-US' : 'tr-TR', { day:'numeric', month:'long', year:'numeric' })}`;
     document.getElementById('reportDate').textContent =
-        t('report_generated_at').replace('{date}', now.toLocaleString('tr-TR'));
+        t('report_generated_at').replace('{date}', now.toLocaleString(_lang === 'en' ? 'en-US' : 'tr-TR'));
 
     // Süre
     const durationMs = sessionData.startTime ? Date.now() - sessionData.startTime : 0;
@@ -2851,7 +2896,7 @@ Kesinlikle emoji kullanma. Sıcak, profesyonel ve umut verici bir dil kullan.`;
     } catch(e) {
         document.getElementById('aiEvalLoading').style.display = 'none';
         const evalEl = document.getElementById('aiEvalText');
-        evalEl.textContent = `${childName}'in bu oturumda uygulamaya aktif katılım gösterdiği görülmektedir. Düzenli oturumlar çocuğun konuşma güveni ve ifade becerilerini destekleyecektir. Yıldız Can ile çalışmaya devam etmenizi öneririz.`;
+        evalEl.textContent = t('report_eval_fallback').replace('{name}', childName);
         evalEl.style.display = 'block';
     }
 }
@@ -3610,7 +3655,7 @@ function startQuestion() {
     speak(currentObj.q, function() {
         document.getElementById('micBtn').disabled = false;
         resetIdleTimer();
-        document.getElementById('info').innerText = "Konuşmak için mikrofona bas!";
+        document.getElementById('info').innerText = t('mic_prompt');
     });
 }
 
@@ -3669,7 +3714,7 @@ async function rec() {
             document.getElementById('micBtn').disabled = false;
             isWaiting = false;
             resetIdleTimer();
-            document.getElementById('info').innerText = "Konuşmak için mikrofona bas!";
+            document.getElementById('info').innerText = t('mic_prompt');
         });
     }
 
@@ -3771,7 +3816,7 @@ async function rec() {
             _finalizeSpeech();
         } else if (document.getElementById('micBtn').disabled && isWaiting) {
             document.getElementById('micBtn').disabled = false;
-            document.getElementById('info').innerText = "Konuşmak için mikrofona bas!";
+            document.getElementById('info').innerText = t('mic_prompt');
         }
     };
 
@@ -4849,7 +4894,7 @@ function onAuthSuccessWithStudent(student) {
     const nameEl = document.getElementById('active-student-name');
     if (nameEl) nameEl.textContent = student.name;
     const greetEl = document.getElementById('menu-greeting');
-    if (greetEl) greetEl.textContent = `Merhaba, ${student.name}! 🌟`;
+    if (greetEl) greetEl.textContent = t('menu_greeting_named').replace('{name}', student.name);
     showOnly('menu-screen');
     renderCityScene();
 }
@@ -5141,7 +5186,7 @@ async function selectStudentLogin(id) {
     activeStudentName = student.name;
     const nameEl = document.getElementById('active-student-name');
     if (nameEl) nameEl.textContent = student.name;
-    document.getElementById('menu-greeting').textContent = `Merhaba, ${student.name}! 🌟`;
+    document.getElementById('menu-greeting').textContent = t('menu_greeting_named').replace('{name}', student.name);
     speakFallback(_lang === 'en' ? `Hello ${student.name}! Welcome!` : `Merhaba ${student.name}! Hoş geldin!`);
     showOnly('menu-screen');
     renderCityScene();
@@ -5199,8 +5244,8 @@ function _renderAzIdentityCard(profile) {
     }
 
     if (metaEl) {
-        const now = new Date().toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' });
-        metaEl.textContent = `Analiz tarihi: ${now}`;
+        const now = new Date().toLocaleDateString(_lang === 'en' ? 'en-US' : 'tr-TR', { day: 'numeric', month: 'long', year: 'numeric' });
+        metaEl.textContent = `${t('analysis_date_label')} ${now}`;
     }
 }
 
@@ -5234,15 +5279,22 @@ function _renderAzMetrics(history) {
     const insightEl = document.getElementById('azInsightText');
     if (insightEl) {
         if (!history.length) {
-            insightEl.textContent = 'Henüz seans kaydı yok. İlk konuşma terapisi seansını tamamladıktan sonra veriler burada görünür.';
+            insightEl.textContent = t('analysis_no_data');
         } else if (indPct === null) {
-            insightEl.textContent = `${history.length} seans kaydı var. Bağımsız konuşma verisi toplanıyor.`;
+            insightEl.textContent = t('analysis_collecting').replace('{n}', history.length);
         } else {
-            const name = activeStudentName || 'Öğrenci';
-            insightEl.textContent = `${name}, son ${history.length} seansta %${indPct} oranında tamamen bağımsız konuştu` +
-                (repPct ? `, %${repPct} oranında tekrar dinlemeye` : '') +
-                (simPct ? ` ve %${simPct} oranında dili basitleştirmeye` : '') +
-                ' ihtiyaç duydu.';
+            const name = activeStudentName || (_lang === 'en' ? 'Student' : 'Öğrenci');
+            if (_lang === 'en') {
+                insightEl.textContent = t('analysis_summary')
+                    .replace('{name}', name).replace('{n}', history.length).replace('{ind}', indPct)
+                    .replace('{rep}', repPct ? t('analysis_summary_rep').replace('{pct}', repPct) : '')
+                    .replace('{sim}', simPct ? t('analysis_summary_sim').replace('{pct}', simPct) : '');
+            } else {
+                insightEl.textContent = `${name}, son ${history.length} seansta %${indPct} oranında tamamen bağımsız konuştu` +
+                    (repPct ? `, %${repPct} oranında tekrar dinlemeye` : '') +
+                    (simPct ? ` ve %${simPct} oranında dili basitleştirmeye` : '') +
+                    ' ihtiyaç duydu.';
+            }
         }
     }
 

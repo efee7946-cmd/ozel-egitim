@@ -34,7 +34,7 @@
 <div id="auth-screen" style="display:none">
     <div class="auth-card">
         <img src="avatar.png" class="auth-logo" alt="">
-        <h1 class="auth-app-name">YıldızCan</h1>
+        <h1 class="auth-app-name" data-i18n="app_name">YıldızCan</h1>
         <p class="auth-tagline">Özel eğitim yönetim platformu</p>
 
         <!-- Sekmeler -->
@@ -138,7 +138,7 @@
     <div class="login-wrapper">
         <div class="login-header">
             <img src="avatar.png" class="login-logo" alt="">
-            <h1 class="login-title">YıldızCan</h1>
+            <h1 class="login-title" data-i18n="app_name">YıldızCan</h1>
             <p class="login-subtitle">Kim olduğunu seç!</p>
         </div>
         <div class="login-students" id="loginStudents">
@@ -238,8 +238,8 @@
     <!-- Karşılama alanı -->
     <div class="menu-welcome">
         <img src="avatar.png" class="welcome-avatar" alt="Yıldız Can">
-        <h1 id="menu-greeting" class="welcome-title">Merhaba! 👋</h1>
-        <p class="welcome-sub">Bugün ne yapmak istersin?</p>
+        <h1 id="menu-greeting" class="welcome-title" data-i18n="menu_greeting_default">Merhaba! 👋</h1>
+        <p class="welcome-sub" data-i18n="welcome_sub">Bugün ne yapmak istersin?</p>
     </div>
 
     <!-- Ana navigasyon -->
@@ -273,7 +273,7 @@
 
     <!-- Alt çubuk -->
     <div class="menu-bottom-bar">
-        <button type="button" class="menu-logout-btn" onclick="authLogout()">
+        <button type="button" class="menu-logout-btn" onclick="authLogout()" data-i18n="logout">
             Çıkış Yap
         </button>
     </div>
@@ -361,8 +361,8 @@ document.addEventListener('DOMContentLoaded', function(){
         <canvas id="avatarCanvas"></canvas>
         <div id="chat-bubbles"></div>
         <div class="ai-mode-btns">
-            <button type="button" class="ai-mode-btn" onclick="askAIMode('repeat')" title="Soruyu tekrar dinle">🔄 Tekrar Et</button>
-            <button type="button" class="ai-mode-btn ai-mode-simplify" onclick="askAIMode('simplify')" title="Daha basit anlat">🟢 Daha Basit</button>
+            <button type="button" class="ai-mode-btn" onclick="askAIMode('repeat')" title="Soruyu tekrar dinle" data-i18n="repeat_btn">🔄 Tekrar Et</button>
+            <button type="button" class="ai-mode-btn ai-mode-simplify" onclick="askAIMode('simplify')" title="Daha basit anlat" data-i18n="simplify_btn">🟢 Daha Basit</button>
         </div>
     </div>
 </div>
@@ -694,7 +694,7 @@ document.addEventListener('DOMContentLoaded', function(){
             <div class="az-identity-top">
                 <span class="az-identity-icon">📊</span>
                 <div>
-                    <div class="az-identity-title">Konuşma Pratiği Performans Analizi</div>
+                    <div class="az-identity-title" data-i18n="analysis_title">Konuşma Pratiği Performans Analizi</div>
                     <div class="az-identity-sub" id="azStudentName"></div>
                 </div>
             </div>
@@ -704,30 +704,30 @@ document.addEventListener('DOMContentLoaded', function(){
 
         <!-- 2. İletişim Bağımsızlığı Metrikleri -->
         <div class="az-card">
-            <h3 class="az-card-title">Dil ve Sosyal Uyum Göstergeleri</h3>
+            <h3 class="az-card-title" data-i18n="analysis_lang_title">Dil ve Sosyal Uyum Göstergeleri</h3>
             <div class="az-metric">
                 <div class="az-metric-label">
-                    <span>İletişim Bağımsızlığı</span>
+                    <span data-i18n="analysis_ind_comm">İletişim Bağımsızlığı</span>
                     <span class="az-metric-val" id="azIndependentPct">—</span>
                 </div>
                 <div class="az-bar-track"><div class="az-bar-fill az-bar-green" id="azIndependentBar"></div></div>
-                <div class="az-metric-hint">Hiçbir yardım almadan doğrudan mikrofona konuştu</div>
+                <div class="az-metric-hint" data-i18n="analysis_ind_comm_hint">Hiçbir yardım almadan doğrudan mikrofona konuştu</div>
             </div>
             <div class="az-metric">
                 <div class="az-metric-label">
-                    <span>Tekrar Dinleme İhtiyacı</span>
+                    <span data-i18n="analysis_repeat_label">Tekrar Dinleme İhtiyacı</span>
                     <span class="az-metric-val" id="azRepeatPct">—</span>
                 </div>
                 <div class="az-bar-track"><div class="az-bar-fill az-bar-yellow" id="azRepeatBar"></div></div>
-                <div class="az-metric-hint">"Tekrar Et" butonuna basarak soruyu yeniden dinledi</div>
+                <div class="az-metric-hint" data-i18n="analysis_repeat_hint">"Tekrar Et" butonuna basarak soruyu yeniden dinledi</div>
             </div>
             <div class="az-metric">
                 <div class="az-metric-label">
-                    <span>Dil Adaptasyon İhtiyacı</span>
+                    <span data-i18n="analysis_simplify_label">Dil Adaptasyon İhtiyacı</span>
                     <span class="az-metric-val" id="azSimplifyPct">—</span>
                 </div>
                 <div class="az-bar-track"><div class="az-bar-fill az-bar-orange" id="azSimplifyBar"></div></div>
-                <div class="az-metric-hint">"Daha Basit" butonu ile dili hafifletmesini istedi</div>
+                <div class="az-metric-hint" data-i18n="analysis_simplify_hint">"Daha Basit" butonu ile dili hafifletmesini istedi</div>
             </div>
             <div class="az-insight" id="azInsightText"></div>
         </div>
