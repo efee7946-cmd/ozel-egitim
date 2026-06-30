@@ -1,0 +1,12 @@
+{
+  "appId": "com.yildizsiniflari.app",
+  "appName": "Yıldız Sınıfı",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  },
+  "ios": {
+    "contentInset": "always",
+    "backgroundColor": "#ffffff"
+  }
+}

@@ -3,6 +3,10 @@ function escapeHtml(str) {
     return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 
+const API_BASE = (typeof Capacitor !== 'undefined' && Capacitor.isNativePlatform())
+    ? 'https://ozel-egitim.vercel.app'
+    : '';
+
 // =============================================
 // GENEL DEĞİŞKENLER
 // =============================================
@@ -367,7 +371,7 @@ async function startTherapyWithTopic() {
 
     try {
         const prompt = `Özel eğitim öğrencisi (8-12 yaş, orta düzey) için "${currentTopic}" konusunda 6 kısa soru üret. Her soru günlük yaşam ve sosyal beceriye yönelik olsun. Her soru yeni satırda, maksimum 10 kelime. Sadece soruları yaz.`;
-        const res = await fetch('/api/chat', {
+        const res = await fetch(API_BASE + '/api/chat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ contents: [{ role: 'user', parts: [{ text: prompt }] }] }),
@@ -1538,7 +1542,7 @@ Lütfen veliye hitap ederek, 3-4 paragraf halinde şunları içeren sevecen ve p
 Kesinlikle emoji kullanma. Sıcak, profesyonel ve umut verici bir dil kullan.`;
 
     try {
-        const res = await fetch('/api/chat', {
+        const res = await fetch(API_BASE + '/api/chat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -1917,7 +1921,7 @@ function renderMatchingGame() {
 
 async function fetchCardPhoto(query) {
     try {
-        const r = await fetch('/api/video?query=' + encodeURIComponent(query));
+        const r = await fetch(API_BASE + '/api/video?query=' + encodeURIComponent(query));
         const d = await r.json();
         if (d && d.videos && d.videos[0] && d.videos[0].image) {
             return d.videos[0].image;
@@ -2025,7 +2029,7 @@ async function fetchEditorPhoto(index, query) {
     const preview = document.getElementById('medPreview_' + index);
     if (preview) preview.innerHTML = '<span style="font-size:1rem;opacity:0.5">⏳</span>';
     try {
-        const r = await fetch('/api/video?query=' + encodeURIComponent(query));
+        const r = await fetch(API_BASE + '/api/video?query=' + encodeURIComponent(query));
         const d = await r.json();
         const url = d?.videos?.[0]?.image;
         if (url && _editorPairs[index] !== undefined) {
@@ -2346,7 +2350,7 @@ async function loadNext() {
     try {
         const _videoCtrl = new AbortController();
         const _videoFetchTimer = setTimeout(() => _videoCtrl.abort(), 6000);
-        const r = await fetch('/api/video?query=' + currentObj.query, { signal: _videoCtrl.signal });
+        const r = await fetch(API_BASE + '/api/video?query=' + currentObj.query, { signal: _videoCtrl.signal });
         clearTimeout(_videoFetchTimer);
         const d = await r.json();
         if (d.videos && d.videos.length) {
@@ -2636,7 +2640,7 @@ async function speakWithLipsync(text, onEnd, emotion = CharacterEmotion.NEUTRAL)
     try {
         const _ttsCtrl = new AbortController();
         const _ttsFetchTimer = setTimeout(() => _ttsCtrl.abort(), 8000);
-        const res = await fetch('/api/tts', {
+        const res = await fetch(API_BASE + '/api/tts', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ text }),
@@ -3378,7 +3382,7 @@ function authUserStorageKey() { return 'auth_user'; }
 
 async function authApi(action, body = {}) {
     try {
-        const r = await fetch('/api/auth', {
+        const r = await fetch(API_BASE + '/api/auth', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ action, ...body }),
@@ -3828,7 +3832,7 @@ ${sessionText}
 Raporu "📝 Bireyselleştirilmiş Eğitim Programı (BEP) Dönemsel Gelişim Raporu" başlığıyla başlat. Şu bölümleri içersin: 1) Öğrenci Kademesi ve Tanı Özeti, 2) İletişim Bağımsızlığı Gelişimi (metrikleri yorumla), 3) Gözlemlenen Güçlü Yönler, 4) Sonraki Dönem Hedefleri. Metrikleri açıklarken somut rakamlar kullan.`;
 
     try {
-        const res = await fetch('/api/chat', {
+        const res = await fetch(API_BASE + '/api/chat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

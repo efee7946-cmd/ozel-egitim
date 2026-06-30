@@ -4,3 +4,5 @@ server.err.log
 screenshot_*.png
 test-results/
 playwright-report/
+android/app/keystore.jks
+www/

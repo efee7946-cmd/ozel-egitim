@@ -1,0 +1,27 @@
+import { cpSync, mkdirSync, existsSync } from 'fs';
+import { resolve, dirname } from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
+const wwwDir = resolve(__dirname, 'www');
+if (!existsSync(wwwDir)) mkdirSync(wwwDir);
+
+const files = [
+    'index.html',
+    'script.js',
+    'style.css',
+    'aac.css',
+    'aac-data.js',
+    'db-client.js',
+    'avatar.png',
+    'avatar3d.js',
+    'bear_avatar.glb',
+];
+
+for (const file of files) {
+    cpSync(resolve(__dirname, file), resolve(wwwDir, file));
+    console.log(`  copied: ${file}`);
+}
+
+console.log('\nBuild tamamlandi -> www/');
