@@ -283,7 +283,7 @@ const STRINGS = {
   }
 };
 
-let _lang = localStorage.getItem('lms_lang') || 'tr';
+let _lang = localStorage.getItem('lms_lang') || (navigator.language && navigator.language.startsWith('tr') ? 'tr' : 'en');
 
 function t(key) {
   return (STRINGS[_lang] && STRINGS[_lang][key]) || (STRINGS.tr[key]) || key;
