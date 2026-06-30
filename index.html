@@ -259,9 +259,9 @@
             <span class="tile-icon">🔢</span>
             <span class="tile-label">Sıralama Oyunları</span>
         </button>
-        <button class="menu-tile" type="button" onclick="goToMatching()">
-            <span class="tile-icon">🧩</span>
-            <span class="tile-label">Eşleştirme</span>
+        <button class="menu-tile" type="button" onclick="goToSort()">
+            <span class="tile-icon">🗂️</span>
+            <span class="tile-label">Sınıflandırma</span>
         </button>
         <button class="menu-tile tile-analysis" type="button" onclick="goToAnalysis()">
             <span class="tile-icon">📊</span>
@@ -288,7 +288,7 @@
 document.addEventListener('DOMContentLoaded', function(){
     const hide = id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; };
     ['start-screen','student-setup-screen','menu-screen','report-screen','game-container',
-     'matching-screen','schedule-screen','aac-screen','sequence-screen',
+     'sort-screen','schedule-screen','aac-screen','sequence-screen',
      'iep-screen','skills-screen','behavior-screen','login-screen','analysis-screen'].forEach(hide);
     const authEl = document.getElementById('auth-screen');
     if (authEl) authEl.style.display = 'flex';
@@ -482,64 +482,25 @@ document.addEventListener('DOMContentLoaded', function(){
     </div>
 </div>
 
-<!-- ===================== EŞLEŞTİRME EDITÖRÜ OVERLAY ===================== -->
-<div id="matchingEditorOverlay" class="matching-editor-overlay" style="display:none">
-    <div class="matching-editor-inner">
-        <div class="matching-editor-head">
-            <h3>✏️ Eşleştirme Editörü</h3>
-            <button type="button" class="matching-editor-close" onclick="closeMatchingEditor()">✕</button>
-        </div>
-        <div class="med-tabs">
-            <button type="button" class="med-tab active" id="medTabList" onclick="switchEditorTab('list')">Oyunlarım</button>
-            <button type="button" class="med-tab" id="medTabCreate" onclick="switchEditorTab('create')">+ Yeni Oyun</button>
-        </div>
-        <!-- Oyun listesi -->
-        <div id="medListView">
-            <div id="medCustomGameList" class="med-game-list"></div>
-        </div>
-        <!-- Yeni oyun formu -->
-        <div id="medCreateView" style="display:none">
-            <div class="med-form-field">
-                <label>Oyun Adı</label>
-                <input type="text" id="medGameTitle" placeholder="Örn: Sebzeler" maxlength="40">
-            </div>
-            <div class="med-form-field">
-                <label>İkon (emoji)</label>
-                <input type="text" id="medGameIcon" placeholder="🎯" maxlength="4" value="🎯">
-            </div>
-            <div class="med-pairs-section">
-                <div class="med-pairs-head">
-                    <strong>Kelime Çiftleri</strong>
-                    <small>Yaz → fotoğraf otomatik bulunur</small>
-                    <button type="button" class="med-add-pair-btn" onclick="addEditorPair()">+ Ekle</button>
-                </div>
-                <div id="medPairsList"></div>
-            </div>
-            <div class="med-form-btns">
-                <button type="button" class="med-save-btn" onclick="saveCustomMatchingGame()">✓ Kaydet</button>
-                <button type="button" class="med-cancel-btn" onclick="switchEditorTab('list')">İptal</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- ===================== EŞLEŞTİRME OYUNLARI ===================== -->
-<div id="matching-screen">
+<!-- ===================== SINIFLANDIRMA OYUNU ===================== -->
+<div id="sort-screen">
     <button class="btn-back" onclick="goToMenu()">← Menü</button>
-    <div class="matching-wrapper">
-        <div class="matching-header">
-            <h2>🧩 Eşleştirme Oyunları</h2>
-            <p>Bir oyun seç ve eşleştirmeye başla!</p>
+    <div class="sort-wrapper">
+        <div id="sortMenuSection">
+            <div class="sort-menu-header">
+                <h2>🗂️ Sınıflandırma</h2>
+                <p>Nesneleri doğru sepete sürükle!</p>
+            </div>
+            <div class="sort-menu-grid" id="sortMenuGrid"></div>
         </div>
-        <div id="matchingMenuSection">
-            <div class="matching-menu-grid" id="matchingMenuGrid"></div>
-        </div>
-        <div id="matchingGameSection" style="display:none">
-            <h3 id="matchingGameTitle" class="matching-game-title"></h3>
-            <p class="matching-game-hint">Bir kelimeye dokun, sonra doğru resme dokun!</p>
-            <div id="matchingGameArea"></div>
-            <a id="matchingPexelsCredit" class="matching-pexels-credit" href="https://www.pexels.com" target="_blank" rel="noopener" style="display:none">Photos provided by Pexels</a>
-            <button type="button" class="menu-ghost-btn matching-back-btn" onclick="renderMatchingMenu()">← Oyun Seçimine Dön</button>
+        <div id="sortGameSection" style="display:none">
+            <div class="sort-header-row">
+                <h3 class="sort-game-title" id="sortGameTitle"></h3>
+                <div class="sort-score" id="sortScore">0 / 0</div>
+            </div>
+            <div class="sort-items-area" id="sortItemsArea"></div>
+            <div class="sort-baskets-area" id="sortBasketsArea"></div>
+            <button type="button" class="menu-ghost-btn sort-back-btn" onclick="renderSortMenu()">← Oyun Seçimine Dön</button>
         </div>
     </div>
 </div>

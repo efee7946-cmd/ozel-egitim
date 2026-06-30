@@ -204,7 +204,7 @@ function celebrateCorrectAnswer() {
 // EKRAN YÖNETİMİ
 // =============================================
 function showOnly(id) {
-    const screens = ['start-screen','student-setup-screen','menu-screen','game-container','report-screen','matching-screen',
+    const screens = ['start-screen','student-setup-screen','menu-screen','game-container','report-screen','sort-screen',
                       'schedule-screen','aac-screen','sequence-screen',
                       'login-screen','iep-screen','skills-screen','behavior-screen','auth-screen','splash-screen','analysis-screen'];
     screens.forEach(s => {
@@ -1773,392 +1773,302 @@ let idleTimer;
 let turnCount = 0;
 
 // =============================================
-// EŞLEŞTİRME OYUNLARI
+// SINIFLANDIRMA OYUNU (SÜRÜKLE & BIRAK)
 // =============================================
-const MATCHING_GAMES = [
+const SORT_GAMES = [
     {
-        key: 'animals',
-        title: 'Hayvanları Eşleştir',
+        key: 'animals-vehicles',
+        title: 'Hayvan mı, Araç mı?',
         icon: '🐾',
-        description: 'Hayvan adını doğru resmiyle eşleştir!',
-        usePhotos: true,
-        pairs: [
-            { label: 'Kedi', emoji: '🐱', query: 'cute cat' },
-            { label: 'Köpek', emoji: '🐶', query: 'cute dog' },
-            { label: 'Kuş', emoji: '🐦', query: 'colorful bird' },
-            { label: 'Balık', emoji: '🐟', query: 'colorful fish' }
+        categories: [
+            { key: 'hayvan', label: 'Hayvanlar', emoji: '🐾', color: '#d4edda' },
+            { key: 'arac',   label: 'Araçlar',   emoji: '🚗', color: '#d1ecf1' }
+        ],
+        items: [
+            { emoji: '🐱', label: 'Kedi',        cat: 'hayvan' },
+            { emoji: '🚗', label: 'Araba',       cat: 'arac'   },
+            { emoji: '🐶', label: 'Köpek',       cat: 'hayvan' },
+            { emoji: '✈️', label: 'Uçak',        cat: 'arac'   },
+            { emoji: '🐦', label: 'Kuş',         cat: 'hayvan' },
+            { emoji: '🚢', label: 'Gemi',        cat: 'arac'   },
+            { emoji: '🐠', label: 'Balık',       cat: 'hayvan' },
+            { emoji: '🚲', label: 'Bisiklet',    cat: 'arac'   },
+            { emoji: '🦁', label: 'Aslan',       cat: 'hayvan' },
+            { emoji: '🚁', label: 'Helikopter',  cat: 'arac'   },
         ]
     },
     {
-        key: 'colors',
-        title: 'Renkleri Eşleştir',
-        icon: '🌈',
-        description: 'Renk adını doğru renkle eşleştir!',
-        usePhotos: false,
-        pairs: [
-            { label: 'Kırmızı', emoji: '🔴' },
-            { label: 'Mavi', emoji: '🔵' },
-            { label: 'Sarı', emoji: '🟡' },
-            { label: 'Yeşil', emoji: '🟢' }
+        key: 'food-toys',
+        title: 'Yiyecek mi, Oyuncak mı?',
+        icon: '🍎',
+        categories: [
+            { key: 'yiyecek', label: 'Yiyecekler', emoji: '🍽️', color: '#fff3cd' },
+            { key: 'oyuncak', label: 'Oyuncaklar',  emoji: '🧸', color: '#fce4ec' }
+        ],
+        items: [
+            { emoji: '🍎', label: 'Elma',         cat: 'yiyecek' },
+            { emoji: '🧸', label: 'Oyun Ayısı',   cat: 'oyuncak' },
+            { emoji: '🍕', label: 'Pizza',         cat: 'yiyecek' },
+            { emoji: '⚽', label: 'Top',           cat: 'oyuncak' },
+            { emoji: '🍌', label: 'Muz',           cat: 'yiyecek' },
+            { emoji: '🎮', label: 'Oyun Kolu',     cat: 'oyuncak' },
+            { emoji: '🍦', label: 'Dondurma',      cat: 'yiyecek' },
+            { emoji: '🎨', label: 'Boya Seti',     cat: 'oyuncak' },
+            { emoji: '🍰', label: 'Pasta',         cat: 'yiyecek' },
+            { emoji: '🎯', label: 'Hedef Tahtası', cat: 'oyuncak' },
         ]
     },
     {
-        key: 'daily',
-        title: 'Eşyaları Eşleştir',
-        icon: '🏠',
-        description: 'Eşya adını doğru resmiyle eşleştir!',
-        usePhotos: true,
-        pairs: [
-            { label: 'Kalem', emoji: '✏️', query: 'pencil' },
-            { label: 'Kitap', emoji: '📚', query: 'book' },
-            { label: 'Elma', emoji: '🍎', query: 'red apple' },
-            { label: 'Top', emoji: '⚽', query: 'soccer ball' }
+        key: 'nature-home',
+        title: 'Dışarıda mı, İçeride mi?',
+        icon: '🌳',
+        categories: [
+            { key: 'disari', label: 'Dışarısı', emoji: '🌳', color: '#d4edda' },
+            { key: 'iceri',  label: 'İçerisi',  emoji: '🏠', color: '#e8d5f5' }
+        ],
+        items: [
+            { emoji: '🌻', label: 'Çiçek',       cat: 'disari' },
+            { emoji: '🛋️', label: 'Kanepe',      cat: 'iceri'  },
+            { emoji: '⛅', label: 'Bulut',        cat: 'disari' },
+            { emoji: '📺', label: 'Televizyon',   cat: 'iceri'  },
+            { emoji: '🌲', label: 'Ağaç',         cat: 'disari' },
+            { emoji: '🛏️', label: 'Yatak',       cat: 'iceri'  },
+            { emoji: '🌊', label: 'Deniz',        cat: 'disari' },
+            { emoji: '🪑', label: 'Sandalye',     cat: 'iceri'  },
+            { emoji: '⛺', label: 'Çadır',        cat: 'disari' },
+            { emoji: '🖥️', label: 'Bilgisayar',  cat: 'iceri'  },
         ]
     },
     {
-        key: 'fruits',
-        title: 'Meyveleri Eşleştir',
-        icon: '🍓',
-        description: 'Meyve adını doğru resmiyle eşleştir!',
-        usePhotos: true,
-        pairs: [
-            { label: 'Elma', emoji: '🍎', query: 'red apple fruit' },
-            { label: 'Muz', emoji: '🍌', query: 'banana fruit' },
-            { label: 'Çilek', emoji: '🍓', query: 'strawberry fruit' },
-            { label: 'Üzüm', emoji: '🍇', query: 'grapes fruit' }
+        key: 'big-small',
+        title: 'Büyük mü, Küçük mü?',
+        icon: '🐘',
+        categories: [
+            { key: 'buyuk', label: 'Büyük', emoji: '🐘', color: '#d1ecf1' },
+            { key: 'kucuk', label: 'Küçük', emoji: '🐭', color: '#fff3cd' }
+        ],
+        items: [
+            { emoji: '🐘', label: 'Fil',       cat: 'buyuk' },
+            { emoji: '🐭', label: 'Fare',      cat: 'kucuk' },
+            { emoji: '🏠', label: 'Ev',        cat: 'buyuk' },
+            { emoji: '🐝', label: 'Arı',       cat: 'kucuk' },
+            { emoji: '✈️', label: 'Uçak',      cat: 'buyuk' },
+            { emoji: '🐜', label: 'Karınca',   cat: 'kucuk' },
+            { emoji: '🚢', label: 'Gemi',      cat: 'buyuk' },
+            { emoji: '💍', label: 'Yüzük',     cat: 'kucuk' },
+            { emoji: '🌍', label: 'Dünya',     cat: 'buyuk' },
+            { emoji: '🦋', label: 'Kelebek',   cat: 'kucuk' },
         ]
     }
 ];
 
-let currentMatchingGame = null;
-let selectedLeftKey = null;
-let matchedPairs = [];
-let matchingErrors = 0;
+let _sortGame = null;
+let _sortItems = [];
+let _sortSorted = {};
+let _sortErrors = 0;
+let _sortSelected = null;
+let _dragGhost = null;
+let _dragOriginEl = null;
+let _dragItemIndex = null;
+let _dragStartX = 0;
+let _dragStartY = 0;
+let _dragMoved = false;
 
-function goToMatching() {
-    showOnly('matching-screen');
-    renderMatchingMenu();
+function goToSort() {
+    showOnly('sort-screen');
+    renderSortMenu();
 }
 
-async function renderMatchingMenu() {
-    const gridEl = document.getElementById('matchingMenuGrid');
-    const menuSection = document.getElementById('matchingMenuSection');
-    const gameSection = document.getElementById('matchingGameSection');
-    if (!gridEl) return;
+function renderSortMenu() {
+    _sortGame = null;
+    _sortSelected = null;
+    const menuSection = document.getElementById('sortMenuSection');
+    const gameSection = document.getElementById('sortGameSection');
     if (menuSection) menuSection.style.display = 'block';
     if (gameSection) gameSection.style.display = 'none';
-
-    const customGames = (await DB.get('custom_matching_games')) || [];
-    const allGames = [...MATCHING_GAMES, ...customGames];
-
-    gridEl.innerHTML = allGames.map(game => `
-        <button type="button" class="matching-game-card" onclick="startMatchingGame('${game.key}')">
-            <div class="matching-game-icon">${game.icon}</div>
-            <strong>${game.title}</strong>
-            <p>${game.description}</p>
-            ${game.isCustom ? '<span class="matching-custom-badge">Özel</span>' : ''}
+    const grid = document.getElementById('sortMenuGrid');
+    if (!grid) return;
+    grid.innerHTML = SORT_GAMES.map(g => `
+        <button type="button" class="sort-menu-card" onclick="startSortGame('${g.key}')">
+            <div class="sort-menu-icon">${g.icon}</div>
+            <strong>${g.title}</strong>
+            <p>${g.categories.map(c => c.emoji + ' ' + c.label).join(' & ')}</p>
         </button>
     `).join('');
-    speakFallback('Bir oyun seç!', () => {});
 }
 
-async function startMatchingGame(gameKey) {
-    let game = MATCHING_GAMES.find(g => g.key === gameKey);
-    if (!game) {
-        const customGames = (await DB.get('custom_matching_games')) || [];
-        game = customGames.find(g => g.key === gameKey);
-    }
-    currentMatchingGame = game;
-    if (!currentMatchingGame) return;
-    selectedLeftKey = null;
-    matchedPairs = [];
-    matchingErrors = 0;
-
-    const menuSection = document.getElementById('matchingMenuSection');
-    const gameSection = document.getElementById('matchingGameSection');
-    const titleEl = document.getElementById('matchingGameTitle');
+function startSortGame(key) {
+    _sortGame = SORT_GAMES.find(g => g.key === key);
+    if (!_sortGame) return;
+    _sortItems = [..._sortGame.items].sort(() => Math.random() - 0.5);
+    _sortSorted = {};
+    _sortErrors = 0;
+    _sortSelected = null;
+    const menuSection = document.getElementById('sortMenuSection');
+    const gameSection = document.getElementById('sortGameSection');
     if (menuSection) menuSection.style.display = 'none';
     if (gameSection) gameSection.style.display = 'block';
-    if (titleEl) titleEl.textContent = currentMatchingGame.title;
-
-    renderMatchingGame();
-    loadMatchingPhotos(currentMatchingGame);
-    const credit = document.getElementById('matchingPexelsCredit');
-    if (credit) credit.style.display = currentMatchingGame.usePhotos ? 'block' : 'none';
-    speakFallback(currentMatchingGame.description, () => {});
+    const titleEl = document.getElementById('sortGameTitle');
+    if (titleEl) titleEl.textContent = _sortGame.title;
+    renderSortGame();
+    speakFallback(_sortGame.title + '!', () => {});
 }
 
-function renderMatchingGame() {
-    const container = document.getElementById('matchingGameArea');
-    if (!container || !currentMatchingGame) return;
-
-    const pairs = currentMatchingGame.pairs;
-    const usePhotos = currentMatchingGame.usePhotos;
-    const shuffledRight = [...pairs].sort(() => Math.random() - 0.5);
-
-    container.innerHTML = `
-        <div class="matching-columns">
-            <div class="matching-column" id="matchingLeft">
-                ${pairs.map(pair => `
-                    <button type="button" class="matching-card matching-label-card ${matchedPairs.includes(pair.label) ? 'matched' : ''}"
-                            data-key="${pair.label}"
-                            onclick="selectMatchLeft('${pair.label}')">
-                        ${pair.label}
-                    </button>
-                `).join('')}
-            </div>
-            <div class="matching-column" id="matchingRight">
-                ${shuffledRight.map(pair => `
-                    <button type="button" class="matching-card matching-emoji-card ${matchedPairs.includes(pair.label) ? 'matched' : ''}"
-                            data-key="${pair.label}"
-                            onclick="selectMatchRight('${pair.label}', this)">
-                        ${usePhotos
-                            ? pair.photoUrl
-                                ? `<img src="${pair.photoUrl}" alt="${pair.label}" class="matching-card-photo" onerror="this.outerHTML='<span class=\\'matching-emoji\\'>${pair.emoji || '❓'}</span>'">`
-                                : `<div class="matching-photo-shimmer" data-photo-key="${pair.label}">
-                                       <span class="shimmer-emoji">${pair.emoji}</span>
-                                   </div>`
-                            : `<span class="matching-emoji">${pair.emoji}</span>`
-                        }
-                    </button>
-                `).join('')}
-            </div>
-        </div>
-    `;
+function renderSortGame() {
+    _renderSortItems();
+    _renderSortBaskets();
+    _updateSortScore();
 }
 
-async function fetchCardPhoto(query) {
-    try {
-        const r = await fetch(API_BASE + '/api/video?query=' + encodeURIComponent(query));
-        const d = await r.json();
-        if (d && d.videos && d.videos[0] && d.videos[0].image) {
-            return d.videos[0].image;
-        }
-    } catch (e) {}
-    return null;
+function _renderSortItems() {
+    const area = document.getElementById('sortItemsArea');
+    if (!area || !_sortGame) return;
+    area.innerHTML = _sortItems.map((item, i) => {
+        const sorted = _sortSorted[i] !== undefined;
+        const selected = _sortSelected === i;
+        return `<button type="button"
+            class="sort-item${sorted ? ' sort-item-done' : ''}${selected ? ' sort-item-selected' : ''}"
+            data-index="${i}"
+            ${sorted ? 'disabled' : ''}
+            ontouchstart="_sortPointerDown(event,${i})"
+            onmousedown="_sortPointerDown(event,${i})"
+            onclick="_sortTap(${i})">
+            <span class="sort-item-emoji">${item.emoji}</span>
+            <span class="sort-item-label">${item.label}</span>
+            ${sorted ? '<span class="sort-item-check">✓</span>' : ''}
+        </button>`;
+    }).join('');
 }
 
-async function loadMatchingPhotos(game) {
-    if (!game || !game.usePhotos) return;
-    for (const pair of game.pairs) {
-        if (pair.photoUrl) continue; // özel oyunlarda URL zaten var
-        const photoUrl = await fetchCardPhoto(pair.query);
-        if (!photoUrl) continue;
-        const shimmer = document.querySelector(`.matching-photo-shimmer[data-photo-key="${pair.label}"]`);
-        if (shimmer) {
-            shimmer.innerHTML = `<img src="${photoUrl}" alt="${pair.label}" class="matching-card-photo" onerror="this.parentNode.innerHTML='<span class=\\'matching-emoji\\'>${pair.emoji}</span>'">`;
-            shimmer.classList.add('loaded');
-        }
+function _renderSortBaskets() {
+    const area = document.getElementById('sortBasketsArea');
+    if (!area || !_sortGame) return;
+    area.innerHTML = _sortGame.categories.map(cat => {
+        const count = Object.values(_sortSorted).filter(c => c === cat.key).length;
+        return `<div class="sort-basket" data-cat="${cat.key}" style="background:${cat.color}"
+            onclick="_sortBasketTap('${cat.key}')">
+            <div class="sort-basket-emoji">${cat.emoji}</div>
+            <div class="sort-basket-label">${cat.label}</div>
+            <div class="sort-basket-count">${count > 0 ? count : ''}</div>
+        </div>`;
+    }).join('');
+}
+
+function _updateSortScore() {
+    const el = document.getElementById('sortScore');
+    if (el) el.textContent = `${Object.keys(_sortSorted).length} / ${_sortItems.length}`;
+}
+
+function _sortTap(idx) {
+    if (_dragMoved) { _dragMoved = false; return; }
+    if (_sortSorted[idx] !== undefined) return;
+    _sortSelected = (_sortSelected === idx) ? null : idx;
+    _renderSortItems();
+}
+
+function _sortBasketTap(cat) {
+    if (_sortSelected === null) return;
+    _checkSortDrop(_sortSelected, cat);
+    _sortSelected = null;
+}
+
+function _sortPointerDown(e, idx) {
+    if (e.type === 'mousedown' && e.button !== 0) return;
+    if (_sortSorted[idx] !== undefined) return;
+    e.preventDefault();
+    e.stopPropagation();
+    const pt = e.touches ? e.touches[0] : e;
+    _dragItemIndex = idx;
+    _dragOriginEl = e.currentTarget;
+    _dragStartX = pt.clientX;
+    _dragStartY = pt.clientY;
+    _dragMoved = false;
+    document.addEventListener('mousemove', _onSortDragMove, { passive: false });
+    document.addEventListener('touchmove', _onSortDragMove, { passive: false });
+    document.addEventListener('mouseup', _onSortDragEnd);
+    document.addEventListener('touchend', _onSortDragEnd);
+}
+
+function _onSortDragMove(e) {
+    e.preventDefault();
+    const pt = e.touches ? e.touches[0] : e;
+    const dx = pt.clientX - _dragStartX;
+    const dy = pt.clientY - _dragStartY;
+    if (!_dragMoved && Math.sqrt(dx * dx + dy * dy) > 8) {
+        _dragMoved = true;
+        _dragGhost = document.createElement('div');
+        _dragGhost.className = 'sort-drag-ghost';
+        _dragGhost.textContent = _sortItems[_dragItemIndex].emoji;
+        document.body.appendChild(_dragGhost);
+        if (_dragOriginEl) _dragOriginEl.style.opacity = '0.3';
     }
-}
-
-/* ========== EŞLEŞTİRME EDITÖRÜ ========== */
-let _editorPairs = [];
-let _photoDebounceTimers = {};
-
-function openMatchingEditor() {
-    const overlay = document.getElementById('matchingEditorOverlay');
-    if (overlay) overlay.style.display = 'flex';
-    switchEditorTab('list');
-    renderEditorGameList();
-}
-
-function closeMatchingEditor() {
-    const overlay = document.getElementById('matchingEditorOverlay');
-    if (overlay) overlay.style.display = 'none';
-}
-
-function switchEditorTab(tab) {
-    document.getElementById('medListView').style.display = tab === 'list' ? 'block' : 'none';
-    document.getElementById('medCreateView').style.display = tab === 'create' ? 'block' : 'none';
-    document.getElementById('medTabList').classList.toggle('active', tab === 'list');
-    document.getElementById('medTabCreate').classList.toggle('active', tab === 'create');
-    if (tab === 'create') {
-        _editorPairs = [
-            { label: '', photoUrl: '', emoji: '❓' },
-            { label: '', photoUrl: '', emoji: '❓' },
-            { label: '', photoUrl: '', emoji: '❓' }
-        ];
-        const titleEl = document.getElementById('medGameTitle');
-        const iconEl = document.getElementById('medGameIcon');
-        if (titleEl) titleEl.value = '';
-        if (iconEl) iconEl.value = '🎯';
-        renderEditorPairs();
-    }
-}
-
-async function renderEditorGameList() {
-    const list = document.getElementById('medCustomGameList');
-    if (!list) return;
-    const games = (await DB.get('custom_matching_games')) || [];
-    if (!games.length) {
-        list.innerHTML = '<p class="med-empty">Henüz özel oyun yok. "+ Yeni Oyun" ile başla!</p>';
-        return;
-    }
-    list.innerHTML = games.map(g => `
-        <div class="med-game-item">
-            <span class="med-game-icon">${g.icon}</span>
-            <span class="med-game-title">${g.title}</span>
-            <span class="med-game-count">${g.pairs.length} çift</span>
-            <button type="button" class="med-delete-btn" onclick="deleteCustomMatchingGame('${g.key}')">🗑️</button>
-        </div>
-    `).join('');
-}
-
-function renderEditorPairs() {
-    const el = document.getElementById('medPairsList');
-    if (!el) return;
-    el.innerHTML = _editorPairs.map((pair, i) => `
-        <div class="med-pair-row" id="medPair_${i}">
-            <input type="text" class="med-pair-input" placeholder="Kelime gir..."
-                value="${pair.label}"
-                oninput="debounceEditorPhoto(${i}, this.value)">
-            <div class="med-pair-preview ${pair.photoUrl ? 'has-photo' : ''}" id="medPreview_${i}">
-                ${pair.photoUrl
-                    ? `<img src="${pair.photoUrl}" alt="${pair.label}">`
-                    : `<span>${pair.emoji || '❓'}</span>`
-                }
-            </div>
-            <button type="button" class="med-pair-remove"
-                onclick="removeEditorPair(${i})"
-                ${_editorPairs.length <= 2 ? 'disabled' : ''}>✕</button>
-        </div>
-    `).join('');
-}
-
-function debounceEditorPhoto(index, value) {
-    _editorPairs[index].label = value;
-    clearTimeout(_photoDebounceTimers[index]);
-    if (!value.trim()) return;
-    _photoDebounceTimers[index] = setTimeout(() => fetchEditorPhoto(index, value.trim()), 700);
-}
-
-async function fetchEditorPhoto(index, query) {
-    const preview = document.getElementById('medPreview_' + index);
-    if (preview) preview.innerHTML = '<span style="font-size:1rem;opacity:0.5">⏳</span>';
-    try {
-        const r = await fetch(API_BASE + '/api/video?query=' + encodeURIComponent(query));
-        const d = await r.json();
-        const url = d?.videos?.[0]?.image;
-        if (url && _editorPairs[index] !== undefined) {
-            _editorPairs[index].photoUrl = url;
-            const p = document.getElementById('medPreview_' + index);
-            if (p) {
-                p.classList.add('has-photo');
-                p.innerHTML = `<img src="${url}" alt="${query}">`;
-            }
-        } else {
-            const p = document.getElementById('medPreview_' + index);
-            if (p) p.innerHTML = '<span>🖼️</span>';
-        }
-    } catch {
-        const p = document.getElementById('medPreview_' + index);
-        if (p) p.innerHTML = '<span>❓</span>';
-    }
-}
-
-function addEditorPair() {
-    _editorPairs.push({ label: '', photoUrl: '', emoji: '❓' });
-    renderEditorPairs();
-}
-
-function removeEditorPair(index) {
-    if (_editorPairs.length <= 2) return;
-    _editorPairs.splice(index, 1);
-    renderEditorPairs();
-}
-
-async function saveCustomMatchingGame() {
-    const title = (document.getElementById('medGameTitle')?.value || '').trim();
-    const icon = (document.getElementById('medGameIcon')?.value || '').trim() || '🎯';
-    const validPairs = _editorPairs.filter(p => p.label.trim());
-
-    if (!title) { alert('Oyun adı girin!'); return; }
-    if (validPairs.length < 2) { alert('En az 2 kelime girin!'); return; }
-
-    const games = (await DB.get('custom_matching_games')) || [];
-    const key = 'custom_' + Date.now();
-    const newGame = {
-        key,
-        title,
-        icon,
-        description: `${validPairs.length} kelime çifti`,
-        usePhotos: validPairs.some(p => p.photoUrl),
-        pairs: validPairs.map(p => ({
-            label: p.label.trim(),
-            emoji: '🖼️',
-            query: p.label.trim(),
-            photoUrl: p.photoUrl || null
-        })),
-        isCustom: true
-    };
-    games.push(newGame);
-    DB.set('custom_matching_games', games);
-    switchEditorTab('list');
-    renderEditorGameList();
-}
-
-async function deleteCustomMatchingGame(key) {
-    if (!confirm('Bu oyunu silmek istiyor musun?')) return;
-    const games = (await DB.get('custom_matching_games')) || [];
-    DB.set('custom_matching_games', games.filter(g => g.key !== key));
-    renderEditorGameList();
-}
-/* ========================================== */
-
-function selectMatchLeft(key) {
-    if (matchedPairs.includes(key)) return;
-    selectedLeftKey = key;
-    document.querySelectorAll('#matchingLeft .matching-label-card').forEach(card => {
-        card.classList.toggle('selected', card.dataset.key === key);
-    });
-    speakFallback(key, () => {});
-}
-
-function selectMatchRight(key, btn) {
-    if (!selectedLeftKey || matchedPairs.includes(key)) return;
-
-    if (selectedLeftKey === key) {
-        matchedPairs.push(key);
-        btn.classList.add('matched');
-        document.querySelectorAll('#matchingLeft .matching-label-card').forEach(card => {
-            if (card.dataset.key === key) {
-                card.classList.add('matched');
-                card.classList.remove('selected');
-            }
+    if (_dragGhost) {
+        _dragGhost.style.left = (pt.clientX - 44) + 'px';
+        _dragGhost.style.top  = (pt.clientY - 44) + 'px';
+        document.querySelectorAll('.sort-basket').forEach(b => {
+            const r = b.getBoundingClientRect();
+            b.classList.toggle('sort-basket-hover',
+                pt.clientX >= r.left && pt.clientX <= r.right &&
+                pt.clientY >= r.top  && pt.clientY <= r.bottom);
         });
-        selectedLeftKey = null;
-        confetti({ particleCount: 30, spread: 45, origin: { y: 0.6 } });
-        speakFallback('Harika! Doğru!', () => {});
-
-        if (matchedPairs.length === currentMatchingGame.pairs.length) {
-            setTimeout(showMatchingComplete, 700);
-        }
-    } else {
-        matchingErrors++;
-        btn.classList.add('error');
-        setTimeout(() => btn.classList.remove('error'), 600);
-        speakFallback('Tekrar deneyelim!', () => {});
     }
 }
 
-function showMatchingComplete() {
-    const container = document.getElementById('matchingGameArea');
-    if (!container) return;
-    confetti({ particleCount: 100, spread: 80 });
+function _onSortDragEnd(e) {
+    document.removeEventListener('mousemove', _onSortDragMove);
+    document.removeEventListener('touchmove', _onSortDragMove);
+    document.removeEventListener('mouseup', _onSortDragEnd);
+    document.removeEventListener('touchend', _onSortDragEnd);
+    document.querySelectorAll('.sort-basket').forEach(b => b.classList.remove('sort-basket-hover'));
+    if (_dragGhost) { _dragGhost.remove(); _dragGhost = null; }
+    if (_dragOriginEl) { _dragOriginEl.style.opacity = ''; _dragOriginEl = null; }
+    if (!_dragMoved) { _dragItemIndex = null; return; }
+    const pt = e.changedTouches ? e.changedTouches[0] : e;
+    let droppedCat = null;
+    document.querySelectorAll('.sort-basket').forEach(b => {
+        const r = b.getBoundingClientRect();
+        if (pt.clientX >= r.left && pt.clientX <= r.right &&
+            pt.clientY >= r.top  && pt.clientY <= r.bottom) droppedCat = b.dataset.cat;
+    });
+    if (droppedCat && _dragItemIndex !== null) _checkSortDrop(_dragItemIndex, droppedCat);
+    _dragItemIndex = null;
+    _dragMoved = false;
+}
+
+function _checkSortDrop(idx, cat) {
+    const item = _sortItems[idx];
+    if (!item) return;
+    if (item.cat === cat) {
+        _sortSorted[idx] = cat;
+        speakFallback('Harika! ' + item.label + '!', () => {});
+        confetti({ particleCount: 25, spread: 40, origin: { y: 0.7 }, scalar: 0.8 });
+        renderSortGame();
+        if (Object.keys(_sortSorted).length === _sortItems.length) setTimeout(_showSortComplete, 600);
+    } else {
+        _sortErrors++;
+        speakFallback('Tekrar dene!', () => {});
+        const el = document.querySelector(`.sort-item[data-index="${idx}"]`);
+        if (el) { el.classList.add('sort-item-shake'); setTimeout(() => el.classList.remove('sort-item-shake'), 500); }
+    }
+}
+
+function _showSortComplete() {
+    const gameSection = document.getElementById('sortGameSection');
+    if (!gameSection) return;
+    confetti({ particleCount: 120, spread: 90 });
     speakFallback('Tebrikler! Çok güzel yaptın!', () => {});
-    container.innerHTML = `
-        <div class="matching-complete">
-            <div class="matching-complete-icon">⭐</div>
-            <h3>Tebrikler!</h3>
-            <p>Tüm eşleştirmeleri doğru yaptın!</p>
-            <div class="matching-complete-stats">
-                <span>${currentMatchingGame.pairs.length} doğru eşleştirme</span>
-                ${matchingErrors > 0 ? `<span>${matchingErrors} deneme</span>` : ''}
+    gameSection.innerHTML = `
+        <div class="sort-complete">
+            <div class="sort-complete-icon">🏆</div>
+            <h2>Tebrikler!</h2>
+            <p>Tüm nesneleri doğru sepete koydun!</p>
+            <div class="sort-complete-stats">
+                <span>✓ ${_sortItems.length} nesne</span>
+                ${_sortErrors > 0 ? `<span>↺ ${_sortErrors} deneme</span>` : '<span>🌟 Mükemmel!</span>'}
             </div>
-            <div class="matching-complete-btns">
-                <button type="button" class="btn-primary-gradient" onclick="startMatchingGame('${currentMatchingGame.key}')">Tekrar Oyna</button>
-                <button type="button" class="menu-ghost-btn" onclick="renderMatchingMenu()">Başka Oyun</button>
+            <div class="sort-complete-btns">
+                <button type="button" class="btn-primary-gradient" onclick="startSortGame('${_sortGame.key}')">Tekrar Oyna</button>
+                <button type="button" class="menu-ghost-btn" onclick="renderSortMenu()">Başka Oyun</button>
             </div>
         </div>
     `;
@@ -3489,11 +3399,12 @@ window.createStudent = createStudent;
 window.updateStudent = updateStudent;
 window.selectStudent = selectStudent;
 window.changeHistoryMonth = changeHistoryMonth;
-window.goToMatching = goToMatching;
-window.renderMatchingMenu = renderMatchingMenu;
-window.startMatchingGame = startMatchingGame;
-window.selectMatchLeft = selectMatchLeft;
-window.selectMatchRight = selectMatchRight;
+window.goToSort = goToSort;
+window.renderSortMenu = renderSortMenu;
+window.startSortGame = startSortGame;
+window._sortTap = _sortTap;
+window._sortBasketTap = _sortBasketTap;
+window._sortPointerDown = _sortPointerDown;
 window.rereadQuestion = rereadQuestion;
 window.askAIMode = askAIMode;
 // Yeni özellikler
@@ -3523,14 +3434,6 @@ window.handleLogin = handleLogin;
 window.handleRegister = handleRegister;
 window.authLogout = authLogout;
 window.selectRegisterEmoji = selectRegisterEmoji;
-window.openMatchingEditor = openMatchingEditor;
-window.closeMatchingEditor = closeMatchingEditor;
-window.switchEditorTab = switchEditorTab;
-window.addEditorPair = addEditorPair;
-window.removeEditorPair = removeEditorPair;
-window.debounceEditorPhoto = debounceEditorPhoto;
-window.saveCustomMatchingGame = saveCustomMatchingGame;
-window.deleteCustomMatchingGame = deleteCustomMatchingGame;
 
 // =============================================
 // KİMLİK DOĞRULAMA (AUTH)
