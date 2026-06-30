@@ -2848,6 +2848,34 @@ async function goToAac() {
     _aacBoards = await AACData.listBoards(sid);
     _aacCurrentBoardId = _aacBoards[0]?.id || null;
     await _aacRenderAll();
+    _aacClearArasaacImages(sid).catch(() => {});
+}
+
+async function _aacClearArasaacImages(sid) {
+    const flag = 'aac_arasaac_cleared_' + sid;
+    if (localStorage.getItem(flag)) return;
+
+    const lookup = {};
+    (AACData._boards || []).forEach(b =>
+        (b.cards || []).forEach(c => {
+            if (c.visual?.type === 'emoji') lookup[c.label] = c.visual.value;
+        })
+    );
+
+    const boards = await AACData.listBoards(sid);
+    let found = 0;
+    for (const board of boards) {
+        const cards = await AACData.listCards(board.id);
+        for (const card of cards) {
+            if (!card.visual?.value?.includes('arasaac.org')) continue;
+            await AACData.updateCard(board.id, card.id, {
+                visual: { type: 'emoji', value: lookup[card.label] || '❓' },
+            });
+            found++;
+        }
+    }
+    localStorage.setItem(flag, '1');
+    if (found > 0) await _aacRenderAll();
 }
 
 async function _aacRenderAll() {

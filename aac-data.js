@@ -605,6 +605,7 @@
     buildGrid,
     imageFileToDataURL, supportsWebP,
     importBoard, migrateLegacyIfNeeded, migrateV2IfNeeded,
+    _boards: ALL_BOARDS,
     inBounds, AACError,
     _keys: k,
     _defaults: DEFAULTS,
