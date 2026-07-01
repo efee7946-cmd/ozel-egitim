@@ -4850,11 +4850,12 @@ async function authApi(action, body = {}) {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ action, ...body }),
-            signal: AbortSignal.timeout(8000),
+            signal: AbortSignal.timeout(15000),
         });
-        return r.json();
-    } catch {
-        return { fallback: true, error: 'Bağlantı hatası' };
+        const text = await r.text();
+        try { return JSON.parse(text); } catch { return { fallback: true, error: 'JSON parse hatası: ' + text.slice(0, 100) }; }
+    } catch(e) {
+        return { fallback: true, error: e.message || 'Bağlantı hatası' };
     }
 }
 
@@ -4979,7 +4980,7 @@ async function handleLogin(e) {
     setAuthLoading(false);
 
     if (res.fallback) {
-        return showAuthError('Sunucu bağlantısı kurulamadı. Vercel KV yapılandırmasını kontrol et.');
+        return showAuthError('Bağlantı hatası: ' + (res.error || '?') + ' | ' + API_BASE);
     }
     if (!res.ok) return showAuthError(res.error || 'Giriş başarısız');
     _authToken = res.token;
@@ -5018,7 +5019,7 @@ async function handleRegister(e) {
     setAuthLoading(false);
 
     if (res.fallback) {
-        return showAuthError('Sunucu bağlantısı kurulamadı. Vercel KV yapılandırmasını kontrol et.');
+        return showAuthError('Bağlantı hatası: ' + (res.error || '?') + ' | ' + API_BASE);
     }
     if (!res.ok) return showAuthError(res.error || 'Kayıt başarısız');
     _authToken = res.token;
