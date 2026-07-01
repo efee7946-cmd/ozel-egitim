@@ -10,7 +10,7 @@ test.describe('Yıldız Can AI App Tests', () => {
 
     // App should show auth or splash screen on load
     await page.waitForTimeout(2000);
-    const authScreen = page.locator('#auth-screen, #splash-screen, #login-screen');
+    const authScreen = page.locator('#auth-screen, #login-screen');
     await expect(authScreen.first()).toBeVisible();
 
     await page.screenshot({ path: testInfo.outputPath('initial-screen.png') });
