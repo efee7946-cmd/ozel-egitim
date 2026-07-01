@@ -3790,15 +3790,24 @@ async function rec() {
         });
     }
 
+    var _noSpeechTimeout = null;
     recognition.onstart = function() {
         _safariActive = true;
         document.getElementById('micBtn').classList.add('listening');
         document.getElementById('info').innerText = "Seni dinliyorum... 🎙️";
         _startVolumeRings();
+        _noSpeechTimeout = setTimeout(function() {
+            try { recognition.stop(); } catch(_) {}
+            document.getElementById('micBtn').disabled = false;
+            document.getElementById('micBtn').classList.remove('listening');
+            _stopVolumeRings();
+            document.getElementById('info').innerText = t('mic_prompt');
+        }, 10000);
     };
 
     recognition.onresult = function(e) {
         clearTimeout(_silenceTimer);
+        clearTimeout(_noSpeechTimeout);
         var interim = '';
         for (var i = e.resultIndex; i < e.results.length; i++) {
             if (e.results[i].isFinal) {
@@ -3821,6 +3830,7 @@ async function rec() {
 
     recognition.onerror = function(err) {
         clearTimeout(_silenceTimer);
+        clearTimeout(_noSpeechTimeout);
         _stopVolumeRings();
         document.getElementById('micBtn').disabled = false;
         document.getElementById('micBtn').classList.remove('listening');
