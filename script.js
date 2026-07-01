@@ -1680,7 +1680,7 @@ function setTherapySelectionMode(isSelecting) {
 }
 
 function goToMenu() {
-    window.speechSynthesis.cancel();
+    try { window.speechSynthesis.cancel(); } catch(_){}
     clearTimeout(idleTimer);
     const hadTherapy = sessionData.micUsedInTherapy > 0 || sessionData.therapyTurns.length > 0;
     persistSessionSnapshot();
@@ -3914,15 +3914,17 @@ function addMessage(text, type) {
 }
 
 function speakFallback(t, callback) {
-    window.speechSynthesis.cancel();
-    var u = new SpeechSynthesisUtterance(t);
-    u.lang = _lang === 'en' ? 'en-US' : 'tr-TR'; u.pitch = 1.2; u.rate = 0.7;
-    var ended = false;
-    var safeEnd = function() { if (ended) return; ended = true; if (callback) callback(); };
-    u.onend = safeEnd;
-    var wordCount = t.split(' ').length;
-    setTimeout(safeEnd, (wordCount * 500) + 2500);
-    window.speechSynthesis.speak(u);
+    try {
+        window.speechSynthesis.cancel();
+        var u = new SpeechSynthesisUtterance(t);
+        u.lang = _lang === 'en' ? 'en-US' : 'tr-TR'; u.pitch = 1.2; u.rate = 0.7;
+        var ended = false;
+        var safeEnd = function() { if (ended) return; ended = true; if (callback) callback(); };
+        u.onend = safeEnd;
+        var wordCount = t.split(' ').length;
+        setTimeout(safeEnd, (wordCount * 500) + 2500);
+        window.speechSynthesis.speak(u);
+    } catch(_) { if (callback) callback(); }
 }
 
 async function speak(t, callback) {
@@ -5241,7 +5243,7 @@ async function selectStudentLogin(id) {
 }
 
 function goToLogin() {
-    window.speechSynthesis.cancel();
+    try { window.speechSynthesis.cancel(); } catch(_){}
     showOnly('login-screen');
     loadStudents().then(renderLoginStudents);
 }
