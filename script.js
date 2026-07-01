@@ -5221,18 +5221,23 @@ async function createStudentFromLogin() {
 }
 
 async function selectStudentLogin(id) {
-    const students = _cachedLoginStudents.length ? _cachedLoginStudents : await loadStudents();
-    const student = students.find(s => s.id === id);
-    if (!student) return;
-    // Mevcut öğrenci sistemini güncelle
-    activeStudentId = student.id;
-    activeStudentName = student.name;
-    const nameEl = document.getElementById('active-student-name');
-    if (nameEl) nameEl.textContent = student.name;
-    document.getElementById('menu-greeting').textContent = t('menu_greeting_named').replace('{name}', student.name);
-    speakFallback(_lang === 'en' ? `Hello ${student.name}! Welcome!` : `Merhaba ${student.name}! Hoş geldin!`);
-    showOnly('menu-screen');
-    renderCityScene();
+    try {
+        const students = _cachedLoginStudents.length ? _cachedLoginStudents : await loadStudents();
+        const student = students.find(s => s.id === id);
+        if (!student) { showOnly('menu-screen'); return; }
+        activeStudentId = student.id;
+        activeStudentName = student.name;
+        childName = student.name;
+        const nameEl = document.getElementById('active-student-name');
+        if (nameEl) nameEl.textContent = student.name;
+        const greetEl = document.getElementById('menu-greeting');
+        if (greetEl) greetEl.textContent = t('menu_greeting_named').replace('{name}', student.name);
+        try { speakFallback(_lang === 'en' ? `Hello ${student.name}!` : `Merhaba ${student.name}!`); } catch(_){}
+        showOnly('menu-screen');
+        try { renderCityScene(); } catch(_){}
+    } catch(e) {
+        showOnly('menu-screen');
+    }
 }
 
 function goToLogin() {
