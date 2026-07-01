@@ -1,10 +1,10 @@
 apply plugin: 'com.android.application'
 
 android {
-    namespace "com.yildizsiniflari.app"
+    namespace "app.yildizcan"
     compileSdk rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "com.yildizsiniflari.app"
+        applicationId "app.yildizcan"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

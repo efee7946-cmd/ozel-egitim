@@ -1,4 +1,4 @@
-package com.yildizsiniflari.app;
+package app.yildizcan;
 
 import com.getcapacitor.BridgeActivity;
 
