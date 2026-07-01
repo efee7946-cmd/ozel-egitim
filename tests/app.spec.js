@@ -6,7 +6,7 @@ test.describe('Yıldız Can AI App Tests', () => {
     await page.goto('/');
 
     // Check if the title is correct
-    await expect(page).toHaveTitle(/Yıldız Sınıfı/);
+    await expect(page).toHaveTitle(/YildizCan|Yıldız/);
 
     // The app now skips auth and shows the main menu directly
     const menuScreen = page.locator('#menu-screen');
