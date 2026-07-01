@@ -10,7 +10,7 @@ const SESSION_DAYS = 14;
 const BCRYPT_ROUNDS = 12;
 
 function cors(res) {
-    res.setHeader('Access-Control-Allow-Origin', process.env.ALLOWED_ORIGIN || 'https://yildizsiniflari.vercel.app');
+    res.setHeader('Access-Control-Allow-Origin', process.env.ALLOWED_ORIGIN || '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 }
