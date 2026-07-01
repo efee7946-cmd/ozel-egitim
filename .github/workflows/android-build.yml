@@ -58,9 +58,20 @@ jobs:
             -Pandroid.injected.signing.key.alias=${{ secrets.KEY_ALIAS }} \
             -Pandroid.injected.signing.key.password=${{ secrets.KEY_PASSWORD }}
 
+      - name: Debug APK derle (test için)
+        working-directory: android
+        run: ./gradlew assembleDebug
+
       - name: AAB dosyasını artifact olarak kaydet
         uses: actions/upload-artifact@v4
         with:
           name: yildiz-siniflari-release
           path: android/app/build/outputs/bundle/release/app-release.aab
+          retention-days: 30
+
+      - name: Debug APK artifact olarak kaydet
+        uses: actions/upload-artifact@v4
+        with:
+          name: yildiz-siniflari-debug-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
           retention-days: 30
