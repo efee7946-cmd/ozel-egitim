@@ -539,26 +539,10 @@ document.addEventListener('DOMContentLoaded', function(){
 <div id="kvkk-modal" class="kvkk-modal-overlay" style="display:none" onclick="closeKvkkModal(event)">
     <div class="kvkk-modal-box">
         <div class="kvkk-modal-head">
-            <h3>Gizlilik ve KVKK Bilgilendirmesi</h3>
+            <h3 id="kvkkModalTitle">Gizlilik ve KVKK Bilgilendirmesi</h3>
             <button type="button" class="kvkk-modal-close" onclick="document.getElementById('kvkk-modal').style.display='none'">✕</button>
         </div>
-        <div class="kvkk-modal-body">
-            <h4>Aydınlatma Metni</h4>
-            <p><strong>Veri Sorumlusu:</strong> Efe Erman — İstanbul, Tuzla — efee7946@gmail.com</p>
-            <p><strong>Toplanan Veriler:</strong> Kullanıcı adı, öğrenci adı, eğitim kademesi, destek ihtiyacı bilgileri, beceri ve davranış takip verileri, oturum bilgileri. Öğrenci verilerinin işlenmesi için veli/yasal temsilci onayı zorunludur.</p>
-            <p><strong>İşleme Amacı:</strong> Özel eğitim süreçlerinin takibi, BEP hazırlama, beceri ve davranış değerlendirmesi, yapay zeka destekli geri bildirim oluşturulması.</p>
-            <p><strong>Saklama Süresi:</strong> Hesap silinene kadar. Hesap silme talebi üzerine tüm veriler 30 gün içinde kalıcı olarak silinir.</p>
-            <p><strong>Aktarılan Taraflar:</strong> Vercel (barındırma altyapısı), Aiven (veritabanı), Google Gemini (yapay zeka), ElevenLabs (ses sentezi), Pexels (görsel içerik). Bu hizmetler yalnızca teknik işleme amacıyla kullanılmakta olup kişisel verileriniz pazarlama amaçlı üçüncü taraflarla paylaşılmamaktadır.</p>
-            <p><strong>Haklarınız (KVKK Md. 11):</strong> Verilerinize erişim, düzeltme, silme, işlemeyi kısıtlama ve taşıma haklarına sahipsiniz. Talepleriniz için uygulama içi "Hesabı Sil" veya "Verilerimi İndir" özelliklerini kullanabilirsiniz.</p>
-
-            <h4>Gizlilik Politikası</h4>
-            <p>YıldızCan, 6698 sayılı Kişisel Verilerin Korunması Kanunu (KVKK) kapsamında kişisel verilerinizi korumayı taahhüt eder. Çocuklara ait veriler yalnızca eğitim amacıyla işlenir, hiçbir koşulda satılmaz veya reklam amacıyla kullanılmaz.</p>
-            <p>Uygulama, tarayıcı yerel deposunu (localStorage) oturum ve tercih bilgilerini saklamak için kullanır. Bu veriler cihazınızda kalır ve sunucuya aktarılmaz.</p>
-            <p>Sorularınız için: yildizsiniflari@gmail.com</p>
-
-            <h4>Çerez / Yerel Depolama Politikası</h4>
-            <p>Uygulama; oturum belirteci, kullanıcı tercihleri ve öğrenci verilerini cihazınızdaki localStorage'da saklar. Üçüncü taraf çerez kullanılmaz. Tarayıcı verilerini temizlediğinizde yerel veriler de silinir.</p>
-        </div>
+        <div class="kvkk-modal-body" id="kvkkModalBody"></div>
     </div>
 </div>
 

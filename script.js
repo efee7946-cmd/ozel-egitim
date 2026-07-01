@@ -5143,6 +5143,39 @@ async function authLogout() {
 
 function openKvkkModal(e) {
     if (e) e.preventDefault();
+    const isTr = _lang !== 'en';
+    document.getElementById('kvkkModalTitle').textContent = isTr
+        ? 'Gizlilik ve KVKK Bilgilendirmesi'
+        : 'Privacy & Data Protection';
+    document.getElementById('kvkkModalBody').innerHTML = isTr ? `
+        <h4>Aydınlatma Metni</h4>
+        <p><strong>Veri Sorumlusu:</strong> Efe Erman — İstanbul, Tuzla — efee7946@gmail.com</p>
+        <p><strong>Toplanan Veriler:</strong> Kullanıcı adı, öğrenci adı, eğitim kademesi, destek ihtiyacı bilgileri, beceri ve davranış takip verileri, oturum bilgileri. Öğrenci verilerinin işlenmesi için veli/yasal temsilci onayı zorunludur.</p>
+        <p><strong>İşleme Amacı:</strong> Özel eğitim süreçlerinin takibi, BEP hazırlama, beceri ve davranış değerlendirmesi, yapay zeka destekli geri bildirim oluşturulması.</p>
+        <p><strong>Saklama Süresi:</strong> Hesap silinene kadar. Hesap silme talebi üzerine tüm veriler 30 gün içinde kalıcı olarak silinir.</p>
+        <p><strong>Aktarılan Taraflar:</strong> Vercel (barındırma altyapısı), Aiven (veritabanı), Google Gemini (yapay zeka), ElevenLabs (ses sentezi), Pexels (görsel içerik). Bu hizmetler yalnızca teknik işleme amacıyla kullanılmakta olup kişisel verileriniz pazarlama amaçlı üçüncü taraflarla paylaşılmamaktadır.</p>
+        <p><strong>Haklarınız (KVKK Md. 11):</strong> Verilerinize erişim, düzeltme, silme, işlemeyi kısıtlama ve taşıma haklarına sahipsiniz. Talepleriniz için uygulama içi "Hesabı Sil" veya "Verilerimi İndir" özelliklerini kullanabilirsiniz.</p>
+        <h4>Gizlilik Politikası</h4>
+        <p>YıldızCan, 6698 sayılı Kişisel Verilerin Korunması Kanunu (KVKK) kapsamında kişisel verilerinizi korumayı taahhüt eder. Çocuklara ait veriler yalnızca eğitim amacıyla işlenir, hiçbir koşulda satılmaz veya reklam amacıyla kullanılmaz.</p>
+        <p>Uygulama, tarayıcı yerel deposunu (localStorage) oturum ve tercih bilgilerini saklamak için kullanır. Bu veriler cihazınızda kalır ve sunucuya aktarılmaz.</p>
+        <p>Sorularınız için: yildizsiniflari@gmail.com</p>
+        <h4>Çerez / Yerel Depolama Politikası</h4>
+        <p>Uygulama; oturum belirteci, kullanıcı tercihleri ve öğrenci verilerini cihazınızdaki localStorage'da saklar. Üçüncü taraf çerez kullanılmaz. Tarayıcı verilerini temizlediğinizde yerel veriler de silinir.</p>
+    ` : `
+        <h4>Privacy Notice</h4>
+        <p><strong>Data Controller:</strong> Efe Erman — Istanbul, Tuzla — efee7946@gmail.com</p>
+        <p><strong>Data Collected:</strong> Username, student name, education level, support needs, skill and behavior tracking data, session information. Parental/guardian consent is required to process student data.</p>
+        <p><strong>Purpose:</strong> Tracking special education progress, IEP preparation, skill and behavior assessment, AI-assisted feedback generation.</p>
+        <p><strong>Retention:</strong> Until account deletion. Upon request, all data is permanently deleted within 30 days.</p>
+        <p><strong>Third Parties:</strong> Vercel (hosting), Aiven (database), Google Gemini (AI), ElevenLabs (text-to-speech), Pexels (images). These services are used for technical processing only — your data is never shared with third parties for marketing purposes.</p>
+        <p><strong>Your Rights:</strong> You have the right to access, correct, delete, restrict processing, and port your data. Use the in-app "Delete Account" or "Export My Data" features to exercise these rights.</p>
+        <h4>Privacy Policy</h4>
+        <p>YıldızCan is committed to protecting your personal data. Student data is processed solely for educational purposes and will never be sold or used for advertising.</p>
+        <p>The app uses browser local storage (localStorage) to store session and preference data. This data stays on your device and is not transmitted to the server.</p>
+        <p>Questions: yildizsiniflari@gmail.com</p>
+        <h4>Cookie / Local Storage Policy</h4>
+        <p>The app stores session tokens, user preferences, and student data in your device's localStorage. No third-party cookies are used. Clearing your browser data will also remove local app data.</p>
+    `;
     document.getElementById('kvkk-modal').style.display = 'flex';
 }
 
