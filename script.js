@@ -46,10 +46,20 @@ const STRINGS = {
     auth_cond_stereotipik: 'Stereotipik Hareket',
     reg_username_placeholder: 'örnek: ahmet_ogretmen (harf, rakam, _)',
     reg_student_placeholder: 'örn: Ali',
-    auth_kvkk_link1: 'Aydınlatma Metni',
-    auth_kvkk_sep: '’ni ve',
-    auth_kvkk_link2: 'Gizlilik Politikası',
-    auth_kvkk_agree: '’nı okudum, kabul ediyorum.',
+    auth_kvkk_link1: ‘Aydınlatma Metni’,
+    auth_kvkk_sep: ‘’ni ve’,
+    auth_kvkk_link2: ‘Gizlilik Politikası’,
+    auth_kvkk_agree: ‘’nı okudum, kabul ediyorum.’,
+    auth_fill_all: ‘Tüm alanları doldurun’,
+    auth_passwords_mismatch: ‘Şifreler uyuşmuyor’,
+    auth_password_short: ‘Şifre en az 6 karakter olmalı’,
+    auth_kvkk_required: ‘Devam etmek için Aydınlatma Metni\’ni kabul etmelisiniz’,
+    AUTH_FIELDS_REQUIRED: ‘Kullanıcı adı ve şifre gerekli’,
+    AUTH_USERNAME_TOO_SHORT: ‘Kullanıcı adı en az 3 karakter olmalı’,
+    AUTH_PASSWORD_TOO_SHORT: ‘Şifre en az 6 karakter olmalı’,
+    AUTH_USERNAME_INVALID_CHARS: ‘Sadece harf, rakam ve alt çizgi kullanabilirsin’,
+    AUTH_USERNAME_TAKEN: ‘Bu kullanıcı adı zaten alınmış’,
+    AUTH_INVALID_CREDENTIALS: ‘Kullanıcı adı veya şifre yanlış’,
     setup_title: 'Öğrenci Bilgileri',
     setup_name: 'Öğrenci adı',
     setup_age: 'Yaş',
@@ -723,6 +733,16 @@ const STRINGS = {
     auth_kvkk_sep: ' and',
     auth_kvkk_link2: 'Privacy Policy',
     auth_kvkk_agree: ' – I have read and agree.',
+    auth_fill_all: 'Please fill in all fields',
+    auth_passwords_mismatch: 'Passwords do not match',
+    auth_password_short: 'Password must be at least 6 characters',
+    auth_kvkk_required: 'You must accept the Privacy Notice to continue',
+    AUTH_FIELDS_REQUIRED: 'Username and password are required',
+    AUTH_USERNAME_TOO_SHORT: 'Username must be at least 3 characters',
+    AUTH_PASSWORD_TOO_SHORT: 'Password must be at least 6 characters',
+    AUTH_USERNAME_INVALID_CHARS: 'Only letters, numbers and underscores are allowed',
+    AUTH_USERNAME_TAKEN: 'This username is already taken',
+    AUTH_INVALID_CREDENTIALS: 'Incorrect username or password',
     setup_title: 'Student Information',
     setup_name: 'Student name',
     setup_age: 'Age',
@@ -5039,16 +5059,16 @@ async function handleLogin(e) {
     e.preventDefault();
     const username = document.getElementById('loginUsername').value.trim();
     const password = document.getElementById('loginPassword').value;
-    if (!username || !password) return showAuthError('Tüm alanları doldurun');
+    if (!username || !password) return showAuthError(t('auth_fill_all'));
     setAuthLoading(true);
 
     const res = await authApi('login', { username, password });
     setAuthLoading(false);
 
     if (res.fallback) {
-        return showAuthError(t('auth_connection_error') || 'Sunucu bağlantısı kurulamadı.');
+        return showAuthError(t('auth_connection_error') || t('AUTH_FIELDS_REQUIRED'));
     }
-    if (!res.ok) return showAuthError(res.error || 'Giriş başarısız');
+    if (!res.ok) return showAuthError(t(res.error) || t('auth_fill_all'));
     _authToken = res.token;
     _authUser  = { username: username.toLowerCase(), displayName: res.displayName };
     await DB.initEncryption(res.token);
@@ -5075,19 +5095,19 @@ async function handleRegister(e) {
     const password2   = document.getElementById('regPassword2').value;
     const studentName = document.getElementById('regStudentName').value.trim();
     const emoji       = document.getElementById('regStudentEmoji').value || '🌟';
-    if (!document.getElementById('kvkkConsent').checked) return showAuthError('Devam etmek için Aydınlatma Metni\'ni kabul etmelisiniz');
-    if (!username || !password || !studentName) return showAuthError('Tüm alanları doldurun');
-    if (password !== password2) return showAuthError('Şifreler uyuşmuyor');
-    if (password.length < 6) return showAuthError('Şifre en az 6 karakter olmalı');
+    if (!document.getElementById('kvkkConsent').checked) return showAuthError(t('auth_kvkk_required'));
+    if (!username || !password || !studentName) return showAuthError(t('auth_fill_all'));
+    if (password !== password2) return showAuthError(t('auth_passwords_mismatch'));
+    if (password.length < 6) return showAuthError(t('auth_password_short'));
     setAuthLoading(true);
 
     const res = await authApi('register', { username, password });
     setAuthLoading(false);
 
     if (res.fallback) {
-        return showAuthError(t('auth_connection_error') || 'Sunucu bağlantısı kurulamadı.');
+        return showAuthError(t('auth_connection_error') || t('AUTH_FIELDS_REQUIRED'));
     }
-    if (!res.ok) return showAuthError(res.error || 'Kayıt başarısız');
+    if (!res.ok) return showAuthError(t(res.error) || t('auth_fill_all'));
     _authToken = res.token;
     _authUser  = { username: username.toLowerCase(), displayName: res.displayName };
     await DB.initEncryption(res.token);

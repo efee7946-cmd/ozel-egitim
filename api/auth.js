@@ -38,18 +38,18 @@ export default async function handler(req, res) {
         /* ---- KAYIT OL ---- */
         if (action === 'register') {
             if (!username || !password)
-                return res.status(400).json({ error: 'Kullanıcı adı ve şifre gerekli' });
+                return res.status(400).json({ error: 'AUTH_FIELDS_REQUIRED' });
             const u = username.trim().toLowerCase();
             if (u.length < 3)
-                return res.status(400).json({ error: 'Kullanıcı adı en az 3 karakter olmalı' });
+                return res.status(400).json({ error: 'AUTH_USERNAME_TOO_SHORT' });
             if (password.length < 6)
-                return res.status(400).json({ error: 'Şifre en az 6 karakter olmalı' });
+                return res.status(400).json({ error: 'AUTH_PASSWORD_TOO_SHORT' });
             if (!/^[a-z0-9_]+$/.test(u))
-                return res.status(400).json({ error: 'Sadece harf, rakam ve alt çizgi kullanabilirsin' });
+                return res.status(400).json({ error: 'AUTH_USERNAME_INVALID_CHARS' });
 
             const existing = await query('SELECT username FROM users WHERE username = $1', [u]);
             if (existing.length > 0)
-                return res.status(409).json({ error: 'Bu kullanıcı adı zaten alınmış' });
+                return res.status(409).json({ error: 'AUTH_USERNAME_TAKEN' });
 
             // bcrypt ile yeni kayıt
             const hash = await bcrypt.hash(password, BCRYPT_ROUNDS);
@@ -70,28 +70,26 @@ export default async function handler(req, res) {
         /* ---- GİRİŞ YAP ---- */
         if (action === 'login') {
             if (!username || !password)
-                return res.status(400).json({ error: 'Kullanıcı adı ve şifre gerekli' });
+                return res.status(400).json({ error: 'AUTH_FIELDS_REQUIRED' });
             const u = username.trim().toLowerCase();
 
             const rows = await query('SELECT * FROM users WHERE username = $1', [u]);
             if (!rows.length)
-                return res.status(401).json({ error: 'Kullanıcı adı veya şifre yanlış' });
+                return res.status(401).json({ error: 'AUTH_INVALID_CREDENTIALS' });
 
             const user = rows[0];
             let valid = false;
             let needsMigration = false;
 
             if (user.hash.startsWith('$2')) {
-                // Yeni format: bcrypt
                 valid = await bcrypt.compare(password, user.hash);
             } else {
-                // Eski format: SHA-256 — doğrulayıp bcrypt'e geçir
                 valid = _legacyHash(password, user.salt) === user.hash;
                 if (valid) needsMigration = true;
             }
 
             if (!valid)
-                return res.status(401).json({ error: 'Kullanıcı adı veya şifre yanlış' });
+                return res.status(401).json({ error: 'AUTH_INVALID_CREDENTIALS' });
 
             // SHA-256 kullanan eski hesabı bcrypt'e geçir
             if (needsMigration) {
