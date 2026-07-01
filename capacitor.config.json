@@ -3,7 +3,8 @@
   "appName": "YıldızCan",
   "webDir": "www",
   "server": {
-    "androidScheme": "https"
+    "url": "https://ozel-egitim.vercel.app",
+    "cleartext": false
   },
   "ios": {
     "contentInset": "always",
