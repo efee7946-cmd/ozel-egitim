@@ -4980,7 +4980,7 @@ async function handleLogin(e) {
     setAuthLoading(false);
 
     if (res.fallback) {
-        return showAuthError('Bağlantı hatası: ' + (res.error || '?') + ' | ' + API_BASE);
+        return showAuthError(t('auth_connection_error') || 'Sunucu bağlantısı kurulamadı.');
     }
     if (!res.ok) return showAuthError(res.error || 'Giriş başarısız');
     _authToken = res.token;
@@ -5019,7 +5019,7 @@ async function handleRegister(e) {
     setAuthLoading(false);
 
     if (res.fallback) {
-        return showAuthError('Bağlantı hatası: ' + (res.error || '?') + ' | ' + API_BASE);
+        return showAuthError(t('auth_connection_error') || 'Sunucu bağlantısı kurulamadı.');
     }
     if (!res.ok) return showAuthError(res.error || 'Kayıt başarısız');
     _authToken = res.token;
