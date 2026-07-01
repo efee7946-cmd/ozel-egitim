@@ -4936,7 +4936,7 @@ async function authApi(action, body = {}) {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ action, ...body }),
-            signal: AbortSignal.timeout(15000),
+            signal: AbortSignal.timeout(7000),
         });
         const text = await r.text();
         try { return JSON.parse(text); } catch { return { fallback: true, error: 'JSON parse hatası: ' + text.slice(0, 100) }; }
@@ -4951,7 +4951,7 @@ function hideSplash() {
 }
 
 async function checkAuthSession() {
-    const timer = setTimeout(() => hideSplash(), 10000); // her koşulda 10s sonra splash kapanır
+    const timer = setTimeout(() => { hideSplash(); showOnly('auth-screen'); }, 8000);
     try {
         const savedToken = DB.getSync(authStorageKey());
         const savedUser  = DB.getSync(authUserStorageKey());
