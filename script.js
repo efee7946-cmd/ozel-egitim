@@ -5161,7 +5161,10 @@ async function saveStudents(list) {
     DB.set(studentsKey(), list);
 }
 
+let _cachedLoginStudents = [];
+
 function renderLoginStudents(students) {
+    _cachedLoginStudents = students;
     const wrap = document.getElementById('loginStudents');
     if (!wrap) return;
     if (!students.length) {
@@ -5218,7 +5221,7 @@ async function createStudentFromLogin() {
 }
 
 async function selectStudentLogin(id) {
-    const students = await loadStudents();
+    const students = _cachedLoginStudents.length ? _cachedLoginStudents : await loadStudents();
     const student = students.find(s => s.id === id);
     if (!student) return;
     // Mevcut öğrenci sistemini güncelle
