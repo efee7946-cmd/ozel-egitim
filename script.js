@@ -3797,6 +3797,8 @@ async function rec() {
         document.getElementById('info').innerText = "Seni dinliyorum... 🎙️";
         _startVolumeRings();
         _noSpeechTimeout = setTimeout(function() {
+            _safariActive = false;
+            _recognized = true;
             try { recognition.stop(); } catch(_) {}
             document.getElementById('micBtn').disabled = false;
             document.getElementById('micBtn').classList.remove('listening');
