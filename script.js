@@ -4951,42 +4951,35 @@ function hideSplash() {
 }
 
 async function checkAuthSession() {
-    const timer = setTimeout(() => { hideSplash(); showOnly('auth-screen'); }, 8000);
     try {
         const savedToken = DB.getSync(authStorageKey());
         const savedUser  = DB.getSync(authUserStorageKey());
 
         if (savedToken && savedUser) {
-            const res = await authApi('verify', { token: savedToken });
-            if (res.valid) {
-                _authToken = savedToken;
-                _authUser  = { username: res.username, displayName: res.displayName };
-                await DB.initEncryption(savedToken);
-                clearTimeout(timer);
-                hideSplash();
-                onAuthSuccess();
-                return;
-            } else if (res.fallback && !savedToken.startsWith('demo_')) {
-                _authToken = savedToken;
-                _authUser  = savedUser;
-                await DB.initEncryption(savedToken);
-                clearTimeout(timer);
-                hideSplash();
-                onAuthSuccess();
-                return;
-            }
-            DB.del(authStorageKey());
-            DB.del(authUserStorageKey());
-        }
+            _authToken = savedToken;
+            _authUser  = savedUser;
+            await DB.initEncryption(savedToken).catch(() => {});
+            hideSplash();
+            onAuthSuccess();
 
-        clearTimeout(timer);
-        hideSplash();
-        showOnly('auth-screen');
-    } catch (e) {
-        clearTimeout(timer);
-        hideSplash();
-        showOnly('auth-screen');
-    }
+            // Arka planda token geçerliliğini kontrol et
+            authApi('verify', { token: savedToken }).then(res => {
+                if (res && !res.valid && !res.fallback) {
+                    DB.del(authStorageKey());
+                    DB.del(authUserStorageKey());
+                    _authToken = null;
+                    _authUser  = null;
+                    showOnly('auth-screen');
+                } else if (res && res.valid) {
+                    _authUser = { username: res.username, displayName: res.displayName };
+                }
+            }).catch(() => {});
+            return;
+        }
+    } catch (e) {}
+
+    hideSplash();
+    showOnly('auth-screen');
 }
 
 function continueAsGuest() {
