@@ -38,7 +38,7 @@
     <div class="auth-card">
         <img src="avatar.png" class="auth-logo" alt="">
         <h1 class="auth-app-name" data-i18n="app_name">YıldızCan</h1>
-        <p class="auth-tagline">Özel eğitim yönetim platformu</p>
+        <p class="auth-tagline" data-i18n="auth_tagline">Özel eğitim yönetim platformu</p>
 
         <!-- Sekmeler -->
         <div class="auth-tabs">
@@ -51,12 +51,12 @@
         <!-- Giriş formu -->
         <form id="loginForm" class="auth-form" onsubmit="handleLogin(event)">
             <div class="auth-field">
-                <label>Kullanıcı Adı</label>
+                <label data-i18n="auth_username_label">Kullanıcı Adı</label>
                 <input type="text" id="loginUsername" autocomplete="username"
                     placeholder="kullaniciadi" data-i18n-placeholder="login_username" required>
             </div>
             <div class="auth-field">
-                <label>Şifre</label>
+                <label data-i18n="auth_password_label">Şifre</label>
                 <input type="password" id="loginPassword" autocomplete="current-password"
                     placeholder="••••••" data-i18n-placeholder="login_password" required>
             </div>
@@ -66,57 +66,57 @@
         <!-- Kayıt formu (gizli) -->
         <form id="registerForm" class="auth-form" style="display:none" onsubmit="handleRegister(event)">
             <div class="auth-field">
-                <label>Kullanıcı Adı</label>
+                <label data-i18n="auth_username_label">Kullanıcı Adı</label>
                 <input type="text" id="regUsername" autocomplete="username"
-                    placeholder="ornek: ahmet_ogretmen (harf, rakam, _)" required>
+                    placeholder="ornek: ahmet_ogretmen (harf, rakam, _)" data-i18n-placeholder="reg_username_placeholder" required>
             </div>
             <div class="auth-field">
-                <label>Şifre <small>(en az 6 karakter)</small></label>
+                <label><span data-i18n="auth_password_label">Şifre</span> <small data-i18n="auth_password_hint">(en az 6 karakter)</small></label>
                 <input type="password" id="regPassword" autocomplete="new-password"
                     placeholder="••••••" required>
             </div>
             <div class="auth-field">
-                <label>Şifre Tekrar</label>
+                <label data-i18n="auth_password_repeat">Şifre Tekrar</label>
                 <input type="password" id="regPassword2" autocomplete="new-password"
                     placeholder="••••••" required>
             </div>
             <div class="auth-field">
-                <label>Öğrencinin Adı</label>
-                <input type="text" id="regStudentName" placeholder="örn: Ali" required>
+                <label data-i18n="auth_student_name">Öğrencinin Adı</label>
+                <input type="text" id="regStudentName" placeholder="örn: Ali" data-i18n-placeholder="reg_student_placeholder" required>
             </div>
             <div class="auth-field">
-                <label>Öğrenci Emojisi</label>
+                <label data-i18n="auth_student_emoji">Öğrenci Emojisi</label>
                 <div class="auth-emoji-picker" id="regEmojiPicker"></div>
                 <input type="hidden" id="regStudentEmoji" value="🌟">
             </div>
             <div class="auth-field">
-                <label>Eğitim Kademesi</label>
+                <label data-i18n="auth_edu_level">Eğitim Kademesi</label>
                 <div class="reg-level-group">
                     <label class="reg-level-opt">
                         <input type="radio" name="regLevel" value="ogreti">
-                        <span>Hafif – Öğretilebilir</span>
+                        <span data-i18n="auth_level_mild">Hafif – Öğretilebilir</span>
                     </label>
                     <label class="reg-level-opt">
                         <input type="radio" name="regLevel" value="egit" checked>
-                        <span>Orta – Eğitilebilir</span>
+                        <span data-i18n="auth_level_moderate">Orta – Eğitilebilir</span>
                     </label>
                     <label class="reg-level-opt">
                         <input type="radio" name="regLevel" value="destekli">
-                        <span>Ağır/İleri – Desteklenen</span>
+                        <span data-i18n="auth_level_severe">Ağır/İleri – Desteklenen</span>
                     </label>
                 </div>
             </div>
             <div class="auth-field">
-                <label>Tanı / Eşlik Eden Durumlar</label>
+                <label data-i18n="auth_diagnosis">Tanı / Eşlik Eden Durumlar</label>
                 <div class="reg-condition-chips">
-                    <label class="reg-chip"><input type="checkbox" class="reg-cond" value="osb"> OSB</label>
-                    <label class="reg-chip"><input type="checkbox" class="reg-cond" value="dehb"> DEHB</label>
-                    <label class="reg-chip"><input type="checkbox" class="reg-cond" value="dil"> Dil / Konuşma</label>
-                    <label class="reg-chip"><input type="checkbox" class="reg-cond" value="down"> Down Sendromu</label>
-                    <label class="reg-chip"><input type="checkbox" class="reg-cond" value="cp"> Serebral Palsi</label>
-                    <label class="reg-chip"><input type="checkbox" class="reg-cond" value="oog"> Öz. Öğrenme Güçlüğü</label>
-                    <label class="reg-chip"><input type="checkbox" class="reg-cond" value="ekolali"> Ekolali</label>
-                    <label class="reg-chip"><input type="checkbox" class="reg-cond" value="stereotipik"> Stereotipik Hareket</label>
+                    <label class="reg-chip"><input type="checkbox" class="reg-cond" value="osb"> <span data-i18n="auth_cond_osb">OSB</span></label>
+                    <label class="reg-chip"><input type="checkbox" class="reg-cond" value="dehb"> <span data-i18n="auth_cond_dehb">DEHB</span></label>
+                    <label class="reg-chip"><input type="checkbox" class="reg-cond" value="dil"> <span data-i18n="auth_cond_dil">Dil / Konuşma</span></label>
+                    <label class="reg-chip"><input type="checkbox" class="reg-cond" value="down"> <span data-i18n="auth_cond_down">Down Sendromu</span></label>
+                    <label class="reg-chip"><input type="checkbox" class="reg-cond" value="cp"> <span data-i18n="auth_cond_cp">Serebral Palsi</span></label>
+                    <label class="reg-chip"><input type="checkbox" class="reg-cond" value="oog"> <span data-i18n="auth_cond_oog">Öz. Öğrenme Güçlüğü</span></label>
+                    <label class="reg-chip"><input type="checkbox" class="reg-cond" value="ekolali"> <span data-i18n="auth_cond_ekolali">Ekolali</span></label>
+                    <label class="reg-chip"><input type="checkbox" class="reg-cond" value="stereotipik"> <span data-i18n="auth_cond_stereotipik">Stereotipik Hareket</span></label>
                 </div>
             </div>
             <div class="kvkk-consent-row">
