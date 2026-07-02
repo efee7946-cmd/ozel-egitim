@@ -162,6 +162,32 @@
     </div>
 </div>
 
+<!-- ===================== İLK AÇILIŞ REHBERİ ===================== -->
+<div id="onboardingModal" class="onboarding-overlay" style="display:none">
+    <div class="onboarding-card">
+        <div class="onboarding-step" data-step="0">
+            <div class="onboarding-icon">🎤</div>
+            <h3 data-i18n="ob_step1_title">Konuşma Pratiği ile başlayın</h3>
+            <p data-i18n="ob_step1_text">Bir konu yazın (örn. "alışveriş"), Yıldız Can o konuda sorular sorsun. Çocuk mikrofona konuşarak yanıt verir, anında teşvik alır.</p>
+        </div>
+        <div class="onboarding-step" data-step="1" style="display:none">
+            <div class="onboarding-icon">🗣️</div>
+            <h3 data-i18n="ob_step2_title">Program ve AAC her zaman elinizde</h3>
+            <p data-i18n="ob_step2_text">Günlük Program ile rutinleri görselleştirin, AAC panosuyla konuşamayan anlarda kartlara dokunarak iletişim kurun.</p>
+        </div>
+        <div class="onboarding-step" data-step="2" style="display:none">
+            <div class="onboarding-icon">📊</div>
+            <h3 data-i18n="ob_step3_title">Gelişim kendiliğinden kaydedilir</h3>
+            <p data-i18n="ob_step3_text">Her seans otomatik kaydedilir. Analiz ekranında gelişim grafiğini görün, veli raporu ve BEP taslağı oluşturun.</p>
+        </div>
+        <div class="onboarding-dots" id="onboardingDots"></div>
+        <div class="onboarding-btns">
+            <button type="button" class="onboarding-skip" onclick="finishOnboarding()" data-i18n="ob_skip">Atla</button>
+            <button type="button" class="onboarding-next" id="onboardingNextBtn" onclick="nextOnboardingStep()" data-i18n="ob_next">İleri →</button>
+        </div>
+    </div>
+</div>
+
 <!-- ===================== KURTARMA KODU MODALI ===================== -->
 <div id="recoveryCodeModal" class="recovery-modal-overlay" style="display:none">
     <div class="recovery-modal-card">

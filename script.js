@@ -846,6 +846,15 @@ const STRINGS = {
     analysis_trend_table: 'Tablo görünümü',
     analysis_trend_col_date: 'Tarih',
     analysis_trend_col_pct: 'Bağımsız %',
+    ob_step1_title: 'Konuşma Pratiği ile başlayın',
+    ob_step1_text: 'Bir konu yazın (örn. "alışveriş"), Yıldız Can o konuda sorular sorsun. Çocuk mikrofona konuşarak yanıt verir, anında teşvik alır.',
+    ob_step2_title: 'Program ve AAC her zaman elinizde',
+    ob_step2_text: 'Günlük Program ile rutinleri görselleştirin, AAC panosuyla konuşamayan anlarda kartlara dokunarak iletişim kurun.',
+    ob_step3_title: 'Gelişim kendiliğinden kaydedilir',
+    ob_step3_text: 'Her seans otomatik kaydedilir. Analiz ekranında gelişim grafiğini görün, veli raporu ve BEP taslağı oluşturun.',
+    ob_skip: 'Atla',
+    ob_next: 'İleri →',
+    ob_start: 'Başlayalım! 🎉',
   },
   en: {
     back_menu: '← Menu',
@@ -1690,6 +1699,15 @@ const STRINGS = {
     analysis_trend_table: 'Table view',
     analysis_trend_col_date: 'Date',
     analysis_trend_col_pct: 'Independent %',
+    ob_step1_title: 'Start with Speech Practice',
+    ob_step1_text: 'Type a topic (e.g. "shopping") and Yıldız Can will ask questions about it. The child answers by speaking into the microphone and gets instant encouragement.',
+    ob_step2_title: 'Schedule and AAC always at hand',
+    ob_step2_text: 'Visualize routines with the Daily Schedule, and use the AAC board to communicate by tapping cards when speaking is hard.',
+    ob_step3_title: 'Progress is recorded automatically',
+    ob_step3_text: 'Every session is saved automatically. See the progress chart on the Analysis screen and generate parent reports and IEP drafts.',
+    ob_skip: 'Skip',
+    ob_next: 'Next →',
+    ob_start: "Let's start! 🎉",
   }
 };
 
@@ -1949,6 +1967,7 @@ function showOnly(id) {
     currentScreenId = id;
     if (id === 'menu-screen') {
         requestAnimationFrame(() => renderCityScene());
+        maybeShowOnboarding();
     }
     _updateBottomNav(id);
 
@@ -4205,6 +4224,46 @@ async function processTherapySpeech(speech) {
         resetIdleTimer();
         document.getElementById('info').innerText = t('mic_prompt');
     });
+}
+
+// =============================================
+// İLK AÇILIŞ REHBERİ
+// =============================================
+let _onboardingStep = 0;
+const ONBOARDING_STEPS = 3;
+
+function maybeShowOnboarding() {
+    if (localStorage.getItem('lms_onboarding_done')) return;
+    const modal = document.getElementById('onboardingModal');
+    if (!modal) return;
+    _onboardingStep = 0;
+    _renderOnboardingStep();
+    modal.style.display = 'flex';
+}
+
+function _renderOnboardingStep() {
+    document.querySelectorAll('#onboardingModal .onboarding-step').forEach(el => {
+        el.style.display = Number(el.dataset.step) === _onboardingStep ? '' : 'none';
+    });
+    const dots = document.getElementById('onboardingDots');
+    if (dots) {
+        dots.innerHTML = Array.from({ length: ONBOARDING_STEPS }, (_, i) =>
+            `<span class="ob-dot${i === _onboardingStep ? ' active' : ''}"></span>`).join('');
+    }
+    const nextBtn = document.getElementById('onboardingNextBtn');
+    if (nextBtn) nextBtn.textContent = _onboardingStep === ONBOARDING_STEPS - 1 ? t('ob_start') : t('ob_next');
+}
+
+function nextOnboardingStep() {
+    if (_onboardingStep >= ONBOARDING_STEPS - 1) return finishOnboarding();
+    _onboardingStep++;
+    _renderOnboardingStep();
+}
+
+function finishOnboarding() {
+    localStorage.setItem('lms_onboarding_done', '1');
+    const modal = document.getElementById('onboardingModal');
+    if (modal) modal.style.display = 'none';
 }
 
 function _getNativeSpeech() {
