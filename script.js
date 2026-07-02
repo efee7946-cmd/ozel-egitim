@@ -836,6 +836,7 @@ const STRINGS = {
     auth_reset_success: 'Şifreniz yenilendi!',
     verify_modal_title: 'E-postanızı Doğrulayın',
     verify_modal_sub: '{email} adresine 6 haneli doğrulama kodu gönderdik. 📁 Gelen kutunuzda yoksa SPAM/Gereksiz klasörüne bakın!',
+    verify_modal_nudge: 'E-postanız henüz doğrulanmamış. "Kodu tekrar gönder"e basın, e-postanıza gelen 6 haneli kodu girin. 📁 Kod SPAM/Gereksiz klasörüne düşebilir!',
     verify_btn: 'Doğrula ✓',
     verify_resend: 'Kodu tekrar gönder',
     verify_later: 'Daha sonra',
@@ -1708,6 +1709,7 @@ const STRINGS = {
     auth_reset_success: 'Your password has been reset!',
     verify_modal_title: 'Verify Your Email',
     verify_modal_sub: 'We sent a 6-digit verification code to {email}. 📁 Not in your inbox? Check your SPAM/Junk folder!',
+    verify_modal_nudge: 'Your email is not verified yet. Tap "Resend code" and enter the 6-digit code from your email. 📁 The code may land in your SPAM/Junk folder!',
     verify_btn: 'Verify ✓',
     verify_resend: 'Resend code',
     verify_later: 'Later',
@@ -5690,11 +5692,12 @@ async function requestResetCode() {
 }
 
 /* ---- E-posta doğrulama modalı ---- */
-function showEmailVerifyModal(emailMasked) {
+function showEmailVerifyModal(emailMasked, codeAlreadySent = true) {
     const modal = document.getElementById('emailVerifyModal');
     if (!modal) return;
-    document.getElementById('verifyModalText').textContent =
-        t('verify_modal_sub').replace('{email}', emailMasked || '');
+    document.getElementById('verifyModalText').textContent = codeAlreadySent
+        ? t('verify_modal_sub').replace('{email}', emailMasked || '')
+        : t('verify_modal_nudge');
     document.getElementById('verifyCodeInput').value = '';
     modal.style.display = 'flex';
 }
@@ -5717,8 +5720,13 @@ async function submitEmailVerification() {
 
 async function resendVerificationCode() {
     const res = await authApi('send_email_verification', { token: _authToken });
-    if (res && res.ok) showToast(t('auth_code_sent_toast'));
-    else showToast(t(res && res.error) || t('error'));
+    if (res && res.ok) {
+        document.getElementById('verifyModalText').textContent =
+            t('verify_modal_sub').replace('{email}', res.emailMasked || '');
+        showToast(t('auth_code_sent_toast'));
+    } else {
+        showToast(t(res && res.error) || t('error'));
+    }
 }
 
 async function handleResetPassword(e) {
@@ -5815,6 +5823,8 @@ async function handleLogin(e) {
     } else {
         onAuthSuccess();
     }
+    // E-posta var ama doğrulanmamışsa hatırlat
+    if (res.hasEmail && !res.emailVerified) showEmailVerifyModal(null, false);
     showToast(t('auth_login_success'));
 }
 
