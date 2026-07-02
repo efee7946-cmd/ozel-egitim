@@ -822,6 +822,7 @@ const STRINGS = {
     behavior_antecedent_ph: 'Ne tetikledi?',
     search_btn: 'Ara',
     add_btn: 'Ekle',
+    student_pill: 'Öğrenci seç',
   },
   en: {
     back_menu: '← Menu',
@@ -1642,6 +1643,7 @@ const STRINGS = {
     behavior_antecedent_ph: 'What triggered it?',
     search_btn: 'Search',
     add_btn: 'Add',
+    student_pill: 'Select student',
   }
 };
 
@@ -1889,7 +1891,7 @@ function updateMenuIdentity() {
         emailEl.textContent = (_authUser && _authUser.displayName) ? `${_authUser.displayName} • ${roleLabel}` : 'Misafir';
     }
     if (studentEl) {
-        studentEl.textContent = activeStudentName || t('choose_student');
+        studentEl.textContent = activeStudentName || t('student_pill');
     }
     // Pill dot: green if student selected
     const dot = document.querySelector('.pill-dot');
