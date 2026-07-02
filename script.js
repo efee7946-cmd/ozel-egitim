@@ -5893,7 +5893,7 @@ function openKvkkModal(e) {
     document.getElementById('kvkkModalBody').innerHTML = isTr ? `
         <h4>Aydınlatma Metni</h4>
         <p><strong>Veri Sorumlusu:</strong> Efe Erman — İstanbul, Tuzla — efee7946@gmail.com</p>
-        <p><strong>Toplanan Veriler:</strong> Kullanıcı adı, öğrenci adı, eğitim kademesi, destek ihtiyacı bilgileri, beceri ve davranış takip verileri, oturum bilgileri. Öğrenci verilerinin işlenmesi için veli/yasal temsilci onayı zorunludur.</p>
+        <p><strong>Toplanan Veriler:</strong> Kullanıcı adı, e-posta adresi (şifre sıfırlama ve hesap doğrulama amaçlı), öğrenci adı, eğitim kademesi, destek ihtiyacı bilgileri, beceri ve davranış takip verileri, oturum bilgileri. Öğrenci verilerinin işlenmesi için veli/yasal temsilci onayı zorunludur.</p>
         <p><strong>İşleme Amacı:</strong> Özel eğitim süreçlerinin takibi, BEP hazırlama, beceri ve davranış değerlendirmesi, yapay zeka destekli geri bildirim oluşturulması.</p>
         <p><strong>Saklama Süresi:</strong> Hesap silinene kadar. Hesap silme talebi üzerine tüm veriler 30 gün içinde kalıcı olarak silinir.</p>
         <p><strong>Aktarılan Taraflar:</strong> Vercel (barındırma altyapısı), Aiven (veritabanı), Google Gemini ve Google Cloud (yapay zeka ve ses sentezi), Pexels (görsel içerik). Bu hizmetler yalnızca teknik işleme amacıyla kullanılmakta olup kişisel verileriniz pazarlama amaçlı üçüncü taraflarla paylaşılmamaktadır.</p>
@@ -5907,7 +5907,7 @@ function openKvkkModal(e) {
     ` : `
         <h4>Privacy Notice</h4>
         <p><strong>Data Controller:</strong> Efe Erman — Istanbul, Tuzla — efee7946@gmail.com</p>
-        <p><strong>Data Collected:</strong> Username, student name, education level, support needs, skill and behavior tracking data, session information. Parental/guardian consent is required to process student data.</p>
+        <p><strong>Data Collected:</strong> Username, email address (for password reset and account verification), student name, education level, support needs, skill and behavior tracking data, session information. Parental/guardian consent is required to process student data.</p>
         <p><strong>Purpose:</strong> Tracking special education progress, IEP preparation, skill and behavior assessment, AI-assisted feedback generation.</p>
         <p><strong>Retention:</strong> Until account deletion. Upon request, all data is permanently deleted within 30 days.</p>
         <p><strong>Third Parties:</strong> Vercel (hosting), Aiven (database), Google Gemini and Google Cloud (AI and text-to-speech), Pexels (images). These services are used for technical processing only — your data is never shared with third parties for marketing purposes.</p>
