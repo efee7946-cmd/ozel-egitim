@@ -29,8 +29,12 @@ export default async function handler(req, res) {
         return res.status(500).json({ error: 'GOOGLE_TTS_CREDENTIALS eksik' });
     }
 
-    const { text } = req.body;
+    const { text, lang } = req.body;
     if (!text) return res.status(400).json({ error: 'text zorunlu.' });
+
+    const voice = lang === 'en'
+        ? { languageCode: 'en-US', name: 'en-US-Chirp3-HD-Aoede' }
+        : { languageCode: 'tr-TR', name: 'tr-TR-Chirp3-HD-Aoede' };
 
     try {
         const token = await getAccessToken();
@@ -42,7 +46,7 @@ export default async function handler(req, res) {
             },
             body: JSON.stringify({
                 input: { text },
-                voice: { languageCode: 'tr-TR', name: 'tr-TR-Chirp3-HD-Aoede' },
+                voice,
                 audioConfig: { audioEncoding: 'MP3' },
             }),
         });

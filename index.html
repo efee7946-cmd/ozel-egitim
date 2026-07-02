@@ -141,12 +141,12 @@
         <div class="login-header">
             <img src="avatar.png" class="login-logo" alt="">
             <h1 class="login-title" data-i18n="app_name">YıldızCan</h1>
-            <p class="login-subtitle">Kim olduğunu seç!</p>
+            <p class="login-subtitle" data-i18n="login_pick_who">Kim olduğunu seç!</p>
         </div>
         <div class="login-students" id="loginStudents">
-            <div class="login-loading">Yükleniyor...</div>
+            <div class="login-loading" data-i18n="loading">Yükleniyor...</div>
         </div>
-        <button type="button" class="login-add-btn" onclick="showLoginAddForm()">
+        <button type="button" class="login-add-btn" onclick="showLoginAddForm()" data-i18n="login_add_student">
             + Yeni Öğrenci Ekle
         </button>
         <!-- Yeni öğrenci formu (gizli) -->
@@ -159,8 +159,8 @@
                 <span data-i18n="veli_consent_label">Bu öğrencinin velisi KVKK kapsamında bilgilendirildi ve rıza verdi.</span>
             </label>
             <div class="login-form-btns">
-                <button type="button" class="login-save-btn" onclick="createStudentFromLogin()">Kaydet</button>
-                <button type="button" class="login-cancel-btn" onclick="hideLoginAddForm()">İptal</button>
+                <button type="button" class="login-save-btn" onclick="createStudentFromLogin()" data-i18n="save">Kaydet</button>
+                <button type="button" class="login-cancel-btn" onclick="hideLoginAddForm()" data-i18n="cancel">İptal</button>
             </div>
         </div>
     </div>
@@ -174,7 +174,7 @@
                 <img src="avatar.png" class="setup-logo" alt="">
                 <h2 data-i18n="setup_select_student">Öğrenci Seç</h2>
             </div>
-            <div class="student-status" id="studentStatus">Yükleniyor...</div>
+            <div class="student-status" id="studentStatus" data-i18n="loading">Yükleniyor...</div>
             <div class="student-list" id="studentList"></div>
             <div class="setup-divider"><span data-i18n="setup_add_new_divider">Yeni öğrenci ekle</span></div>
             <div class="student-form-card">
@@ -190,7 +190,7 @@
                 </div>
                 <div class="field">
                     <label data-i18n="setup_note_label">Not</label>
-                    <textarea id="studentNotesInput" rows="2" placeholder="Destek notu, ilgi alanı..."></textarea>
+                    <textarea id="studentNotesInput" rows="2" data-i18n-placeholder="student_notes_ph" placeholder="Destek notu, ilgi alanı..."></textarea>
                 </div>
                 <label class="veli-consent-label">
                     <input type="checkbox" id="setupVeliConsent">
@@ -216,7 +216,7 @@
         <div class="topbar-right">
             <button class="student-pill" type="button" id="topbarStudentPill" onclick="goToLogin()">
                 <span class="pill-dot"></span>
-                <span id="active-student-name">Öğrenci seç</span>
+                <span id="active-student-name" data-i18n="choose_student">Öğrenci seç</span>
                 <span class="pill-chevron">›</span>
             </button>
             <button id="langToggleBtn" class="lang-toggle-btn" type="button" onclick="setLang(document.documentElement.lang==='en'?'tr':'en')">EN</button>
@@ -404,9 +404,9 @@ document.addEventListener('DOMContentLoaded', function(){
             <img src="avatar.png" class="report-avatar" alt="Yıldız Can">
             <div class="report-title-block">
                 <h2 data-i18n="report_title_full">Veli Gelişim Raporu</h2>
-                <p id="reportSubtitle">Hazırlanıyor...</p>
+                <p id="reportSubtitle" data-i18n="report_preparing">Hazırlanıyor...</p>
             </div>
-            <button class="btn-print" onclick="window.print()">🖨️ Yazdır</button>
+            <button class="btn-print" onclick="window.print()" data-i18n="report_print">🖨️ Yazdır</button>
         </div>
 
         <!-- Özet kartları -->
@@ -414,27 +414,27 @@ document.addEventListener('DOMContentLoaded', function(){
             <div class="stat-card">
                 <div class="stat-icon">🎙️</div>
                 <div class="stat-value" id="statMicCount">0</div>
-                <div class="stat-label">Mikrofon Kullanımı</div>
+                <div class="stat-label" data-i18n="report_stat_mic">Mikrofon Kullanımı</div>
             </div>
             <div class="stat-card">
                 <div class="stat-icon">⏱️</div>
                 <div class="stat-value" id="statDuration">0 dk</div>
-                <div class="stat-label">Toplam Süre</div>
+                <div class="stat-label" data-i18n="report_stat_duration">Toplam Süre</div>
             </div>
             <div class="stat-card">
                 <div class="stat-icon">📖</div>
                 <div class="stat-value" id="statStoryProgress">-</div>
-                <div class="stat-label">Hikâye İlerlemesi</div>
+                <div class="stat-label" data-i18n="report_stat_story">Hikâye İlerlemesi</div>
             </div>
             <div class="stat-card">
                 <div class="stat-icon">💬</div>
                 <div class="stat-value" id="statTotalTurns">0</div>
-                <div class="stat-label">Toplam Yanıt</div>
+                <div class="stat-label" data-i18n="report_stat_turns">Toplam Yanıt</div>
             </div>
             <div class="stat-card">
                 <div class="stat-icon">🧠</div>
                 <div class="stat-value" id="statInterventions">0 / 0</div>
-                <div class="stat-label">Müdahale / Prososyal</div>
+                <div class="stat-label" data-i18n="report_stat_intervention">Müdahale / Prososyal</div>
             </div>
         </div>
 
@@ -479,23 +479,23 @@ document.addEventListener('DOMContentLoaded', function(){
 
         <!-- Seçim Analizi -->
         <div class="report-section">
-            <h3>🔍 Seçim Analizi</h3>
+            <h3 data-i18n="report_choice_analysis">🔍 Seçim Analizi</h3>
             <div id="choiceAnalysis" class="choice-analysis-list">
-                <p class="report-empty">Henüz hikâye oturumu yapılmadı.</p>
+                <p class="report-empty" data-i18n="report_no_story">Henüz hikâye oturumu yapılmadı.</p>
             </div>
         </div>
 
         <!-- Konuşma Terapisi Özeti -->
         <div class="report-section">
-            <h3>🎙️ Konuşma Pratiği Özeti</h3>
+            <h3 data-i18n="report_speech_summary">🎙️ Konuşma Pratiği Özeti</h3>
             <div id="therapyLog" class="therapy-log">
-                <p class="report-empty">Henüz oturum yapılmadı.</p>
+                <p class="report-empty" data-i18n="report_no_session">Henüz oturum yapılmadı.</p>
             </div>
         </div>
 
         <!-- AI Değerlendirmesi -->
         <div class="report-section ai-section">
-            <h3>🤖 Yıldız Can'ın Değerlendirmesi</h3>
+            <h3 data-i18n="report_ai_eval">🤖 Yıldız Can'ın Değerlendirmesi</h3>
             <div id="aiEvaluation" class="ai-evaluation">
                 <div class="ai-eval-loading" id="aiEvalLoading">
                     <div class="skel-line skel-full skeleton" style="height:14px;margin:4px 0"></div>
@@ -550,11 +550,11 @@ document.addEventListener('DOMContentLoaded', function(){
 <div id="a11y-panel" class="a11y-panel" style="display:none" role="dialog" aria-label="Erişilebilirlik Ayarları">
     <div class="a11y-panel-inner">
         <div class="a11y-panel-head">
-            <h3>⚙️ Erişilebilirlik</h3>
+            <h3 data-i18n="a11y_title">⚙️ Erişilebilirlik</h3>
             <button type="button" class="a11y-close-btn" onclick="toggleA11yPanel()">✕</button>
         </div>
         <div class="a11y-account-section" id="a11yAccountSection" style="display:none">
-            <div class="a11y-section-title">Hesap</div>
+            <div class="a11y-section-title" data-i18n="a11y_account">Hesap</div>
             <div class="a11y-account-user" id="a11yAccountUser"></div>
             <div class="a11y-account-actions">
                 <button type="button" class="a11y-account-btn" onclick="exportMyData()"><span data-i18n="a11y_export">📥 Verilerimi İndir</span></button>
@@ -623,7 +623,7 @@ document.addEventListener('DOMContentLoaded', function(){
     <div class="schedule-wrapper">
         <div class="schedule-header">
             <div class="schedule-title-row">
-                <h2 class="schedule-title">📅 Günlük Program</h2>
+                <h2 class="schedule-title" data-i18n="schedule_screen_title">📅 Günlük Program</h2>
                 <span class="schedule-date-badge" id="scheduleDate"></span>
             </div>
             <div class="schedule-progress-wrap" id="scheduleProgressWrap" style="display:none">
@@ -644,17 +644,17 @@ document.addEventListener('DOMContentLoaded', function(){
                 <input type="time" id="scheduleTimeInput" class="schedule-time-input">
             </div>
             <div class="schedule-form-actions">
-                <button type="button" class="schedule-save-btn" onclick="saveNewActivity()">✓ Ekle</button>
-                <button type="button" class="schedule-cancel-btn" onclick="cancelAddActivity()">İptal</button>
+                <button type="button" class="schedule-save-btn" onclick="saveNewActivity()" data-i18n="schedule_add_btn">✓ Ekle</button>
+                <button type="button" class="schedule-cancel-btn" onclick="cancelAddActivity()" data-i18n="cancel">İptal</button>
             </div>
         </div>
 
         <div class="schedule-list" id="scheduleList"></div>
 
         <div class="schedule-footer-btns">
-            <button type="button" class="schedule-add-btn" onclick="showAddActivityForm()">+ Etkinlik Ekle</button>
+            <button type="button" class="schedule-add-btn" onclick="showAddActivityForm()" data-i18n="schedule_add_activity">+ Etkinlik Ekle</button>
             <button type="button" class="schedule-reset-btn" id="scheduleResetBtn"
-                onclick="resetSchedule()" style="display:none">🔄 Günü Sıfırla</button>
+                onclick="resetSchedule()" style="display:none" data-i18n="schedule_reset">🔄 Günü Sıfırla</button>
         </div>
     </div>
 </div>
@@ -765,69 +765,69 @@ document.addEventListener('DOMContentLoaded', function(){
     <button class="btn-back" onclick="iepBack()"><span data-i18n="back">← Geri</span></button>
     <div class="iep-wrapper">
         <div class="iep-header">
-            <h2>📋 IEP Hedefleri</h2>
+            <h2 data-i18n="iep_screen_title">📋 IEP Hedefleri</h2>
             <span class="iep-student-badge" id="iepStudentBadge"></span>
         </div>
 
         <!-- Yeni hedef formu (gizli) -->
         <div class="iep-goal-form" id="iepGoalForm" style="display:none">
-            <h3>Yeni Hedef Ekle</h3>
+            <h3 data-i18n="iep_new_goal">Yeni Hedef Ekle</h3>
             <div class="iep-form-field">
-                <label>Alan</label>
+                <label data-i18n="iep_domain">Alan</label>
                 <div class="iep-domain-chips" id="iepDomainChips"></div>
             </div>
             <div class="iep-form-field">
-                <label>Hedef Davranış</label>
-                <textarea id="iepGoalText" rows="3"
+                <label data-i18n="iep_target_behavior">Hedef Davranış</label>
+                <textarea id="iepGoalText" rows="3" data-i18n-placeholder="iep_behavior_ph"
                     placeholder="Örn: 10 farklı nesneyi doğru isimle tanımlayacak" maxlength="200"></textarea>
             </div>
             <div class="iep-form-row">
                 <div class="iep-form-field">
-                    <label>Hedef Başarı %</label>
+                    <label data-i18n="iep_target_pct">Hedef Başarı %</label>
                     <input type="number" id="iepTargetPct" value="80" min="50" max="100">
                 </div>
                 <div class="iep-form-field">
-                    <label>Deneme Sayısı</label>
+                    <label data-i18n="iep_trial_count">Deneme Sayısı</label>
                     <input type="number" id="iepTargetTrials" value="10" min="3" max="30">
                 </div>
             </div>
             <div class="iep-form-row">
                 <div class="iep-form-field">
-                    <label>Başlangıç</label>
+                    <label data-i18n="iep_start_date">Başlangıç</label>
                     <input type="date" id="iepStartDate">
                 </div>
                 <div class="iep-form-field">
-                    <label>Hedef Tarih</label>
+                    <label data-i18n="iep_target_date">Hedef Tarih</label>
                     <input type="date" id="iepTargetDate">
                 </div>
             </div>
             <div class="iep-form-btns">
-                <button type="button" class="iep-save-btn" onclick="saveIepGoal()">✓ Kaydet</button>
-                <button type="button" class="iep-cancel-btn" onclick="hideIepGoalForm()">İptal</button>
+                <button type="button" class="iep-save-btn" onclick="saveIepGoal()" data-i18n="iep_save">✓ Kaydet</button>
+                <button type="button" class="iep-cancel-btn" onclick="hideIepGoalForm()" data-i18n="cancel">İptal</button>
             </div>
         </div>
 
         <!-- Seans veri girişi (gizli, hedef seçince açılır) -->
         <div class="iep-session-panel" id="iepSessionPanel" style="display:none">
             <div class="iep-session-goal-info" id="iepSessionGoalInfo"></div>
-            <p class="iep-session-hint">Her deneme için butona bas:</p>
+            <p class="iep-session-hint" data-i18n="iep_session_hint">Her deneme için butona bas:</p>
             <div class="iep-trial-btns">
                 <button type="button" class="trial-btn trial-correct" onclick="recordTrial('correct')">
-                    ✓<br><span>Doğru</span>
+                    ✓<br><span data-i18n="iep_correct">Doğru</span>
                 </button>
                 <button type="button" class="trial-btn trial-prompted" onclick="recordTrial('prompted')">
-                    P<br><span>İpucu</span>
+                    P<br><span data-i18n="iep_prompted">İpucu</span>
                 </button>
                 <button type="button" class="trial-btn trial-incorrect" onclick="recordTrial('incorrect')">
-                    ✗<br><span>Yanlış</span>
+                    ✗<br><span data-i18n="iep_wrong">Yanlış</span>
                 </button>
             </div>
             <div class="iep-trial-tally" id="iepTrialTally"></div>
-            <textarea id="iepSessionNotes" class="iep-session-notes"
+            <textarea id="iepSessionNotes" class="iep-session-notes" data-i18n-placeholder="iep_session_note_ph"
                 placeholder="Seans notu (isteğe bağlı)" rows="2"></textarea>
             <div class="iep-session-btns">
-                <button type="button" class="iep-save-btn" onclick="submitTrialSession()">✓ Seansı Kaydet</button>
-                <button type="button" class="iep-cancel-btn" onclick="closeSessionPanel()">İptal</button>
+                <button type="button" class="iep-save-btn" onclick="submitTrialSession()" data-i18n="iep_save_session">✓ Seansı Kaydet</button>
+                <button type="button" class="iep-cancel-btn" onclick="closeSessionPanel()" data-i18n="cancel">İptal</button>
             </div>
         </div>
 
@@ -835,7 +835,7 @@ document.addEventListener('DOMContentLoaded', function(){
         <div id="iepGoalList"></div>
 
         <div class="iep-add-btn-wrap">
-            <button type="button" class="iep-add-btn" onclick="showIepGoalForm()">+ Hedef Ekle</button>
+            <button type="button" class="iep-add-btn" onclick="showIepGoalForm()" data-i18n="iep_add_goal">+ Hedef Ekle</button>
         </div>
     </div>
 </div>
@@ -845,7 +845,7 @@ document.addEventListener('DOMContentLoaded', function(){
     <button class="btn-back" onclick="skillsBack()"><span data-i18n="back">← Geri</span></button>
     <div class="skills-wrapper">
         <div class="skills-header">
-            <h2>🗺️ Beceri Haritası</h2>
+            <h2 data-i18n="skills_screen_title">🗺️ Beceri Haritası</h2>
             <span class="skills-student-badge" id="skillsStudentBadge"></span>
         </div>
         <div class="skills-legend">
@@ -863,12 +863,12 @@ document.addEventListener('DOMContentLoaded', function(){
     <button class="btn-back" onclick="behaviorBack()"><span data-i18n="back">← Geri</span></button>
     <div class="behavior-wrapper">
         <div class="behavior-header">
-            <h2>📊 Davranış Kaydı</h2>
+            <h2 data-i18n="behavior_screen_title">📊 Davranış Kaydı</h2>
             <span class="behavior-student-badge" id="behaviorStudentBadge"></span>
         </div>
         <!-- Hızlı kayıt formu -->
         <div class="behavior-quick-form">
-            <h3>Yeni Kayıt</h3>
+            <h3 data-i18n="behavior_new_entry">Yeni Kayıt</h3>
             <div class="behavior-form-field">
                 <label data-i18n="behavior_label">Davranış</label>
                 <input type="text" id="behaviorText" data-i18n-placeholder="behavior_what_happened_ph" placeholder="Ne oldu?" maxlength="100">
@@ -876,11 +876,11 @@ document.addEventListener('DOMContentLoaded', function(){
             <div class="behavior-form-row">
                 <div class="behavior-form-field">
                     <label data-i18n="behavior_antecedent_label">Öncesi (A)</label>
-                    <input type="text" id="behaviorAntecedent" placeholder="Ne tetikledi?" maxlength="80">
+                    <input type="text" id="behaviorAntecedent" data-i18n-placeholder="behavior_antecedent_ph" placeholder="Ne tetikledi?" maxlength="80">
                 </div>
                 <div class="behavior-form-field">
                     <label data-i18n="behavior_consequence_label">Sonrası (C)</label>
-                    <input type="text" id="behaviorConsequence" placeholder="Ne yapıldı?" maxlength="80">
+                    <input type="text" id="behaviorConsequence" data-i18n-placeholder="behavior_consequence_ph" placeholder="Ne yapıldı?" maxlength="80">
                 </div>
             </div>
             <div class="behavior-form-row">
@@ -897,11 +897,11 @@ document.addEventListener('DOMContentLoaded', function(){
                     <input type="number" id="behaviorDuration" placeholder="0" min="0" max="120">
                 </div>
             </div>
-            <button type="button" class="behavior-save-btn" onclick="saveBehaviorEntry()">✓ Kaydet</button>
+            <button type="button" class="behavior-save-btn" onclick="saveBehaviorEntry()" data-i18n="behavior_save">✓ Kaydet</button>
         </div>
         <!-- Geçmiş kayıtlar -->
         <div class="behavior-log-section">
-            <h3>Geçmiş Kayıtlar</h3>
+            <h3 data-i18n="behavior_history">Geçmiş Kayıtlar</h3>
             <div id="behaviorLogList"></div>
         </div>
     </div>
@@ -913,7 +913,7 @@ document.addEventListener('DOMContentLoaded', function(){
         <div class="star-modal-stars" id="starModalStars"></div>
         <div class="star-modal-title" id="starModalTitle"></div>
         <div class="star-modal-sub" id="starModalSub"></div>
-        <button class="star-modal-btn" onclick="closeStarModal()">Harika! ✨</button>
+        <button class="star-modal-btn" onclick="closeStarModal()" data-i18n="star_close_btn">Harika! ✨</button>
     </div>
 </div>
 
@@ -921,13 +921,13 @@ document.addEventListener('DOMContentLoaded', function(){
 <div id="aac-search-modal" class="aac-search-overlay" style="display:none" onclick="closeAacSearch(event)">
     <div class="aac-search-box">
         <div class="aac-search-head">
-            <h3>➕ Kart Ekle</h3>
+            <h3 data-i18n="aac_add_card">➕ Kart Ekle</h3>
             <button type="button" class="aac-search-close" onclick="document.getElementById('aac-search-modal').style.display='none'">✕</button>
         </div>
         <!-- Mod seçici -->
         <div class="aac-mode-tabs">
-            <button type="button" class="aac-mode-tab active" id="aacModeEmoji" onclick="switchAacMode('emoji')">😊 Emoji</button>
-            <button type="button" class="aac-mode-tab" id="aacModePhoto" onclick="switchAacMode('photo')">📷 Fotoğraf</button>
+            <button type="button" class="aac-mode-tab active" id="aacModeEmoji" onclick="switchAacMode('emoji')" data-i18n="aac_mode_emoji">😊 Emoji</button>
+            <button type="button" class="aac-mode-tab" id="aacModePhoto" onclick="switchAacMode('photo')" data-i18n="aac_mode_photo">📷 Fotoğraf</button>
         </div>
 
         <!-- EMOJİ MODU -->
@@ -939,12 +939,12 @@ document.addEventListener('DOMContentLoaded', function(){
         <!-- FOTOĞRAF MODU -->
         <div id="aacPhotoMode" style="display:none">
             <div class="aac-photo-search-row">
-                <input type="text" id="aacPhotoQuery" placeholder="Kelime ara... (elma, köpek, oyun)"
+                <input type="text" id="aacPhotoQuery" data-i18n-placeholder="aac_photo_search_ph" placeholder="Kelime ara... (elma, köpek, oyun)"
                        onkeydown="if(event.key==='Enter') searchAacPhoto()">
-                <button type="button" class="aac-photo-search-btn" onclick="searchAacPhoto()">Ara</button>
+                <button type="button" class="aac-photo-search-btn" onclick="searchAacPhoto()" data-i18n="search_btn">Ara</button>
             </div>
             <div class="aac-photo-grid" id="aacPhotoGrid">
-                <p class="aac-photo-hint">Türkçe veya İngilizce kelime yaz, fotoğraflar gelsin.</p>
+                <p class="aac-photo-hint" data-i18n="aac_photo_hint">Türkçe veya İngilizce kelime yaz, fotoğraflar gelsin.</p>
             </div>
             <a class="aac-pexels-credit" href="https://www.pexels.com" target="_blank" rel="noopener">Photos provided by Pexels</a>
         </div>
@@ -952,9 +952,9 @@ document.addEventListener('DOMContentLoaded', function(){
         <!-- Seçim + etiket satırı (her iki mod için) -->
         <div class="aac-emoji-label-row" id="aacEmojiLabelRow" style="display:none">
             <span class="aac-selected-emoji" id="aacSelectedEmoji"></span>
-            <input type="text" id="aacEmojiLabel" placeholder="Kart adı yaz..."
+            <input type="text" id="aacEmojiLabel" data-i18n-placeholder="aac_card_name_ph" placeholder="Kart adı yaz..."
                    onkeydown="if(event.key==='Enter') addEmojiCard()">
-            <button type="button" class="aac-emoji-add-btn" onclick="addEmojiCard()">Ekle</button>
+            <button type="button" class="aac-emoji-add-btn" onclick="addEmojiCard()" data-i18n="add_btn">Ekle</button>
         </div>
     </div>
 </div>

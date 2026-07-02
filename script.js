@@ -689,6 +689,139 @@ const STRINGS = {
     analysis_summary_sim: ' ve %{pct} oranında dili basitleştirmeye',
     analysis_summary_need: ' ihtiyaç duydu',
     report_eval_fallback: '{name}\'in bu oturumda uygulamaya aktif katılım gösterdiği görülmektedir. Düzenli oturumlar çocuğun konuşma güveni ve ifade becerilerini destekleyecektir. Yıldız Can ile çalışmaya devam etmenizi öneririz.',
+    info_next_question: 'Hadi yeni soruya geçelim! ➡️',
+    info_no_speech_support: 'Tarayıcı ses tanımayı desteklemiyor. Chrome veya Edge kullanmayı dene.',
+    info_press_next: 'İleri butonuna basabilirsin! ➡️',
+    info_listening: 'Seni dinliyorum... 🎙️',
+    info_no_sound: 'Sesi duymadım, tekrar dene!',
+    info_repeat_please: 'Duyamadım, tekrar eder misin?',
+    therapy_session_end: 'Seninle konuşmak harikaydı! Hadi şimdi yeni bir videoya bakalım!',
+    city_open_area: '{label} alanını aç',
+    city_go_therapy: 'Konuşma Terapisine Git',
+    city_in_focus: '{label} odakta',
+    star_title_5: 'Muhteşemsin! 🎉',
+    star_sub_5: 'Bu seans kendi başına çok güzel konuştun!',
+    star_title_3: 'Aferin! ⭐',
+    star_sub_3: 'Harika bir seans geçirdin, her gün daha iyisin!',
+    star_title_1: 'Eline sağlık! 💪',
+    star_sub_1: 'Bugün de konuşmak için çaba gösterdin, bu çok değerli!',
+    star_close_btn: 'Harika! ✨',
+    menu_panel_mode: 'Panel Modu',
+    menu_panel_parent: 'Veli Paneli',
+    menu_panel_specialist: 'Uzman Paneli',
+    menu_panel_copy_parent: 'Seçili öğrenci için uygun çalışmayı seçip gelişimini tek panelden izleyebilirsin.',
+    menu_panel_copy_specialist: 'Birden fazla öğrenciyi takip edip seçili öğrenci için seansları yönetebilirsin.',
+    menu_student_summary: 'Öğrenci Özeti',
+    menu_not_selected: 'Henüz seçilmedi',
+    menu_student_summary_hint: 'Öğrenci seçince notları ve temel bilgileri burada göreceksin.',
+    menu_total_students: 'Toplam Öğrenci',
+    menu_count_copy_parent: 'Bu veli hesabında takip edilen aktif öğrenci sayısı.',
+    menu_count_copy_specialist: 'Bu uzman hesabına bağlı aktif öğrenci sayısı.',
+    sd_selected_student: 'Seçili Öğrenci',
+    sd_none_selected: 'Öğrenci seçilmedi',
+    sd_pick_hint: 'Bir öğrenci seçtiğinde güçlü yönler, destek notları ve oturum özeti burada görünür.',
+    sd_manage_btn: 'Öğrenci Yönet',
+    sd_support_note: 'Destek Notu',
+    sd_note_empty: 'Henüz destek notu eklenmedi.',
+    sd_focus_label: 'Öğrenme Odağı',
+    sd_focus_empty: 'Destek notlarına göre odak alanı burada özetlenir.',
+    sd_last_session: 'Son Oturum',
+    sd_no_session: 'Henüz kayıtlı oturum yok.',
+    sd_total_sessions: 'Toplam Oturum',
+    sd_total_minutes: 'Toplam Dakika',
+    sd_last_summary: 'Son Kayıt Özeti',
+    sd_session_line: '{date} tarihinde {min} dk, {turns} yanıt',
+    sd_turns_line: '{n} yanıt',
+    sd_subtitle_default: 'Seçili öğrenci için destek notları ve oturum özeti burada.',
+    sd_subtitle_with_year: 'Doğum yılı {year}. Seçili öğrenci için destek notları ve oturum özeti burada.',
+    sd_birth_year: 'Doğum yılı: {y}',
+    sd_birth_missing: 'Doğum yılı girilmedi',
+    sd_unnamed: 'İsimsiz öğrenci',
+    min_unit: 'dk',
+    la_age_48: '4-8 yaş',
+    la_age_47: '4-7 yaş',
+    la_speech_title: 'Konuşma ve İfade',
+    la_speech_sum: 'Kısa cümle kurma, soru anlama ve ihtiyaç ifade etme becerileri.',
+    la_speech_o1: 'Basit sorulara uygun yanıt verir',
+    la_speech_o2: 'Tek kelime yerine kısa cümle kurar',
+    la_speech_o3: 'İhtiyacını sözel olarak ifade eder',
+    la_speech_plan: 'Terapi ekranında kısa soru, yanıt ve terapist geri bildirimiyle ilerler.',
+    la_visual_title: 'Görsel Dikkat',
+    la_visual_sum: 'Eşleştirme, sıralama ve yönerge takibi için görsel hazırlık alanı.',
+    la_visual_o1: 'Görsel eşleştirme yapar',
+    la_visual_o2: 'Sıralı yönergeyi takip eder',
+    la_visual_o3: 'Farklılıkları ayırt eder',
+    la_visual_plan: 'Kart, eşleştirme ve adım takibi etkinlikleriyle kısa görevler sunulur.',
+    la_daily_title: 'Günlük Yaşam Becerileri',
+    la_daily_sum: 'Rutin, bekleme, yardım isteme ve temel özbakım davranışları.',
+    la_daily_o1: 'Günlük rutinleri tanır',
+    la_daily_o2: 'Yardım isteme davranışı geliştirir',
+    la_daily_o3: 'Bekleme ve sıra alma becerisini uygular',
+    la_daily_plan: 'Gerçek yaşam senaryoları ve kısa karar kartlarıyla çalışılır.',
+    report_first_focus: 'Önerilen ilk odak',
+    report_answer_prefix: 'Yanıt: ',
+    report_other: 'Diğer',
+    report_new_questions: 'Bu alanda yeni sorular çalışıldı.',
+    report_story_full: '✅ Tam',
+    report_preparing: 'Hazırlanıyor...',
+    report_stat_mic: 'Mikrofon Kullanımı',
+    report_stat_duration: 'Toplam Süre',
+    report_stat_story: 'Hikâye İlerlemesi',
+    report_stat_turns: 'Toplam Yanıt',
+    report_stat_intervention: 'Müdahale / Prososyal',
+    report_choice_analysis: '🔍 Seçim Analizi',
+    report_speech_summary: '🎙️ Konuşma Pratiği Özeti',
+    report_ai_eval: "🤖 Yıldız Can'ın Değerlendirmesi",
+    report_no_story: 'Henüz hikâye oturumu yapılmadı.',
+    report_no_session: 'Henüz oturum yapılmadı.',
+    report_print: '🖨️ Yazdır',
+    iep_goal_won: 'Tebrikler! Hedef kazanıldı!',
+    iep_session_saved: 'Seans kaydedildi!',
+    iep_screen_title: '📋 IEP Hedefleri',
+    iep_target_behavior: 'Hedef Davranış',
+    iep_behavior_ph: 'Örn: 10 farklı nesneyi doğru isimle tanımlayacak',
+    iep_target_pct: 'Hedef Başarı %',
+    iep_trial_count: 'Deneme Sayısı',
+    iep_start_date: 'Başlangıç',
+    iep_save: '✓ Kaydet',
+    iep_session_hint: 'Her deneme için butona bas:',
+    iep_correct: 'Doğru',
+    iep_prompted: 'İpucu',
+    iep_wrong: 'Yanlış',
+    iep_session_note_ph: 'Seans notu (isteğe bağlı)',
+    iep_save_session: '✓ Seansı Kaydet',
+    login_pick_who: 'Kim olduğunu seç!',
+    login_add_student: '+ Yeni Öğrenci Ekle',
+    login_no_students: 'Henüz öğrenci eklenmedi.',
+    login_add_first: 'Aşağıdan ilk öğrenciyi ekleyin!',
+    student_fallback: 'Öğrenci',
+    student_notes_ph: 'Destek notu, ilgi alanı...',
+    btn_create: 'Oluştur',
+    auth_waiting: 'Bekleniyor...',
+    schedule_screen_title: '📅 Günlük Program',
+    schedule_add_btn: '✓ Ekle',
+    schedule_reset: '🔄 Günü Sıfırla',
+    behavior_new_entry: 'Yeni Kayıt',
+    behavior_history: 'Geçmiş Kayıtlar',
+    behavior_consequence_ph: 'Ne yapıldı?',
+    behavior_save: '✓ Kaydet',
+    aac_add_card: '➕ Kart Ekle',
+    aac_mode_emoji: '😊 Emoji',
+    aac_mode_photo: '📷 Fotoğraf',
+    aac_photo_search_ph: 'Kelime ara... (elma, köpek, oyun)',
+    aac_photo_hint: 'Türkçe veya İngilizce kelime yaz, fotoğraflar gelsin.',
+    aac_card_name_ph: 'Kart adı yaz...',
+    a11y_account: 'Hesap',
+    schedule_add_activity: '+ Etkinlik Ekle',
+    iep_new_goal: 'Yeni Hedef Ekle',
+    iep_domain: 'Alan',
+    iep_target_date: 'Hedef Tarih',
+    iep_add_goal: '+ Hedef Ekle',
+    skills_screen_title: '🗺️ Beceri Haritası',
+    behavior_screen_title: '📊 Davranış Kaydı',
+    behavior_antecedent_ph: 'Ne tetikledi?',
+    search_btn: 'Ara',
+    add_btn: 'Ekle',
   },
   en: {
     back_menu: '← Menu',
@@ -1376,6 +1509,139 @@ const STRINGS = {
     analysis_summary_sim: ' and requested simpler language {pct}%',
     analysis_summary_need: '',
     report_eval_fallback: '{name} showed active engagement with the app during this session. Regular sessions will support the child\'s speech confidence and expressive skills. We recommend continuing to work with Yıldız Can.',
+    info_next_question: "Let's move on to a new question! ➡️",
+    info_no_speech_support: 'Your browser does not support speech recognition. Try Chrome or Edge.',
+    info_press_next: 'You can press the next button! ➡️',
+    info_listening: "I'm listening... 🎙️",
+    info_no_sound: "I didn't hear you, try again!",
+    info_repeat_please: "I couldn't hear that, can you say it again?",
+    therapy_session_end: "It was great talking with you! Let's look at a new video now!",
+    city_open_area: 'Open the {label} area',
+    city_go_therapy: 'Go to Speech Practice',
+    city_in_focus: '{label} in focus',
+    star_title_5: "You're amazing! 🎉",
+    star_sub_5: 'You spoke wonderfully on your own this session!',
+    star_title_3: 'Well done! ⭐',
+    star_sub_3: "You had a great session, you're getting better every day!",
+    star_title_1: 'Great effort! 💪',
+    star_sub_1: 'You worked hard on speaking today, and that is so valuable!',
+    star_close_btn: 'Great! ✨',
+    menu_panel_mode: 'Panel Mode',
+    menu_panel_parent: 'Parent Panel',
+    menu_panel_specialist: 'Specialist Panel',
+    menu_panel_copy_parent: 'Pick the right activity for the selected student and track progress from one panel.',
+    menu_panel_copy_specialist: 'Track multiple students and manage sessions for the selected student.',
+    menu_student_summary: 'Student Summary',
+    menu_not_selected: 'Not selected yet',
+    menu_student_summary_hint: 'Select a student to see their notes and basic info here.',
+    menu_total_students: 'Total Students',
+    menu_count_copy_parent: 'Active students tracked in this parent account.',
+    menu_count_copy_specialist: 'Active students linked to this specialist account.',
+    sd_selected_student: 'Selected Student',
+    sd_none_selected: 'No student selected',
+    sd_pick_hint: 'When you select a student, strengths, support notes and session summary appear here.',
+    sd_manage_btn: 'Manage Students',
+    sd_support_note: 'Support Note',
+    sd_note_empty: 'No support note added yet.',
+    sd_focus_label: 'Learning Focus',
+    sd_focus_empty: 'The focus area is summarized here based on support notes.',
+    sd_last_session: 'Last Session',
+    sd_no_session: 'No recorded sessions yet.',
+    sd_total_sessions: 'Total Sessions',
+    sd_total_minutes: 'Total Minutes',
+    sd_last_summary: 'Last Record Summary',
+    sd_session_line: '{min} min, {turns} answers on {date}',
+    sd_turns_line: '{n} answers',
+    sd_subtitle_default: 'Support notes and session summary for the selected student.',
+    sd_subtitle_with_year: 'Born {year}. Support notes and session summary for the selected student.',
+    sd_birth_year: 'Birth year: {y}',
+    sd_birth_missing: 'Birth year not entered',
+    sd_unnamed: 'Unnamed student',
+    min_unit: 'min',
+    la_age_48: 'ages 4-8',
+    la_age_47: 'ages 4-7',
+    la_speech_title: 'Speech and Expression',
+    la_speech_sum: 'Building short sentences, understanding questions and expressing needs.',
+    la_speech_o1: 'Responds appropriately to simple questions',
+    la_speech_o2: 'Uses short sentences instead of single words',
+    la_speech_o3: 'Expresses needs verbally',
+    la_speech_plan: 'Progresses on the therapy screen with short questions, answers and therapist feedback.',
+    la_visual_title: 'Visual Attention',
+    la_visual_sum: 'Visual readiness area for matching, sequencing and following instructions.',
+    la_visual_o1: 'Matches visually',
+    la_visual_o2: 'Follows sequential instructions',
+    la_visual_o3: 'Distinguishes differences',
+    la_visual_plan: 'Short tasks are offered with cards, matching and step-tracking activities.',
+    la_daily_title: 'Daily Living Skills',
+    la_daily_sum: 'Routines, waiting, asking for help and basic self-care behaviors.',
+    la_daily_o1: 'Recognizes daily routines',
+    la_daily_o2: 'Develops help-seeking behavior',
+    la_daily_o3: 'Practices waiting and turn-taking',
+    la_daily_plan: 'Practiced with real-life scenarios and short decision cards.',
+    report_first_focus: 'Recommended first focus',
+    report_answer_prefix: 'Answer: ',
+    report_other: 'Other',
+    report_new_questions: 'New questions were practiced in this area.',
+    report_story_full: '✅ Full',
+    report_preparing: 'Preparing...',
+    report_stat_mic: 'Microphone Use',
+    report_stat_duration: 'Total Duration',
+    report_stat_story: 'Story Progress',
+    report_stat_turns: 'Total Answers',
+    report_stat_intervention: 'Intervention / Prosocial',
+    report_choice_analysis: '🔍 Choice Analysis',
+    report_speech_summary: '🎙️ Speech Practice Summary',
+    report_ai_eval: "🤖 Yıldız Can's Evaluation",
+    report_no_story: 'No story session yet.',
+    report_no_session: 'No session yet.',
+    report_print: '🖨️ Print',
+    iep_goal_won: 'Congratulations! Goal achieved!',
+    iep_session_saved: 'Session saved!',
+    iep_screen_title: '📋 IEP Goals',
+    iep_target_behavior: 'Target Behavior',
+    iep_behavior_ph: 'E.g.: Will name 10 different objects correctly',
+    iep_target_pct: 'Target Success %',
+    iep_trial_count: 'Trial Count',
+    iep_start_date: 'Start',
+    iep_save: '✓ Save',
+    iep_session_hint: 'Press a button for each trial:',
+    iep_correct: 'Correct',
+    iep_prompted: 'Prompt',
+    iep_wrong: 'Wrong',
+    iep_session_note_ph: 'Session note (optional)',
+    iep_save_session: '✓ Save Session',
+    login_pick_who: 'Pick who you are!',
+    login_add_student: '+ Add New Student',
+    login_no_students: 'No students added yet.',
+    login_add_first: 'Add your first student below!',
+    student_fallback: 'Student',
+    student_notes_ph: 'Support note, interests...',
+    btn_create: 'Create',
+    auth_waiting: 'Please wait...',
+    schedule_screen_title: '📅 Daily Schedule',
+    schedule_add_btn: '✓ Add',
+    schedule_reset: '🔄 Reset Day',
+    behavior_new_entry: 'New Entry',
+    behavior_history: 'Past Entries',
+    behavior_consequence_ph: 'What was done?',
+    behavior_save: '✓ Save',
+    aac_add_card: '➕ Add Card',
+    aac_mode_emoji: '😊 Emoji',
+    aac_mode_photo: '📷 Photo',
+    aac_photo_search_ph: 'Search a word... (apple, dog, play)',
+    aac_photo_hint: 'Type a Turkish or English word to get photos.',
+    aac_card_name_ph: 'Type a card name...',
+    a11y_account: 'Account',
+    schedule_add_activity: '+ Add Activity',
+    iep_new_goal: 'Add New Goal',
+    iep_domain: 'Domain',
+    iep_target_date: 'Target Date',
+    iep_add_goal: '+ Add Goal',
+    skills_screen_title: '🗺️ Skill Map',
+    behavior_screen_title: '📊 Behavior Log',
+    behavior_antecedent_ph: 'What triggered it?',
+    search_btn: 'Search',
+    add_btn: 'Add',
   }
 };
 
@@ -1457,63 +1723,27 @@ let historyCalendarMonth = null;
 const LEARNING_AREAS = [
     {
         key: 'speech',
-        title: 'Konuşma ve İfade',
-        ageRange: '4-8 yaş',
-        summary: 'Kısa cümle kurma, soru anlama ve ihtiyaç ifade etme becerileri.',
-        outcomes: [
-            'Basit sorulara uygun yanıt verir',
-            'Tek kelime yerine kısa cümle kurar',
-            'İhtiyacını sözel olarak ifade eder'
-        ],
-        screenPlan: 'Terapi ekranında kısa soru, yanıt ve terapist geri bildirimiyle ilerler.'
+        get title() { return t('la_speech_title'); },
+        get ageRange() { return t('la_age_48'); },
+        get summary() { return t('la_speech_sum'); },
+        get outcomes() { return [t('la_speech_o1'), t('la_speech_o2'), t('la_speech_o3')]; },
+        get screenPlan() { return t('la_speech_plan'); }
     },
     {
         key: 'visual',
-        title: 'Görsel Dikkat',
-        ageRange: '4-7 yaş',
-        summary: 'Eşleştirme, sıralama ve yönerge takibi için görsel hazırlık alanı.',
-        outcomes: [
-            'Görsel eşleştirme yapar',
-            'Sıralı yönergeyi takip eder',
-            'Farklılıkları ayırt eder'
-        ],
-        screenPlan: 'Kart, eşleştirme ve adım takibi etkinlikleriyle kısa görevler sunulur.'
+        get title() { return t('la_visual_title'); },
+        get ageRange() { return t('la_age_47'); },
+        get summary() { return t('la_visual_sum'); },
+        get outcomes() { return [t('la_visual_o1'), t('la_visual_o2'), t('la_visual_o3')]; },
+        get screenPlan() { return t('la_visual_plan'); }
     },
     {
         key: 'daily',
-        title: 'Günlük Yaşam Becerileri',
-        ageRange: '4-8 yaş',
-        summary: 'Rutin, bekleme, yardım isteme ve temel özbakım davranışları.',
-        outcomes: [
-            'Günlük rutinleri tanır',
-            'Yardım isteme davranışı geliştirir',
-            'Bekleme ve sıra alma becerisini uygular'
-        ],
-        screenPlan: 'Gerçek yaşam senaryoları ve kısa karar kartlarıyla çalışılır.'
-    }
-];
-
-const THERAPY_STAGES = [
-    {
-        title: 'Hazırlık',
-        focus: 'Tanıdık ve rahatlatıcı sorularla başlıyoruz',
-        brief: 'Kısa ve anlaşılır cevaplar vererek başlayacağız.',
-        coachTitle: 'Sakin başlangıç',
-        coachCopy: 'Önce çocuğun rahat konuşmasını sağlayan kısa ve tanıdık sorularla ilerleyeceğiz.'
-    },
-    {
-        title: 'İfade',
-        focus: 'Kısa cümle kurma ve açıklama becerisi',
-        brief: 'Yanıtı biraz daha açmasını destekleyen sorular seçiyoruz.',
-        coachTitle: 'İfade geliştirme',
-        coachCopy: 'Bu bölümde tek kelimeden kısa cümleye geçişi destekleyen sorular öne çıkıyor.'
-    },
-    {
-        title: 'Genelleme',
-        focus: 'Günlük yaşamla bağlantı kurma',
-        brief: 'Yanıtları günlük hayatla ilişkilendirerek beceriyi kalıcılaştırıyoruz.',
-        coachTitle: 'Günlük yaşama taşıma',
-        coachCopy: 'Son bölümde çocuk verdiği yanıtı günlük hayatına bağlamaya teşvik edilir.'
+        get title() { return t('la_daily_title'); },
+        get ageRange() { return t('la_age_48'); },
+        get summary() { return t('la_daily_sum'); },
+        get outcomes() { return [t('la_daily_o1'), t('la_daily_o2'), t('la_daily_o3')]; },
+        get screenPlan() { return t('la_daily_plan'); }
     }
 ];
 
@@ -1659,7 +1889,7 @@ function updateMenuIdentity() {
         emailEl.textContent = (_authUser && _authUser.displayName) ? `${_authUser.displayName} • ${roleLabel}` : 'Misafir';
     }
     if (studentEl) {
-        studentEl.textContent = activeStudentName || 'Öğrenci seç';
+        studentEl.textContent = activeStudentName || t('choose_student');
     }
     // Pill dot: green if student selected
     const dot = document.querySelector('.pill-dot');
@@ -1853,7 +2083,7 @@ function getMonthKey(date) {
 
 function formatHistoryDate(dateKey) {
     const date = new Date(`${dateKey}T12:00:00`);
-    return date.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' });
+    return date.toLocaleDateString(_lang === 'en' ? 'en-US' : 'tr-TR', { day: 'numeric', month: 'long', year: 'numeric' });
 }
 
 function createSessionHistoryId() {
@@ -1933,19 +2163,19 @@ function ensureStudentEnhancements() {
         insights.className = 'menu-insights';
         insights.innerHTML = `
             <div class="menu-insight-card">
-                <span class="menu-insight-label">Panel Modu</span>
-                <strong id="role-mode-title">Veli Paneli</strong>
-                <p id="role-mode-copy">Seçili öğrenci için doğru akışı seçip oturumları tek panelden takip edebilirsin.</p>
+                <span class="menu-insight-label">${t('menu_panel_mode')}</span>
+                <strong id="role-mode-title">${t('menu_panel_parent')}</strong>
+                <p id="role-mode-copy">${t('menu_panel_copy_parent')}</p>
             </div>
             <div class="menu-insight-card">
-                <span class="menu-insight-label">Öğrenci Özeti</span>
-                <strong id="student-summary-name">Henüz seçilmedi</strong>
-                <p id="student-summary-copy">Öğrenci seçince notları ve temel bilgileri burada göreceksin.</p>
+                <span class="menu-insight-label">${t('menu_student_summary')}</span>
+                <strong id="student-summary-name">${t('menu_not_selected')}</strong>
+                <p id="student-summary-copy">${t('menu_student_summary_hint')}</p>
             </div>
             <div class="menu-insight-card">
-                <span class="menu-insight-label">Toplam Öğrenci</span>
+                <span class="menu-insight-label">${t('menu_total_students')}</span>
                 <strong id="student-count-value">0</strong>
-                <p id="student-count-copy">Bu hesap için takip edilen aktif öğrenci sayısı.</p>
+                <p id="student-count-copy">${t('menu_count_copy_parent')}</p>
             </div>
         `;
         menuHeader.insertAdjacentElement('afterend', insights);
@@ -1958,37 +2188,37 @@ function ensureStudentEnhancements() {
         detailPanel.innerHTML = `
             <div class="student-detail-head">
                 <div>
-                    <span class="student-detail-kicker">Seçili Öğrenci</span>
-                    <h3 id="student-detail-title">Öğrenci seçilmedi</h3>
-                    <p id="student-detail-subtitle">Bir öğrenci seçtiğinde güçlü yönler, destek notları ve oturum özeti burada görünür.</p>
+                    <span class="student-detail-kicker">${t('sd_selected_student')}</span>
+                    <h3 id="student-detail-title">${t('sd_none_selected')}</h3>
+                    <p id="student-detail-subtitle">${t('sd_pick_hint')}</p>
                 </div>
-                <button type="button" class="menu-ghost-btn" onclick="openStudentSetup()">Öğrenci Yönet</button>
+                <button type="button" class="menu-ghost-btn" onclick="openStudentSetup()">${t('sd_manage_btn')}</button>
             </div>
             <div class="student-detail-grid">
                 <div class="student-detail-card">
-                    <span class="student-detail-label">Destek Notu</span>
-                    <p id="student-detail-notes">Henüz destek notu eklenmedi.</p>
+                    <span class="student-detail-label">${t('sd_support_note')}</span>
+                    <p id="student-detail-notes">${t('sd_note_empty')}</p>
                 </div>
                 <div class="student-detail-card">
-                    <span class="student-detail-label">Öğrenme Odağı</span>
-                    <p id="student-detail-goal">Destek notlarına göre odak alanı burada özetlenir.</p>
+                    <span class="student-detail-label">${t('sd_focus_label')}</span>
+                    <p id="student-detail-goal">${t('sd_focus_empty')}</p>
                 </div>
                 <div class="student-detail-card">
-                    <span class="student-detail-label">Son Oturum</span>
-                    <p id="student-detail-session">Henüz kayıtlı oturum yok.</p>
+                    <span class="student-detail-label">${t('sd_last_session')}</span>
+                    <p id="student-detail-session">${t('sd_no_session')}</p>
                 </div>
             </div>
             <div class="student-detail-meta-row">
                 <div class="student-mini-stat">
-                    <span>Toplam Oturum</span>
+                    <span>${t('sd_total_sessions')}</span>
                     <strong id="student-detail-total-sessions">0</strong>
                 </div>
                 <div class="student-mini-stat">
-                    <span>Toplam Dakika</span>
-                    <strong id="student-detail-total-minutes">0 dk</strong>
+                    <span>${t('sd_total_minutes')}</span>
+                    <strong id="student-detail-total-minutes">0 ${t('min_unit')}</strong>
                 </div>
                 <div class="student-mini-stat">
-                    <span>Son Kayıt Özeti</span>
+                    <span>${t('sd_last_summary')}</span>
                     <strong id="student-detail-story-progress">-</strong>
                 </div>
             </div>
@@ -2289,29 +2519,29 @@ function renderRoleDashboard() {
     const studentCountCopyEl = document.getElementById('student-count-copy');
     const student = studentsCache.find(item => item.id === activeStudentId);
 
-    if (roleTitleEl) roleTitleEl.textContent = currentUserRole === 'specialist' ? 'Uzman Paneli' : 'Veli Paneli';
+    if (roleTitleEl) roleTitleEl.textContent = currentUserRole === 'specialist' ? t('menu_panel_specialist') : t('menu_panel_parent');
     if (roleCopyEl) {
         roleCopyEl.textContent = currentUserRole === 'specialist'
-            ? 'Birden fazla öğrenciyi takip edip seçili öğrenci için seansları yönetebilirsin.'
-            : 'Seçili öğrenci için uygun çalışmayı seçip gelişimini tek panelden izleyebilirsin.';
+            ? t('menu_panel_copy_specialist')
+            : t('menu_panel_copy_parent');
     }
 
-    if (studentSummaryNameEl) studentSummaryNameEl.textContent = activeStudentName || 'Henüz seçilmedi';
+    if (studentSummaryNameEl) studentSummaryNameEl.textContent = activeStudentName || t('menu_not_selected');
     if (studentSummaryCopyEl) {
         if (student) {
-            const note = student.support_notes ? student.support_notes : 'Destek notu henüz eklenmedi.';
-            const yearText = student.birth_year ? `Doğum yılı: ${student.birth_year}. ` : '';
+            const note = student.support_notes ? student.support_notes : t('sd_note_empty');
+            const yearText = student.birth_year ? t('sd_birth_year').replace('{y}', student.birth_year) + '. ' : '';
             studentSummaryCopyEl.textContent = `${yearText}${note}`;
         } else {
-            studentSummaryCopyEl.textContent = 'Öğrenci seçince notları ve temel bilgileri burada göreceksin.';
+            studentSummaryCopyEl.textContent = t('menu_student_summary_hint');
         }
     }
 
     if (studentCountEl) studentCountEl.textContent = String(studentsCache.length);
     if (studentCountCopyEl) {
         studentCountCopyEl.textContent = currentUserRole === 'specialist'
-            ? 'Bu uzman hesabına bağlı aktif öğrenci sayısı.'
-            : 'Bu veli hesabında takip edilen aktif öğrenci sayısı.';
+            ? t('menu_count_copy_specialist')
+            : t('menu_count_copy_parent');
     }
 }
 
@@ -2342,29 +2572,25 @@ async function renderStudentDetailPanel() {
     const student = studentsCache.find(item => item.id === activeStudentId);
     if (!student) {
         titleEl.textContent = t('no_student');
-        subtitleEl.textContent = 'Bir öğrenci seçtiğinde güçlü yönler, destek notları ve oturum özeti burada görünür.';
-        notesEl.textContent = 'Henüz destek notu eklenmedi.';
-        goalEl.textContent = 'Destek notlarına göre odak alanı burada özetlenir.';
-        sessionEl.textContent = 'Henüz kayıtlı oturum yok.';
+        subtitleEl.textContent = t('sd_pick_hint');
+        notesEl.textContent = t('sd_note_empty');
+        goalEl.textContent = t('sd_focus_empty');
+        sessionEl.textContent = t('sd_no_session');
         totalSessionsEl.textContent = '0';
-        totalMinutesEl.textContent = '0 dk';
+        totalMinutesEl.textContent = '0 ' + t('min_unit');
         storyProgressEl.textContent = '-';
         return;
     }
 
-    titleEl.textContent = student.full_name || 'İsimsiz öğrenci';
+    titleEl.textContent = student.full_name || t('sd_unnamed');
     subtitleEl.textContent = student.birth_year
-        ? `Doğum yılı ${student.birth_year}. Seçili öğrenci için destek notları ve oturum özeti burada.`
-        : 'Seçili öğrenci için destek notları ve oturum özeti burada.';
-    notesEl.textContent = student.support_notes || 'Henüz destek notu eklenmedi.';
+        ? t('sd_subtitle_with_year').replace('{year}', student.birth_year)
+        : t('sd_subtitle_default');
+    notesEl.textContent = student.support_notes || t('sd_note_empty');
 
     const userId = await getCurrentUserId();
     const metrics = await loadStudentDetailMetrics(userId, student.id);
-    goalEl.textContent = student.support_notes
-        ? `Odak: ${student.support_notes}`
-        : (currentUserRole === 'specialist'
-            ? 'Oturumdan önce destek notu ekleyerek yönlendirmeyi güçlendirebilirsin.'
-            : 'Destek notu ekleyerek hangi beceriye odaklanacağını netleştirebilirsin.');
+    goalEl.textContent = student.support_notes ? student.support_notes : t('sd_focus_empty');
 
     const recommendedArea = inferLearningArea(student);
     if (recommendedArea) {
@@ -2372,16 +2598,21 @@ async function renderStudentDetailPanel() {
     }
 
     if (metrics.latestSession) {
-        const sessionDate = new Date(metrics.latestSession.created_at).toLocaleDateString('tr-TR');
-        sessionEl.textContent = `${sessionDate} tarihinde ${metrics.latestSession.duration_min || 0} dk, ${metrics.latestSession.total_turns || 0} yanıt`;
-        storyProgressEl.textContent = metrics.latestSession.story_completed ? 'Tamamlandı' : `${metrics.latestSession.total_turns || 0} yanıt`;
+        const sessionDate = new Date(metrics.latestSession.created_at).toLocaleDateString(_lang === 'en' ? 'en-US' : 'tr-TR');
+        sessionEl.textContent = t('sd_session_line')
+            .replace('{date}', sessionDate)
+            .replace('{min}', metrics.latestSession.duration_min || 0)
+            .replace('{turns}', metrics.latestSession.total_turns || 0);
+        storyProgressEl.textContent = metrics.latestSession.story_completed
+            ? t('report_completed')
+            : t('sd_turns_line').replace('{n}', metrics.latestSession.total_turns || 0);
     } else {
-        sessionEl.textContent = 'Henüz kayıtlı oturum yok.';
+        sessionEl.textContent = t('sd_no_session');
         storyProgressEl.textContent = '-';
     }
 
     totalSessionsEl.textContent = String(metrics.totalSessions);
-    totalMinutesEl.textContent = `${metrics.totalMinutes} dk`;
+    totalMinutesEl.textContent = `${metrics.totalMinutes} ${t('min_unit')}`;
 }
 
 function renderStudentList() {
@@ -2398,9 +2629,9 @@ function renderStudentList() {
     statusEl.textContent = t('select_or_add_student');
     listEl.innerHTML = studentsCache.map(student => `
         <button type="button" class="student-card ${student.id === activeStudentId ? 'active' : ''}" onclick="selectStudent('${escapeHtml(student.id)}')">
-            <h4>${escapeHtml(student.full_name) || 'İsimsiz öğrenci'}</h4>
-            <p>${escapeHtml(student.support_notes) || 'Henüz destek notu eklenmedi.'}</p>
-            <span class="student-card-meta">${student.birth_year ? `Doğum yılı: ${escapeHtml(String(student.birth_year))}` : 'Doğum yılı girilmedi'}</span>
+            <h4>${escapeHtml(student.full_name) || t('sd_unnamed')}</h4>
+            <p>${escapeHtml(student.support_notes) || t('sd_note_empty')}</p>
+            <span class="student-card-meta">${student.birth_year ? t('sd_birth_year').replace('{y}', escapeHtml(String(student.birth_year))) : t('sd_birth_missing')}</span>
         </button>
     `).join('');
     renderRoleDashboard();
@@ -2592,7 +2823,7 @@ function updateAdaptiveState() {
     const catStats = existing.categoryStats || {};
 
     sessionData.therapyTurns.forEach(t => {
-        const c = t.category || 'Diğer';
+        const c = t.category || t('report_other');
         if (!catStats[c]) catStats[c] = { turns: 0, simplify: 0, noResponse: 0 };
         catStats[c].turns++;
     });
@@ -2798,7 +3029,7 @@ function renderCitySessionSummary() {
                 <article class="city-session-card">
                     <h4>${label}</h4>
                     <p>${data.count} soru • ${[...data.categories].join(', ') || t('report_general_speech')}</p>
-                    <span>${data.sample || 'Bu alanda yeni sorular çalışıldı.'}</span>
+                    <span>${data.sample || t('report_new_questions')}</span>
                 </article>
             `).join('')}
         </div>
@@ -2843,7 +3074,7 @@ async function goToReport() {
         ? Math.round((sessionData.totalScenesReached / sessionData.totalScenes) * 100) + '%'
         : '-';
     document.getElementById('statStoryProgress').textContent =
-        sessionData.storyCompleted ? '✅ Tam' : storyPct;
+        sessionData.storyCompleted ? t('report_story_full') : storyPct;
 
     // Toplam yanıt
     const totalTurns = sessionData.therapyTurns.length + sessionData.storyChoices.length + sessionData.micUsedInStory;
@@ -2863,7 +3094,7 @@ async function goToReport() {
         const recommendedArea = inferLearningArea(student);
         learningAreaPlanEl.innerHTML = `
             <div class="learning-area-plan-card emphasis">
-                <span class="learning-area-plan-label">Önerilen ilk odak</span>
+                <span class="learning-area-plan-label">${t('report_first_focus')}</span>
                 <strong>${recommendedArea.title}</strong>
                 <p>${recommendedArea.summary}</p>
             </div>
@@ -2889,7 +3120,7 @@ async function goToReport() {
                 <div>
                     <div class="choice-row-scene">${c.sceneLabel}</div>
                     <div class="choice-row-text">${c.choice}</div>
-                    <div class="choice-row-meta">Yanıt: "${c.response}"</div>
+                    <div class="choice-row-meta">${t('report_answer_prefix')}"${c.response}"</div>
                 </div>`;
             choiceEl.appendChild(row);
         });
@@ -2966,7 +3197,30 @@ async function generateAIEvaluation(durationMin, totalMic, storyPct, totalTurns)
     if (_iepText)      _contextBlock += `\nIEP/BEP HEDEFLERİ:\n${_iepText}\n`;
     if (_skillsText)   _contextBlock += `\nBECERİ HARİTASI:\n${_skillsText}\n`;
 
-    const prompt = `Sen özel eğitim ve konuşma terapisi alanında uzman, empati dolu bir asistansın.
+    const prompt = _lang === 'en'
+        ? `You are an empathetic assistant specialized in special education and speech therapy.
+The data below comes from a student's session in the Yıldız Can app.
+
+Session duration: ${durationMin} minutes
+Total answers: ${totalTurns}
+Microphone uses: ${totalMic}
+Story progress: ${storyPct}
+Story completed: ${sessionData.storyCompleted ? 'Yes' : 'No'}
+${_contextBlock}
+Choices made in the story:
+${choices}
+
+Samples from speech practice:
+${therapySample}
+
+Please write a warm, professional evaluation in English addressed to the parent, in 3-4 paragraphs covering:
+1. The child's overall engagement and motivation in this session
+2. Social/emotional cues observed from the story choices
+3. Notable points regarding speech and communication
+4. ${_adaptiveText || _iepText ? 'Concrete category-level suggestions for the family referencing the category/goal data (e.g. which themes to reinforce at home) and an encouraging closing' : 'Concrete suggestions for the family and an encouraging closing'}
+
+Do not use any emoji. Use warm, professional and hopeful language.`
+        : `Sen özel eğitim ve konuşma terapisi alanında uzman, empati dolu bir asistansın.
 Aşağıdaki veriler, bir öğrencinin Yıldız Can uygulamasındaki oturum verisidir.
 
 Oturum süresi: ${durationMin} dakika
@@ -3645,14 +3899,14 @@ function renderCityScene() {
 
     if (titleEl) titleEl.textContent = location.label;
     if (descEl) descEl.textContent = location.description || location.summary;
-    if (kickerEl) kickerEl.textContent = `${location.label} odakta`;
+    if (kickerEl) kickerEl.textContent = t('city_in_focus').replace('{label}', location.label);
     if (goalsEl) {
         goalsEl.innerHTML = (location.goals || []).map((goal) => `<span>${goal}</span>`).join('');
     }
     if (startBtn) {
         startBtn.textContent = currentScreenId === 'game-container'
-            ? `${location.label} alanını aç`
-            : 'Konuşma Terapisine Git';
+            ? t('city_open_area').replace('{label}', location.label)
+            : t('city_go_therapy');
     }
 }
 
@@ -3711,7 +3965,7 @@ function resetIdleTimer() {
     if (document.getElementById('micBtn').disabled && turnCount >= 7) return;
     idleTimer = setTimeout(() => {
         document.getElementById('nextBtn').classList.add('pulse-anim');
-        document.getElementById('info').innerText = "Hadi yeni soruya geçelim! ➡️";
+        document.getElementById('info').innerText = t('info_next_question');
     }, 15000);
 }
 
@@ -3806,7 +4060,7 @@ async function rec() {
     clearTimeout(idleTimer);
     var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
-        document.getElementById('info').innerText = "Tarayıcı ses tanımayı desteklemiyor. Chrome veya Edge kullanmayı dene.";
+        document.getElementById('info').innerText = t('info_no_speech_support');
         document.getElementById('micBtn').disabled = true;
         return;
     }
@@ -3830,16 +4084,16 @@ async function rec() {
         _speechBuffer = '';
         addMessage(speech, "user");
         if (turnCount >= 7) {
-            var final = "Seninle konuşmak harikaydı! Hadi şimdi yeni bir videoya bakalım!";
+            var final = t('therapy_session_end');
             addMessage(final, "ai");
             speak(final, function() {
                 document.getElementById('nextBtn').classList.add('pulse-anim');
-                document.getElementById('info').innerText = "İleri butonuna basabilirsin! ➡️";
+                document.getElementById('info').innerText = t('info_press_next');
             });
             isWaiting = false;
             return;
         }
-        document.getElementById('info').innerText = "Düşünüyorum...";
+        document.getElementById('info').innerText = t('thinking');
         var aiRes = await getGemmaResponse(speech);
         addMessage(aiRes, "ai");
         const currentLocation = CITY_LOCATIONS[currentCityLocationKey];
@@ -3905,7 +4159,7 @@ async function rec() {
     recognition.onstart = function() {
         _safariActive = true;
         document.getElementById('micBtn').classList.add('listening');
-        document.getElementById('info').innerText = "Seni dinliyorum... 🎙️";
+        document.getElementById('info').innerText = t('info_listening');
         _startVolumeRings();
         _noSpeechTimeout = setTimeout(function() {
             _safariActive = false;
@@ -3953,8 +4207,8 @@ async function rec() {
             if (_speechBuffer.trim()) { _finalizeSpeech(); return; }
             const _nrCat = getCurrentTherapyCategory().label;
             sessionData.noResponseByCategory[_nrCat] = (sessionData.noResponseByCategory[_nrCat] || 0) + 1;
-            document.getElementById('info').innerText = "Sesi duymadım, tekrar dene!";
-        } else document.getElementById('info').innerText = "Duyamadım, tekrar eder misin?";
+            document.getElementById('info').innerText = t('info_no_sound');
+        } else document.getElementById('info').innerText = t('info_repeat_please');
     };
 
     recognition.onend = function() {
@@ -4082,7 +4336,7 @@ async function speakWithLipsync(text, onEnd, emotion = CharacterEmotion.NEUTRAL)
         const res = await fetch(API_BASE + '/api/tts', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ text }),
+            body: JSON.stringify({ text, lang: _lang }),
             signal: _ttsCtrl.signal
         });
         clearTimeout(_ttsFetchTimer);
@@ -4170,10 +4424,8 @@ function saveScheduleCompletion(done) {
 function goToSchedule() {
     showOnly('schedule-screen');
     const today = new Date();
-    const days = ['Pazar','Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi'];
-    const months = ['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
     document.getElementById('scheduleDate').textContent =
-        `${days[today.getDay()]}, ${today.getDate()} ${months[today.getMonth()]}`;
+        today.toLocaleDateString(_lang === 'en' ? 'en-US' : 'tr-TR', { weekday: 'long', day: 'numeric', month: 'long' });
     cancelAddActivity();
     renderSchedule();
 }
@@ -4316,7 +4568,7 @@ async function _aacRenderAll() {
 
     // Navigasyon sekmeleri
     const nav = document.getElementById('aacNav');
-    const backBtn = '<button class="aac-nav-btn" onclick="goToMenu()">← Menü</button>';
+    const backBtn = `<button class="aac-nav-btn" onclick="goToMenu()">${t('back_menu')}</button>`;
     const tabs = _aacBoards.map(b => `
         <button type="button"
             class="aac-nav-btn${b.id === _aacCurrentBoardId ? ' active' : ''}"
@@ -4573,16 +4825,16 @@ function _showStarReward() {
     let stars, title, sub;
     if (indPct >= 75) {
         stars = 5;
-        title = 'Muhteşemsin! 🎉';
-        sub = 'Bu seans kendi başına çok güzel konuştun!';
+        title = t('star_title_5');
+        sub = t('star_sub_5');
     } else if (indPct >= 45) {
         stars = 3;
-        title = 'Aferin! ⭐';
-        sub = 'Harika bir seans geçirdin, her gün daha iyisin!';
+        title = t('star_title_3');
+        sub = t('star_sub_3');
     } else {
         stars = 1;
-        title = 'Eline sağlık! 💪';
-        sub = 'Bugün de konuşmak için çaba gösterdin, bu çok değerli!';
+        title = t('star_title_1');
+        sub = t('star_sub_1');
     }
 
     const starsEl = document.getElementById('starModalStars');
@@ -5089,7 +5341,7 @@ function switchAuthTab(mode) {
 
 function setAuthLoading(loading) {
     const btn = document.getElementById(_authMode === 'login' ? 'loginBtn' : 'registerBtn');
-    if (btn) { btn.disabled = loading; btn.textContent = loading ? 'Bekleniyor...' : (_authMode === 'login' ? 'Giriş Yap' : 'Kayıt Ol'); }
+    if (btn) { btn.disabled = loading; btn.textContent = loading ? t('auth_waiting') : (_authMode === 'login' ? t('login_btn') : t('register_btn')); }
 }
 
 function showAuthError(msg) {
@@ -5330,8 +5582,8 @@ function renderLoginStudents(students) {
     if (!wrap) return;
     if (!students.length) {
         wrap.innerHTML = `<div class="login-empty">
-            <p>Henüz öğrenci eklenmedi.</p>
-            <p>Aşağıdan ilk öğrenciyi ekleyin!</p>
+            <p>${t('login_no_students')}</p>
+            <p>${t('login_add_first')}</p>
         </div>`;
         return;
     }
@@ -5447,7 +5699,7 @@ function _renderAzIdentityCard(profile) {
     const tagsEl = document.getElementById('azStudentTags');
     const metaEl = document.getElementById('azSessionMeta');
 
-    if (nameEl) nameEl.textContent = activeStudentName || 'Öğrenci';
+    if (nameEl) nameEl.textContent = activeStudentName || t('student_fallback');
 
     if (tagsEl) {
         const levelTag = profile.category
@@ -5535,11 +5787,19 @@ async function generateBepReport() {
     const history = await loadReportHistory();
 
     const categoryLabels = {
-        ogreti: 'Hafif Düzey (Öğretilebilir)',
-        egit: 'Orta Düzey (Eğitilebilir)',
-        destekli: 'Ağır/İleri Düzey (Desteklenen)'
+        ogreti: t('bep_cat_ogreti'),
+        egit: t('bep_cat_egit'),
+        destekli: t('bep_cat_destekli')
     };
-    const conditionBehaviors = {
+    const conditionBehaviors = _lang === 'en' ? {
+        ekolali: 'verbal repetition patterns observed',
+        stereotipik: 'repetitive movement patterns observed',
+        dehb: 'difficulty with attention span and impulse control observed',
+        dil: 'needs support in language and speech development',
+        down: 'needs individualized support in cognitive and language development',
+        cp: 'needs motor coordination support',
+        oog: 'receiving support for specific learning difficulty'
+    } : {
         ekolali: 'sözel tekrarlama örüntüleri gözlemleniyor',
         stereotipik: 'tekrarlayıcı hareket örüntüleri gözlemleniyor',
         dehb: 'dikkat süresi ve dürtü kontrolünde güçlük gözlemleniyor',
@@ -5561,7 +5821,15 @@ Gözlemlenen Özellikler: ${(profile.conditions || []).map(c => conditionBehavio
         ? `İletişim Bağımsızlığı: %${m.indPct} (bağımsız mikrofon kullanımı)\nTekrar Dinleme İhtiyacı: %${m.repPct}\nDil Adaptasyon İhtiyacı: %${m.simPct}`
         : 'Metrik verisi henüz toplanmamış.';
 
-    const systemPrompt = `Sen özel eğitim kurumları için çalışan bir BEP (Bireyselleştirilmiş Eğitim Programı) taslak hazırlama asistanısın. Görevin, ham etkileşim verilerini BEP'e girdi olabilecek gözlem odaklı bir taslak metne dönüştürmektir. Bu taslak yetkili BEP ekibi tarafından incelenmeden resmi belge olarak kullanılamaz.
+    const systemPrompt = _lang === 'en'
+        ? `You are an IEP (Individualized Education Program) draft-writing assistant working for special education institutions. Your task is to turn raw interaction data into an observation-focused draft text that can serve as input to the IEP. This draft cannot be used as an official document before being reviewed by the authorized IEP team.
+
+WRITING RULES:
+1. Do not use "Medical Model" language. Use "Social Model" language: focus on community participation, peer interaction and social adaptation.
+2. If the student has "Echolalia" or "Stereotypic movement", emphasize the AI's dampening and independence-building effect.
+3. Write observable, performance-focused sentences. Never use "definitive diagnosis" or "official diagnosis" phrasing.
+4. Write in English. Keep it between 300-400 words.`
+        : `Sen özel eğitim kurumları için çalışan bir BEP (Bireyselleştirilmiş Eğitim Programı) taslak hazırlama asistanısın. Görevin, ham etkileşim verilerini BEP'e girdi olabilecek gözlem odaklı bir taslak metne dönüştürmektir. Bu taslak yetkili BEP ekibi tarafından incelenmeden resmi belge olarak kullanılamaz.
 
 YAZIM KURALLARI:
 1. "Tıbbi Model" dili kullanma. "Sosyal Model" dilini esas al: toplumsal katılım, akran etkileşimi ve sosyal uyum odaklı yaz.
@@ -5569,7 +5837,20 @@ YAZIM KURALLARI:
 3. Gözlemlenebilir, performans odaklı cümleler kur. "Kesin tanı" veya "resmi teşhis" ifadesi kullanma.
 4. Türkçe yaz. 300-400 kelime arası tut.`;
 
-    const userPrompt = `Aşağıdaki profil, bağımsızlık metrikleri ve seans verilerini kullanarak bir BEP Dönemsel Gelişim Taslağı oluştur:
+    const userPrompt = _lang === 'en'
+        ? `Create an IEP Periodic Progress Draft using the profile, independence metrics and session data below:
+
+STUDENT PROFILE:
+${profileText}
+
+COMMUNICATION INDEPENDENCE METRICS (total of ${m.sessionCount || history.length} sessions):
+${metricsText}
+
+RECENT SESSIONS (${Math.min(history.length, 10)} sessions):
+${sessionText}
+
+Start the draft with the heading "📝 IEP Periodic Progress Draft". Include these sections: 1) Student Level and Observation Summary, 2) Communication Independence Progress (interpret the metrics), 3) Observed Strengths, 4) Recommendations for the Next Period. Use concrete numbers when explaining the metrics.`
+        : `Aşağıdaki profil, bağımsızlık metrikleri ve seans verilerini kullanarak bir BEP Dönemsel Gelişim Taslağı oluştur:
 
 ÖĞRENCİ PROFİLİ:
 ${profileText}
@@ -5857,9 +6138,9 @@ async function submitTrialSession() {
         DB.set(iepGoalsKey(), goals);
         if (goals[goalIdx].status === 'mastered' && typeof confetti === 'function') {
             confetti({ particleCount: 80, spread: 60, origin: { y: 0.6 } });
-            speakFallback('Tebrikler! Hedef kazanıldı!');
+            speakFallback(t('iep_goal_won'));
         } else {
-            speakFallback('Seans kaydedildi!');
+            speakFallback(t('iep_session_saved'));
         }
     }
     closeSessionPanel();
