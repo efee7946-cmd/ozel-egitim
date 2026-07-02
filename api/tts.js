@@ -1,55 +1,67 @@
+import { GoogleAuth } from 'google-auth-library';
+
+let _authClient = null;
+
+async function getAccessToken() {
+    if (!_authClient) {
+        const credentials = JSON.parse(process.env.GOOGLE_TTS_CREDENTIALS);
+        const auth = new GoogleAuth({
+            credentials,
+            scopes: ['https://www.googleapis.com/auth/cloud-platform'],
+        });
+        _authClient = await auth.getClient();
+    }
+    const { token } = await _authClient.getAccessToken();
+    return token;
+}
+
 export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Origin', process.env.ALLOWED_ORIGIN || '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
     if (req.method === 'OPTIONS') return res.status(200).end();
 
-    const ELEVEN_KEY = process.env.ELEVEN_KEY;
-    const ELEVEN_VOICE_ID = process.env.ELEVENLABS_VOICE;
-
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Sadece POST isteği atılabilir.' });
     }
 
-    // Env değişkenleri kontrol
-    if (!ELEVEN_KEY) return res.status(500).json({ error: 'ELEVEN_KEY eksik' });
-    if (!ELEVEN_VOICE_ID) return res.status(500).json({ error: 'ELEVENLABS_VOICE eksik' });
+    if (!process.env.GOOGLE_TTS_CREDENTIALS) {
+        return res.status(500).json({ error: 'GOOGLE_TTS_CREDENTIALS eksik' });
+    }
 
     const { text } = req.body;
     if (!text) return res.status(400).json({ error: 'text zorunlu.' });
 
     try {
-        const response = await fetch(
-            `https://api.elevenlabs.io/v1/text-to-speech/${ELEVEN_VOICE_ID}`,
-            {
-                method: 'POST',
-                headers: {
-                    'xi-api-key': ELEVEN_KEY,
-                    'Content-Type': 'application/json',
-                    'Accept': 'audio/mpeg'
-                },
-                body: JSON.stringify({
-                    text,
-                    model_id: 'eleven_multilingual_v2',
-                    voice_settings: { stability: 0.5, similarity_boost: 0.75 }
-                })
-            }
-        );
+        const token = await getAccessToken();
+        const response = await fetch('https://texttospeech.googleapis.com/v1/text:synthesize', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                input: { text },
+                voice: { languageCode: 'tr-TR', name: 'tr-TR-Chirp3-HD-Aoede' },
+                audioConfig: { audioEncoding: 'MP3' },
+            }),
+        });
 
         if (!response.ok) {
             const errBody = await response.text();
-            console.error('ElevenLabs hata:', response.status, errBody);
-            return res.status(response.status).json({ 
-                error: 'ElevenLabs hatası', 
+            console.error('Google TTS hatası:', response.status, errBody);
+            return res.status(response.status).json({
+                error: 'Google TTS hatası',
                 status: response.status,
-                detail: errBody 
+                detail: errBody
             });
         }
 
-        const audioBuffer = await response.arrayBuffer();
+        const data = await response.json();
+        const audioBuffer = Buffer.from(data.audioContent, 'base64');
         res.setHeader('Content-Type', 'audio/mpeg');
         res.setHeader('Cache-Control', 'no-store');
-        res.send(Buffer.from(audioBuffer));
+        res.send(audioBuffer);
 
     } catch (error) {
         console.error('TTS backend hatası:', error);
