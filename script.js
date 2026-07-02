@@ -860,7 +860,7 @@ const STRINGS = {
     ob_next: 'İleri →',
     ob_start: 'Başlayalım! 🎉',
     auth_email_label: 'E-posta',
-    auth_email_hint: '(şifre sıfırlama için önerilir)',
+    AUTH_EMAIL_REQUIRED: 'E-posta adresi gerekli',
     auth_reset_email_info: 'Kullanıcı adınızı veya e-postanızı girin, kayıtlı e-postanıza sıfırlama kodu gönderelim.',
     auth_send_code_btn: 'E-postama Kod Gönder',
     auth_email_code_label: 'E-postadaki 6 Haneli Kod',
@@ -1733,7 +1733,7 @@ const STRINGS = {
     ob_next: 'Next →',
     ob_start: "Let's start! 🎉",
     auth_email_label: 'Email',
-    auth_email_hint: '(recommended for password reset)',
+    AUTH_EMAIL_REQUIRED: 'Email address is required',
     auth_reset_email_info: 'Enter your username or email and we will send a reset code to your registered email.',
     auth_send_code_btn: 'Send Code to My Email',
     auth_email_code_label: '6-Digit Code from Email',
@@ -5837,12 +5837,12 @@ async function handleRegister(e) {
     const studentName = document.getElementById('regStudentName').value.trim();
     const emoji       = document.getElementById('regStudentEmoji').value || '🌟';
     if (!document.getElementById('kvkkConsent').checked) return showAuthError(t('auth_kvkk_required'));
-    if (!username || !password || !studentName) return showAuthError(t('auth_fill_all'));
+    if (!username || !password || !studentName || !regEmail) return showAuthError(t('auth_fill_all'));
     if (password !== password2) return showAuthError(t('auth_passwords_mismatch'));
     if (password.length < 6) return showAuthError(t('auth_password_short'));
     setAuthLoading(true);
 
-    const res = await authApi('register', { username, password, email: regEmail || undefined });
+    const res = await authApi('register', { username, password, email: regEmail });
     setAuthLoading(false);
 
     if (res.fallback) {

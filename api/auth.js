@@ -108,27 +108,27 @@ export default async function handler(req, res) {
 
             await ensureAuthColumns();
             const userEmail = email && String(email).trim().toLowerCase();
-            if (userEmail && !isValidEmail(userEmail))
+            if (!userEmail)
+                return res.status(400).json({ error: 'AUTH_EMAIL_REQUIRED' });
+            if (!isValidEmail(userEmail))
                 return res.status(400).json({ error: 'AUTH_EMAIL_INVALID' });
-            if (userEmail && await emailInUse(userEmail, u))
+            if (await emailInUse(userEmail, u))
                 return res.status(409).json({ error: 'AUTH_EMAIL_TAKEN' });
 
             const hash = await bcrypt.hash(password, BCRYPT_ROUNDS);
             const displayName = username.trim();
             await query(
                 'INSERT INTO users (username, display_name, hash, salt, email) VALUES ($1, $2, $3, $4, $5)',
-                [u, displayName, hash, '', userEmail || null]  // bcrypt hash'i salt içeriyor, ayrı sütun boş
+                [u, displayName, hash, '', userEmail]  // bcrypt hash'i salt içeriyor, ayrı sütun boş
             );
 
             // Doğrulama kodu gönder — mail hatası kaydı engellemesin
             let emailVerificationPending = false;
-            if (userEmail) {
-                try {
-                    await sendVerificationCode(u, userEmail);
-                    emailVerificationPending = true;
-                } catch (e) {
-                    console.error('Doğrulama maili gönderilemedi:', e.message);
-                }
+            try {
+                await sendVerificationCode(u, userEmail);
+                emailVerificationPending = true;
+            } catch (e) {
+                console.error('Doğrulama maili gönderilemedi:', e.message);
             }
 
             const tok = crypto.randomBytes(32).toString('hex');
