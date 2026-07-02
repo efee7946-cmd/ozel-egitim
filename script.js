@@ -823,6 +823,7 @@ const STRINGS = {
     search_btn: 'Ara',
     add_btn: 'Ekle',
     student_pill: 'Öğrenci seç',
+    info_mic_permission: 'Mikrofon izni gerekli.',
   },
   en: {
     back_menu: '← Menu',
@@ -1644,6 +1645,7 @@ const STRINGS = {
     search_btn: 'Search',
     add_btn: 'Add',
     student_pill: 'Select student',
+    info_mic_permission: 'Microphone permission is required.',
   }
 };
 
@@ -4081,8 +4083,102 @@ function startQuestion() {
     });
 }
 
+async function processTherapySpeech(speech) {
+    if (!speech) return;
+    addMessage(speech, "user");
+    if (turnCount >= 7) {
+        var final = t('therapy_session_end');
+        addMessage(final, "ai");
+        speak(final, function() {
+            document.getElementById('nextBtn').classList.add('pulse-anim');
+            document.getElementById('info').innerText = t('info_press_next');
+        });
+        isWaiting = false;
+        return;
+    }
+    document.getElementById('info').innerText = t('thinking');
+    var aiRes = await getGemmaResponse(speech);
+    addMessage(aiRes, "ai");
+    const currentLocation = CITY_LOCATIONS[currentCityLocationKey];
+    sessionData.therapyTurns.push({
+        location: currentLocation ? currentLocation.label : '',
+        category: getCurrentTherapyCategory().label,
+        question: currentObj.q,
+        answer: speech
+    });
+    confetti({ particleCount: 50 });
+    var vEl = document.getElementById('v');
+    var pp = vEl.play();
+    if (pp !== undefined) pp.catch(function() {});
+    speak(aiRes, function() {
+        document.getElementById('micBtn').disabled = false;
+        isWaiting = false;
+        resetIdleTimer();
+        document.getElementById('info').innerText = t('mic_prompt');
+    });
+}
+
+function _getNativeSpeech() {
+    try {
+        if (typeof Capacitor !== 'undefined' && Capacitor.isNativePlatform()
+            && Capacitor.Plugins && Capacitor.Plugins.SpeechRecognition) {
+            return Capacitor.Plugins.SpeechRecognition;
+        }
+    } catch(_) {}
+    return null;
+}
+
+async function recNative(SR) {
+    const micBtn = document.getElementById('micBtn');
+    const infoEl = document.getElementById('info');
+    micBtn.disabled = true;
+    infoEl.innerText = _lang === 'en' ? 'Getting ready to listen...' : 'Dinlemeye hazırlanıyorum...';
+    try {
+        const avail = await SR.available();
+        if (!avail || !avail.available) {
+            infoEl.innerText = t('info_no_speech_support');
+            micBtn.disabled = false;
+            return;
+        }
+        try {
+            const perm = await SR.requestPermissions();
+            if (perm && perm.speechRecognition === 'denied') {
+                infoEl.innerText = t('info_mic_permission');
+                micBtn.disabled = false;
+                return;
+            }
+        } catch(_) {}
+
+        micBtn.classList.add('listening');
+        infoEl.innerText = t('info_listening');
+        const res = await SR.start({
+            language: _lang === 'en' ? 'en-US' : 'tr-TR',
+            maxResults: 1,
+            partialResults: false,
+            popup: false
+        });
+        micBtn.classList.remove('listening');
+        const speech = res && Array.isArray(res.matches) && res.matches[0] ? res.matches[0].trim() : '';
+        if (!speech) {
+            const _nrCat = getCurrentTherapyCategory().label;
+            sessionData.noResponseByCategory[_nrCat] = (sessionData.noResponseByCategory[_nrCat] || 0) + 1;
+            infoEl.innerText = t('info_no_sound');
+            micBtn.disabled = false;
+            return;
+        }
+        infoEl.innerText = '🎙️ ' + speech;
+        await processTherapySpeech(speech);
+    } catch (e) {
+        micBtn.classList.remove('listening');
+        micBtn.disabled = false;
+        infoEl.innerText = t('info_repeat_please');
+    }
+}
+
 async function rec() {
     clearTimeout(idleTimer);
+    const _nativeSR = _getNativeSpeech();
+    if (_nativeSR) return recNative(_nativeSR);
     var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
         document.getElementById('info').innerText = t('info_no_speech_support');
@@ -4107,37 +4203,7 @@ async function rec() {
         const speech = _speechBuffer.trim();
         if (!speech) return;
         _speechBuffer = '';
-        addMessage(speech, "user");
-        if (turnCount >= 7) {
-            var final = t('therapy_session_end');
-            addMessage(final, "ai");
-            speak(final, function() {
-                document.getElementById('nextBtn').classList.add('pulse-anim');
-                document.getElementById('info').innerText = t('info_press_next');
-            });
-            isWaiting = false;
-            return;
-        }
-        document.getElementById('info').innerText = t('thinking');
-        var aiRes = await getGemmaResponse(speech);
-        addMessage(aiRes, "ai");
-        const currentLocation = CITY_LOCATIONS[currentCityLocationKey];
-        sessionData.therapyTurns.push({
-            location: currentLocation ? currentLocation.label : '',
-            category: getCurrentTherapyCategory().label,
-            question: currentObj.q,
-            answer: speech
-        });
-        confetti({ particleCount: 50 });
-        var vEl = document.getElementById('v');
-        var pp = vEl.play();
-        if (pp !== undefined) pp.catch(function() {});
-        speak(aiRes, function() {
-            document.getElementById('micBtn').disabled = false;
-            isWaiting = false;
-            resetIdleTimer();
-            document.getElementById('info').innerText = t('mic_prompt');
-        });
+        await processTherapySpeech(speech);
     }
 
     var _volStream = null, _volCtx = null, _volFrame = null;
@@ -4226,7 +4292,7 @@ async function rec() {
         _stopVolumeRings();
         document.getElementById('micBtn').disabled = false;
         document.getElementById('micBtn').classList.remove('listening');
-        if (err.error === 'not-allowed') document.getElementById('info').innerText = "Mikrofon izni gerekli.";
+        if (err.error === 'not-allowed') document.getElementById('info').innerText = t('info_mic_permission');
         else if (err.error === 'no-speech') {
             // Ses gelmedi ama buffer'da bir şey varsa gönder
             if (_speechBuffer.trim()) { _finalizeSpeech(); return; }

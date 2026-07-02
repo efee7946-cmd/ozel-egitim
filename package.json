@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/efee7946-cmd/ozel-egitim#readme",
   "dependencies": {
+    "@capacitor-community/speech-recognition": "^7.0.1",
     "bcryptjs": "^2.4.3",
     "express": "^5.2.1",
     "google-auth-library": "^10.9.0",
