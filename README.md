@@ -23,7 +23,7 @@
 
 ## Özellikler
 
-- **Konuşma Terapisi** — Gemini AI geri bildirimi, ElevenLabs TTS, Web Speech API ile mikrofon kaydı, Pexels bağlamsal video
+- **Konuşma Terapisi** — Gemini AI geri bildirimi, Google Cloud TTS (Chirp 3 HD), Web Speech API ile mikrofon kaydı, Pexels bağlamsal video
 - **Eşleştirme Oyunları** — 4 hazır oyun + öğretmenin kendi oyununu oluşturabileceği editör
 - **Sıralama ve Sebep-Sonuç Oyunları** — Görsel kartları doğru sıraya yerleştirme
 - **AAC (Destekleyici İletişim)** — 4 kategori × 8 kart = 32 sembol, cümle oluşturma ve sesli çıktı
@@ -66,7 +66,7 @@ Sabit kategori butonları yerine serbest konu girişi — öğretmen veya terapi
 
 1. Serbest konu girilir (örn. "piknik", "doğum günü")
 2. Pexels API'den bağlamsal video yüklenir
-3. Soru ElevenLabs TTS ile seslendirilir; animasyonlu karakter dudak senkronizasyonu yapar
+3. Soru Google Cloud TTS ile seslendirilir; animasyonlu karakter dudak senkronizasyonu yapar
 4. Öğrenci Web Speech API ile yanıtını kaydeder (özel eğitim için duraklama toleransı ayarlı)
 5. Gemini AI, AAC etkileşim modeline göre gerçek zamanlı geri bildirim verir
 6. Seans verileri kaydedilir
@@ -203,14 +203,14 @@ Her hedef için:
 - Soruyu basitleştirme (Daha Basit modu)
 - Veli raporu için AI değerlendirmesi
 
-### ElevenLabs TTS
+### Google Cloud TTS
 
 | Parametre | Değer |
 |---|---|
-| Model | `eleven_multilingual_v2` |
+| Model | `tr-TR-Chirp3-HD-Aoede` |
 | Uç nokta | `/api/tts` |
 | Çıktı | MP3 |
-| Env değişkenleri | `ELEVEN_KEY`, `ELEVENLABS_VOICE` |
+| Env değişkeni | `GOOGLE_TTS_CREDENTIALS` (servis hesabı JSON) |
 
 Yedek: tarayıcı yerleşik Web Speech Synthesis API (`tr-TR`)
 
@@ -295,7 +295,7 @@ Okuma  →  localStorage (önce)    →  Vercel KV (yedek)
 | `/api/auth` | POST | Kimlik doğrulama (register/login/verify/logout) |
 | `/api/data` | GET/POST/DELETE | Vercel KV veri erişim katmanı |
 | `/api/chat` | POST | Gemini AI yanıt üretimi |
-| `/api/tts` | POST | ElevenLabs TTS ses sentezi |
+| `/api/tts` | POST | Google Cloud TTS ses sentezi |
 | `/api/video` | GET | Pexels arama ve video getirme |
 
 ---
@@ -332,9 +332,8 @@ Uygulama `http://localhost:3000` adresinde çalışır.
 # Google AI Studio — https://aistudio.google.com/apikey
 GEMINI_KEY=your_gemini_api_key
 
-# ElevenLabs — https://elevenlabs.io/app/settings/api-keys
-ELEVEN_KEY=your_elevenlabs_api_key
-ELEVENLABS_VOICE=your_voice_id
+# Google Cloud TTS — Cloud Console'dan indirilen servis hesabı JSON'ının tamamı
+GOOGLE_TTS_CREDENTIALS={"type":"service_account",...}
 
 # Pexels — https://www.pexels.com/api
 PEXELS_KEY=your_pexels_api_key
@@ -375,7 +374,7 @@ ozel-egitim/
 │   ├── _db.js          # PostgreSQL bağlantı havuzu (Aiven)
 │   ├── auth.js         # Kimlik doğrulama (register/login/verify/logout)
 │   ├── chat.js         # Gemini AI entegrasyonu
-│   ├── tts.js          # ElevenLabs TTS
+│   ├── tts.js          # Google Cloud TTS (Chirp 3 HD)
 │   ├── data.js         # Vercel KV erişim ağ geçidi
 │   └── video.js        # Pexels API
 ├── tests/
@@ -401,7 +400,7 @@ Vercel Serverless Functions
   ├── /api/auth    → Vercel KV (oturum ve kullanıcı)
   ├── /api/data    → Vercel KV (uygulama verisi)
   ├── /api/chat    → Google Gemini API
-  ├── /api/tts     → ElevenLabs API
+  ├── /api/tts     → Google Cloud TTS API
   └── /api/video   → Pexels API
 ```
 

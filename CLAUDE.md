@@ -26,7 +26,7 @@ Tüm anahtarlar `lms_` öneki ile başlar: `lms_students`, `lms_iep_<studentId>`
 
 ## Dış API'ler
 - `GEMINI_KEY` — Google Gemini (terapi geri bildirimi, veli raporu)
-- `ELEVEN_KEY` + `ELEVENLABS_VOICE` — ElevenLabs TTS
+- `GOOGLE_TTS_CREDENTIALS` — Google Cloud TTS (Chirp 3 HD) servis hesabı JSON'ı
 - `PEXELS_KEY` — Pexels fotoğraf/video
 - `KV_REST_API_URL` + `KV_REST_API_TOKEN` — Vercel KV (opsiyonel)
 - `DATABASE_URL` — PostgreSQL/Aiven bağlantısı
