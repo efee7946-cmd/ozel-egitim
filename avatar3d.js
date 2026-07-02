@@ -68,7 +68,6 @@ function init() {
         gltf.scene.traverse((o) => {
             if (!o.morphTargetDictionary) return;
             const keys = Object.keys(o.morphTargetDictionary);
-            console.log('Mesh:', o.name, keys);
 
                 // Ağız: viseme_aa tercihli, yoksa mouth_open, yoksa pattern'e uyan ilk key
             const mouthKey = keys.find(k => k === 'viseme_aa')
@@ -81,15 +80,17 @@ function init() {
             if (blinkKey && !eyesMesh) { eyesMesh = o; eyesMesh._blinkKey = blinkKey; }
         });
 
-        console.log('Mouth:', !!mouth, mouth?._mouthKey);
-        console.log('Eyes:', !!eyesMesh, eyesMesh?._blinkKey);
-
         if (eyesMesh) startBlinkLoop();
     });
 
+    let canvasVisible = false;
+    new IntersectionObserver((entries) => {
+        canvasVisible = entries[0].isIntersecting;
+    }).observe(canvas);
+
     (function renderLoop() {
         requestAnimationFrame(renderLoop);
-        renderer.render(scene, camera);
+        if (canvasVisible) renderer.render(scene, camera);
     })();
 }
 
