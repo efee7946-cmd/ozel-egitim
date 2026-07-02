@@ -39,6 +39,19 @@ const DB = (function () {
     const SENSITIVE = ['students', 'bep_profile_', 'iep_', 'skills_', 'behavior_', 'adaptive_', 'trials_'];
     function isSensitive(key) { return SENSITIVE.some(p => key.startsWith(p)); }
 
+    // Cihaza özel anahtarlar — buluta asla gönderilmez (oturum güvenliği)
+    const LOCAL_ONLY = ['auth_token', 'auth_user'];
+    function isLocalOnly(key) { return LOCAL_ONLY.includes(key); }
+
+    function _apiToken() {
+        try {
+            const raw = localStorage.getItem(PFX + 'auth_token');
+            const token = raw ? JSON.parse(raw) : null;
+            if (!token || String(token).startsWith('demo_')) return null;
+            return token;
+        } catch { return null; }
+    }
+
     /* ---------- Şifreleme ---------- */
     async function _deriveKey(token) {
         const enc = new TextEncoder();
@@ -111,10 +124,15 @@ const DB = (function () {
 
     /* ---------- Cloud ---------- */
     async function cloudFetch(key) {
-        if (!_cloud) return null;
+        if (!_cloud || isLocalOnly(key)) return null;
+        const token = _apiToken();
+        if (!token) return null;
         try {
-            const r = await fetch('/api/data?key=' + encodeURIComponent(key),
-                { signal: AbortSignal.timeout(4000) });
+            const r = await fetch('/api/data?key=' + encodeURIComponent(key), {
+                headers: { 'Authorization': 'Bearer ' + token },
+                signal: AbortSignal.timeout(4000)
+            });
+            if (r.status === 401) return null;
             const d = await r.json();
             if (d.fallback) { _cloudDown(); return null; }
             _lastSyncAt = Date.now();
@@ -126,10 +144,12 @@ const DB = (function () {
         return r ? r.value : null;
     }
     function cloudPut(key, val) {
-        if (!_cloud) return;
+        if (!_cloud || isLocalOnly(key)) return;
+        const token = _apiToken();
+        if (!token) return;
         fetch('/api/data', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
             body: JSON.stringify({ key, value: val }),
             signal: AbortSignal.timeout(6000),
         }).then(r => r.json()).then(d => {
@@ -138,8 +158,13 @@ const DB = (function () {
         }).catch(() => { _cloudDown(); });
     }
     function cloudDel(key) {
-        if (!_cloud) return;
-        fetch('/api/data?key=' + encodeURIComponent(key), { method: 'DELETE' }).catch(() => {});
+        if (!_cloud || isLocalOnly(key)) return;
+        const token = _apiToken();
+        if (!token) return;
+        fetch('/api/data?key=' + encodeURIComponent(key), {
+            method: 'DELETE',
+            headers: { 'Authorization': 'Bearer ' + token }
+        }).catch(() => {});
     }
 
     /* ---------- Public API ---------- */
