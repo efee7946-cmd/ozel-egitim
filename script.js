@@ -650,6 +650,10 @@ const STRINGS = {
     therapy_loading: 'Sorular hazırlanıyor...',
     therapy_progress: 'Soru {a} / {t}',
     therapy_fallback_q: '{topic} hakkında ne düşünüyorsun?',
+    therapy_complete_title: 'Tebrikler!',
+    therapy_complete_msg: 'Bu konuyu tamamladın! Yeni bir konu seçebilir ya da menüye dönebilirsin.',
+    therapy_complete_new_topic: 'Yeni Konu Seç',
+    therapy_complete_menu: 'Menüye Dön',
     video_loading: 'Video yükleniyor...',
     topic_shopping: 'Alışveriş',
     topic_school: 'Okul',
@@ -1332,6 +1336,10 @@ const STRINGS = {
     therapy_loading: 'Getting questions ready...',
     therapy_progress: 'Question {a} / {t}',
     therapy_fallback_q: 'What do you think about {topic}?',
+    therapy_complete_title: 'Well done!',
+    therapy_complete_msg: 'You completed this topic! Pick a new topic or go back to the menu.',
+    therapy_complete_new_topic: 'New Topic',
+    therapy_complete_menu: 'Back to Menu',
     video_loading: 'Loading video...',
     topic_shopping: 'Shopping',
     topic_school: 'School',
@@ -3578,6 +3586,29 @@ function resetTherapyQuestionPool() {
     unaskedQuestions = [...getActiveTherapyQuestions()];
 }
 
+function showTherapySessionComplete() {
+    clearTimeout(idleTimer);
+    document.getElementById('micBtn').disabled = true;
+    document.getElementById('nextBtn').classList.remove('pulse-anim');
+    document.querySelectorAll('#therapyMainCard .therapy-session-ui').forEach(el => el.style.display = 'none');
+    confetti({ particleCount: 120, spread: 90 });
+    speakFallback(t('therapy_complete_msg'), () => {});
+    const card = document.getElementById('therapyMainCard');
+    const box = document.createElement('div');
+    box.className = 'sort-complete therapy-session-ui';
+    box.id = 'therapyCompleteBox';
+    box.innerHTML = `
+        <div class="sort-complete-icon">🏆</div>
+        <h2>${t('therapy_complete_title')}</h2>
+        <p>${t('therapy_complete_msg')}</p>
+        <div class="sort-complete-btns">
+            <button type="button" class="btn-primary-gradient" onclick="document.getElementById('therapyCompleteBox').remove(); currentTopic=''; goToTherapy();">${t('therapy_complete_new_topic')}</button>
+            <button type="button" class="menu-ghost-btn" onclick="currentTopic=''; goToMenu();">${t('therapy_complete_menu')}</button>
+        </div>
+    `;
+    card.appendChild(box);
+}
+
 function renderTherapyCategories() {
     const barEl = document.getElementById('therapyCategoryBar');
     const summaryEl = document.getElementById('therapyCategorySummary');
@@ -3692,6 +3723,9 @@ function getBestVideoUrl(videoFiles) {
 
 async function loadNext() {
     if (isWaiting) return;
+    const completeBox = document.getElementById('therapyCompleteBox');
+    if (completeBox) completeBox.remove();
+    document.querySelectorAll('#therapyMainCard .therapy-session-ui').forEach(el => el.style.display = '');
     clearTimeout(idleTimer);
     document.getElementById('nextBtn').classList.remove('pulse-anim');
     document.getElementById('micBtn').disabled = true;
@@ -3700,7 +3734,10 @@ async function loadNext() {
     _qBar.classList.add('skeleton');
     document.getElementById('info').innerText = t('video_loading');
 
-    if (unaskedQuestions.length === 0) resetTherapyQuestionPool();
+    if (unaskedQuestions.length === 0) {
+        if (currentTopic) return showTherapySessionComplete();
+        resetTherapyQuestionPool();
+    }
     const rIndex = Math.floor(Math.random() * unaskedQuestions.length);
     currentObj = unaskedQuestions[rIndex];
     unaskedQuestions.splice(rIndex, 1);
@@ -3997,8 +4034,17 @@ function addMessage(text, type) {
     chatDiv.scrollTop = chatDiv.scrollHeight;
 }
 
+function sanitizeForSpeech(text) {
+    return text
+        .replace(/[\u{1F1E6}-\u{1F1FF}\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}\u{FE0F}\u{200D}]/gu, '')
+        .replace(/[‘’ʼʻ`]/g, "'")
+        .replace(/\s+/g, ' ')
+        .trim();
+}
+
 function speakFallback(t, callback) {
     try {
+        t = sanitizeForSpeech(t);
         window.speechSynthesis.cancel();
         var u = new SpeechSynthesisUtterance(t);
         u.lang = _lang === 'en' ? 'en-US' : 'tr-TR'; u.pitch = 1.2; u.rate = 0.7;
@@ -4016,6 +4062,7 @@ async function speak(t, callback) {
 }
 
 async function speakWithLipsync(text, onEnd, emotion = CharacterEmotion.NEUTRAL) {
+    text = sanitizeForSpeech(text);
     setCharacterEmotion(emotion);
 
     // Genel güvenlik: 20sn içinde hiçbir şey olmazsa fallback'e düş
