@@ -786,6 +786,18 @@ document.addEventListener('DOMContentLoaded', function(){
             <div class="az-insight" id="azInsightText"></div>
         </div>
 
+        <!-- İlerleme grafiği (2+ seans olunca görünür) -->
+        <div class="az-card" id="azTrendCard" style="display:none">
+            <h3 class="az-card-title" data-i18n="analysis_trend_title">Bağımsız Konuşma Gelişimi</h3>
+            <p class="az-card-sub" data-i18n="analysis_trend_sub">Her seansta yardımsız konuşma oranı. Çizgi yukarı gidiyorsa bağımsızlık artıyor demektir.</p>
+            <div class="az-trend-chart" id="azTrendChart"></div>
+            <div class="az-trend-tooltip" id="azTrendTooltip" style="display:none"></div>
+            <details class="az-trend-details">
+                <summary data-i18n="analysis_trend_table">Tablo görünümü</summary>
+                <div class="az-trend-table-wrap" id="azTrendTable"></div>
+            </details>
+        </div>
+
         <!-- 3. BEP Rapor Üretici -->
         <div class="az-card">
             <h3 class="az-card-title" data-i18n="bep_periodic_title">Dönemsel BEP Taslağı</h3>

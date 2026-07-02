@@ -841,6 +841,11 @@ const STRINGS = {
     recovery_saved_btn: 'Kodu kaydettim ✓',
     sync_last: 'Son senkron: {time}',
     sync_never: 'Henüz senkron olmadı',
+    analysis_trend_title: 'Bağımsız Konuşma Gelişimi',
+    analysis_trend_sub: 'Her seansta yardımsız konuşma oranı. Çizgi yukarı gidiyorsa bağımsızlık artıyor demektir.',
+    analysis_trend_table: 'Tablo görünümü',
+    analysis_trend_col_date: 'Tarih',
+    analysis_trend_col_pct: 'Bağımsız %',
   },
   en: {
     back_menu: '← Menu',
@@ -1680,6 +1685,11 @@ const STRINGS = {
     recovery_saved_btn: 'I saved the code ✓',
     sync_last: 'Last sync: {time}',
     sync_never: 'Not synced yet',
+    analysis_trend_title: 'Independent Speech Progress',
+    analysis_trend_sub: 'Unassisted speech rate per session. An upward line means growing independence.',
+    analysis_trend_table: 'Table view',
+    analysis_trend_col_date: 'Date',
+    analysis_trend_col_pct: 'Independent %',
   }
 };
 
@@ -5994,6 +6004,104 @@ async function goToAnalysis() {
     document.querySelectorAll('.az-card').forEach(c => c.classList.remove('az-loading'));
     _renderAzIdentityCard(profile);
     _renderAzMetrics(history);
+    _renderAzTrend(history);
+}
+
+function _renderAzTrend(history) {
+    const card = document.getElementById('azTrendCard');
+    const host = document.getElementById('azTrendChart');
+    if (!card || !host) return;
+
+    const points = [...history].reverse()
+        .map(h => {
+            const total = (h.micUsedInTherapy || 0) + (h.repeatUsed || 0) + (h.simplifyUsed || 0);
+            if (total === 0) return null;
+            return {
+                dateKey: h.dateKey,
+                pct: Math.round(((h.micUsedInTherapy || 0) / total) * 100)
+            };
+        })
+        .filter(Boolean)
+        .slice(-20);
+
+    if (points.length < 2) { card.style.display = 'none'; return; }
+    card.style.display = '';
+
+    const W = 640, H = 240;
+    const PAD = { top: 24, right: 20, bottom: 34, left: 40 };
+    const iw = W - PAD.left - PAD.right;
+    const ih = H - PAD.top - PAD.bottom;
+    const x = i => PAD.left + (points.length === 1 ? iw / 2 : (i / (points.length - 1)) * iw);
+    const y = pct => PAD.top + (1 - pct / 100) * ih;
+
+    const locale = _lang === 'en' ? 'en-US' : 'tr-TR';
+    const fmtDate = dk => new Date(dk + 'T12:00:00').toLocaleDateString(locale, { day: 'numeric', month: 'short' });
+
+    const linePath = points.map((p, i) => `${i === 0 ? 'M' : 'L'}${x(i).toFixed(1)},${y(p.pct).toFixed(1)}`).join(' ');
+    const gridLines = [0, 50, 100].map(v =>
+        `<line x1="${PAD.left}" y1="${y(v)}" x2="${W - PAD.right}" y2="${y(v)}" stroke="#e8ecf4" stroke-width="1"/>
+         <text x="${PAD.left - 8}" y="${y(v) + 4}" text-anchor="end" font-size="11" fill="#8a93a8">%${v}</text>`
+    ).join('');
+
+    const markers = points.map((p, i) =>
+        `<circle cx="${x(i).toFixed(1)}" cy="${y(p.pct).toFixed(1)}" r="4"
+            fill="#6C63FF" stroke="#fff" stroke-width="2" data-idx="${i}"/>`
+    ).join('');
+
+    const first = points[0], last = points[points.length - 1];
+    const endLabels = `
+        <text x="${x(0).toFixed(1)}" y="${(y(first.pct) - 10).toFixed(1)}" text-anchor="middle" font-size="12" font-weight="700" fill="#4a5578">%${first.pct}</text>
+        <text x="${x(points.length - 1).toFixed(1)}" y="${(y(last.pct) - 10).toFixed(1)}" text-anchor="middle" font-size="12" font-weight="700" fill="#4a5578">%${last.pct}</text>`;
+
+    const xLabels = `
+        <text x="${x(0).toFixed(1)}" y="${H - 10}" text-anchor="start" font-size="11" fill="#8a93a8">${fmtDate(first.dateKey)}</text>
+        <text x="${x(points.length - 1).toFixed(1)}" y="${H - 10}" text-anchor="end" font-size="11" fill="#8a93a8">${fmtDate(last.dateKey)}</text>`;
+
+    host.innerHTML = `
+        <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${t('analysis_trend_title')}" style="width:100%;height:auto;display:block">
+            ${gridLines}
+            <path d="${linePath}" fill="none" stroke="#6C63FF" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+            ${markers}
+            ${endLabels}
+            ${xLabels}
+        </svg>`;
+
+    const tbl = document.getElementById('azTrendTable');
+    if (tbl) {
+        tbl.innerHTML = `<table class="az-trend-table">
+            <thead><tr><th>${t('analysis_trend_col_date')}</th><th>${t('analysis_trend_col_pct')}</th></tr></thead>
+            <tbody>${points.map(p => `<tr><td>${fmtDate(p.dateKey)}</td><td>%${p.pct}</td></tr>`).join('')}</tbody>
+        </table>`;
+    }
+
+    const tooltip = document.getElementById('azTrendTooltip');
+    const svg = host.querySelector('svg');
+    if (!tooltip || !svg) return;
+
+    function showTip(clientX) {
+        const rect = svg.getBoundingClientRect();
+        const relX = (clientX - rect.left) / rect.width * W;
+        let best = 0, bestDist = Infinity;
+        points.forEach((p, i) => {
+            const d = Math.abs(x(i) - relX);
+            if (d < bestDist) { bestDist = d; best = i; }
+        });
+        const p = points[best];
+        tooltip.textContent = `${fmtDate(p.dateKey)} • %${p.pct}`;
+        tooltip.style.display = 'block';
+        const cardRect = host.getBoundingClientRect();
+        const px = (x(best) / W) * rect.width + rect.left - cardRect.left;
+        tooltip.style.left = Math.max(4, Math.min(px - 45, cardRect.width - 95)) + 'px';
+        tooltip.style.top = ((y(p.pct) / H) * rect.height - 38) + 'px';
+        svg.querySelectorAll('circle').forEach((c, i) => c.setAttribute('r', i === best ? '6' : '4'));
+    }
+    function hideTip() {
+        tooltip.style.display = 'none';
+        svg.querySelectorAll('circle').forEach(c => c.setAttribute('r', '4'));
+    }
+    svg.addEventListener('pointermove', e => showTip(e.clientX));
+    svg.addEventListener('pointerdown', e => showTip(e.clientX));
+    svg.addEventListener('pointerleave', hideTip);
 }
 
 function _renderAzIdentityCard(profile) {
