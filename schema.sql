@@ -2,12 +2,15 @@
 -- Aiven Console → Services → projen → Query Editor'a yapıştır ve çalıştır.
 
 CREATE TABLE IF NOT EXISTS users (
-    username     TEXT PRIMARY KEY,
-    display_name TEXT NOT NULL,
-    hash         TEXT NOT NULL,
-    salt         TEXT NOT NULL,
-    created_at   TIMESTAMPTZ DEFAULT now()
+    username      TEXT PRIMARY KEY,
+    display_name  TEXT NOT NULL,
+    hash          TEXT NOT NULL,
+    salt          TEXT NOT NULL,
+    recovery_hash TEXT,
+    created_at    TIMESTAMPTZ DEFAULT now()
 );
+
+ALTER TABLE users ADD COLUMN IF NOT EXISTS recovery_hash TEXT;
 
 CREATE TABLE IF NOT EXISTS sessions (
     token        TEXT PRIMARY KEY,

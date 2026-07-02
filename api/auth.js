@@ -27,6 +27,30 @@ function expiresAt() {
     return new Date(Date.now() + SESSION_DAYS * 24 * 60 * 60 * 1000);
 }
 
+// Karışması zor karakterler: 0/O, 1/I/L yok
+const RECOVERY_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+
+function generateRecoveryCode() {
+    const bytes = crypto.randomBytes(8);
+    let code = '';
+    for (let i = 0; i < 8; i++) {
+        code += RECOVERY_ALPHABET[bytes[i] % RECOVERY_ALPHABET.length];
+        if (i === 3) code += '-';
+    }
+    return code;
+}
+
+function normalizeRecoveryCode(input) {
+    return String(input || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+}
+
+let _recoveryColumnEnsured = false;
+async function ensureRecoveryColumn() {
+    if (_recoveryColumnEnsured) return;
+    await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS recovery_hash TEXT');
+    _recoveryColumnEnsured = true;
+}
+
 export default async function handler(req, res) {
     cors(res);
     if (req.method === 'OPTIONS') return res.status(200).end();
@@ -52,11 +76,14 @@ export default async function handler(req, res) {
                 return res.status(409).json({ error: 'AUTH_USERNAME_TAKEN' });
 
             // bcrypt ile yeni kayıt
+            await ensureRecoveryColumn();
             const hash = await bcrypt.hash(password, BCRYPT_ROUNDS);
+            const recoveryCode = generateRecoveryCode();
+            const recoveryHash = await bcrypt.hash(normalizeRecoveryCode(recoveryCode), BCRYPT_ROUNDS);
             const displayName = username.trim();
             await query(
-                'INSERT INTO users (username, display_name, hash, salt) VALUES ($1, $2, $3, $4)',
-                [u, displayName, hash, '']  // bcrypt hash'i salt içeriyor, ayrı sütun boş
+                'INSERT INTO users (username, display_name, hash, salt, recovery_hash) VALUES ($1, $2, $3, $4, $5)',
+                [u, displayName, hash, '', recoveryHash]  // bcrypt hash'i salt içeriyor, ayrı sütun boş
             );
 
             const tok = crypto.randomBytes(32).toString('hex');
@@ -64,7 +91,7 @@ export default async function handler(req, res) {
                 'INSERT INTO sessions (token, username, display_name, expires_at) VALUES ($1, $2, $3, $4)',
                 [tok, u, displayName, expiresAt()]
             );
-            return res.json({ ok: true, token: tok, displayName });
+            return res.json({ ok: true, token: tok, displayName, recoveryCode });
         }
 
         /* ---- GİRİŞ YAP ---- */
@@ -97,12 +124,54 @@ export default async function handler(req, res) {
                 await query('UPDATE users SET hash = $1, salt = $2 WHERE username = $3', [newHash, '', u]);
             }
 
+            // Eski hesapta kurtarma kodu yoksa üret ve bir kez göster
+            let recoveryCode = null;
+            await ensureRecoveryColumn();
+            if (!user.recovery_hash) {
+                recoveryCode = generateRecoveryCode();
+                const recoveryHash = await bcrypt.hash(normalizeRecoveryCode(recoveryCode), BCRYPT_ROUNDS);
+                await query('UPDATE users SET recovery_hash = $1 WHERE username = $2', [recoveryHash, u]);
+            }
+
             const tok = crypto.randomBytes(32).toString('hex');
             await query(
                 'INSERT INTO sessions (token, username, display_name, expires_at) VALUES ($1, $2, $3, $4)',
                 [tok, u, user.display_name, expiresAt()]
             );
-            return res.json({ ok: true, token: tok, displayName: user.display_name });
+            return res.json({ ok: true, token: tok, displayName: user.display_name, recoveryCode });
+        }
+
+        /* ---- ŞİFRE SIFIRLA (kurtarma koduyla) ---- */
+        if (action === 'reset_password') {
+            const { recoveryCode, newPassword } = req.body || {};
+            if (!username || !recoveryCode || !newPassword)
+                return res.status(400).json({ error: 'AUTH_FIELDS_REQUIRED' });
+            if (newPassword.length < 6)
+                return res.status(400).json({ error: 'AUTH_PASSWORD_TOO_SHORT' });
+            const u = username.trim().toLowerCase();
+
+            await ensureRecoveryColumn();
+            const rows = await query('SELECT * FROM users WHERE username = $1', [u]);
+            if (!rows.length || !rows[0].recovery_hash)
+                return res.status(401).json({ error: 'AUTH_RECOVERY_INVALID' });
+
+            const valid = await bcrypt.compare(normalizeRecoveryCode(recoveryCode), rows[0].recovery_hash);
+            if (!valid)
+                return res.status(401).json({ error: 'AUTH_RECOVERY_INVALID' });
+
+            const newHash = await bcrypt.hash(newPassword, BCRYPT_ROUNDS);
+            const nextCode = generateRecoveryCode();
+            const nextHash = await bcrypt.hash(normalizeRecoveryCode(nextCode), BCRYPT_ROUNDS);
+            await query('UPDATE users SET hash = $1, salt = $2, recovery_hash = $3 WHERE username = $4',
+                [newHash, '', nextHash, u]);
+            await query('DELETE FROM sessions WHERE username = $1', [u]);
+
+            const tok = crypto.randomBytes(32).toString('hex');
+            await query(
+                'INSERT INTO sessions (token, username, display_name, expires_at) VALUES ($1, $2, $3, $4)',
+                [tok, u, rows[0].display_name, expiresAt()]
+            );
+            return res.json({ ok: true, token: tok, displayName: rows[0].display_name, recoveryCode: nextCode });
         }
 
         /* ---- OTURUM DOĞRULA ---- */

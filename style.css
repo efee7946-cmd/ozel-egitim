@@ -4718,6 +4718,55 @@ body.a11y-reduce-motion * { transition: none !important; animation: none !import
     color: #e74c3c; font-size: 0.88rem;
     font-weight: 600; text-align: center;
 }
+.auth-forgot-link {
+    width: 100%; margin-top: 10px; padding: 10px;
+    background: none; border: none;
+    color: #667eea; font-size: 0.9rem; font-weight: 600;
+    cursor: pointer; text-align: center;
+    min-height: 44px;
+}
+.auth-forgot-link:hover { text-decoration: underline; }
+.auth-reset-info {
+    margin: 0 0 12px; padding: 10px 14px;
+    background: #eef2ff; border-radius: 10px;
+    font-size: 0.86rem; color: #4a5578;
+}
+.recovery-modal-overlay {
+    position: fixed; inset: 0; z-index: 3000;
+    background: rgba(20, 25, 60, 0.65);
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px;
+}
+.recovery-modal-card {
+    background: #fff; border-radius: 24px;
+    padding: 28px 24px; max-width: 380px; width: 100%;
+    text-align: center;
+    box-shadow: 0 24px 70px rgba(0,0,0,0.3);
+}
+.recovery-modal-icon { font-size: 2.4rem; margin-bottom: 8px; }
+.recovery-modal-card h3 { margin: 0 0 8px; color: #1d2746; }
+.recovery-modal-card p { margin: 0 0 16px; font-size: 0.9rem; color: #6e7894; line-height: 1.5; }
+.recovery-code-box {
+    background: #f0f4ff; border: 2px dashed #667eea;
+    border-radius: 14px; padding: 16px;
+    font-size: 1.6rem; font-weight: 800; letter-spacing: 3px;
+    color: #3a4a8c; margin-bottom: 14px;
+    -webkit-user-select: text; user-select: text;
+}
+.recovery-copy-btn {
+    width: 100%; padding: 12px; margin-bottom: 8px;
+    background: #eef2ff; color: #4a5aa8;
+    border: none; border-radius: 12px;
+    font-size: 0.95rem; font-weight: 700; cursor: pointer;
+    min-height: 44px;
+}
+.recovery-close-btn {
+    width: 100%; padding: 13px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: #fff; border: none; border-radius: 12px;
+    font-size: 1rem; font-weight: 700; cursor: pointer;
+    min-height: 44px;
+}
 .auth-offline-note {
     margin-top: 12px; padding: 10px 14px;
     background: #fff8e1; border-radius: 10px;

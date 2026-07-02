@@ -827,6 +827,18 @@ const STRINGS = {
     auth_login_success: 'Başarıyla giriş yapıldı! 👋',
     auth_register_success: 'Kayıt tamamlandı, hoş geldiniz! 🎉',
     bottom_nav_games: 'Oyunlar',
+    auth_forgot_link: 'Şifremi unuttum',
+    auth_reset_info: 'Kayıt olurken size verilen kurtarma kodunu girin.',
+    auth_recovery_code_label: 'Kurtarma Kodu',
+    auth_new_password_label: 'Yeni Şifre',
+    auth_reset_btn: 'Şifreyi Sıfırla',
+    auth_back_to_login: '← Girişe dön',
+    auth_reset_success: 'Şifreniz yenilendi!',
+    AUTH_RECOVERY_INVALID: 'Kullanıcı adı veya kurtarma kodu hatalı',
+    recovery_modal_title: 'Kurtarma Kodunuz',
+    recovery_modal_sub: 'Şifrenizi unutursanız hesabınıza yalnızca bu kodla erişebilirsiniz. Bir yere yazın veya ekran görüntüsü alın.',
+    recovery_copy_btn: '📋 Kodu Kopyala',
+    recovery_saved_btn: 'Kodu kaydettim ✓',
   },
   en: {
     back_menu: '← Menu',
@@ -1652,6 +1664,18 @@ const STRINGS = {
     auth_login_success: 'Signed in successfully! 👋',
     auth_register_success: 'Registration complete, welcome! 🎉',
     bottom_nav_games: 'Games',
+    auth_forgot_link: 'Forgot my password',
+    auth_reset_info: 'Enter the recovery code you were given at registration.',
+    auth_recovery_code_label: 'Recovery Code',
+    auth_new_password_label: 'New Password',
+    auth_reset_btn: 'Reset Password',
+    auth_back_to_login: '← Back to login',
+    auth_reset_success: 'Your password has been reset!',
+    AUTH_RECOVERY_INVALID: 'Username or recovery code is incorrect',
+    recovery_modal_title: 'Your Recovery Code',
+    recovery_modal_sub: 'If you forget your password, this code is the only way to access your account. Write it down or take a screenshot.',
+    recovery_copy_btn: '📋 Copy Code',
+    recovery_saved_btn: 'I saved the code ✓',
   }
 };
 
@@ -5447,10 +5471,78 @@ function switchAuthTab(mode) {
     _authMode = mode;
     document.getElementById('loginForm').style.display    = mode === 'login'    ? '' : 'none';
     document.getElementById('registerForm').style.display = mode === 'register' ? '' : 'none';
+    document.getElementById('resetForm').style.display    = 'none';
     document.getElementById('tabLogin').classList.toggle('active',    mode === 'login');
     document.getElementById('tabRegister').classList.toggle('active', mode === 'register');
     document.getElementById('authError').textContent = '';
     if (mode === 'register') renderRegisterEmojiPicker();
+}
+
+function showResetForm() {
+    document.getElementById('loginForm').style.display    = 'none';
+    document.getElementById('registerForm').style.display = 'none';
+    document.getElementById('resetForm').style.display    = '';
+    document.getElementById('resetUsername').value = document.getElementById('loginUsername').value;
+    document.getElementById('authError').textContent = '';
+}
+
+function hideResetForm() {
+    document.getElementById('resetForm').style.display = 'none';
+    switchAuthTab('login');
+}
+
+function showRecoveryModal(code) {
+    document.getElementById('recoveryCodeValue').textContent = code;
+    document.getElementById('recoveryCodeModal').style.display = 'flex';
+}
+
+function closeRecoveryModal() {
+    document.getElementById('recoveryCodeModal').style.display = 'none';
+}
+
+function copyRecoveryCode() {
+    const code = document.getElementById('recoveryCodeValue').textContent;
+    navigator.clipboard.writeText(code).then(() => showToast(t('copy_success'))).catch(() => {});
+}
+
+async function handleResetPassword(e) {
+    e.preventDefault();
+    const username     = document.getElementById('resetUsername').value.trim();
+    const recoveryCode = document.getElementById('resetRecoveryCode').value.trim();
+    const newPassword  = document.getElementById('resetPassword').value;
+    const newPassword2 = document.getElementById('resetPassword2').value;
+    if (!username || !recoveryCode || !newPassword) return showAuthError(t('auth_fill_all'));
+    if (newPassword !== newPassword2) return showAuthError(t('auth_passwords_mismatch'));
+    if (newPassword.length < 6) return showAuthError(t('auth_password_short'));
+
+    const btn = document.getElementById('resetBtn');
+    btn.disabled = true; btn.textContent = t('auth_waiting');
+    const res = await authApi('reset_password', { username, recoveryCode, newPassword });
+    btn.disabled = false; btn.textContent = t('auth_reset_btn');
+
+    if (res.fallback) return showAuthError(t('auth_connection_error') || t('AUTH_FIELDS_REQUIRED'));
+    if (!res.ok) return showAuthError(t(res.error) || t('AUTH_RECOVERY_INVALID'));
+
+    _authToken = res.token;
+    _authUser  = { username: username.toLowerCase(), displayName: res.displayName };
+    await DB.initEncryption(res.token);
+    DB.set(authStorageKey(), _authToken);
+    DB.set(authUserStorageKey(), _authUser);
+    localStorage.setItem('lms_last_user', _authUser.username);
+
+    hideResetForm();
+    if (res.recoveryCode) showRecoveryModal(res.recoveryCode);
+    showToast(t('auth_reset_success'));
+
+    const students = await loadStudents();
+    if (students.length > 0) {
+        const student = students[0];
+        activeStudentId   = student.id;
+        activeStudentName = student.name;
+        onAuthSuccessWithStudent(student);
+    } else {
+        onAuthSuccess();
+    }
 }
 
 function setAuthLoading(loading) {
@@ -5497,6 +5589,9 @@ async function handleLogin(e) {
     DB.set(authStorageKey(), _authToken);
     DB.set(authUserStorageKey(), _authUser);
     localStorage.setItem('lms_last_user', _authUser.username);
+
+    // Eski hesaba ilk kez kurtarma kodu üretildiyse bir kez göster
+    if (res.recoveryCode) showRecoveryModal(res.recoveryCode);
 
     // Öğrenci varsa direkt menüye, yoksa öğrenci seçim ekranına
     const students = await loadStudents();
@@ -5549,6 +5644,7 @@ async function handleRegister(e) {
     activeStudentName = student.name;
     localStorage.setItem('lms_last_user', _authUser.username);
     onAuthSuccessWithStudent(student);
+    if (res.recoveryCode) showRecoveryModal(res.recoveryCode);
     showToast(t('auth_register_success'));
 }
 

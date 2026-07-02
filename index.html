@@ -62,6 +62,32 @@
                     placeholder="••••••" data-i18n-placeholder="login_password" required>
             </div>
             <button type="submit" class="auth-submit-btn" id="loginBtn" data-i18n="login_btn">Giriş Yap</button>
+            <button type="button" class="auth-forgot-link" onclick="showResetForm()" data-i18n="auth_forgot_link">Şifremi unuttum</button>
+        </form>
+
+        <!-- Şifre sıfırlama formu (gizli) -->
+        <form id="resetForm" class="auth-form" style="display:none" onsubmit="handleResetPassword(event)">
+            <p class="auth-reset-info" data-i18n="auth_reset_info">Kayıt olurken size verilen kurtarma kodunu girin.</p>
+            <div class="auth-field">
+                <label data-i18n="auth_username_label">Kullanıcı Adı</label>
+                <input type="text" id="resetUsername" autocomplete="username"
+                    placeholder="kullaniciadi" data-i18n-placeholder="login_username">
+            </div>
+            <div class="auth-field">
+                <label data-i18n="auth_recovery_code_label">Kurtarma Kodu</label>
+                <input type="text" id="resetRecoveryCode" autocomplete="off"
+                    placeholder="XXXX-XXXX" style="text-transform:uppercase">
+            </div>
+            <div class="auth-field">
+                <label><span data-i18n="auth_new_password_label">Yeni Şifre</span> <small data-i18n="auth_password_hint">(en az 6 karakter)</small></label>
+                <input type="password" id="resetPassword" autocomplete="new-password" placeholder="••••••">
+            </div>
+            <div class="auth-field">
+                <label data-i18n="auth_password_repeat">Şifre Tekrar</label>
+                <input type="password" id="resetPassword2" autocomplete="new-password" placeholder="••••••">
+            </div>
+            <button type="submit" class="auth-submit-btn" id="resetBtn" data-i18n="auth_reset_btn">Şifreyi Sıfırla</button>
+            <button type="button" class="auth-forgot-link" onclick="hideResetForm()" data-i18n="auth_back_to_login">← Girişe dön</button>
         </form>
 
         <!-- Kayıt formu (gizli) -->
@@ -133,6 +159,18 @@
         </form>
 
         <div class="auth-error" id="authError"></div>
+    </div>
+</div>
+
+<!-- ===================== KURTARMA KODU MODALI ===================== -->
+<div id="recoveryCodeModal" class="recovery-modal-overlay" style="display:none">
+    <div class="recovery-modal-card">
+        <div class="recovery-modal-icon">🔑</div>
+        <h3 data-i18n="recovery_modal_title">Kurtarma Kodunuz</h3>
+        <p data-i18n="recovery_modal_sub">Şifrenizi unutursanız hesabınıza yalnızca bu kodla erişebilirsiniz. Bir yere yazın veya ekran görüntüsü alın.</p>
+        <div class="recovery-code-box" id="recoveryCodeValue">XXXX-XXXX</div>
+        <button type="button" class="recovery-copy-btn" onclick="copyRecoveryCode()" data-i18n="recovery_copy_btn">📋 Kodu Kopyala</button>
+        <button type="button" class="recovery-close-btn" onclick="closeRecoveryModal()" data-i18n="recovery_saved_btn">Kodu kaydettim ✓</button>
     </div>
 </div>
 
