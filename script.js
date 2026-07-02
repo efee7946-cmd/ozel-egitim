@@ -1722,6 +1722,43 @@ const API_BASE = (typeof Capacitor !== 'undefined' && Capacitor.isNativePlatform
     : '';
 
 // =============================================
+// HATA İZLEME — client hataları /api/log'a gider
+// =============================================
+const _reportedErrors = new Set();
+
+function reportClientError(message, stack) {
+    try {
+        if (!message || _reportedErrors.size >= 10) return;
+        const key = String(message).slice(0, 120);
+        if (_reportedErrors.has(key)) return;
+        if (key === 'Script error.' || key.includes('ResizeObserver loop')) return;
+        _reportedErrors.add(key);
+        fetch(API_BASE + '/api/log', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                message: key,
+                stack: String(stack || '').slice(0, 3000),
+                screen: typeof currentScreenId !== 'undefined' ? currentScreenId : '',
+                lang: _lang
+            })
+        }).catch(() => {});
+    } catch(_) {}
+}
+
+window.addEventListener('error', (e) => {
+    reportClientError(e.message, e.error && e.error.stack);
+});
+
+window.addEventListener('unhandledrejection', (e) => {
+    const r = e.reason;
+    reportClientError(
+        (r && r.message) || String(r || 'unhandledrejection'),
+        r && r.stack
+    );
+});
+
+// =============================================
 // GENEL DEĞİŞKENLER
 // =============================================
 let childName = "";
