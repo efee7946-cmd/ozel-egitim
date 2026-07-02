@@ -824,6 +824,9 @@ const STRINGS = {
     add_btn: 'Ekle',
     student_pill: 'Öğrenci seç',
     info_mic_permission: 'Mikrofon izni gerekli.',
+    auth_login_success: 'Başarıyla giriş yapıldı! 👋',
+    auth_register_success: 'Kayıt tamamlandı, hoş geldiniz! 🎉',
+    bottom_nav_games: 'Oyunlar',
   },
   en: {
     back_menu: '← Menu',
@@ -1646,6 +1649,9 @@ const STRINGS = {
     add_btn: 'Add',
     student_pill: 'Select student',
     info_mic_permission: 'Microphone permission is required.',
+    auth_login_success: 'Signed in successfully! 👋',
+    auth_register_success: 'Registration complete, welcome! 🎉',
+    bottom_nav_games: 'Games',
   }
 };
 
@@ -1899,6 +1905,8 @@ function _updateBottomNav(screenId) {
         'aac-screen': 'bnAAC',
         'schedule-screen': 'bnSchedule',
         'analysis-screen': 'bnAnalysis',
+        'sequence-screen': 'bnGames',
+        'sort-screen': 'bnGames',
     };
     nav.querySelectorAll('.bottom-nav-item').forEach(btn => btn.classList.remove('active'));
     const activeId = map[screenId];
@@ -3679,7 +3687,7 @@ function _renderSortBaskets() {
     if (!area || !_sortGame) return;
     area.innerHTML = _sortGame.categories.map(cat => {
         const count = Object.values(_sortSorted).filter(c => c === cat.key).length;
-        return `<div class="sort-basket" data-cat="${cat.key}" style="background:${cat.color}"
+        return `<div class="sort-basket${_sortSelected !== null ? ' sort-basket-ready' : ''}" data-cat="${cat.key}" style="background:${cat.color}"
             onclick="_sortBasketTap('${cat.key}')">
             <div class="sort-basket-emoji">${cat.emoji}</div>
             <div class="sort-basket-label">${cat.label}</div>
@@ -3698,6 +3706,7 @@ function _sortTap(idx) {
     if (_sortSorted[idx] !== undefined) return;
     _sortSelected = (_sortSelected === idx) ? null : idx;
     _renderSortItems();
+    _renderSortBaskets();
 }
 
 function _sortBasketTap(cat) {
@@ -3756,7 +3765,12 @@ function _onSortDragEnd(e) {
     document.querySelectorAll('.sort-basket').forEach(b => b.classList.remove('sort-basket-hover'));
     if (_dragGhost) { _dragGhost.remove(); _dragGhost = null; }
     if (_dragOriginEl) { _dragOriginEl.style.opacity = ''; _dragOriginEl = null; }
-    if (!_dragMoved) { _dragItemIndex = null; return; }
+    if (!_dragMoved) {
+        const tappedIdx = _dragItemIndex;
+        _dragItemIndex = null;
+        if (e.type === 'touchend' && tappedIdx !== null) _sortTap(tappedIdx);
+        return;
+    }
     const pt = e.changedTouches ? e.changedTouches[0] : e;
     let droppedCat = null;
     document.querySelectorAll('.sort-basket').forEach(b => {
@@ -5025,8 +5039,17 @@ function renderSequenceMenu() {
                     <span class="seq-menu-type">${g.type === 'cause' ? t('seq_menu_type_cause') : t('seq_menu_type_order')}</span>
                 </button>
             `).join('')}
+            <button type="button" class="seq-menu-card" onclick="goToSort()">
+                <span class="seq-menu-emoji">🗂️</span>
+                <span class="seq-menu-label">${t('menu_sort')}</span>
+                <span class="seq-menu-type">${t('sort_subtitle')}</span>
+            </button>
         </div>
     `;
+}
+
+function goToGames() {
+    goToSequence();
 }
 
 function startSequenceGame(index) {
@@ -5440,6 +5463,20 @@ function showAuthError(msg) {
     if (el) { el.textContent = msg; }
 }
 
+function showToast(msg) {
+    let el = document.getElementById('appToast');
+    if (!el) {
+        el = document.createElement('div');
+        el.id = 'appToast';
+        el.className = 'app-toast';
+        document.body.appendChild(el);
+    }
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(el._hideTimer);
+    el._hideTimer = setTimeout(() => el.classList.remove('show'), 2600);
+}
+
 async function handleLogin(e) {
     e.preventDefault();
     const username = document.getElementById('loginUsername').value.trim();
@@ -5471,6 +5508,7 @@ async function handleLogin(e) {
     } else {
         onAuthSuccess();
     }
+    showToast(t('auth_login_success'));
 }
 
 async function handleRegister(e) {
@@ -5511,6 +5549,7 @@ async function handleRegister(e) {
     activeStudentName = student.name;
     localStorage.setItem('lms_last_user', _authUser.username);
     onAuthSuccessWithStudent(student);
+    showToast(t('auth_register_success'));
 }
 
 async function authLogout() {

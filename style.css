@@ -46,6 +46,30 @@ input, textarea, [contenteditable],
     user-select: text;
 }
 
+.app-toast {
+    position: fixed;
+    top: calc(14px + env(safe-area-inset-top));
+    left: 50%;
+    transform: translate(-50%, -80px);
+    background: linear-gradient(135deg, #22a06b, #16875c);
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.95rem;
+    padding: 12px 22px;
+    border-radius: 999px;
+    box-shadow: 0 10px 30px rgba(22, 135, 92, 0.35);
+    z-index: 10000;
+    opacity: 0;
+    pointer-events: none;
+    transition: transform 0.35s cubic-bezier(0.2, 0.9, 0.3, 1.2), opacity 0.3s;
+    max-width: 90vw;
+    text-align: center;
+}
+.app-toast.show {
+    transform: translate(-50%, 0);
+    opacity: 1;
+}
+
 /* ========== GİRİŞ EKRANI ========== */
 #start-screen {
     transition: opacity 0.4s ease;
@@ -2090,6 +2114,15 @@ video { width: 100%; height: 100%; object-fit: cover; }
     box-shadow: 0 0 0 4px rgba(108,99,255,0.22);
     transform: scale(1.04);
 }
+@keyframes basketReadyPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(108,99,255,0.35); }
+    50% { box-shadow: 0 0 0 8px rgba(108,99,255,0.12); }
+}
+.sort-basket-ready {
+    border-color: #6C63FF;
+    border-style: solid;
+    animation: basketReadyPulse 1.1s ease-in-out infinite;
+}
 .sort-basket-emoji { font-size: 2.6rem; }
 .sort-basket-label { font-size: 0.92rem; font-weight: 700; color: #2d3a5c; margin: 5px 0 3px; }
 .sort-basket-count { font-size: 1.4rem; font-weight: 800; color: #6C63FF; min-height: 28px; }
@@ -2175,7 +2208,9 @@ video { width: 100%; height: 100%; object-fit: cover; }
     .mic-ring { width: 70px; height: 70px; }
     .sort-items-area { grid-template-columns: repeat(4, 1fr); gap: 8px; }
     .sort-item-emoji { font-size: 1.8rem; }
-    .sort-menu-grid { grid-template-columns: 1fr; }
+    .sort-menu-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .sort-menu-card { padding: 14px 10px; }
+    .sort-menu-icon { font-size: 1.9rem; }
     .question-bar-wrap .question-bar { font-size: 1.05rem; }
     .ai-mode-btns { gap: 6px; }
     .btn-next { width: 55px; height: 55px; font-size: 1.5rem; }
@@ -3822,7 +3857,9 @@ body.a11y-reduce-motion * { transition: none !important; animation: none !import
     .student-pill { max-width: 140px; font-size: 0.82rem; }
 
     .aac-grid { grid-template-columns: repeat(3, 1fr); }
-    .seq-menu-grid { grid-template-columns: 1fr; }
+    .seq-menu-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .seq-menu-card { padding: 14px 10px; gap: 5px; }
+    .seq-menu-emoji { font-size: 1.9rem; }
     .cause-effect-area { grid-template-columns: 1fr; }
     .a11y-panel { align-items: flex-end; padding: 0; }
     .a11y-panel-inner { width: 100%; border-radius: 20px 20px 0 0; }
@@ -4344,9 +4381,9 @@ body.a11y-reduce-motion * { transition: none !important; animation: none !import
     padding: 6px 12px; width: fit-content;
 }
 .behavior-counter button {
-    width: 28px; height: 28px;
-    background: #f0f3f8; border: none; border-radius: 8px;
-    font-size: 1.1rem; font-weight: 700; cursor: pointer;
+    width: 44px; height: 44px;
+    background: #f0f3f8; border: none; border-radius: 10px;
+    font-size: 1.3rem; font-weight: 700; cursor: pointer;
 }
 .behavior-counter span { font-size: 1.1rem; font-weight: 800; min-width: 24px; text-align: center; }
 .behavior-save-btn {
