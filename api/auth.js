@@ -5,6 +5,7 @@
 import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 import { query } from './_db.js';
+import { sendMail, resetCodeEmailHtml } from './_mail.js';
 
 const SESSION_DAYS = 14;
 const BCRYPT_ROUNDS = 12;
@@ -44,11 +45,24 @@ function normalizeRecoveryCode(input) {
     return String(input || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
 }
 
-let _recoveryColumnEnsured = false;
+let _columnsEnsured = false;
 async function ensureRecoveryColumn() {
-    if (_recoveryColumnEnsured) return;
+    if (_columnsEnsured) return;
     await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS recovery_hash TEXT');
-    _recoveryColumnEnsured = true;
+    await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS email TEXT');
+    await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS reset_hash TEXT');
+    await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS reset_expires TIMESTAMPTZ');
+    await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS reset_attempts INT DEFAULT 0');
+    _columnsEnsured = true;
+}
+
+function isValidEmail(e) {
+    return typeof e === 'string' && /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(e) && e.length <= 200;
+}
+
+function maskEmail(e) {
+    const [local, domain] = e.split('@');
+    return local[0] + '***@' + domain[0] + '***' + domain.slice(domain.lastIndexOf('.'));
 }
 
 export default async function handler(req, res) {
@@ -56,7 +70,7 @@ export default async function handler(req, res) {
     if (req.method === 'OPTIONS') return res.status(200).end();
     if (req.method !== 'POST') return res.status(405).json({ error: 'POST gerekli' });
 
-    const { action, username, password, token } = req.body || {};
+    const { action, username, password, token, email } = req.body || {};
 
     try {
         /* ---- KAYIT OL ---- */
@@ -77,13 +91,16 @@ export default async function handler(req, res) {
 
             // bcrypt ile yeni kayıt
             await ensureRecoveryColumn();
+            const userEmail = email && String(email).trim().toLowerCase();
+            if (userEmail && !isValidEmail(userEmail))
+                return res.status(400).json({ error: 'AUTH_EMAIL_INVALID' });
             const hash = await bcrypt.hash(password, BCRYPT_ROUNDS);
             const recoveryCode = generateRecoveryCode();
             const recoveryHash = await bcrypt.hash(normalizeRecoveryCode(recoveryCode), BCRYPT_ROUNDS);
             const displayName = username.trim();
             await query(
-                'INSERT INTO users (username, display_name, hash, salt, recovery_hash) VALUES ($1, $2, $3, $4, $5)',
-                [u, displayName, hash, '', recoveryHash]  // bcrypt hash'i salt içeriyor, ayrı sütun boş
+                'INSERT INTO users (username, display_name, hash, salt, recovery_hash, email) VALUES ($1, $2, $3, $4, $5, $6)',
+                [u, displayName, hash, '', recoveryHash, userEmail || null]  // bcrypt hash'i salt içeriyor, ayrı sütun boş
             );
 
             const tok = crypto.randomBytes(32).toString('hex');
@@ -138,7 +155,82 @@ export default async function handler(req, res) {
                 'INSERT INTO sessions (token, username, display_name, expires_at) VALUES ($1, $2, $3, $4)',
                 [tok, u, user.display_name, expiresAt()]
             );
-            return res.json({ ok: true, token: tok, displayName: user.display_name, recoveryCode });
+            return res.json({ ok: true, token: tok, displayName: user.display_name, recoveryCode, hasEmail: !!user.email });
+        }
+
+        /* ---- SIFIRLAMA KODU GÖNDER (e-posta) ---- */
+        if (action === 'request_reset') {
+            if (!username) return res.status(400).json({ error: 'AUTH_FIELDS_REQUIRED' });
+            const u = username.trim().toLowerCase();
+            await ensureRecoveryColumn();
+            const rows = await query('SELECT * FROM users WHERE username = $1', [u]);
+            if (!rows.length)
+                return res.status(404).json({ error: 'AUTH_INVALID_CREDENTIALS' });
+            if (!rows[0].email)
+                return res.status(400).json({ error: 'AUTH_NO_EMAIL' });
+
+            // 60 sn içinde tekrar istenmesin
+            if (rows[0].reset_expires && new Date(rows[0].reset_expires).getTime() - Date.now() > 14 * 60 * 1000)
+                return res.status(429).json({ error: 'AUTH_RESET_TOO_SOON' });
+
+            const code = String(crypto.randomInt(100000, 1000000));
+            const codeHash = await bcrypt.hash(code, 8);
+            await query(
+                `UPDATE users SET reset_hash = $1, reset_expires = now() + interval '15 minutes', reset_attempts = 0 WHERE username = $2`,
+                [codeHash, u]
+            );
+            await sendMail(rows[0].email, 'YıldızCan şifre sıfırlama kodu', resetCodeEmailHtml(code));
+            return res.json({ ok: true, emailMasked: maskEmail(rows[0].email) });
+        }
+
+        /* ---- ŞİFRE SIFIRLA (e-posta koduyla) ---- */
+        if (action === 'reset_with_email_code') {
+            const { code, newPassword } = req.body || {};
+            if (!username || !code || !newPassword)
+                return res.status(400).json({ error: 'AUTH_FIELDS_REQUIRED' });
+            if (newPassword.length < 6)
+                return res.status(400).json({ error: 'AUTH_PASSWORD_TOO_SHORT' });
+            const u = username.trim().toLowerCase();
+            await ensureRecoveryColumn();
+            const rows = await query('SELECT * FROM users WHERE username = $1', [u]);
+            const user = rows[0];
+            if (!user || !user.reset_hash || !user.reset_expires || new Date(user.reset_expires) < new Date())
+                return res.status(401).json({ error: 'AUTH_RESET_CODE_INVALID' });
+            if ((user.reset_attempts || 0) >= 5)
+                return res.status(429).json({ error: 'AUTH_RESET_CODE_INVALID' });
+
+            const valid = await bcrypt.compare(String(code).trim(), user.reset_hash);
+            if (!valid) {
+                await query('UPDATE users SET reset_attempts = reset_attempts + 1 WHERE username = $1', [u]);
+                return res.status(401).json({ error: 'AUTH_RESET_CODE_INVALID' });
+            }
+
+            const newHash = await bcrypt.hash(newPassword, BCRYPT_ROUNDS);
+            await query(
+                'UPDATE users SET hash = $1, salt = $2, reset_hash = NULL, reset_expires = NULL, reset_attempts = 0 WHERE username = $3',
+                [newHash, '', u]
+            );
+            await query('DELETE FROM sessions WHERE username = $1', [u]);
+
+            const tok = crypto.randomBytes(32).toString('hex');
+            await query(
+                'INSERT INTO sessions (token, username, display_name, expires_at) VALUES ($1, $2, $3, $4)',
+                [tok, u, user.display_name, expiresAt()]
+            );
+            return res.json({ ok: true, token: tok, displayName: user.display_name });
+        }
+
+        /* ---- E-POSTA EKLE/GÜNCELLE (oturumlu) ---- */
+        if (action === 'set_email') {
+            if (!token) return res.status(400).json({ error: 'Token gerekli' });
+            const userEmail = email && String(email).trim().toLowerCase();
+            if (!isValidEmail(userEmail))
+                return res.status(400).json({ error: 'AUTH_EMAIL_INVALID' });
+            const rows = await query('SELECT username FROM sessions WHERE token = $1 AND expires_at > now()', [token]);
+            if (!rows.length) return res.status(401).json({ error: 'Geçersiz oturum' });
+            await ensureRecoveryColumn();
+            await query('UPDATE users SET email = $1 WHERE username = $2', [userEmail, rows[0].username]);
+            return res.json({ ok: true, emailMasked: maskEmail(userEmail) });
         }
 
         /* ---- ŞİFRE SIFIRLA (kurtarma koduyla) ---- */

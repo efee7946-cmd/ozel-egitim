@@ -67,26 +67,32 @@
 
         <!-- Şifre sıfırlama formu (gizli) -->
         <form id="resetForm" class="auth-form" style="display:none" onsubmit="handleResetPassword(event)">
-            <p class="auth-reset-info" data-i18n="auth_reset_info">Kayıt olurken size verilen kurtarma kodunu girin.</p>
+            <p class="auth-reset-info" id="resetInfoText" data-i18n="auth_reset_email_info">Kullanıcı adınızı girin, kayıtlı e-postanıza sıfırlama kodu gönderelim.</p>
             <div class="auth-field">
                 <label data-i18n="auth_username_label">Kullanıcı Adı</label>
                 <input type="text" id="resetUsername" autocomplete="username"
                     placeholder="kullaniciadi" data-i18n-placeholder="login_username">
             </div>
-            <div class="auth-field">
-                <label data-i18n="auth_recovery_code_label">Kurtarma Kodu</label>
-                <input type="text" id="resetRecoveryCode" autocomplete="off"
-                    placeholder="XXXX-XXXX" style="text-transform:uppercase">
+            <button type="button" class="auth-submit-btn" id="sendResetCodeBtn"
+                onclick="requestResetCode()" data-i18n="auth_send_code_btn">E-postama Kod Gönder</button>
+            <div id="resetCodeFields" style="display:none">
+                <div class="auth-field">
+                    <label id="resetCodeLabel" data-i18n="auth_email_code_label">E-postadaki 6 Haneli Kod</label>
+                    <input type="text" id="resetCodeInput" autocomplete="one-time-code"
+                        inputmode="numeric" placeholder="123456">
+                </div>
+                <div class="auth-field">
+                    <label><span data-i18n="auth_new_password_label">Yeni Şifre</span> <small data-i18n="auth_password_hint">(en az 6 karakter)</small></label>
+                    <input type="password" id="resetPassword" autocomplete="new-password" placeholder="••••••">
+                </div>
+                <div class="auth-field">
+                    <label data-i18n="auth_password_repeat">Şifre Tekrar</label>
+                    <input type="password" id="resetPassword2" autocomplete="new-password" placeholder="••••••">
+                </div>
+                <button type="submit" class="auth-submit-btn" id="resetBtn" data-i18n="auth_reset_btn">Şifreyi Sıfırla</button>
             </div>
-            <div class="auth-field">
-                <label><span data-i18n="auth_new_password_label">Yeni Şifre</span> <small data-i18n="auth_password_hint">(en az 6 karakter)</small></label>
-                <input type="password" id="resetPassword" autocomplete="new-password" placeholder="••••••">
-            </div>
-            <div class="auth-field">
-                <label data-i18n="auth_password_repeat">Şifre Tekrar</label>
-                <input type="password" id="resetPassword2" autocomplete="new-password" placeholder="••••••">
-            </div>
-            <button type="submit" class="auth-submit-btn" id="resetBtn" data-i18n="auth_reset_btn">Şifreyi Sıfırla</button>
+            <button type="button" class="auth-forgot-link" id="resetModeToggle"
+                onclick="toggleResetMode()" data-i18n="auth_use_recovery_code">Kurtarma kodum var</button>
             <button type="button" class="auth-forgot-link" onclick="hideResetForm()" data-i18n="auth_back_to_login">← Girişe dön</button>
         </form>
 
@@ -106,6 +112,11 @@
                 <label data-i18n="auth_password_repeat">Şifre Tekrar</label>
                 <input type="password" id="regPassword2" autocomplete="new-password"
                     placeholder="••••••" required>
+            </div>
+            <div class="auth-field">
+                <label><span data-i18n="auth_email_label">E-posta</span> <small data-i18n="auth_email_hint">(şifre sıfırlama için önerilir)</small></label>
+                <input type="email" id="regEmail" autocomplete="email"
+                    placeholder="ornek@gmail.com">
             </div>
             <div class="auth-field">
                 <label data-i18n="auth_student_name">Öğrencinin Adı</label>
@@ -626,6 +637,7 @@ document.addEventListener('DOMContentLoaded', function(){
             <div class="a11y-section-title" data-i18n="a11y_account">Hesap</div>
             <div class="a11y-account-user" id="a11yAccountUser"></div>
             <div class="a11y-account-actions">
+                <button type="button" class="a11y-account-btn" onclick="promptSetEmail()"><span data-i18n="a11y_set_email">📧 E-posta Ekle/Güncelle</span></button>
                 <button type="button" class="a11y-account-btn" onclick="exportMyData()"><span data-i18n="a11y_export">📥 Verilerimi İndir</span></button>
                 <button type="button" class="a11y-account-btn a11y-danger-btn" onclick="deleteAccount()"><span data-i18n="a11y_delete">🗑️ Hesabı Sil</span></button>
             </div>

@@ -836,7 +836,7 @@ const STRINGS = {
     auth_reset_success: 'Şifreniz yenilendi!',
     AUTH_RECOVERY_INVALID: 'Kullanıcı adı veya kurtarma kodu hatalı',
     recovery_modal_title: 'Kurtarma Kodunuz',
-    recovery_modal_sub: 'Şifrenizi unutursanız hesabınıza yalnızca bu kodla erişebilirsiniz. Bir yere yazın veya ekran görüntüsü alın.',
+    recovery_modal_sub: 'Şifrenizi unutursanız e-postanıza gelen kodla veya bu kurtarma koduyla sıfırlayabilirsiniz. Kodu yine de bir yere kaydetmenizi öneririz.',
     recovery_copy_btn: '📋 Kodu Kopyala',
     recovery_saved_btn: 'Kodu kaydettim ✓',
     sync_last: 'Son senkron: {time}',
@@ -855,6 +855,22 @@ const STRINGS = {
     ob_skip: 'Atla',
     ob_next: 'İleri →',
     ob_start: 'Başlayalım! 🎉',
+    auth_email_label: 'E-posta',
+    auth_email_hint: '(şifre sıfırlama için önerilir)',
+    auth_reset_email_info: 'Kullanıcı adınızı girin, kayıtlı e-postanıza sıfırlama kodu gönderelim.',
+    auth_send_code_btn: 'E-postama Kod Gönder',
+    auth_email_code_label: 'E-postadaki 6 Haneli Kod',
+    auth_code_sent_info: 'Kod {email} adresine gönderildi. Spam klasörünü de kontrol edin.',
+    auth_code_sent_toast: 'Sıfırlama kodu gönderildi! 📧',
+    auth_use_recovery_code: 'Kurtarma kodum var',
+    auth_use_email_code: 'E-posta ile sıfırla',
+    AUTH_NO_EMAIL: 'Bu hesapta kayıtlı e-posta yok. Kurtarma kodunuzla sıfırlayabilirsiniz.',
+    AUTH_EMAIL_INVALID: 'Geçerli bir e-posta adresi girin',
+    AUTH_RESET_CODE_INVALID: 'Kod hatalı veya süresi dolmuş',
+    AUTH_RESET_TOO_SOON: 'Az önce kod gönderildi, lütfen e-postanızı kontrol edin',
+    a11y_set_email: '📧 E-posta Ekle/Güncelle',
+    set_email_prompt: 'Şifre sıfırlama için e-posta adresiniz:',
+    set_email_success: 'E-posta kaydedildi: {email}',
   },
   en: {
     back_menu: '← Menu',
@@ -1689,7 +1705,7 @@ const STRINGS = {
     auth_reset_success: 'Your password has been reset!',
     AUTH_RECOVERY_INVALID: 'Username or recovery code is incorrect',
     recovery_modal_title: 'Your Recovery Code',
-    recovery_modal_sub: 'If you forget your password, this code is the only way to access your account. Write it down or take a screenshot.',
+    recovery_modal_sub: 'If you forget your password, you can reset it via your email or with this recovery code. We still recommend saving this code somewhere.',
     recovery_copy_btn: '📋 Copy Code',
     recovery_saved_btn: 'I saved the code ✓',
     sync_last: 'Last sync: {time}',
@@ -1708,6 +1724,22 @@ const STRINGS = {
     ob_skip: 'Skip',
     ob_next: 'Next →',
     ob_start: "Let's start! 🎉",
+    auth_email_label: 'Email',
+    auth_email_hint: '(recommended for password reset)',
+    auth_reset_email_info: 'Enter your username and we will send a reset code to your registered email.',
+    auth_send_code_btn: 'Send Code to My Email',
+    auth_email_code_label: '6-Digit Code from Email',
+    auth_code_sent_info: 'Code sent to {email}. Check your spam folder too.',
+    auth_code_sent_toast: 'Reset code sent! 📧',
+    auth_use_recovery_code: 'I have a recovery code',
+    auth_use_email_code: 'Reset via email',
+    AUTH_NO_EMAIL: 'No email on this account. You can reset with your recovery code.',
+    AUTH_EMAIL_INVALID: 'Enter a valid email address',
+    AUTH_RESET_CODE_INVALID: 'Code is incorrect or expired',
+    AUTH_RESET_TOO_SOON: 'A code was just sent, please check your email',
+    a11y_set_email: '📧 Add/Update Email',
+    set_email_prompt: 'Your email address for password reset:',
+    set_email_success: 'Email saved: {email}',
   }
 };
 
@@ -5617,17 +5649,70 @@ function switchAuthTab(mode) {
     if (mode === 'register') renderRegisterEmojiPicker();
 }
 
+let _resetMode = 'email'; // 'email' | 'recovery'
+let _resetCodeSent = false;
+
 function showResetForm() {
     document.getElementById('loginForm').style.display    = 'none';
     document.getElementById('registerForm').style.display = 'none';
     document.getElementById('resetForm').style.display    = '';
     document.getElementById('resetUsername').value = document.getElementById('loginUsername').value;
     document.getElementById('authError').textContent = '';
+    _resetMode = 'email';
+    _resetCodeSent = false;
+    _applyResetMode();
 }
 
 function hideResetForm() {
     document.getElementById('resetForm').style.display = 'none';
     switchAuthTab('login');
+}
+
+function toggleResetMode() {
+    _resetMode = _resetMode === 'email' ? 'recovery' : 'email';
+    _resetCodeSent = false;
+    document.getElementById('authError').textContent = '';
+    _applyResetMode();
+}
+
+function _applyResetMode() {
+    const emailMode = _resetMode === 'email';
+    document.getElementById('sendResetCodeBtn').style.display = emailMode ? '' : 'none';
+    document.getElementById('resetCodeFields').style.display = (emailMode && !_resetCodeSent) ? 'none' : '';
+    document.getElementById('resetInfoText').textContent = emailMode
+        ? t('auth_reset_email_info')
+        : t('auth_reset_info');
+    document.getElementById('resetCodeLabel').textContent = emailMode
+        ? t('auth_email_code_label')
+        : t('auth_recovery_code_label');
+    const codeInput = document.getElementById('resetCodeInput');
+    codeInput.value = '';
+    codeInput.placeholder = emailMode ? '123456' : 'XXXX-XXXX';
+    codeInput.style.textTransform = emailMode ? 'none' : 'uppercase';
+    document.getElementById('resetModeToggle').textContent = emailMode
+        ? t('auth_use_recovery_code')
+        : t('auth_use_email_code');
+}
+
+async function requestResetCode() {
+    const username = document.getElementById('resetUsername').value.trim();
+    if (!username) return showAuthError(t('auth_fill_all'));
+    const btn = document.getElementById('sendResetCodeBtn');
+    btn.disabled = true; btn.textContent = t('auth_waiting');
+    const res = await authApi('request_reset', { username });
+    btn.disabled = false; btn.textContent = t('auth_send_code_btn');
+
+    if (res.fallback) return showAuthError(t('auth_connection_error') || t('AUTH_FIELDS_REQUIRED'));
+    if (!res.ok) {
+        if (res.error === 'AUTH_NO_EMAIL') return showAuthError(t('AUTH_NO_EMAIL'));
+        return showAuthError(t(res.error) || t('auth_fill_all'));
+    }
+    _resetCodeSent = true;
+    document.getElementById('resetCodeFields').style.display = '';
+    document.getElementById('resetInfoText').textContent =
+        t('auth_code_sent_info').replace('{email}', res.emailMasked || '');
+    document.getElementById('authError').textContent = '';
+    showToast(t('auth_code_sent_toast'));
 }
 
 function showRecoveryModal(code) {
@@ -5647,16 +5732,18 @@ function copyRecoveryCode() {
 async function handleResetPassword(e) {
     e.preventDefault();
     const username     = document.getElementById('resetUsername').value.trim();
-    const recoveryCode = document.getElementById('resetRecoveryCode').value.trim();
+    const codeValue    = document.getElementById('resetCodeInput').value.trim();
     const newPassword  = document.getElementById('resetPassword').value;
     const newPassword2 = document.getElementById('resetPassword2').value;
-    if (!username || !recoveryCode || !newPassword) return showAuthError(t('auth_fill_all'));
+    if (!username || !codeValue || !newPassword) return showAuthError(t('auth_fill_all'));
     if (newPassword !== newPassword2) return showAuthError(t('auth_passwords_mismatch'));
     if (newPassword.length < 6) return showAuthError(t('auth_password_short'));
 
     const btn = document.getElementById('resetBtn');
     btn.disabled = true; btn.textContent = t('auth_waiting');
-    const res = await authApi('reset_password', { username, recoveryCode, newPassword });
+    const res = _resetMode === 'email'
+        ? await authApi('reset_with_email_code', { username, code: codeValue, newPassword })
+        : await authApi('reset_password', { username, recoveryCode: codeValue, newPassword });
     btn.disabled = false; btn.textContent = t('auth_reset_btn');
 
     if (res.fallback) return showAuthError(t('auth_connection_error') || t('AUTH_FIELDS_REQUIRED'));
@@ -5750,6 +5837,7 @@ async function handleRegister(e) {
     const username    = document.getElementById('regUsername').value.trim();
     const password    = document.getElementById('regPassword').value;
     const password2   = document.getElementById('regPassword2').value;
+    const regEmail    = document.getElementById('regEmail').value.trim();
     const studentName = document.getElementById('regStudentName').value.trim();
     const emoji       = document.getElementById('regStudentEmoji').value || '🌟';
     if (!document.getElementById('kvkkConsent').checked) return showAuthError(t('auth_kvkk_required'));
@@ -5758,7 +5846,7 @@ async function handleRegister(e) {
     if (password.length < 6) return showAuthError(t('auth_password_short'));
     setAuthLoading(true);
 
-    const res = await authApi('register', { username, password });
+    const res = await authApi('register', { username, password, email: regEmail || undefined });
     setAuthLoading(false);
 
     if (res.fallback) {
@@ -5884,6 +5972,15 @@ async function deleteAccount() {
     alert(t('account_deleted_msg'));
     showOnly('auth-screen');
     switchAuthTab('login');
+}
+
+async function promptSetEmail() {
+    if (!_authToken || _authToken.startsWith('demo_')) return;
+    const email = prompt(t('set_email_prompt'));
+    if (!email) return;
+    const res = await authApi('set_email', { token: _authToken, email: email.trim() });
+    if (res && res.ok) showToast(t('set_email_success').replace('{email}', res.emailMasked || ''));
+    else showToast(t(res && res.error) || t('AUTH_EMAIL_INVALID'));
 }
 
 function updateA11yAccountSection() {
