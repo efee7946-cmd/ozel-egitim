@@ -1849,10 +1849,14 @@ function celebrateCorrectAnswer() {
 // =============================================
 // EKRAN YÖNETİMİ
 // =============================================
+let _restoringScreen = false;
+
 function showOnly(id) {
     const screens = ['start-screen','student-setup-screen','menu-screen','game-container','report-screen','sort-screen',
                       'schedule-screen','aac-screen','sequence-screen',
                       'login-screen','iep-screen','skills-screen','behavior-screen','auth-screen','splash-screen','analysis-screen'];
+    const isNewScreen = currentScreenId !== id;
+    const prevScreen = currentScreenId;
     screens.forEach(s => {
         const el = document.getElementById(s);
         if (el) el.style.display = 'none';
@@ -1864,7 +1868,23 @@ function showOnly(id) {
         requestAnimationFrame(() => renderCityScene());
     }
     _updateBottomNav(id);
+
+    if (!_restoringScreen && isNewScreen) {
+        const entryScreens = ['auth-screen', 'splash-screen', 'start-screen', 'login-screen'];
+        const replace = history.state === null || entryScreens.includes(prevScreen) || entryScreens.includes(id);
+        try {
+            if (replace) history.replaceState({ screen: id }, '');
+            else history.pushState({ screen: id }, '');
+        } catch(_) {}
+    }
 }
+
+window.addEventListener('popstate', (e) => {
+    if (e.state && e.state.screen && e.state.screen !== currentScreenId) {
+        _restoringScreen = true;
+        try { showOnly(e.state.screen); } finally { _restoringScreen = false; }
+    }
+});
 
 function _updateBottomNav(screenId) {
     const nav = document.getElementById('bottomNav');
@@ -1953,6 +1973,9 @@ async function startApp(resetSession) {
 document.addEventListener('DOMContentLoaded', function() {
     // Supabase auth atlanıyor — kendi auth sistemimizi kullanıyoruz
     checkAuthSession();
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw.js').catch(() => {});
+    }
 });
 window.addEventListener('pagehide', persistSessionSnapshot);
 document.addEventListener('DOMContentLoaded', function() {
