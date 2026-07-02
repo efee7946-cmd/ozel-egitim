@@ -19,17 +19,22 @@ npm test              # Playwright e2e testleri
 - `api/` — Vercel serverless fonksiyonlar (auth, chat, tts, data, video, _db)
 
 ## State Yönetimi
-Framework yok — global değişkenler (`childName`, `activeStudentId`, `currentUserRole`, `currentScreenId`). Ekran geçişleri `showOnly()` ile DOM göster/gizle. Veri: localStorage (önce) → Vercel KV (arka plan) → PostgreSQL.
+Framework yok — global değişkenler (`childName`, `activeStudentId`, `currentScreenId`). Ekran geçişleri `showOnly()` ile DOM göster/gizle (History API entegre, Android geri tuşu çalışır). Veri: localStorage (önce) → arka planda `/api/data` → PostgreSQL.
+
+## Hesap Modeli
+Tek tip hesap: bir yetişkin (öğretmen/terapist/veli ayrımı yok) kayıt olur, altına öğrenciler ekler. Rol/PIN mekanizması yoktur. Kimlik: kullanıcı adı + şifre + zorunlu e-posta (şifre sıfırlama ve doğrulama 6 haneli e-posta koduyla, Gmail SMTP). `/api/data` oturum token'ı ister; veriler sunucuda `kullanıcıadı:anahtar` olarak izole edilir.
 
 ## Veri Anahtarları
 Tüm anahtarlar `lms_` öneki ile başlar: `lms_students`, `lms_iep_<studentId>`, `lms_skills_<studentId>`, `lms_behavior_<studentId>`, vb.
 
 ## Dış API'ler
-- `GEMINI_KEY` — Google Gemini (terapi geri bildirimi, veli raporu)
+- `GEMINI_KEY` — Google Gemini (konuşma pratiği geri bildirimi, veli raporu)
 - `GOOGLE_TTS_CREDENTIALS` — Google Cloud TTS (Chirp 3 HD) servis hesabı JSON'ı
 - `PEXELS_KEY` — Pexels fotoğraf/video
-- `KV_REST_API_URL` + `KV_REST_API_TOKEN` — Vercel KV (opsiyonel)
+- `GMAIL_USER` + `GMAIL_APP_PASSWORD` — Gmail SMTP (şifre sıfırlama/doğrulama kodları)
 - `DATABASE_URL` — PostgreSQL/Aiven bağlantısı
+- `ALLOWED_ORIGIN` — CORS kısıtı (https://ozel-egitim.vercel.app)
+- `ADMIN_KEY` — /api/log hata listesini görüntüleme anahtarı
 
 ## Kodlama Kuralları
 - Yorum yazma — değişken adları yeterince açıklayıcı
@@ -40,9 +45,6 @@ Tüm anahtarlar `lms_` öneki ile başlar: `lms_students`, `lms_iep_<studentId>`
 
 ## Test
 Playwright ile e2e. Test dosyası: `tests/app.spec.js`. CI: GitHub Actions, Node 24.
-
-## Öğretmen Paneli
-PIN korumalı (varsayılan: `1234`). Sağ üst köşe öğretmen simgesinden erişilir.
 
 ## Deploy
 Vercel — `main` branch her push'ta otomatik deploy edilir.

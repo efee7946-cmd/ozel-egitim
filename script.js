@@ -147,10 +147,6 @@ const STRINGS = {
     level2: 'Orta',
     level3: 'Ağır',
     start_btn: 'Başla',
-    teacher_panel: 'Öğretmen Paneli',
-    teacher_pin: 'PIN gir',
-    teacher_enter: 'Giriş',
-    teacher_wrong_pin: 'Yanlış PIN!',
     change_student: 'Öğrenci Değiştir',
     thinking: 'Düşünüyorum...',
     mic_start: 'Mikrofon',
@@ -707,16 +703,13 @@ const STRINGS = {
     star_sub_1: 'Bugün de konuşmak için çaba gösterdin, bu çok değerli!',
     star_close_btn: 'Harika! ✨',
     menu_panel_mode: 'Panel Modu',
-    menu_panel_parent: 'Veli Paneli',
-    menu_panel_specialist: 'Uzman Paneli',
+    menu_panel_parent: 'YıldızCan Paneli',
     menu_panel_copy_parent: 'Seçili öğrenci için uygun çalışmayı seçip gelişimini tek panelden izleyebilirsin.',
-    menu_panel_copy_specialist: 'Birden fazla öğrenciyi takip edip seçili öğrenci için seansları yönetebilirsin.',
     menu_student_summary: 'Öğrenci Özeti',
     menu_not_selected: 'Henüz seçilmedi',
     menu_student_summary_hint: 'Öğrenci seçince notları ve temel bilgileri burada göreceksin.',
     menu_total_students: 'Toplam Öğrenci',
-    menu_count_copy_parent: 'Bu veli hesabında takip edilen aktif öğrenci sayısı.',
-    menu_count_copy_specialist: 'Bu uzman hesabına bağlı aktif öğrenci sayısı.',
+    menu_count_copy_parent: 'Bu hesapta takip edilen aktif öğrenci sayısı.',
     sd_selected_student: 'Seçili Öğrenci',
     sd_none_selected: 'Öğrenci seçilmedi',
     sd_pick_hint: 'Bir öğrenci seçtiğinde güçlü yönler, destek notları ve oturum özeti burada görünür.',
@@ -1020,10 +1013,6 @@ const STRINGS = {
     level2: 'Moderate',
     level3: 'Severe',
     start_btn: 'Start',
-    teacher_panel: 'Teacher Panel',
-    teacher_pin: 'Enter PIN',
-    teacher_enter: 'Enter',
-    teacher_wrong_pin: 'Wrong PIN!',
     change_student: 'Change Student',
     thinking: 'Thinking...',
     mic_start: 'Microphone',
@@ -1580,16 +1569,13 @@ const STRINGS = {
     star_sub_1: 'You worked hard on speaking today, and that is so valuable!',
     star_close_btn: 'Great! ✨',
     menu_panel_mode: 'Panel Mode',
-    menu_panel_parent: 'Parent Panel',
-    menu_panel_specialist: 'Specialist Panel',
+    menu_panel_parent: 'YıldızCan Panel',
     menu_panel_copy_parent: 'Pick the right activity for the selected student and track progress from one panel.',
-    menu_panel_copy_specialist: 'Track multiple students and manage sessions for the selected student.',
     menu_student_summary: 'Student Summary',
     menu_not_selected: 'Not selected yet',
     menu_student_summary_hint: 'Select a student to see their notes and basic info here.',
     menu_total_students: 'Total Students',
-    menu_count_copy_parent: 'Active students tracked in this parent account.',
-    menu_count_copy_specialist: 'Active students linked to this specialist account.',
+    menu_count_copy_parent: 'Active students tracked in this account.',
     sd_selected_student: 'Selected Student',
     sd_none_selected: 'No student selected',
     sd_pick_hint: 'When you select a student, strengths, support notes and session summary appear here.',
@@ -1835,9 +1821,7 @@ window.addEventListener('unhandledrejection', (e) => {
 // =============================================
 let childName = "";
 let appStarted = false;
-let currentUserRole = "parent";
 let currentScreenId = 'start-screen';
-let currentMenuSection = 'overview';
 let activeStudentId = '';
 let activeStudentName = '';
 let studentsCache = [];
@@ -2051,8 +2035,7 @@ function updateMenuIdentity() {
     const emailEl = document.getElementById('account-email');
     const studentEl = document.getElementById('active-student-name');
     if (emailEl) {
-        const roleLabel = currentUserRole === 'specialist' ? 'Uzman' : 'Veli';
-        emailEl.textContent = (_authUser && _authUser.displayName) ? `${_authUser.displayName} • ${roleLabel}` : 'Misafir';
+        emailEl.textContent = (_authUser && _authUser.displayName) ? _authUser.displayName : 'Misafir';
     }
     if (studentEl) {
         studentEl.textContent = activeStudentName || t('student_pill');
@@ -2395,203 +2378,6 @@ function ensureStudentEnhancements() {
         menuHeader.insertAdjacentElement('afterend', detailPanel);
     }
 
-    ensureMenuWorkspace();
-}
-
-function ensureMenuWorkspace() {
-    return; // Sade menü tasarımı aktif — karmaşık workspace devre dışı
-    const menuScreen = document.getElementById('menu-screen');
-    const menuHeader = document.querySelector('.menu-header');
-    const menuTopbar = document.querySelector('.menu-topbar');
-    const onboardingPanel = document.getElementById('onboarding-panel');
-    const cards = document.querySelector('.menu-cards');
-    const insights = document.querySelector('.menu-insights');
-    if (!menuScreen || !menuHeader || !menuTopbar || !onboardingPanel || !cards || !insights) return;
-
-    let shell = document.getElementById('menu-app-shell');
-    let sidebar = document.getElementById('menu-sidebar');
-    let mainPane = document.getElementById('menu-main-pane');
-    if (!shell) {
-        shell = document.createElement('div');
-        shell.id = 'menu-app-shell';
-        shell.className = 'menu-app-shell';
-
-        sidebar = document.createElement('aside');
-        sidebar.id = 'menu-sidebar';
-        sidebar.className = 'menu-sidebar';
-        sidebar.innerHTML = `
-            <div class="sidebar-brand">
-                <img src="avatar.png" class="sidebar-brand-avatar" alt="Yıldız Can">
-                <div>
-                    <strong>YıldızCan</strong>
-                    <span>Çocuk destek paneli</span>
-                </div>
-            </div>
-            <div class="sidebar-section">
-                <span class="sidebar-label">Hızlı Erişim</span>
-                <button type="button" class="sidebar-link-btn" onclick="goToTherapy()">Konuşma Terapisti</button>
-                <button type="button" class="sidebar-link-btn" onclick="goToReport()">Veli Raporu</button>
-                <button type="button" class="sidebar-link-btn" onclick="openStudentSetup()">Öğrenci Yönetimi</button>
-            </div>
-        `;
-
-        mainPane = document.createElement('div');
-        mainPane.id = 'menu-main-pane';
-        mainPane.className = 'menu-main-pane';
-
-        shell.appendChild(sidebar);
-        shell.appendChild(mainPane);
-        menuScreen.appendChild(shell);
-    } else {
-        sidebar = document.getElementById('menu-sidebar');
-        mainPane = document.getElementById('menu-main-pane');
-    }
-
-    if (mainPane && menuTopbar.parentNode !== mainPane) {
-        mainPane.appendChild(menuTopbar);
-    }
-    if (mainPane && menuHeader.parentNode !== mainPane) {
-        mainPane.appendChild(menuHeader);
-    }
-
-    if (sidebar) {
-        sidebar.querySelectorAll('.sidebar-nav-btn').forEach(btn => {
-            if (!btn.dataset.bound) {
-                btn.dataset.bound = '1';
-                btn.addEventListener('click', () => switchMenuSection(btn.dataset.section));
-            }
-        });
-    }
-
-    let nav = document.getElementById('menu-workspace-nav');
-    if (!nav) {
-        nav = document.createElement('div');
-        nav.id = 'menu-workspace-nav';
-        nav.className = 'menu-workspace-nav';
-        nav.innerHTML = `
-            <button type="button" class="workspace-tab active" data-section="overview">Genel Bakış</button>
-            <button type="button" class="workspace-tab" data-section="students">Öğrenciler</button>
-            <button type="button" class="workspace-tab" data-section="guide">Rehber</button>
-            <button type="button" class="workspace-tab" data-section="activities">Oturumlar</button>
-        `;
-        mainPane.appendChild(nav);
-        nav.querySelectorAll('.workspace-tab').forEach(btn => {
-            btn.addEventListener('click', () => switchMenuSection(btn.dataset.section));
-        });
-    }
-
-    if (!document.getElementById('menu-overview-section')) {
-        const overview = document.createElement('section');
-        overview.id = 'menu-overview-section';
-        overview.className = 'menu-workspace-section';
-        mainPane.appendChild(overview);
-        overview.innerHTML = `
-            <div class="workspace-section-head">
-                <span class="workspace-section-kicker">Genel Bakış</span>
-                <h3>Bugünkü genel durum</h3>
-                <p>Rolüne ve seçili öğrenciye göre hızlı bir özet, yönlendirme ve bir sonraki adımı gör.</p>
-            </div>
-        `;
-        overview.appendChild(insights);
-        overview.appendChild(onboardingPanel);
-    }
-
-    if (!document.getElementById('menu-students-section')) {
-        const students = document.createElement('section');
-        students.id = 'menu-students-section';
-        students.className = 'menu-workspace-section';
-        mainPane.appendChild(students);
-        students.innerHTML = `
-            <div class="workspace-section-head">
-                <span class="workspace-section-kicker">Öğrenciler</span>
-                <h3>Öğrenci yönetimi</h3>
-                <p>Seçili öğrenciyi incele, destek notlarını güncelle ve hangi çalışmaya ihtiyacı olduğunu gör.</p>
-            </div>
-            <div class="students-section-actions">
-                <button type="button" class="menu-ghost-btn" onclick="openStudentSetup()">Öğrenci seç veya ekle</button>
-                <button type="button" class="menu-ghost-btn" onclick="openOnboarding()">Kullanım rehberini aç</button>
-            </div>
-        `;
-    }
-
-    if (!document.getElementById('menu-guide-section')) {
-        const guide = document.createElement('section');
-        guide.id = 'menu-guide-section';
-        guide.className = 'menu-workspace-section';
-        mainPane.appendChild(guide);
-        guide.innerHTML = `
-            <div class="workspace-section-head">
-                <span class="workspace-section-kicker">Rehber</span>
-                <h3>Öğretici kullanım akışı</h3>
-                <p>Karmaşayı azaltmak için her oturumda terapi ve rapor odağında net bir akış sunuyoruz.</p>
-            </div>
-            <div class="guide-grid">
-                <article class="guide-card">
-                    <span class="guide-card-step">1. Hazırlık</span>
-                    <h4>Öğrenci notlarını oku</h4>
-                    <p>Destek notları çocuğun ilgisini, zorlandığı alanları ve dili nasıl sade tutman gerektiğini hatırlatır.</p>
-                </article>
-                <article class="guide-card">
-                    <span class="guide-card-step">2. Uygulama</span>
-                    <h4>Kısa terapiyle başla</h4>
-                    <p>İlk olarak konuşma terapisti açılıp mikrofon, dikkat ve kısa cevap akışı denenebilir.</p>
-                </article>
-                <article class="guide-card">
-                    <span class="guide-card-step">3. Pekiştirme</span>
-                    <h4>Oturumu notla</h4>
-                    <p>Terapi sırasında verilen yanıtları ve dikkat düzeyini gözleyip raporda anlamlı bir özet oluşmasını sağla.</p>
-                </article>
-                <article class="guide-card guide-card-accent">
-                    <span class="guide-card-step">4. Gözlem</span>
-                    <h4>Raporla kapat</h4>
-                    <p>Son adımda veli raporundan süre, katılım ve değerlendirme özetini inceleyip bir sonraki oturuma not çıkar.</p>
-                </article>
-            </div>
-        `;
-    }
-
-    if (!document.getElementById('menu-activities-section')) {
-        const activities = document.createElement('section');
-        activities.id = 'menu-activities-section';
-        activities.className = 'menu-workspace-section';
-        mainPane.appendChild(activities);
-        activities.innerHTML = `
-            <div class="workspace-section-head">
-                <span class="workspace-section-kicker">Oturumlar</span>
-                <h3>Çalışma alanını seç</h3>
-                <p>Bugün konuşma terapisi başlatabilir veya önceki oturumların veli raporlarını inceleyebilirsin.</p>
-            </div>
-            <div class="activity-playbook">
-                <div class="activity-playbook-card">
-                    <strong>Hızlı başlangıç</strong>
-                    <p>Dikkat dağınıksa önce terapiyi açıp 3-4 kısa yanıtla ısın.</p>
-                </div>
-                <div class="activity-playbook-card">
-                    <strong>Terapi odağı</strong>
-                    <p>Bugünün hedefi kısa yanıt, cümle kurma ya da anlama çalışmasıysa konuşma terapisiyle ilerle.</p>
-                </div>
-                <div class="activity-playbook-card">
-                    <strong>Rapor odağı</strong>
-                    <p>Önceki oturumları karşılaştırmak, süreyi görmek ve AI değerlendirmesini okumak için raporu aç.</p>
-                </div>
-                <div class="activity-playbook-card">
-                    <strong>Takip</strong>
-                    <p>Oturum bitince veli raporuna geçip hangi sorularda daha iyi katılım olduğunu kontrol et.</p>
-                </div>
-            </div>
-        `;
-        activities.appendChild(cards);
-    }
-
-    const studentsSection = document.getElementById('menu-students-section');
-    const detailPanel = document.getElementById('student-detail-panel');
-    if (studentsSection && detailPanel && detailPanel.parentNode !== studentsSection) {
-        studentsSection.appendChild(detailPanel);
-    }
-
-    renderLearningAreaBlueprint();
-
-    switchMenuSection(currentMenuSection);
 }
 
 function inferLearningArea(student) {
@@ -2605,57 +2391,12 @@ function inferLearningArea(student) {
     return LEARNING_AREAS.find(area => area.key === 'speech');
 }
 
-function buildLearningAreaCards() {
-    return LEARNING_AREAS.map(area => `
-        <article class="learning-area-card">
-            <div class="learning-area-head">
-                <span class="learning-area-age">${area.ageRange}</span>
-                <strong>${area.title}</strong>
-            </div>
-            <p>${area.summary}</p>
-            <div class="learning-area-list">
-                ${area.outcomes.map(item => `<span>${item}</span>`).join('')}
-            </div>
-            <div class="learning-area-screen">${area.screenPlan}</div>
-        </article>
-    `).join('');
-}
-
 function renderLearningAreaBlueprint() {
     const showcase = document.getElementById('learning-area-showcase');
     if (showcase) showcase.remove();
 
     const roadmap = document.getElementById('learning-roadmap-panel');
     if (roadmap) roadmap.remove();
-}
-
-function switchMenuSection(section) {
-    const sections = {
-        overview: document.getElementById('menu-overview-section'),
-        students: document.getElementById('menu-students-section'),
-        guide: document.getElementById('menu-guide-section'),
-        activities: document.getElementById('menu-activities-section')
-    };
-    currentMenuSection = sections[section] ? section : 'overview';
-
-    Object.entries(sections).forEach(([key, el]) => {
-        if (!el) return;
-        el.style.display = key === currentMenuSection ? 'block' : 'none';
-    });
-
-    const nav = document.getElementById('menu-workspace-nav');
-    if (nav) {
-        nav.querySelectorAll('.workspace-tab').forEach(btn => {
-            btn.classList.toggle('active', btn.dataset.section === currentMenuSection);
-        });
-    }
-
-    const sidebar = document.getElementById('menu-sidebar');
-    if (sidebar) {
-        sidebar.querySelectorAll('.sidebar-nav-btn').forEach(btn => {
-            btn.classList.toggle('active', btn.dataset.section === currentMenuSection);
-        });
-    }
 }
 
 function syncStudentForm(student) {
@@ -2688,12 +2429,8 @@ function renderRoleDashboard() {
     const studentCountCopyEl = document.getElementById('student-count-copy');
     const student = studentsCache.find(item => item.id === activeStudentId);
 
-    if (roleTitleEl) roleTitleEl.textContent = currentUserRole === 'specialist' ? t('menu_panel_specialist') : t('menu_panel_parent');
-    if (roleCopyEl) {
-        roleCopyEl.textContent = currentUserRole === 'specialist'
-            ? t('menu_panel_copy_specialist')
-            : t('menu_panel_copy_parent');
-    }
+    if (roleTitleEl) roleTitleEl.textContent = t('menu_panel_parent');
+    if (roleCopyEl) roleCopyEl.textContent = t('menu_panel_copy_parent');
 
     if (studentSummaryNameEl) studentSummaryNameEl.textContent = activeStudentName || t('menu_not_selected');
     if (studentSummaryCopyEl) {
@@ -2708,9 +2445,7 @@ function renderRoleDashboard() {
 
     if (studentCountEl) studentCountEl.textContent = String(studentsCache.length);
     if (studentCountCopyEl) {
-        studentCountCopyEl.textContent = currentUserRole === 'specialist'
-            ? t('menu_count_copy_specialist')
-            : t('menu_count_copy_parent');
+        studentCountCopyEl.textContent = t('menu_count_copy_parent');
     }
 }
 
