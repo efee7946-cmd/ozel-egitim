@@ -7,8 +7,33 @@
 const DB = (function () {
     const PFX = 'lms_';
     const PFX_S = 'lms_s_'; // sessionStorage prefix (plaintext)
+    const TS_KEY = 'lms__key_ts'; // anahtar başına son yazma zamanı (epoch ms)
+    const CLOUD_RETRY_MS = 30000;
     let _cloud = true;
+    let _cloudRetryTimer = null;
+    let _lastSyncAt = null;
     let _encKey = null; // AES-GCM CryptoKey, bellekte, diske yazılmaz
+
+    function _cloudDown() {
+        _cloud = false;
+        if (_cloudRetryTimer) return;
+        _cloudRetryTimer = setTimeout(() => {
+            _cloudRetryTimer = null;
+            _cloud = true;
+        }, CLOUD_RETRY_MS);
+    }
+
+    function _tsMap() {
+        try { return JSON.parse(localStorage.getItem(TS_KEY)) || {}; } catch { return {}; }
+    }
+    function _tsGet(key) { return _tsMap()[key] || 0; }
+    function _tsSet(key, ms) {
+        try {
+            const m = _tsMap();
+            m[key] = ms;
+            localStorage.setItem(TS_KEY, JSON.stringify(m));
+        } catch {}
+    }
 
     // Şifreli saklanacak anahtarlar (KVKK md.6 özel nitelikli veri)
     const SENSITIVE = ['students', 'bep_profile_', 'iep_', 'skills_', 'behavior_', 'adaptive_', 'trials_'];
@@ -84,16 +109,21 @@ const DB = (function () {
         try { localStorage.removeItem(PFX + key); } catch {}
     }
 
-    /* ---------- Cloud (Vercel KV) ---------- */
-    async function cloudGet(key) {
+    /* ---------- Cloud ---------- */
+    async function cloudFetch(key) {
         if (!_cloud) return null;
         try {
             const r = await fetch('/api/data?key=' + encodeURIComponent(key),
                 { signal: AbortSignal.timeout(4000) });
             const d = await r.json();
-            if (d.fallback) { _cloud = false; return null; }
-            return d.value ?? null;
-        } catch { _cloud = false; return null; }
+            if (d.fallback) { _cloudDown(); return null; }
+            _lastSyncAt = Date.now();
+            return { value: d.value ?? null, ts: d.updatedAt ? Date.parse(d.updatedAt) : 0 };
+        } catch { _cloudDown(); return null; }
+    }
+    async function cloudGet(key) {
+        const r = await cloudFetch(key);
+        return r ? r.value : null;
     }
     function cloudPut(key, val) {
         if (!_cloud) return;
@@ -102,7 +132,10 @@ const DB = (function () {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ key, value: val }),
             signal: AbortSignal.timeout(6000),
-        }).catch(() => { _cloud = false; });
+        }).then(r => r.json()).then(d => {
+            if (d && d.updatedAt) _tsSet(key, Date.parse(d.updatedAt));
+            _lastSyncAt = Date.now();
+        }).catch(() => { _cloudDown(); });
     }
     function cloudDel(key) {
         if (!_cloud) return;
@@ -174,6 +207,7 @@ const DB = (function () {
             } else {
                 try { localStorage.setItem(PFX + key, JSON.stringify(val)); } catch {}
             }
+            _tsSet(key, Date.now());
             cloudPut(key, val);
         },
 
@@ -205,6 +239,44 @@ const DB = (function () {
         },
 
         isCloud() { return _cloud; },
+
+        lastSyncAt() { return _lastSyncAt; },
+
+        /**
+         * Cihazlar arası uzlaştırma: verilen anahtarlar için buluttaki
+         * sürüm daha yeniyse yereli günceller, yerel daha yeniyse buluta yazar.
+         * Değişen (buluttan güncellenen) anahtar listesini döndürür.
+         */
+        async refreshKeys(keys) {
+            const changed = [];
+            const SKEW_MS = 5000;
+            for (const key of keys) {
+                if (!key) continue;
+                const remote = await cloudFetch(key);
+                if (!remote) continue; // cloud kapalı/erişilemedi
+                const localTs = _tsGet(key);
+                const localVal = isSensitive(key) ? ssGet(key) : (() => {
+                    try { const r = localStorage.getItem(PFX + key); return r ? JSON.parse(r) : null; } catch { return null; }
+                })();
+
+                if (remote.value === null) {
+                    // Bulutta hiç yok — yerel varsa gönder
+                    if (localVal !== null) cloudPut(key, localVal);
+                    continue;
+                }
+                if (localVal === null || remote.ts > localTs + SKEW_MS) {
+                    // Bulut daha yeni — yereli güncelle
+                    if (isSensitive(key)) { ssPut(key, remote.value); lsPut(key, remote.value); }
+                    else { try { localStorage.setItem(PFX + key, JSON.stringify(remote.value)); } catch {} }
+                    _tsSet(key, remote.ts);
+                    changed.push(key);
+                } else if (localTs > remote.ts + SKEW_MS) {
+                    // Yerel daha yeni (çevrimdışı yazılmış) — buluta gönder
+                    cloudPut(key, localVal);
+                }
+            }
+            return changed;
+        },
     };
 })();
 

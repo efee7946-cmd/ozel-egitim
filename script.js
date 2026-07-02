@@ -839,6 +839,8 @@ const STRINGS = {
     recovery_modal_sub: 'Şifrenizi unutursanız hesabınıza yalnızca bu kodla erişebilirsiniz. Bir yere yazın veya ekran görüntüsü alın.',
     recovery_copy_btn: '📋 Kodu Kopyala',
     recovery_saved_btn: 'Kodu kaydettim ✓',
+    sync_last: 'Son senkron: {time}',
+    sync_never: 'Henüz senkron olmadı',
   },
   en: {
     back_menu: '← Menu',
@@ -1676,6 +1678,8 @@ const STRINGS = {
     recovery_modal_sub: 'If you forget your password, this code is the only way to access your account. Write it down or take a screenshot.',
     recovery_copy_btn: '📋 Copy Code',
     recovery_saved_btn: 'I saved the code ✓',
+    sync_last: 'Last sync: {time}',
+    sync_never: 'Not synced yet',
   }
 };
 
@@ -5477,6 +5481,33 @@ function onAuthSuccess() {
     document.body.classList.add('has-bottom-nav');
     initLoginScreen();
     showOnly('login-screen');
+    syncUserDataFromCloud();
+}
+
+async function syncUserDataFromCloud() {
+    try {
+        const userId = await getCurrentUserId();
+        if (!userId || userId === 'guest') return;
+        const keys = [
+            'teacher_students_' + userId,
+            'session_history_' + userId,
+            'bep_profile_' + userId,
+            'active_student_' + userId,
+        ];
+        const students = DB.getSync('teacher_students_' + userId) || [];
+        students.forEach(s => {
+            keys.push('schedule_' + s.id, 'iep_' + s.id, 'skills_' + s.id,
+                      'behavior_' + s.id, 'adaptive_' + s.id, 'trials_' + s.id);
+        });
+        const changed = await DB.refreshKeys(keys);
+        if (!changed.length) return;
+        // Öğrenci listesi değiştiyse açık ekranı tazele
+        if (changed.includes('teacher_students_' + userId)) {
+            studentsCache = DB.getSync('teacher_students_' + userId) || [];
+            if (currentScreenId === 'login-screen') initLoginScreen();
+            else if (currentScreenId === 'menu-screen') { renderRoleDashboard(); renderStudentDetailPanel(); }
+        }
+    } catch(_) {}
 }
 
 function onAuthSuccessWithStudent(student) {
@@ -5484,8 +5515,10 @@ function onAuthSuccessWithStudent(student) {
     if (nameEl) nameEl.textContent = student.name;
     const greetEl = document.getElementById('menu-greeting');
     if (greetEl) greetEl.textContent = t('menu_greeting_named').replace('{name}', student.name);
+    document.body.classList.add('has-bottom-nav');
     showOnly('menu-screen');
     renderCityScene();
+    syncUserDataFromCloud();
 }
 
 function renderRegisterEmojiPicker() {
@@ -5790,7 +5823,13 @@ function updateA11yAccountSection() {
     if (!section) return;
     if (_authUser) {
         section.style.display = 'block';
-        if (userEl) userEl.textContent = '@' + _authUser.username;
+        if (userEl) {
+            const syncAt = DB.lastSyncAt ? DB.lastSyncAt() : null;
+            const syncText = syncAt
+                ? t('sync_last').replace('{time}', new Date(syncAt).toLocaleTimeString(_lang === 'en' ? 'en-US' : 'tr-TR', { hour: '2-digit', minute: '2-digit' }))
+                : t('sync_never');
+            userEl.textContent = '@' + _authUser.username + ' • ' + syncText;
+        }
     } else {
         section.style.display = 'none';
     }
