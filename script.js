@@ -75,7 +75,19 @@ const STRINGS = {
     menu_bep: 'BEP',
     menu_report: 'Rapor',
     menu_aac: 'AAC',
-    menu_sequence: 'Sıralama Oyunları',
+    menu_sequence: 'Oyunlar',
+    menu_parent_report: 'Veli Raporu',
+    stars_title: '⭐ Yıldız Koleksiyonu',
+    stars_count_label: 'yıldız topladın!',
+    stars_unlocked: '🎉 Yeni aksesuar açıldı: {item}!',
+    stars_earned: '+{n} ⭐ kazandın!',
+    stars_equipped: 'Takılı ✓',
+    stars_tap_to_wear: 'Takmak için dokun',
+    acc_hat: 'Şapka', acc_scarf: 'Atkı', acc_glasses: 'Gözlük', acc_crown: 'Taç',
+    greet_child: 'Merhaba {name}! Bugün ne oynayalım?',
+    nudge_therapy_gap: '{d} gündür konuşma pratiği yapılmadı — kısa bir seans?',
+    nudge_sort_again: '{game}: son doğruluk %{acc} — tekrar dene!',
+    nudge_first: 'Hadi başlayalım! İlk konuşma pratiğini yap',
     menu_sort: 'Sınıflandırma',
     menu_analysis: 'Analiz',
     therapy_title: 'Konuşma Pratiği',
@@ -661,7 +673,11 @@ const STRINGS = {
     skill_motor_6: 'Çizgi takibi',
     skill_motor_7: 'Denge',
 
-    seq_menu_title: '🔢 Sıralama Oyunları',
+    seq_menu_title: '🧩 Oyunlar',
+    games_group_sort: 'Sınıflandırma',
+    games_group_order: '📋 Sıralama',
+    games_group_cause: '🔗 Sebep-Sonuç',
+    games_sort_hero_sub: '{n} farklı eşleştirme oyunu',
     seq_menu_type_cause: 'Sebep-Sonuç',
     seq_menu_type_order: 'Sıralama',
     seq_back_to_menu: '← Oyun Seçimine Dön',
@@ -824,7 +840,7 @@ const STRINGS = {
     report_stat_duration: 'Toplam Süre',
     report_stat_story: 'Hikâye İlerlemesi',
     report_stat_turns: 'Toplam Yanıt',
-    report_stat_intervention: 'Müdahale / Prososyal',
+    report_stat_intervention: 'Zorlandığı / Olumlu Seçimler',
     report_choice_analysis: '🔍 Seçim Analizi',
     report_speech_summary: '🎙️ Konuşma Pratiği Özeti',
     report_ai_eval: "🤖 Yıldız Can'ın Değerlendirmesi",
@@ -1006,7 +1022,19 @@ const STRINGS = {
     menu_bep: 'IEP',
     menu_report: 'Report',
     menu_aac: 'AAC',
-    menu_sequence: 'Sorting Games',
+    menu_sequence: 'Games',
+    menu_parent_report: 'Parent Report',
+    stars_title: '⭐ Star Collection',
+    stars_count_label: 'stars collected!',
+    stars_unlocked: '🎉 New accessory unlocked: {item}!',
+    stars_earned: 'You earned +{n} ⭐!',
+    stars_equipped: 'Wearing ✓',
+    stars_tap_to_wear: 'Tap to wear',
+    acc_hat: 'Hat', acc_scarf: 'Scarf', acc_glasses: 'Glasses', acc_crown: 'Crown',
+    greet_child: 'Hello {name}! What shall we play today?',
+    nudge_therapy_gap: 'No speech practice for {d} days — a quick session?',
+    nudge_sort_again: '{game}: last accuracy {acc}% — try again!',
+    nudge_first: "Let's begin! Do your first speech practice",
     menu_sort: 'Sorting',
     menu_analysis: 'Analysis',
     therapy_title: 'Speech Practice',
@@ -1591,7 +1619,11 @@ const STRINGS = {
     skill_motor_6: 'Line tracing',
     skill_motor_7: 'Balance',
 
-    seq_menu_title: '🔢 Sequencing Games',
+    seq_menu_title: '🧩 Games',
+    games_group_sort: 'Classification',
+    games_group_order: '📋 Sequencing',
+    games_group_cause: '🔗 Cause & Effect',
+    games_sort_hero_sub: '{n} different matching games',
     seq_menu_type_cause: 'Cause-Effect',
     seq_menu_type_order: 'Sequencing',
     seq_back_to_menu: '← Back to Game Selection',
@@ -1754,7 +1786,7 @@ const STRINGS = {
     report_stat_duration: 'Total Duration',
     report_stat_story: 'Story Progress',
     report_stat_turns: 'Total Answers',
-    report_stat_intervention: 'Intervention / Prosocial',
+    report_stat_intervention: 'Challenging / Positive Choices',
     report_choice_analysis: '🔍 Choice Analysis',
     report_speech_summary: '🎙️ Speech Practice Summary',
     report_ai_eval: "🤖 Yıldız Can's Evaluation",
@@ -2290,6 +2322,9 @@ function goToMenu() {
     if (cityShell) cityShell.style.display = '';
     showOnly('menu-screen');
     renderCityScene();
+    updateStarBadge();
+    maybeGreetChild();
+    renderMenuNudge();
     if (hadTherapy) _showStarReward();
 }
 
@@ -3126,6 +3161,12 @@ async function goToReport() {
     const prosocials = sessionData.storyChoices.filter(c => c.ethicsScore > 0).length;
     const interventionEl = document.getElementById('statInterventions');
     if (interventionEl) interventionEl.textContent = `${interventions} / ${prosocials}`;
+
+    // Veri olmayan kartlar veliyi yaniltmasin — gizle
+    const storyCard = document.getElementById('statStoryProgress')?.closest('.stat-card');
+    if (storyCard) storyCard.style.display = (sessionData.totalScenes > 0 || sessionData.storyCompleted) ? '' : 'none';
+    const interventionCard = interventionEl?.closest('.stat-card');
+    if (interventionCard) interventionCard.style.display = sessionData.storyChoices.length ? '' : 'none';
 
     const history = await persistSessionSnapshot();
     renderReportHistory(history);
@@ -4028,6 +4069,7 @@ function _showSortComplete() {
     const gameSection = document.getElementById('sortGameSection');
     if (!gameSection) return;
     _saveSortResult().catch(() => {});
+    addStars(_sortErrors === 0 ? 3 : (_sortErrors <= 2 ? 2 : 1));
     confetti({ particleCount: 120, spread: 90 });
     speakFallback(t('sort_complete_title') + ' ' + (_lang === 'en' ? 'Well done!' : 'Çok güzel yaptın!'), () => {});
     gameSection.innerHTML = `
@@ -5520,6 +5562,125 @@ async function addEmojiCard() {
 // =============================================
 // GİZLİ YILDIZ ÖDÜL — seans sonu otomatik
 // =============================================
+// =============================================
+// YILDIZ KOLEKSİYONU (token ekonomisi)
+// =============================================
+const BEAR_ACCESSORIES = [
+    { id: 'hat',     emoji: '🎩', cost: 5,  pos: 'top',    get label() { return t('acc_hat'); } },
+    { id: 'scarf',   emoji: '🧣', cost: 15, pos: 'bottom', get label() { return t('acc_scarf'); } },
+    { id: 'glasses', emoji: '🕶️', cost: 30, pos: 'mid',    get label() { return t('acc_glasses'); } },
+    { id: 'crown',   emoji: '👑', cost: 50, pos: 'top',    get label() { return t('acc_crown'); } },
+];
+
+function _starsKey() { return 'stars_' + (activeStudentId || 'default'); }
+function getStarState() { return DB.getSync(_starsKey()) || { total: 0, equipped: null }; }
+
+function addStars(n) {
+    if (!n) return;
+    const s = getStarState();
+    const before = s.total;
+    s.total += n;
+    DB.set(_starsKey(), s);
+    showToast(t('stars_earned').replace('{n}', n));
+    const unlocked = BEAR_ACCESSORIES.find(a => before < a.cost && s.total >= a.cost);
+    if (unlocked) {
+        setTimeout(() => {
+            showToast(t('stars_unlocked').replace('{item}', unlocked.emoji + ' ' + unlocked.label));
+            if (typeof confetti === 'function') confetti({ particleCount: 90, spread: 75 });
+        }, 1400);
+    }
+    updateStarBadge();
+}
+
+function updateStarBadge() {
+    const s = getStarState();
+    const badge = document.getElementById('welcomeStarBadge');
+    if (badge) { badge.style.display = ''; badge.textContent = '⭐ ' + s.total; }
+    const acc = document.getElementById('welcomeAccessory');
+    if (acc) {
+        const a = BEAR_ACCESSORIES.find(x => x.id === s.equipped);
+        acc.textContent = a ? a.emoji : '';
+        acc.className = 'welcome-accessory' + (a ? ' acc-' + a.pos : '');
+    }
+}
+
+function openStarCollection() {
+    const s = getStarState();
+    document.getElementById('starTotal').innerHTML =
+        `<span class="star-total-num">⭐ ${s.total}</span> <span>${t('stars_count_label')}</span>`;
+    document.getElementById('starAccessories').innerHTML = BEAR_ACCESSORIES.map(a => {
+        const owned = s.total >= a.cost;
+        const equipped = s.equipped === a.id;
+        const pct = Math.min(100, Math.round((s.total / a.cost) * 100));
+        return `<button type="button" class="star-acc-card${owned ? '' : ' locked'}${equipped ? ' equipped' : ''}"
+            ${owned ? `onclick="toggleAccessory('${a.id}')"` : 'disabled'}>
+            <span class="star-acc-emoji">${a.emoji}</span>
+            <span class="star-acc-label">${a.label}</span>
+            <span class="star-acc-status">${owned ? (equipped ? t('stars_equipped') : t('stars_tap_to_wear')) : '⭐ ' + a.cost}</span>
+            ${owned ? '' : `<span class="star-acc-progress"><span style="width:${pct}%"></span></span>`}
+        </button>`;
+    }).join('');
+    document.getElementById('star-collection-modal').style.display = 'flex';
+}
+
+function toggleAccessory(id) {
+    const s = getStarState();
+    s.equipped = s.equipped === id ? null : id;
+    DB.set(_starsKey(), s);
+    openStarCollection();
+    updateStarBadge();
+}
+
+let _greetedStudentId = null;
+function maybeGreetChild() {
+    if (!activeStudentName || _greetedStudentId === activeStudentId) return;
+    _greetedStudentId = activeStudentId;
+    const wrap = document.getElementById('welcomeAvatarWrap');
+    if (wrap) {
+        wrap.classList.add('wave');
+        setTimeout(() => wrap.classList.remove('wave'), 2000);
+    }
+    speakFallback(t('greet_child').replace('{name}', activeStudentName));
+}
+
+async function renderMenuNudge() {
+    const el = document.getElementById('menuNudge');
+    if (!el) return;
+    el.style.display = 'none';
+    if (!activeStudentId) return;
+    try {
+        const results = await DB.get('sort_results_' + activeStudentId) || [];
+        const history = await loadReportHistory();
+        const lastTherapy = history[0];
+        const daysSince = lastTherapy
+            ? Math.floor((Date.now() - new Date(lastTherapy.createdAt).getTime()) / 86400000)
+            : null;
+
+        let text = '', action = null;
+        if (daysSince !== null && daysSince >= 3) {
+            text = '🎤 ' + t('nudge_therapy_gap').replace('{d}', daysSince);
+            action = () => goToTherapy();
+        } else if (results[0]) {
+            const last = results[0];
+            const game = SORT_GAMES.find(g => g.key === last.game);
+            if (game) {
+                const acc = last.items + (last.errors || 0) > 0
+                    ? Math.round((last.items / (last.items + (last.errors || 0))) * 100) : 100;
+                text = `🧺 ` + t('nudge_sort_again').replace('{game}', game.title).replace('{acc}', acc);
+                action = () => { goToSort(); setTimeout(() => startSortGame(game.key), 120); };
+            }
+        } else if (!history.length) {
+            text = '✨ ' + t('nudge_first');
+            action = () => goToTherapy();
+        }
+        if (text && action) {
+            el.textContent = text;
+            el.onclick = action;
+            el.style.display = '';
+        }
+    } catch (_) {}
+}
+
 function _showStarReward() {
     const mic = sessionData.micUsedInTherapy || 0;
     const card = sessionData.cardUsedInTherapy || 0;
@@ -5560,6 +5721,7 @@ function _showStarReward() {
     if (typeof confetti === 'function' && stars >= 3) {
         setTimeout(() => confetti({ particleCount: stars === 5 ? 140 : 70, spread: 80, origin: { y: 0.45 } }), 400);
     }
+    addStars(stars);
     speakFallback(title + ' ' + sub);
 }
 
@@ -5631,22 +5793,28 @@ function goToSequence() {
 
 function renderSequenceMenu() {
     const menu = document.getElementById('sequenceMenu');
+    const orderGames = SEQUENCE_GAMES.map((g, i) => ({ g, i })).filter(x => x.g.type !== 'cause');
+    const causeGames = SEQUENCE_GAMES.map((g, i) => ({ g, i })).filter(x => x.g.type === 'cause');
+    const colors = ['gc1', 'gc2', 'gc3', 'gc4'];
+    const card = (x, k, shift) => `
+        <button type="button" class="seq-menu-card ${colors[(k + shift) % 4]}" onclick="startSequenceGame(${x.i})">
+            <span class="seq-menu-emoji">${escapeHtml(x.g.emoji)}</span>
+            <span class="seq-menu-label">${escapeHtml(x.g.title)}</span>
+        </button>`;
     menu.innerHTML = `
         <h2 class="seq-menu-title">${t('seq_menu_title')}</h2>
-        <div class="seq-menu-grid">
-            ${SEQUENCE_GAMES.map((g, i) => `
-                <button type="button" class="seq-menu-card" onclick="startSequenceGame(${i})">
-                    <span class="seq-menu-emoji">${escapeHtml(g.emoji)}</span>
-                    <span class="seq-menu-label">${escapeHtml(g.title)}</span>
-                    <span class="seq-menu-type">${g.type === 'cause' ? t('seq_menu_type_cause') : t('seq_menu_type_order')}</span>
-                </button>
-            `).join('')}
-            <button type="button" class="seq-menu-card" onclick="goToSort()">
-                <span class="seq-menu-emoji">🗂️</span>
-                <span class="seq-menu-label">${t('menu_sort')}</span>
-                <span class="seq-menu-type">${t('sort_subtitle')}</span>
-            </button>
-        </div>
+        <button type="button" class="games-hero-card" onclick="goToSort()">
+            <span class="games-hero-icon">🧺</span>
+            <span class="games-hero-text">
+                <strong>${t('games_group_sort')}</strong>
+                <span>${t('games_sort_hero_sub').replace('{n}', SORT_GAMES.length)}</span>
+            </span>
+            <span class="games-hero-preview">${SORT_GAMES.slice(0, 4).map(g => g.icon).join(' ')}</span>
+        </button>
+        <div class="games-group-title">${t('games_group_order')}</div>
+        <div class="seq-menu-grid">${orderGames.map((x, k) => card(x, k, 0)).join('')}</div>
+        <div class="games-group-title">${t('games_group_cause')}</div>
+        <div class="seq-menu-grid">${causeGames.map((x, k) => card(x, k, 2)).join('')}</div>
     `;
 }
 
@@ -5712,6 +5880,7 @@ function tapSequenceCard(cardIndex) {
                 document.getElementById('seqFeedback').textContent = t('seq_correct_order');
                 speakFallback(t('seq_correct_order_speak'));
                 if (typeof confetti === 'function') confetti({ particleCount: 80, spread: 60, origin: {y: 0.6} });
+                addStars(seqState.errors === 0 ? 3 : (seqState.errors <= 2 ? 2 : 1));
             }, 300);
         }
     } else {
@@ -5795,6 +5964,7 @@ function selectEffect(i) {
                 document.getElementById('seqFeedback').textContent = t('seq_all_pairs_found');
                 speakFallback(t('seq_all_pairs_found_speak'));
                 if (typeof confetti === 'function') confetti({ particleCount: 80, spread: 60, origin: {y: 0.6} });
+                addStars(seqState.errors === 0 ? 3 : (seqState.errors <= 2 ? 2 : 1));
             }, 300);
         }
     } else {

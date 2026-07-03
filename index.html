@@ -323,9 +323,14 @@
 
     <!-- Karşılama alanı -->
     <div class="menu-welcome">
-        <img src="avatar.png" class="welcome-avatar" alt="Yıldız Can">
+        <button type="button" class="welcome-avatar-wrap" id="welcomeAvatarWrap" onclick="openStarCollection()">
+            <img src="avatar.png" class="welcome-avatar" alt="Yıldız Can">
+            <span class="welcome-accessory" id="welcomeAccessory"></span>
+            <span class="welcome-star-badge" id="welcomeStarBadge" style="display:none">⭐ 0</span>
+        </button>
         <h1 id="menu-greeting" class="welcome-title" data-i18n="menu_greeting_default">Merhaba! 👋</h1>
         <p class="welcome-sub" data-i18n="welcome_sub">Bugün ne yapmak istersin?</p>
+        <button type="button" class="menu-nudge" id="menuNudge" style="display:none"></button>
     </div>
 
     <!-- Ana navigasyon -->
@@ -344,12 +349,12 @@
         </button>
 
         <button class="menu-tile tile-sequence" type="button" onclick="goToSequence()">
-            <span class="tile-icon">🔢</span>
-            <span class="tile-label" data-i18n="menu_sequence">Sıralama Oyunları</span>
+            <span class="tile-icon">🧩</span>
+            <span class="tile-label" data-i18n="menu_sequence">Oyunlar</span>
         </button>
-        <button class="menu-tile tile-sort" type="button" onclick="goToSort()">
-            <span class="tile-icon">🗂️</span>
-            <span class="tile-label" data-i18n="menu_sort">Sınıflandırma</span>
+        <button class="menu-tile tile-sort" type="button" onclick="goToReport()">
+            <span class="tile-icon">📋</span>
+            <span class="tile-label" data-i18n="menu_parent_report">Veli Raporu</span>
         </button>
         <button class="menu-tile tile-analysis" type="button" onclick="goToAnalysis()">
             <span class="tile-icon">📊</span>
@@ -1058,6 +1063,18 @@ document.addEventListener('DOMContentLoaded', function(){
                 <button type="button" class="aac-action-btn clear" onclick="clearTherapyAacSentence()">✕</button>
             </div>
         </div>
+    </div>
+</div>
+
+<!-- Yıldız Koleksiyonu modalı -->
+<div id="star-collection-modal" class="aac-search-overlay" style="display:none" onclick="if(event.target.id==='star-collection-modal')this.style.display='none'">
+    <div class="aac-search-box">
+        <div class="aac-search-head">
+            <h3 data-i18n="stars_title">⭐ Yıldız Koleksiyonu</h3>
+            <button type="button" class="aac-search-close" onclick="document.getElementById('star-collection-modal').style.display='none'">✕</button>
+        </div>
+        <div class="star-total" id="starTotal"></div>
+        <div class="star-accessories" id="starAccessories"></div>
     </div>
 </div>
 
