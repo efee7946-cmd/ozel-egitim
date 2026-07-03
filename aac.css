@@ -26,7 +26,8 @@
   background: #f8fafc;
 }
 
-.aac-board {
+/* Değişkenler :root'ta — modallar .aac-board dışında yaşadığı için */
+:root {
   --aac-bg:         #f8fafc;
   --aac-card-bg:    #ffffff;
   --aac-card-ink:   #0f1a2e;
@@ -42,7 +43,9 @@
   --aac-sentence-bg:#f0f4f8;
   --aac-accent:     #6C63FF;
   --aac-danger:     #e53e3e;
+}
 
+.aac-board {
   display: flex;
   flex-direction: column;
   height: 100%;
