@@ -333,6 +333,10 @@ export default async function handler(req, res) {
             const rows = await query('SELECT username FROM sessions WHERE token = $1 AND expires_at > now()', [token]);
             if (!rows.length) return res.status(401).json({ error: 'Geçersiz oturum' });
             const { username: uname } = rows[0];
+            // KVKK silme hakkı: hesapla birlikte tüm LMS verileri de gitmeli.
+            // split_part kullanılıyor çünkü LIKE'ta '_' joker karakter ve
+            // kullanıcı adları '_' içerebiliyor.
+            await query("DELETE FROM app_data WHERE split_part(user_key, ':', 1) = $1", [uname]);
             await query('DELETE FROM sessions WHERE username = $1', [uname]);
             await query('DELETE FROM users WHERE username = $1', [uname]);
             return res.json({ ok: true });

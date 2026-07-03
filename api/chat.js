@@ -1,7 +1,9 @@
+import { sessionUsername } from './_auth.js';
+
 export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Origin', process.env.ALLOWED_ORIGIN || '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     if (req.method === 'OPTIONS') return res.status(200).end();
 
     // Vercel panelindeki GEMINI_KEY (Google AI Studio anahtarı ikisi için de geçerli)
@@ -11,7 +13,15 @@ export default async function handler(req, res) {
         return res.status(405).json({ error: 'Sadece POST isteği atılabilir.' });
     }
 
+    if (!(await sessionUsername(req))) {
+        return res.status(401).json({ error: 'AUTH_REQUIRED' });
+    }
+
     const { contents, system_instruction } = req.body;
+
+    if (!Array.isArray(contents) || JSON.stringify(req.body).length > 32000) {
+        return res.status(400).json({ error: 'Geçersiz istek' });
+    }
 
     const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=${GEMINI_KEY}`;
 

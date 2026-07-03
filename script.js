@@ -1779,6 +1779,12 @@ const API_BASE = (typeof Capacitor !== 'undefined' && Capacitor.isNativePlatform
     ? 'https://ozel-egitim.vercel.app'
     : '';
 
+function apiAuthHeaders() {
+    return (_authToken && !_authToken.startsWith('demo_'))
+        ? { 'Authorization': 'Bearer ' + _authToken }
+        : {};
+}
+
 // =============================================
 // HATA İZLEME — client hataları /api/log'a gider
 // =============================================
@@ -2189,7 +2195,7 @@ async function startTherapyWithTopic() {
             : `Özel eğitim öğrencisi (8-12 yaş, orta düzey) için "${currentTopic}" konusunda 6 kısa soru üret. Her soru günlük yaşam ve sosyal beceriye yönelik olsun. Her soru yeni satırda, maksimum 10 kelime. Sadece soruları yaz.`;
         const res = await fetch(API_BASE + '/api/chat', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', ...apiAuthHeaders() },
             body: JSON.stringify({ contents: [{ role: 'user', parts: [{ text: prompt }] }] }),
             signal: AbortSignal.timeout(15000)
         });
@@ -3150,7 +3156,7 @@ Kesinlikle emoji kullanma. Sıcak, profesyonel ve umut verici bir dil kullan.`;
     try {
         const res = await fetch(API_BASE + '/api/chat', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', ...apiAuthHeaders() },
             body: JSON.stringify({
                 contents: [{ role: 'user', parts: [{ text: prompt }] }]
             })
@@ -3918,7 +3924,7 @@ async function loadNext() {
     try {
         const _videoCtrl = new AbortController();
         const _videoFetchTimer = setTimeout(() => _videoCtrl.abort(), 6000);
-        const r = await fetch(API_BASE + '/api/video?query=' + currentObj.query, { signal: _videoCtrl.signal });
+        const r = await fetch(API_BASE + '/api/video?query=' + currentObj.query, { signal: _videoCtrl.signal, headers: apiAuthHeaders() });
         clearTimeout(_videoFetchTimer);
         const d = await r.json();
         if (d.videos && d.videos.length) {
@@ -4280,7 +4286,7 @@ KATI ETKİLEŞİM VE DİL KURALLARI:
         ].concat(chatHistory)
     };
     try {
-        var res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+        var res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json', ...apiAuthHeaders() }, body: JSON.stringify(payload) });
         var data = await res.json();
         var reply = data?.candidates?.[0]?.content?.parts?.[0]?.text;
         if (!reply) {
@@ -4349,7 +4355,7 @@ async function speakWithLipsync(text, onEnd, emotion = CharacterEmotion.NEUTRAL)
         const _ttsFetchTimer = setTimeout(() => _ttsCtrl.abort(), 8000);
         const res = await fetch(API_BASE + '/api/tts', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', ...apiAuthHeaders() },
             body: JSON.stringify({ text, lang: _lang }),
             signal: _ttsCtrl.signal
         });
@@ -4732,7 +4738,7 @@ async function searchAacPhoto() {
     const grid = document.getElementById('aacPhotoGrid');
     grid.innerHTML = `<p class="aac-photo-hint">${t('aac_searching')}</p>`;
     try {
-        const r = await fetch(API_BASE + '/api/photo?query=' + encodeURIComponent(q));
+        const r = await fetch(API_BASE + '/api/photo?query=' + encodeURIComponent(q), { headers: apiAuthHeaders() });
         const d = await r.json();
         if (!d.photos || !d.photos.length) {
             grid.innerHTML = `<p class="aac-photo-hint">${t('aac_no_results')}</p>`;
@@ -5692,9 +5698,10 @@ async function deleteAccount() {
     if (_authToken && !_authToken.startsWith('demo_')) {
         await authApi('delete', { token: _authToken });
     }
-    // localStorage + cloud (KV/PostgreSQL) temizle
+    // Sunucu tarafı hesapla birlikte tüm app_data kayıtlarını da siliyor;
+    // burada sadece yerel kopya temizlenir
     const lsKeys = [...Object.keys(localStorage)].filter(k => k.startsWith('lms_'));
-    lsKeys.forEach(k => DB.del(k.slice(4)));
+    lsKeys.forEach(k => { try { localStorage.removeItem(k); } catch {} });
     // sessionStorage temizle
     const ssKeys = [...Object.keys(sessionStorage)].filter(k => k.startsWith('lms_s_'));
     ssKeys.forEach(k => sessionStorage.removeItem(k));
@@ -6167,7 +6174,7 @@ Taslağı "📝 BEP Dönemsel Gelişim Taslağı" başlığıyla başlat. Şu b�
     try {
         const res = await fetch(API_BASE + '/api/chat', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', ...apiAuthHeaders() },
             body: JSON.stringify({
                 system_instruction: { parts: [{ text: systemPrompt }] },
                 contents: [{ role: 'user', parts: [{ text: userPrompt }] }]

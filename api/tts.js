@@ -1,4 +1,5 @@
 import { GoogleAuth } from 'google-auth-library';
+import { sessionUsername } from './_auth.js';
 
 let _authClient = null;
 
@@ -18,11 +19,15 @@ async function getAccessToken() {
 export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Origin', process.env.ALLOWED_ORIGIN || '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     if (req.method === 'OPTIONS') return res.status(200).end();
 
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Sadece POST isteği atılabilir.' });
+    }
+
+    if (!(await sessionUsername(req))) {
+        return res.status(401).json({ error: 'AUTH_REQUIRED' });
     }
 
     if (!process.env.GOOGLE_TTS_CREDENTIALS) {
@@ -31,6 +36,7 @@ export default async function handler(req, res) {
 
     const { text, lang } = req.body;
     if (!text) return res.status(400).json({ error: 'text zorunlu.' });
+    if (String(text).length > 800) return res.status(400).json({ error: 'text çok uzun' });
 
     const voice = lang === 'en'
         ? { languageCode: 'en-US', name: 'en-US-Chirp3-HD-Aoede' }
