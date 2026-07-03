@@ -272,7 +272,8 @@ const STRINGS = {
     report_session_summary: '{count} oturum kaydı • {minutes} dk toplam süre • {turns} toplam yanıt • {mic} mikrofon kullanımı',
     report_speech_practice: 'Konuşma çalışması',
     report_story_speech_practice: '{story} + konuşma çalışması',
-    report_session_detail: '{minutes} dk • {turns} yanıt • {mic} mikrofon • Hikaye ilerleme: {progress}',
+    report_session_detail: '{minutes} dk • {turns} yanıt • {mic} mikrofon',
+    report_stat_stars: 'Toplam Yıldız',
     report_completed: 'Tamamlandı',
     report_records_count: '{count} kayıt',
     report_title_full: 'Veli Gelişim Raporu',
@@ -1218,7 +1219,8 @@ const STRINGS = {
     report_session_summary: '{count} session records • {minutes} min total duration • {turns} total responses • {mic} microphone uses',
     report_speech_practice: 'Speech practice',
     report_story_speech_practice: '{story} + speech practice',
-    report_session_detail: '{minutes} min • {turns} responses • {mic} microphone • Story progress: {progress}',
+    report_session_detail: '{minutes} min • {turns} responses • {mic} microphone',
+    report_stat_stars: 'Total Stars',
     report_completed: 'Completed',
     report_records_count: '{count} records',
     report_title_full: 'Parent Progress Report',
@@ -2934,12 +2936,9 @@ async function persistSessionSnapshot() {
 
     const durationMs = sessionData.startTime ? Date.now() - sessionData.startTime : 0;
     const durationMin = Math.max(1, Math.round(durationMs / 60000));
-    const totalMic = sessionData.micUsedInTherapy + sessionData.micUsedInStory;
-    const storyPct = sessionData.totalScenes > 0
-        ? Math.round((sessionData.totalScenesReached / sessionData.totalScenes) * 100) + '%'
-        : '-';
-    const totalTurns = sessionData.therapyTurns.length + sessionData.storyChoices.length + sessionData.micUsedInStory;
-    const snapshot = buildSessionSnapshot(userId, durationMin, totalMic, storyPct, totalTurns);
+    const totalMic = sessionData.micUsedInTherapy;
+    const totalTurns = sessionData.therapyTurns.length;
+    const snapshot = buildSessionSnapshot(userId, durationMin, totalMic, '-', totalTurns);
 
     const key = 'session_history_' + userId;
     const history = await DB.get(key) || [];
@@ -2993,8 +2992,7 @@ function renderHistoryDetails(history, dateKey) {
                         ${t('report_session_detail')
                             .replace('{minutes}', entry.durationMin)
                             .replace('{turns}', entry.totalTurns)
-                            .replace('{mic}', entry.totalMic)
-                            .replace('{progress}', entry.storyCompleted ? t('report_completed') : entry.storyPct)}
+                            .replace('{mic}', entry.totalMic)}
                     </div>
                 </div>
             `).join('')}
@@ -3146,29 +3144,16 @@ async function goToReport() {
     document.getElementById('statDuration').textContent = t('report_minutes').replace('{minutes}', durationMin);
 
     // Mikrofon sayısı
-    const totalMic = sessionData.micUsedInTherapy + sessionData.micUsedInStory;
+    const totalMic = sessionData.micUsedInTherapy;
     document.getElementById('statMicCount').textContent = totalMic;
 
-    // Hikaye ilerleme
-    const storyPct = sessionData.totalScenes > 0
-        ? Math.round((sessionData.totalScenesReached / sessionData.totalScenes) * 100) + '%'
-        : '-';
-    document.getElementById('statStoryProgress').textContent =
-        sessionData.storyCompleted ? t('report_story_full') : storyPct;
-
     // Toplam yanıt
-    const totalTurns = sessionData.therapyTurns.length + sessionData.storyChoices.length + sessionData.micUsedInStory;
+    const totalTurns = sessionData.therapyTurns.length;
     document.getElementById('statTotalTurns').textContent = totalTurns;
-    const interventions = sessionData.storyChoices.filter(c => c.needsIntervention).length;
-    const prosocials = sessionData.storyChoices.filter(c => c.ethicsScore > 0).length;
-    const interventionEl = document.getElementById('statInterventions');
-    if (interventionEl) interventionEl.textContent = `${interventions} / ${prosocials}`;
 
-    // Veri olmayan kartlar veliyi yaniltmasin — gizle
-    const storyCard = document.getElementById('statStoryProgress')?.closest('.stat-card');
-    if (storyCard) storyCard.style.display = (sessionData.totalScenes > 0 || sessionData.storyCompleted) ? '' : 'none';
-    const interventionCard = interventionEl?.closest('.stat-card');
-    if (interventionCard) interventionCard.style.display = sessionData.storyChoices.length ? '' : 'none';
+    // Toplam yıldız
+    const starsEl = document.getElementById('statStarsEarned');
+    if (starsEl) starsEl.textContent = getStarState().total;
 
     const history = await persistSessionSnapshot();
     renderReportHistory(history);
@@ -3185,32 +3170,7 @@ async function goToReport() {
                 <strong>${recommendedArea.title}</strong>
                 <p>${recommendedArea.summary}</p>
             </div>
-            ${LEARNING_AREAS.map(area => `
-                <div class="learning-area-plan-card">
-                    <span class="learning-area-plan-label">${area.ageRange}</span>
-                    <strong>${area.title}</strong>
-                    <p>${area.outcomes.join(' • ')}</p>
-                </div>
-            `).join('')}
         `;
-    }
-
-    // Seçim analizi
-    const choiceEl = document.getElementById('choiceAnalysis');
-    if (sessionData.storyChoices.length > 0) {
-        choiceEl.innerHTML = '';
-        sessionData.storyChoices.forEach(c => {
-            const row = document.createElement('div');
-            row.className = 'choice-row';
-            row.innerHTML = `
-                <div class="choice-icon">${c.sceneEmoji || '📍'}</div>
-                <div>
-                    <div class="choice-row-scene">${c.sceneLabel}</div>
-                    <div class="choice-row-text">${c.choice}</div>
-                    <div class="choice-row-meta">${t('report_answer_prefix')}"${c.response}"</div>
-                </div>`;
-            choiceEl.appendChild(row);
-        });
     }
 
     // Terapi logu
@@ -3228,7 +3188,7 @@ async function goToReport() {
     // AI değerlendirmesi
     document.getElementById('aiEvalLoading').style.display = 'block';
     document.getElementById('aiEvalText').style.display = 'none';
-    await generateAIEvaluation(durationMin, totalMic, storyPct, totalTurns);
+    await generateAIEvaluation(durationMin, totalMic, totalTurns);
 }
 
 function _buildAdaptiveContextText() {
@@ -3268,9 +3228,14 @@ function _buildSkillsContextText() {
     return lines.length ? lines.join('\n') : null;
 }
 
-async function generateAIEvaluation(durationMin, totalMic, storyPct, totalTurns) {
-    const choices = sessionData.storyChoices.map(c =>
-        `- "${c.sceneLabel}" sahnesinde "${c.choice}" seçti`).join('\n') || 'Henüz hikaye oturumu yok.';
+async function generateAIEvaluation(durationMin, totalMic, totalTurns) {
+    const sortResults = (DB.getSync('sort_results_' + (activeStudentId || 'default')) || []).slice(0, 6);
+    const sortText = sortResults.map(r => {
+        const game = SORT_GAMES.find(g => g.key === r.game);
+        const acc = r.items + (r.errors || 0) > 0
+            ? Math.round((r.items / (r.items + (r.errors || 0))) * 100) : 100;
+        return `- ${game ? game.title : r.game}: %${acc} doğruluk (${r.errors || 0} hata)`;
+    }).join('\n') || 'Henüz oyun oynanmadı.';
 
     const therapySample = sessionData.therapyTurns.slice(0, 5).map(t =>
         `Soru: "${t.question}" → Cevap: "${t.answer}"`).join('\n') || 'Terapi oturumu yok.';
@@ -3291,18 +3256,16 @@ The data below comes from a student's session in the Yıldız Can app.
 Session duration: ${durationMin} minutes
 Total answers: ${totalTurns}
 Microphone uses: ${totalMic}
-Story progress: ${storyPct}
-Story completed: ${sessionData.storyCompleted ? 'Yes' : 'No'}
 ${_contextBlock}
-Choices made in the story:
-${choices}
+Recent sorting/matching game results:
+${sortText}
 
 Samples from speech practice:
 ${therapySample}
 
 Please write a warm, professional evaluation in English addressed to the parent, in 3-4 paragraphs covering:
 1. The child's overall engagement and motivation in this session
-2. Social/emotional cues observed from the story choices
+2. Cognitive/academic cues observed from the game results
 3. Notable points regarding speech and communication
 4. ${_adaptiveText || _iepText ? 'Concrete category-level suggestions for the family referencing the category/goal data (e.g. which themes to reinforce at home) and an encouraging closing' : 'Concrete suggestions for the family and an encouraging closing'}
 
@@ -3313,18 +3276,16 @@ Aşağıdaki veriler, bir öğrencinin Yıldız Can uygulamasındaki oturum veri
 Oturum süresi: ${durationMin} dakika
 Toplam yanıt sayısı: ${totalTurns}
 Mikrofon kullanım sayısı: ${totalMic}
-Hikaye ilerlemesi: ${storyPct}
-Hikaye tamamlandı mı: ${sessionData.storyCompleted ? 'Evet' : 'Hayır'}
 ${_contextBlock}
-Hikayede yapılan seçimler:
-${choices}
+Son sıralama/eşleştirme oyunu sonuçları:
+${sortText}
 
 Konuşma terapisinden örnekler:
 ${therapySample}
 
 Lütfen veliye hitap ederek, 3-4 paragraf halinde şunları içeren sevecen ve profesyonel bir Türkçe değerlendirme yaz:
 1. Çocuğun bu oturumdaki genel katılımı ve motivasyonu
-2. Hikayedeki seçimlerden gözlemlenen sosyal/duygusal ipuçları
+2. Oyun sonuçlarından gözlemlenen bilişsel/akademik ipuçları
 3. Konuşma ve iletişim açısından dikkat çeken noktalar
 4. ${_adaptiveText || _iepText ? 'Kategori/hedef verilerini referans alarak aileye kategori düzeyinde somut öneriler (ör. hangi temalar evde pekiştirilmeli) ve teşvik edici bir kapanış' : 'Aileye somut öneriler ve teşvik edici bir kapanış'}
 
