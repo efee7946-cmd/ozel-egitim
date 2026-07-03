@@ -4309,6 +4309,7 @@ function startQuestion() {
 
 async function processTherapySpeech(speech) {
     if (!speech) return;
+    sessionData.micUsedInTherapy++;
     addMessage(speech, "user");
     if (turnCount >= 7) {
         var final = t('therapy_session_end');
