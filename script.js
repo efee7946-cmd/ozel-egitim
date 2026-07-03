@@ -297,6 +297,11 @@ const STRINGS = {
     aac_core_strip: 'Çekirdek şerit (üstteki hızlı kartlar)',
     aac_tts_rate: 'Konuşma hızı',
     aac_shrink_warn: 'Küçültme bazı kartları gizleyecek (silinmez, ızgara büyütülünce geri gelir). Devam edilsin mi?',
+    therapy_card_answer_btn: '🗂️ Kartla Yanıtla',
+    therapy_wait_turn: 'Önce Yıldız Can konuşmasını bitirsin',
+    analysis_card_label: 'Kartla Yanıt',
+    analysis_card_hint: 'AAC kartlarına dokunarak yanıt verdi',
+    analysis_summary_card: 'Ayrıca yanıtların %{pct} kadarını iletişim kartlarıyla verdi.',
     aac_searching: 'Aranıyor...',
     aac_no_results: 'Sonuç bulunamadı. Farklı bir kelime deneyin.',
     aac_connection_error: 'Bağlantı hatası. İnternet bağlantınızı kontrol edin.',
@@ -1222,6 +1227,11 @@ const STRINGS = {
     aac_core_strip: 'Core strip (quick cards at the top)',
     aac_tts_rate: 'Speech rate',
     aac_shrink_warn: 'Shrinking will hide some cards (not deleted; they return when the grid grows). Continue?',
+    therapy_card_answer_btn: '🗂️ Answer with Cards',
+    therapy_wait_turn: "Let Yıldız Can finish speaking first",
+    analysis_card_label: 'Card Responses',
+    analysis_card_hint: 'Answered by tapping AAC cards',
+    analysis_summary_card: 'Also gave {pct}% of responses using communication cards.',
     aac_searching: 'Searching...',
     aac_no_results: 'No results found. Try a different word.',
     aac_connection_error: 'Connection error. Please check your internet connection.',
@@ -1961,6 +1971,7 @@ const sessionData = {
     totalScenes: 0,
     micUsedInStory: 0,
     micUsedInTherapy: 0,
+    cardUsedInTherapy: 0,
     repeatUsed: 0,
     simplifyUsed: 0,
     simplifyByCategory: {},
@@ -2206,6 +2217,7 @@ async function startApp(resetSession) {
         sessionData.totalScenes = 0;
         sessionData.micUsedInStory = 0;
         sessionData.micUsedInTherapy = 0;
+        sessionData.cardUsedInTherapy = 0;
         sessionData.repeatUsed = 0;
         sessionData.simplifyUsed = 0;
         sessionData.simplifyByCategory = {};
@@ -2390,6 +2402,7 @@ function mapHistoryRow(row) {
         totalScenes: row.total_scenes || 0,
         micUsedInStory: row.mic_used_in_story || 0,
         micUsedInTherapy: row.mic_used_in_therapy || 0,
+        cardUsedInTherapy: row.card_used_in_therapy || 0,
         repeatUsed: row.repeat_used || 0,
         simplifyUsed: row.simplify_used || 0,
         therapyTurns: Array.isArray(row.therapy_turns) ? row.therapy_turns : [],
@@ -2819,6 +2832,7 @@ function buildSessionSnapshot(userId, durationMin, totalMic, storyPct, totalTurn
         total_scenes: sessionData.totalScenes,
         mic_used_in_story: sessionData.micUsedInStory,
         mic_used_in_therapy: sessionData.micUsedInTherapy,
+        card_used_in_therapy: sessionData.cardUsedInTherapy,
         repeat_used: sessionData.repeatUsed,
         simplify_used: sessionData.simplifyUsed,
         therapy_turns: sessionData.therapyTurns.slice(),
@@ -2832,7 +2846,8 @@ function hasSessionActivity() {
         sessionData.therapyTurns.length ||
         sessionData.storyChoices.length ||
         sessionData.micUsedInStory ||
-        sessionData.micUsedInTherapy
+        sessionData.micUsedInTherapy ||
+        sessionData.cardUsedInTherapy
     );
 }
 
@@ -4071,6 +4086,98 @@ async function askAIMode(mode) {
     }
 }
 
+let _thAacBoards = [];
+let _thAacBoardId = null;
+let _thAacSentence = [];
+
+async function openTherapyAacPicker() {
+    const sid = activeStudentId || 'default';
+    await AACData.migrateLegacyIfNeeded(sid);
+    await AACData.migrateV2IfNeeded(sid);
+    _thAacBoards = await AACData.listBoards(sid);
+    if (!_thAacBoards.length) return;
+    if (!_thAacBoardId || !_thAacBoards.find(b => b.id === _thAacBoardId)) {
+        _thAacBoardId = _thAacBoards[0].id;
+    }
+    _thAacSentence = [];
+    document.getElementById('therapy-aac-modal').style.display = 'flex';
+    await _renderTherapyAacPicker();
+}
+
+async function _renderTherapyAacPicker() {
+    const tabs = document.getElementById('thAacTabs');
+    tabs.innerHTML = _thAacBoards.map(b => `
+        <button type="button" class="aac-nav-btn${b.id === _thAacBoardId ? ' active' : ''}"
+            onclick="setTherapyAacBoard('${escapeHtml(b.id)}')">
+            ${_aacVisualHtml(b.visual, 'aac-card-emoji', '1rem')} ${escapeHtml(b.label)}
+        </button>
+    `).join('');
+    const cards = (await AACData.listCards(_thAacBoardId))
+        .slice()
+        .sort((a, b) => a.row - b.row || a.col - b.col);
+    const grid = document.getElementById('thAacGrid');
+    grid.innerHTML = cards.length ? cards.map(c => `
+        <button type="button" class="aac-card"
+            onclick="tapTherapyAacCard('${escapeHtml(c.spoken || c.label)}','${escapeHtml(c.label)}')">
+            ${_aacVisualHtml(c.visual, 'aac-card-emoji')}
+            <span class="aac-card-text">${escapeHtml(c.label)}</span>
+        </button>
+    `).join('') : `<p class="aac-photo-hint">${t('aac_no_results')}</p>`;
+    _updateTherapyAacSentence();
+}
+
+async function setTherapyAacBoard(boardId) {
+    _thAacBoardId = boardId;
+    await _renderTherapyAacPicker();
+}
+
+function tapTherapyAacCard(spoken, label) {
+    _thAacSentence.push({ spoken, label });
+    speakFallback(spoken, null, _aacTtsRate);
+    _updateTherapyAacSentence();
+}
+
+function removeTherapyAacWord(index) {
+    _thAacSentence.splice(index, 1);
+    _updateTherapyAacSentence();
+}
+
+function clearTherapyAacSentence() {
+    _thAacSentence = [];
+    _updateTherapyAacSentence();
+}
+
+function _updateTherapyAacSentence() {
+    const wrap = document.getElementById('thAacSentence');
+    const btn = document.getElementById('thAacSpeakBtn');
+    if (!wrap) return;
+    if (!_thAacSentence.length) {
+        wrap.innerHTML = `<span class="aac-sentence-placeholder">${t('aac_sentence_placeholder')}</span>`;
+        if (btn) btn.disabled = true;
+        return;
+    }
+    wrap.innerHTML = _thAacSentence.map((w, i) => `
+        <span class="aac-word-chip" onclick="removeTherapyAacWord(${i})">${escapeHtml(w.label)} ✕</span>
+    `).join('');
+    if (btn) btn.disabled = false;
+}
+
+async function submitTherapyAacAnswer() {
+    if (!_thAacSentence.length) return;
+    const micBtn = document.getElementById('micBtn');
+    if (isWaiting || (micBtn && micBtn.disabled)) {
+        showToast(t('therapy_wait_turn'));
+        return;
+    }
+    const text = _thAacSentence.map(w => w.spoken).join(' ');
+    document.getElementById('therapy-aac-modal').style.display = 'none';
+    _thAacSentence = [];
+    if (micBtn) micBtn.disabled = true;
+    isWaiting = true;
+    document.getElementById('info').innerText = '🗂️ ' + text;
+    await processTherapySpeech(text, 'card');
+}
+
 function getCurrentTherapyCategory() {
     return THERAPY_CATEGORIES[currentTherapyCategoryKey] || THERAPY_CATEGORIES.daily_life;
 }
@@ -4307,9 +4414,10 @@ function startQuestion() {
     });
 }
 
-async function processTherapySpeech(speech) {
+async function processTherapySpeech(speech, source) {
     if (!speech) return;
-    sessionData.micUsedInTherapy++;
+    if (source === 'card') sessionData.cardUsedInTherapy++;
+    else sessionData.micUsedInTherapy++;
     addMessage(speech, "user");
     if (turnCount >= 7) {
         var final = t('therapy_session_end');
@@ -4329,7 +4437,8 @@ async function processTherapySpeech(speech) {
         location: currentLocation ? currentLocation.label : '',
         category: getCurrentTherapyCategory().label,
         question: currentObj.q,
-        answer: speech
+        answer: speech,
+        via: source === 'card' ? 'card' : 'mic'
     });
     confetti({ particleCount: 50 });
     var vEl = document.getElementById('v');
@@ -5411,12 +5520,13 @@ async function addEmojiCard() {
 // =============================================
 function _showStarReward() {
     const mic = sessionData.micUsedInTherapy || 0;
+    const card = sessionData.cardUsedInTherapy || 0;
     const repeat = sessionData.repeatUsed || 0;
     const simplify = sessionData.simplifyUsed || 0;
-    const total = mic + repeat + simplify;
+    const total = mic + card + repeat + simplify;
     if (total === 0) return;
 
-    const indPct = Math.round((mic / total) * 100);
+    const indPct = Math.round(((mic + card) / total) * 100);
     let stars, title, sub;
     if (indPct >= 75) {
         stars = 5;
@@ -6488,7 +6598,7 @@ function _renderAzTrend(history) {
 
     const points = [...history].reverse()
         .map(h => {
-            const total = (h.micUsedInTherapy || 0) + (h.repeatUsed || 0) + (h.simplifyUsed || 0);
+            const total = (h.micUsedInTherapy || 0) + (h.cardUsedInTherapy || 0) + (h.repeatUsed || 0) + (h.simplifyUsed || 0);
             if (total === 0) return null;
             return {
                 dateKey: h.dateKey,
@@ -6603,15 +6713,17 @@ function _renderAzIdentityCard(profile) {
 
 function _renderAzMetrics(history) {
     // Aggregate across all sessions
-    let totalMicSum = 0, totalRepeat = 0, totalSimplify = 0;
+    let totalMicSum = 0, totalCard = 0, totalRepeat = 0, totalSimplify = 0;
     history.forEach(h => {
         totalMicSum += (h.micUsedInTherapy || 0);
+        totalCard += (h.cardUsedInTherapy || 0);
         totalRepeat += (h.repeatUsed || 0);
         totalSimplify += (h.simplifyUsed || 0);
     });
-    const total = totalMicSum + totalRepeat + totalSimplify;
+    const total = totalMicSum + totalCard + totalRepeat + totalSimplify;
 
     const indPct = total > 0 ? Math.round((totalMicSum / total) * 100) : null;
+    const cardPct = total > 0 ? Math.round((totalCard / total) * 100) : null;
     const repPct = total > 0 ? Math.round((totalRepeat / total) * 100) : null;
     const simPct = total > 0 ? Math.round((totalSimplify / total) * 100) : null;
 
@@ -6625,6 +6737,7 @@ function _renderAzMetrics(history) {
     }
 
     setMetric('azIndependentPct', 'azIndependentBar', indPct);
+    setMetric('azCardPct', 'azCardBar', cardPct);
     setMetric('azRepeatPct', 'azRepeatBar', repPct);
     setMetric('azSimplifyPct', 'azSimplifyBar', simPct);
 
@@ -6647,11 +6760,14 @@ function _renderAzMetrics(history) {
                     (simPct ? ` ve %${simPct} oranında dili basitleştirmeye` : '') +
                     ' ihtiyaç duydu.';
             }
+            if (cardPct) {
+                insightEl.textContent += ' ' + t('analysis_summary_card').replace('{pct}', cardPct);
+            }
         }
     }
 
     // Store for BEP report use
-    window._azMetrics = { totalMicSum, totalRepeat, totalSimplify, total, indPct, repPct, simPct, sessionCount: history.length };
+    window._azMetrics = { totalMicSum, totalCard, totalRepeat, totalSimplify, total, indPct, cardPct, repPct, simPct, sessionCount: history.length };
 }
 
 // Keep old function names as no-ops for safety
@@ -6697,7 +6813,7 @@ async function generateBepReport() {
 Gözlemlenen Özellikler: ${(profile.conditions || []).map(c => conditionBehaviors[c] || c).join('; ') || 'Belirtilmemiş'}`;
 
     const sessionText = history.slice(0, 10).map(h =>
-        `• ${formatHistoryDate(h.dateKey)}: ${h.durationMin} dk, ${h.totalTurns} yanıt, ${h.micUsedInTherapy || 0} bağımsız mikrofon, ${h.repeatUsed || 0} tekrar, ${h.simplifyUsed || 0} basitleştirme`
+        `• ${formatHistoryDate(h.dateKey)}: ${h.durationMin} dk, ${h.totalTurns} yanıt, ${h.micUsedInTherapy || 0} bağımsız mikrofon, ${h.cardUsedInTherapy || 0} kartla yanıt, ${h.repeatUsed || 0} tekrar, ${h.simplifyUsed || 0} basitleştirme`
     ).join('\n') || 'Kayıtlı seans verisi yok.';
 
     const m = window._azMetrics || {};

@@ -469,6 +469,7 @@ document.addEventListener('DOMContentLoaded', function(){
         <div class="ai-mode-btns">
             <button type="button" class="ai-mode-btn" onclick="askAIMode('repeat')" title="Soruyu tekrar dinle" data-i18n="repeat_btn">🔄 Tekrar Et</button>
             <button type="button" class="ai-mode-btn ai-mode-simplify" onclick="askAIMode('simplify')" title="Daha basit anlat" data-i18n="simplify_btn">🟢 Daha Basit</button>
+            <button type="button" class="ai-mode-btn ai-mode-card" onclick="openTherapyAacPicker()" title="AAC kartlarıyla yanıt ver" data-i18n="therapy_card_answer_btn">🗂️ Kartla Yanıtla</button>
         </div>
     </div>
 </div>
@@ -822,6 +823,14 @@ document.addEventListener('DOMContentLoaded', function(){
             </div>
             <div class="az-metric">
                 <div class="az-metric-label">
+                    <span data-i18n="analysis_card_label">Kartla Yanıt</span>
+                    <span class="az-metric-val" id="azCardPct">—</span>
+                </div>
+                <div class="az-bar-track"><div class="az-bar-fill az-bar-blue" id="azCardBar"></div></div>
+                <div class="az-metric-hint" data-i18n="analysis_card_hint">AAC kartlarına dokunarak yanıt verdi</div>
+            </div>
+            <div class="az-metric">
+                <div class="az-metric-label">
                     <span data-i18n="analysis_repeat_label">Tekrar Dinleme İhtiyacı</span>
                     <span class="az-metric-val" id="azRepeatPct">—</span>
                 </div>
@@ -1026,6 +1035,25 @@ document.addEventListener('DOMContentLoaded', function(){
 </div>
 
 <!-- ===================== Kart Ekle Modal ===================== -->
+<!-- Terapi: AAC kartlarıyla yanıt modalı -->
+<div id="therapy-aac-modal" class="aac-search-overlay" style="display:none" onclick="if(event.target.id==='therapy-aac-modal')this.style.display='none'">
+    <div class="aac-search-box th-aac-box">
+        <div class="aac-search-head">
+            <h3 data-i18n="therapy_card_answer_btn">🗂️ Kartla Yanıtla</h3>
+            <button type="button" class="aac-search-close" onclick="document.getElementById('therapy-aac-modal').style.display='none'">✕</button>
+        </div>
+        <div class="th-aac-tabs" id="thAacTabs"></div>
+        <div class="th-aac-grid" id="thAacGrid"></div>
+        <div class="th-aac-sentence-bar">
+            <div id="thAacSentence" class="th-aac-sentence-words"></div>
+            <div class="aac-sentence-actions">
+                <button type="button" class="aac-action-btn speak" id="thAacSpeakBtn" onclick="submitTherapyAacAnswer()" disabled>✓</button>
+                <button type="button" class="aac-action-btn clear" onclick="clearTherapyAacSentence()">✕</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- AAC kart düzenleme modalı (yalnızca düzenleme modunda) -->
 <div id="aac-card-edit-modal" class="aac-search-overlay" style="display:none" onclick="if(event.target.id==='aac-card-edit-modal')this.style.display='none'">
     <div class="aac-search-box">

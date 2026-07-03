@@ -297,6 +297,45 @@
 }
 .aac-settings-check-row input { width: 22px; height: 22px; }
 
+/* ---- Terapi: kartla yanit modali ---- */
+.th-aac-box { max-width: 560px; width: 94%; }
+.th-aac-tabs {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding: 8px 0;
+  flex-shrink: 0;
+}
+.th-aac-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  max-height: 42vh;
+  overflow-y: auto;
+  margin: 8px 0;
+  padding: 2px;
+}
+.th-aac-grid .aac-card { min-height: 84px; }
+.th-aac-sentence-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(0,0,0,0.08);
+  min-height: 56px;
+}
+.th-aac-sentence-words {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  overflow-x: auto;
+  min-width: 0;
+}
+@media (max-width: 480px) {
+  .th-aac-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
 /* ---- Kart grid'i ---- */
 .aac-grid-wrap {
   flex: 1;

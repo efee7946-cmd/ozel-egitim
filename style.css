@@ -5374,3 +5374,6 @@ body.has-bottom-nav #behavior-screen {
 .sort-summary-icon { font-size: 1.6rem; }
 .sort-summary-info { display: flex; flex-direction: column; gap: 2px; }
 .sort-summary-info span { font-size: 0.82rem; color: #6b7a90; }
+
+/* ---- Analiz: kartla yanit metrigi ---- */
+.az-bar-blue { background: #4d9de0; }
