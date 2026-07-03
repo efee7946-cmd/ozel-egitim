@@ -860,6 +860,7 @@ const STRINGS = {
     auth_send_code_btn: 'E-postama Kod Gönder',
     auth_email_code_label: 'E-postadaki 6 Haneli Kod',
     auth_code_sent_info: 'Kod {email} adresine gönderildi. 📁 Gelen kutunuzda yoksa SPAM/Gereksiz klasörüne bakın!',
+    auth_code_sent_generic: 'Bilgileriniz kayıtlıysa e-posta adresinize kod gönderildi. 📁 SPAM/Gereksiz klasörünü de kontrol edin!',
     auth_code_sent_toast: 'Sıfırlama kodu gönderildi! 📧',
     auth_use_recovery_code: 'Kurtarma kodum var',
     auth_use_email_code: 'E-posta ile sıfırla',
@@ -1728,6 +1729,7 @@ const STRINGS = {
     auth_send_code_btn: 'Send Code to My Email',
     auth_email_code_label: '6-Digit Code from Email',
     auth_code_sent_info: 'Code sent to {email}. 📁 Not in your inbox? Check your SPAM/Junk folder!',
+    auth_code_sent_generic: 'If your details are registered, a code was sent to your email. 📁 Check your SPAM/Junk folder too!',
     auth_code_sent_toast: 'Reset code sent! 📧',
     auth_use_recovery_code: 'I have a recovery code',
     auth_use_email_code: 'Reset via email',
@@ -5430,8 +5432,9 @@ async function requestResetCode() {
     if (!res.ok) return showAuthError(t(res.error) || t('auth_fill_all'));
 
     document.getElementById('resetCodeFields').style.display = '';
-    document.getElementById('resetInfoText').textContent =
-        t('auth_code_sent_info').replace('{email}', res.emailMasked || '');
+    document.getElementById('resetInfoText').textContent = res.emailMasked
+        ? t('auth_code_sent_info').replace('{email}', res.emailMasked)
+        : t('auth_code_sent_generic');
     document.getElementById('authError').textContent = '';
     showToast(t('auth_code_sent_toast'));
 }

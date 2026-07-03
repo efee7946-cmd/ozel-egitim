@@ -69,6 +69,8 @@ export default async function handler(req, res) {
             const { key, value } = req.body || {};
             if (!key) return res.status(400).json({ error: 'key gerekli' });
             const v = typeof value === 'string' ? value : JSON.stringify(value);
+            if (v && v.length > 262144)
+                return res.status(413).json({ error: 'VALUE_TOO_LARGE' });
             const rows = await query(
                 `INSERT INTO app_data (user_key, value, updated_at) VALUES ($1, $2, now())
                  ON CONFLICT (user_key) DO UPDATE SET value = $2, updated_at = now()

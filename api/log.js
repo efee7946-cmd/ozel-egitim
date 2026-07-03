@@ -27,6 +27,11 @@ export default async function handler(req, res) {
         if (req.method === 'POST') {
             const { message, stack, screen, lang } = req.body || {};
             if (!message) return res.status(400).json({ error: 'message gerekli' });
+            // Taşma koruması: uç kimliksiz olduğu için saatlik tavan var
+            const recent = await query(
+                "SELECT count(*)::int AS n FROM client_errors WHERE created_at > now() - interval '1 hour'"
+            );
+            if (recent[0].n >= 300) return res.json({ ok: true });
             await query(
                 'INSERT INTO client_errors (message, stack, screen, user_agent, app_lang) VALUES ($1, $2, $3, $4, $5)',
                 [
@@ -42,9 +47,11 @@ export default async function handler(req, res) {
 
         if (req.method === 'GET') {
             const adminKey = process.env.ADMIN_KEY;
-            if (!adminKey || req.query.key !== adminKey) {
+            const provided = req.headers['x-admin-key'] || req.query.key;
+            if (!adminKey || provided !== adminKey) {
                 return res.status(401).json({ error: 'Yetkisiz' });
             }
+            await query("DELETE FROM client_errors WHERE created_at < now() - interval '30 days'");
             const rows = await query(
                 'SELECT id, message, stack, screen, user_agent, app_lang, created_at FROM client_errors ORDER BY id DESC LIMIT 100'
             );

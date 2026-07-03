@@ -28,7 +28,17 @@ function init() {
     const canvas = document.getElementById('avatarCanvas');
     if (!canvas) return;
 
-    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+    let renderer;
+    try {
+        renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+    } catch (e) {
+        const img = document.createElement('img');
+        img.src = 'avatar.png';
+        img.alt = '';
+        img.style.cssText = 'width:100%;max-width:180px;border-radius:16px;display:block;margin:0 auto';
+        canvas.replaceWith(img);
+        return;
+    }
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.outputColorSpace = THREE.SRGBColorSpace;
 

@@ -209,8 +209,10 @@ export default async function handler(req, res) {
             if (!ident) return res.status(400).json({ error: 'AUTH_FIELDS_REQUIRED' });
             await ensureAuthColumns();
             const user = await findUserByIdentifier(ident);
+            // Kayıtlı olmayan kimlik de 'ok' alır — kullanıcı adı/e-posta
+            // varlığı dışarıdan test edilemesin
             if (!user)
-                return res.status(404).json({ error: 'AUTH_INVALID_CREDENTIALS' });
+                return res.json({ ok: true, emailMasked: null });
             if (!user.email)
                 return res.status(400).json({ error: 'AUTH_NO_EMAIL' });
 
