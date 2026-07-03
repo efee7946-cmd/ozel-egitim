@@ -2155,6 +2155,10 @@ function showOnly(id) {
     });
     const target = document.getElementById(id);
     if (target) target.style.display = 'flex';
+
+    if (id === 'menu-screen') {
+        try { updateStarBadge(); renderMenuNudge(); } catch (_) {}
+    }
     currentScreenId = id;
     if (id === 'menu-screen') {
         requestAnimationFrame(() => renderCityScene());
@@ -2322,9 +2326,7 @@ function goToMenu() {
     if (cityShell) cityShell.style.display = '';
     showOnly('menu-screen');
     renderCityScene();
-    updateStarBadge();
     maybeGreetChild();
-    renderMenuNudge();
     if (hadTherapy) _showStarReward();
 }
 
