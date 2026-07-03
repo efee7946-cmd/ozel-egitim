@@ -5968,7 +5968,7 @@ function hideSplash() {
     const splash = document.getElementById('splash-screen');
     if (!splash || _splashHiding) return;
     _splashHiding = true;
-    const wait = Math.max(0, 1600 - (Date.now() - _splashShownAt));
+    const wait = Math.max(0, 2500 - (Date.now() - _splashShownAt));
     setTimeout(() => {
         splash.classList.add('splash-hide');
         setTimeout(() => { splash.style.display = 'none'; }, 380);
