@@ -5361,3 +5361,16 @@ body.has-bottom-nav #behavior-screen {
     opacity: 0.6;
     pointer-events: none;
 }
+
+/* ---- Rapor: Siralama Oyunlari ozeti ---- */
+.sort-summary-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+}
+.sort-summary-row:last-child { border-bottom: none; }
+.sort-summary-icon { font-size: 1.6rem; }
+.sort-summary-info { display: flex; flex-direction: column; gap: 2px; }
+.sort-summary-info span { font-size: 0.82rem; color: #6b7a90; }

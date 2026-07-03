@@ -90,6 +90,9 @@ const STRINGS = {
     sort_play_again: 'Tekrar Oyna',
     sort_other_game: 'Başka Oyun',
     sort_perfect: '🌟 Mükemmel!',
+    report_sort_games: '🧩 Sıralama Oyunları',
+    report_no_sort: 'Henüz sıralama oyunu oynanmadı.',
+    sort_summary_line: '{plays} oyun • %{acc} doğruluk • {perfect} hatasız',
     report_title: 'Rapor',
     report_generate: 'Rapor Oluştur',
     bep_title: 'Dönemsel BEP Taslağı',
@@ -985,6 +988,9 @@ const STRINGS = {
     sort_play_again: 'Play Again',
     sort_other_game: 'Other Game',
     sort_perfect: '🌟 Perfect!',
+    report_sort_games: '🧩 Sorting Games',
+    report_no_sort: 'No sorting games played yet.',
+    sort_summary_line: '{plays} plays • {acc}% accuracy • {perfect} flawless',
     report_title: 'Report',
     report_generate: 'Generate Report',
     bep_title: 'IEP Draft',
@@ -3053,6 +3059,7 @@ async function goToReport() {
     const history = await persistSessionSnapshot();
     renderReportHistory(history);
     renderCitySessionSummary();
+    renderSortGamesSummary();
 
     const learningAreaPlanEl = document.getElementById('learningAreaPlan');
     if (learningAreaPlanEl) {
@@ -3731,9 +3738,57 @@ function _checkSortDrop(idx, cat) {
     }
 }
 
+async function _saveSortResult() {
+    const sid = activeStudentId || 'default';
+    const key = 'sort_results_' + sid;
+    const list = await DB.get(key) || [];
+    list.unshift({
+        game: _sortGame.key,
+        date: new Date().toISOString(),
+        items: _sortItems.length,
+        errors: _sortErrors,
+    });
+    if (list.length > 100) list.splice(100);
+    await DB.set(key, list);
+}
+
+async function renderSortGamesSummary() {
+    const el = document.getElementById('sortGamesSummary');
+    if (!el) return;
+    const sid = activeStudentId || 'default';
+    const list = await DB.get('sort_results_' + sid) || [];
+    if (!list.length) {
+        el.innerHTML = `<p class="report-empty">${t('report_no_sort')}</p>`;
+        return;
+    }
+    const byGame = {};
+    list.forEach(r => { (byGame[r.game] = byGame[r.game] || []).push(r); });
+    el.innerHTML = Object.entries(byGame).map(([key, results]) => {
+        const game = SORT_GAMES.find(g => g.key === key);
+        if (!game) return '';
+        const plays = results.length;
+        const items = results.reduce((s, r) => s + (r.items || 0), 0);
+        const errors = results.reduce((s, r) => s + (r.errors || 0), 0);
+        const acc = items + errors > 0 ? Math.round((items / (items + errors)) * 100) : 100;
+        const perfect = results.filter(r => !r.errors).length;
+        const last = new Date(results[0].date).toLocaleDateString(
+            _lang === 'en' ? 'en-US' : 'tr-TR', { day: 'numeric', month: 'short' });
+        const line = t('sort_summary_line')
+            .replace('{plays}', plays).replace('{acc}', acc).replace('{perfect}', perfect);
+        return `<div class="sort-summary-row">
+            <span class="sort-summary-icon">${game.icon}</span>
+            <div class="sort-summary-info">
+                <strong>${escapeHtml(game.title)}</strong>
+                <span>${line} • ${escapeHtml(last)}</span>
+            </div>
+        </div>`;
+    }).join('');
+}
+
 function _showSortComplete() {
     const gameSection = document.getElementById('sortGameSection');
     if (!gameSection) return;
+    _saveSortResult().catch(() => {});
     confetti({ particleCount: 120, spread: 90 });
     speakFallback(t('sort_complete_title') + ' ' + (_lang === 'en' ? 'Well done!' : 'Çok güzel yaptın!'), () => {});
     gameSection.innerHTML = `
