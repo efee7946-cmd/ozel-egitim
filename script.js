@@ -2114,7 +2114,7 @@ let _restoringScreen = false;
 function showOnly(id) {
     const screens = ['start-screen','student-setup-screen','menu-screen','game-container','report-screen','sort-screen',
                       'schedule-screen','aac-screen','sequence-screen',
-                      'login-screen','iep-screen','skills-screen','behavior-screen','auth-screen','splash-screen','analysis-screen'];
+                      'login-screen','iep-screen','skills-screen','behavior-screen','auth-screen','analysis-screen'];
     const isNewScreen = currentScreenId !== id;
     const prevScreen = currentScreenId;
     screens.forEach(s => {
