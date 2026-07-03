@@ -837,10 +837,10 @@ const STRINGS = {
     report_new_questions: 'Bu alanda yeni sorular çalışıldı.',
     report_story_full: '✅ Tam',
     report_preparing: 'Hazırlanıyor...',
-    report_stat_mic: 'Mikrofon Kullanımı',
-    report_stat_duration: 'Toplam Süre',
+    report_stat_sessions: 'Bu Hafta Seans',
+    report_stat_duration: 'Bu Hafta Süre',
     report_stat_story: 'Hikâye İlerlemesi',
-    report_stat_turns: 'Toplam Yanıt',
+    report_stat_turns: 'Bu Hafta Yanıt',
     report_stat_intervention: 'Zorlandığı / Olumlu Seçimler',
     report_choice_analysis: '🔍 Seçim Analizi',
     report_speech_summary: '🎙️ Konuşma Pratiği Özeti',
@@ -1784,10 +1784,10 @@ const STRINGS = {
     report_new_questions: 'New questions were practiced in this area.',
     report_story_full: '✅ Full',
     report_preparing: 'Preparing...',
-    report_stat_mic: 'Microphone Use',
-    report_stat_duration: 'Total Duration',
+    report_stat_sessions: 'Sessions This Week',
+    report_stat_duration: 'Time This Week',
     report_stat_story: 'Story Progress',
-    report_stat_turns: 'Total Answers',
+    report_stat_turns: 'Answers This Week',
     report_stat_intervention: 'Challenging / Positive Choices',
     report_choice_analysis: '🔍 Choice Analysis',
     report_speech_summary: '🎙️ Speech Practice Summary',
@@ -3070,50 +3070,6 @@ function renderReportHistory(history) {
     renderHistoryDetails(history, selectedHistoryDateKey);
 }
 
-function renderCitySessionSummary() {
-    const container = document.getElementById('citySessionSummary');
-    if (!container) return;
-
-    const turns = sessionData.therapyTurns || [];
-    if (!turns.length) {
-        container.innerHTML = `<p class="report-empty">${t('report_no_city_sessions')}</p>`;
-        return;
-    }
-
-    const locationMap = new Map();
-    turns.forEach((turn) => {
-        const key = turn.location || t('report_general_area');
-        const current = locationMap.get(key) || { count: 0, categories: new Set(), sample: '' };
-        current.count += 1;
-        if (turn.category) current.categories.add(turn.category);
-        if (!current.sample && turn.question) current.sample = turn.question;
-        locationMap.set(key, current);
-    });
-
-    const sortedLocations = [...locationMap.entries()].sort((a, b) => b[1].count - a[1].count);
-    const topLocation = sortedLocations[0];
-
-    container.innerHTML = `
-        <div class="city-session-hero">
-            <div>
-                <span class="city-session-kicker">${t('report_top_area')}</span>
-                <strong>${topLocation[0]}</strong>
-                <p>${t('report_top_area_summary').replace('{count}', topLocation[1].count)}</p>
-            </div>
-            <div class="city-session-meta">${t('report_location_count').replace('{count}', sortedLocations.length)}</div>
-        </div>
-        <div class="city-session-grid">
-            ${sortedLocations.map(([label, data]) => `
-                <article class="city-session-card">
-                    <h4>${label}</h4>
-                    <p>${data.count} soru • ${[...data.categories].join(', ') || t('report_general_speech')}</p>
-                    <span>${data.sample || t('report_new_questions')}</span>
-                </article>
-            `).join('')}
-        </div>
-    `;
-}
-
 async function changeHistoryMonth(offset) {
     historyCalendarMonth = historyCalendarMonth || new Date();
     historyCalendarMonth = new Date(historyCalendarMonth.getFullYear(), historyCalendarMonth.getMonth() + offset, 1);
@@ -3138,27 +3094,21 @@ async function goToReport() {
     document.getElementById('reportDate').textContent =
         t('report_generated_at').replace('{date}', now.toLocaleString(_lang === 'en' ? 'en-US' : 'tr-TR'));
 
-    // Süre
-    const durationMs = sessionData.startTime ? Date.now() - sessionData.startTime : 0;
-    const durationMin = Math.max(1, Math.round(durationMs / 60000));
-    document.getElementById('statDuration').textContent = t('report_minutes').replace('{minutes}', durationMin);
-
-    // Mikrofon sayısı
-    const totalMic = sessionData.micUsedInTherapy;
-    document.getElementById('statMicCount').textContent = totalMic;
-
-    // Toplam yanıt
-    const totalTurns = sessionData.therapyTurns.length;
-    document.getElementById('statTotalTurns').textContent = totalTurns;
-
-    // Toplam yıldız
-    const starsEl = document.getElementById('statStarsEarned');
-    if (starsEl) starsEl.textContent = getStarState().total;
-
     const history = await persistSessionSnapshot();
     renderReportHistory(history);
-    renderCitySessionSummary();
     renderSortGamesSummary();
+
+    // İstatistikler son 7 günü anlatır — rapor ne zaman açılırsa açılsın dolu
+    const weekAgo = Date.now() - 7 * 86400000;
+    const week = history.filter(h => new Date(h.createdAt).getTime() >= weekAgo);
+    const weekMinutes = week.reduce((s, h) => s + (h.durationMin || 0), 0);
+    const weekTurns = week.reduce((s, h) => s + (h.totalTurns || 0), 0);
+    const weekMic = week.reduce((s, h) => s + (h.micUsedInTherapy || 0), 0);
+    document.getElementById('statWeekSessions').textContent = week.length;
+    document.getElementById('statDuration').textContent = t('report_minutes').replace('{minutes}', weekMinutes);
+    document.getElementById('statTotalTurns').textContent = weekTurns;
+    const starsEl = document.getElementById('statStarsEarned');
+    if (starsEl) starsEl.textContent = getStarState().total;
 
     const learningAreaPlanEl = document.getElementById('learningAreaPlan');
     if (learningAreaPlanEl) {
@@ -3173,9 +3123,11 @@ async function goToReport() {
         `;
     }
 
-    // Terapi logu
+    // Terapi logu — yalnizca bu oturumda konusma yapildiysa goster
     const therapyEl = document.getElementById('therapyLog');
+    const therapySection = therapyEl?.closest('.report-section');
     if (sessionData.therapyTurns.length > 0) {
+        if (therapySection) therapySection.style.display = '';
         therapyEl.innerHTML = '';
         sessionData.therapyTurns.forEach(turn => {
             const entry = document.createElement('div');
@@ -3183,12 +3135,21 @@ async function goToReport() {
             entry.innerHTML = `<div class="therapy-q">🎙️ ${turn.location ? `${escapeHtml(turn.location)} • ` : ''}${turn.category ? `${escapeHtml(turn.category)} • ` : ''}${t('report_question_prefix')}${escapeHtml(turn.question)}</div>${escapeHtml(turn.answer)}`;
             therapyEl.appendChild(entry);
         });
+    } else if (therapySection) {
+        therapySection.style.display = 'none';
     }
 
-    // AI değerlendirmesi
-    document.getElementById('aiEvalLoading').style.display = 'block';
-    document.getElementById('aiEvalText').style.display = 'none';
-    await generateAIEvaluation(durationMin, totalMic, totalTurns);
+    // AI değerlendirmesi — anlamli veri yoksa bolumu gizle, Gemini'yi cagirma
+    const aiSection = document.getElementById('aiEvalText')?.closest('.report-section');
+    const hasSortData = (DB.getSync('sort_results_' + (activeStudentId || 'default')) || []).length > 0;
+    if (!week.length && !hasSortData && !sessionData.therapyTurns.length) {
+        if (aiSection) aiSection.style.display = 'none';
+    } else {
+        if (aiSection) aiSection.style.display = '';
+        document.getElementById('aiEvalLoading').style.display = 'block';
+        document.getElementById('aiEvalText').style.display = 'none';
+        await generateAIEvaluation(week.length, weekMinutes, weekMic, weekTurns);
+    }
 }
 
 function _buildAdaptiveContextText() {
@@ -3228,7 +3189,7 @@ function _buildSkillsContextText() {
     return lines.length ? lines.join('\n') : null;
 }
 
-async function generateAIEvaluation(durationMin, totalMic, totalTurns) {
+async function generateAIEvaluation(weekSessions, weekMinutes, weekMic, weekTurns) {
     const sortResults = (DB.getSync('sort_results_' + (activeStudentId || 'default')) || []).slice(0, 6);
     const sortText = sortResults.map(r => {
         const game = SORT_GAMES.find(g => g.key === r.game);
@@ -3253,9 +3214,7 @@ async function generateAIEvaluation(durationMin, totalMic, totalTurns) {
         ? `You are an empathetic assistant specialized in special education and speech therapy.
 The data below comes from a student's session in the Yıldız Can app.
 
-Session duration: ${durationMin} minutes
-Total answers: ${totalTurns}
-Microphone uses: ${totalMic}
+Last 7 days: ${weekSessions} sessions, ${weekMinutes} minutes total, ${weekTurns} answers, ${weekMic} independent microphone uses
 ${_contextBlock}
 Recent sorting/matching game results:
 ${sortText}
@@ -3264,7 +3223,7 @@ Samples from speech practice:
 ${therapySample}
 
 Please write a warm, professional evaluation in English addressed to the parent, in 3-4 paragraphs covering:
-1. The child's overall engagement and motivation in this session
+1. The child's overall engagement and motivation over the last week
 2. Cognitive/academic cues observed from the game results
 3. Notable points regarding speech and communication
 4. ${_adaptiveText || _iepText ? 'Concrete category-level suggestions for the family referencing the category/goal data (e.g. which themes to reinforce at home) and an encouraging closing' : 'Concrete suggestions for the family and an encouraging closing'}
@@ -3273,9 +3232,7 @@ Do not use any emoji. Use warm, professional and hopeful language.`
         : `Sen özel eğitim ve konuşma terapisi alanında uzman, empati dolu bir asistansın.
 Aşağıdaki veriler, bir öğrencinin Yıldız Can uygulamasındaki oturum verisidir.
 
-Oturum süresi: ${durationMin} dakika
-Toplam yanıt sayısı: ${totalTurns}
-Mikrofon kullanım sayısı: ${totalMic}
+Son 7 gün: ${weekSessions} seans, toplam ${weekMinutes} dakika, ${weekTurns} yanıt, ${weekMic} bağımsız mikrofon kullanımı
 ${_contextBlock}
 Son sıralama/eşleştirme oyunu sonuçları:
 ${sortText}
@@ -3284,7 +3241,7 @@ Konuşma terapisinden örnekler:
 ${therapySample}
 
 Lütfen veliye hitap ederek, 3-4 paragraf halinde şunları içeren sevecen ve profesyonel bir Türkçe değerlendirme yaz:
-1. Çocuğun bu oturumdaki genel katılımı ve motivasyonu
+1. Çocuğun son bir haftadaki genel katılımı ve motivasyonu
 2. Oyun sonuçlarından gözlemlenen bilişsel/akademik ipuçları
 3. Konuşma ve iletişim açısından dikkat çeken noktalar
 4. ${_adaptiveText || _iepText ? 'Kategori/hedef verilerini referans alarak aileye kategori düzeyinde somut öneriler (ör. hangi temalar evde pekiştirilmeli) ve teşvik edici bir kapanış' : 'Aileye somut öneriler ve teşvik edici bir kapanış'}
