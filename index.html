@@ -323,7 +323,7 @@
 
     <!-- Karşılama alanı -->
     <div class="menu-welcome">
-        <button type="button" class="welcome-avatar-wrap" id="welcomeAvatarWrap" onclick="openStarCollection()">
+        <button type="button" class="welcome-avatar-wrap" id="welcomeAvatarWrap" onclick="goToStore()">
             <img src="avatar.png" class="welcome-avatar" alt="Yıldız Can">
             <span class="welcome-accessory" id="welcomeAccessory"></span>
             <span class="welcome-star-badge" id="welcomeStarBadge" style="display:none">⭐ 0</span>
@@ -352,7 +352,7 @@
             <span class="tile-icon">🧩</span>
             <span class="tile-label" data-i18n="menu_sequence">Oyunlar</span>
         </button>
-        <button class="menu-tile tile-sort" type="button" onclick="goToReport()">
+        <button class="menu-tile tile-sort" type="button" onclick="goToAnalysis('report')">
             <span class="tile-icon">📋</span>
             <span class="tile-label" data-i18n="menu_parent_report">Veli Raporu</span>
         </button>
@@ -485,114 +485,6 @@ document.addEventListener('DOMContentLoaded', function(){
         </div>
     </div>
 </div>
-
-
-
-<!-- ===================== VELİ RAPORU EKRANI ===================== -->
-<div id="report-screen">
-    <button class="btn-back" onclick="goToAnalysis()"><span data-i18n="back">← Geri</span></button>
-
-    <div class="report-wrapper" id="reportWrapper">
-        <!-- Başlık -->
-        <div class="report-header">
-            <img src="avatar.png" class="report-avatar" alt="Yıldız Can">
-            <div class="report-title-block">
-                <h2 data-i18n="report_title_full">Veli Gelişim Raporu</h2>
-                <p id="reportSubtitle" data-i18n="report_preparing">Hazırlanıyor...</p>
-            </div>
-            <button class="btn-print" onclick="window.print()" data-i18n="report_print">🖨️ Yazdır</button>
-        </div>
-
-        <!-- Özet kartları -->
-        <div class="report-stats">
-            <div class="stat-card">
-                <div class="stat-icon">🗓️</div>
-                <div class="stat-value" id="statWeekSessions">0</div>
-                <div class="stat-label" data-i18n="report_stat_sessions">Bu Hafta Seans</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon">⏱️</div>
-                <div class="stat-value" id="statDuration">0 dk</div>
-                <div class="stat-label" data-i18n="report_stat_duration">Bu Hafta Süre</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon">💬</div>
-                <div class="stat-value" id="statTotalTurns">0</div>
-                <div class="stat-label" data-i18n="report_stat_turns">Bu Hafta Yanıt</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon">⭐</div>
-                <div class="stat-value" id="statStarsEarned">0</div>
-                <div class="stat-label" data-i18n="report_stat_stars">Toplam Yıldız</div>
-            </div>
-        </div>
-
-        <div class="report-section report-history-section">
-            <div class="report-history-header">
-                <h3 data-i18n="report_history_section_title">Takvimli Kullanım Geçmişi</h3>
-                <p data-i18n="report_history_section_sub">Hangi günlerde kullanıldığını ve her güne ait oturum detaylarını buradan inceleyebilirsin.</p>
-            </div>
-            <div class="history-calendar-card">
-                <div class="history-calendar-top">
-                    <button class="calendar-nav-btn" type="button" onclick="changeHistoryMonth(-1)">←</button>
-                    <strong id="historyMonthLabel">Bu Ay</strong>
-                    <button class="calendar-nav-btn" type="button" onclick="changeHistoryMonth(1)">→</button>
-                </div>
-                <div class="history-weekdays">
-                    <span data-i18n="weekday_mon">Pzt</span>
-                    <span data-i18n="weekday_tue">Sal</span>
-                    <span data-i18n="weekday_wed">Çar</span>
-                    <span data-i18n="weekday_thu">Per</span>
-                    <span data-i18n="weekday_fri">Cum</span>
-                    <span data-i18n="weekday_sat">Cmt</span>
-                    <span data-i18n="weekday_sun">Paz</span>
-                </div>
-                <div class="history-calendar-grid" id="historyCalendarGrid"></div>
-            </div>
-            <div class="history-day-details" id="historyDayDetails">
-                <p class="report-empty" data-i18n="report_no_usage_days">Henüz kayıtlı bir kullanım günü yok.</p>
-            </div>
-        </div>
-
-        <div class="report-section">
-            <h3 data-i18n="report_learning_area_plan">📚 Gelişim Alanı Planı</h3>
-            <div id="learningAreaPlan" class="learning-area-plan"></div>
-        </div>
-
-        <div class="report-section">
-            <h3 data-i18n="report_sort_games">🧩 Sıralama Oyunları</h3>
-            <div id="sortGamesSummary" class="sort-games-summary">
-                <p class="report-empty" data-i18n="report_no_sort">Henüz sıralama oyunu oynanmadı.</p>
-            </div>
-        </div>
-
-        <!-- Konuşma Terapisi Özeti -->
-        <div class="report-section">
-            <h3 data-i18n="report_speech_summary">🎙️ Konuşma Pratiği Özeti</h3>
-            <div id="therapyLog" class="therapy-log">
-                <p class="report-empty" data-i18n="report_no_session">Henüz oturum yapılmadı.</p>
-            </div>
-        </div>
-
-        <!-- AI Değerlendirmesi -->
-        <div class="report-section ai-section">
-            <h3 data-i18n="report_ai_eval">🤖 Yıldız Can'ın Değerlendirmesi</h3>
-            <div id="aiEvaluation" class="ai-evaluation">
-                <div class="ai-eval-loading" id="aiEvalLoading">
-                    <div class="skel-line skel-full skeleton" style="height:14px;margin:4px 0"></div>
-                    <div class="skel-line skel-med skeleton" style="height:14px;margin:4px 0"></div>
-                    <div class="skel-line skel-full skeleton" style="height:14px;margin:4px 0"></div>
-                    <div class="skel-line skel-short skeleton" style="height:14px;margin:4px 0"></div>
-                </div>
-                <p id="aiEvalText" class="ai-eval-text" style="display:none"></p>
-            </div>
-        </div>
-
-        <!-- Tarih -->
-        <div class="report-footer-note" id="reportDate"></div>
-    </div>
-</div>
-
 <!-- ===================== SINIFLANDIRMA OYUNU ===================== -->
 <div id="sort-screen">
     <button class="btn-back" onclick="goToMenu()"><span data-i18n="back_menu">← Menü</span></button>
@@ -613,6 +505,25 @@ document.addEventListener('DOMContentLoaded', function(){
             <div class="sort-baskets-area" id="sortBasketsArea"></div>
             <button type="button" class="menu-ghost-btn sort-back-btn" onclick="renderSortMenu()"><span data-i18n="sort_back">← Oyun Seçimine Dön</span></button>
         </div>
+    </div>
+</div>
+
+<!-- ===================== GİYİM MAĞAZASI ===================== -->
+<div id="store-screen">
+    <button class="btn-back" onclick="goToMenu()"><span data-i18n="back_menu">← Menü</span></button>
+    <div class="store-wrapper">
+        <div class="store-header">
+            <h2 data-i18n="store_title">👗 Giyim Mağazası</h2>
+            <div class="store-balance" id="storeBalance">⭐ 0</div>
+        </div>
+        <div class="store-mannequin-card">
+            <div class="store-mannequin" id="storeMannequin">
+                <img src="avatar.png" alt="">
+                <span class="store-mannequin-item" id="storeMannequinItem"></span>
+            </div>
+        </div>
+        <div class="store-cat-tabs" id="storeCatTabs"></div>
+        <div class="store-grid" id="storeGrid"></div>
     </div>
 </div>
 
@@ -789,6 +700,12 @@ document.addEventListener('DOMContentLoaded', function(){
     <div class="analysis-wrapper">
         <button class="btn-back" onclick="goToMenu()"><span data-i18n="back_menu">← Menü</span></button>
 
+        <div class="report-tabs">
+            <button type="button" class="report-tab-btn active" id="repTabAnalysis" onclick="switchReportTab('analysis')">📊 <span data-i18n="tab_analysis">Uzman Analizi</span></button>
+            <button type="button" class="report-tab-btn" id="repTabParent" onclick="switchReportTab('report')">📋 <span data-i18n="tab_parent">Veli Özeti</span></button>
+        </div>
+
+    <div id="analysisTabPanel">
         <!-- 1. Öğrenci Kimlik Kartı -->
         <div class="az-card az-identity-card">
             <div class="az-identity-top">
@@ -866,8 +783,112 @@ document.addEventListener('DOMContentLoaded', function(){
                 <button class="bep-copy-btn" onclick="copyBepReport()" data-i18n="bep_copy_btn">📋 Metni Kopyala</button>
             </div>
         </div>
+    </div><!-- /analysisTabPanel -->
+
+    <div id="reportTabPanel" style="display:none">
+    <div class="report-wrapper" id="reportWrapper">
+        <!-- Başlık -->
+        <div class="report-header">
+            <img src="avatar.png" class="report-avatar" alt="Yıldız Can">
+            <div class="report-title-block">
+                <h2 data-i18n="report_title_full">Veli Gelişim Raporu</h2>
+                <p id="reportSubtitle" data-i18n="report_preparing">Hazırlanıyor...</p>
+            </div>
+            <button class="btn-print" onclick="window.print()" data-i18n="report_print">🖨️ Yazdır</button>
+        </div>
+
+        <!-- Özet kartları -->
+        <div class="report-stats">
+            <div class="stat-card">
+                <div class="stat-icon">🗓️</div>
+                <div class="stat-value" id="statWeekSessions">0</div>
+                <div class="stat-label" data-i18n="report_stat_sessions">Bu Hafta Seans</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">⏱️</div>
+                <div class="stat-value" id="statDuration">0 dk</div>
+                <div class="stat-label" data-i18n="report_stat_duration">Bu Hafta Süre</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">💬</div>
+                <div class="stat-value" id="statTotalTurns">0</div>
+                <div class="stat-label" data-i18n="report_stat_turns">Bu Hafta Yanıt</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">⭐</div>
+                <div class="stat-value" id="statStarsEarned">0</div>
+                <div class="stat-label" data-i18n="report_stat_stars">Toplam Yıldız</div>
+            </div>
+        </div>
+
+        <div class="report-section report-history-section">
+            <div class="report-history-header">
+                <h3 data-i18n="report_history_section_title">Takvimli Kullanım Geçmişi</h3>
+                <p data-i18n="report_history_section_sub">Hangi günlerde kullanıldığını ve her güne ait oturum detaylarını buradan inceleyebilirsin.</p>
+            </div>
+            <div class="history-calendar-card">
+                <div class="history-calendar-top">
+                    <button class="calendar-nav-btn" type="button" onclick="changeHistoryMonth(-1)">←</button>
+                    <strong id="historyMonthLabel">Bu Ay</strong>
+                    <button class="calendar-nav-btn" type="button" onclick="changeHistoryMonth(1)">→</button>
+                </div>
+                <div class="history-weekdays">
+                    <span data-i18n="weekday_mon">Pzt</span>
+                    <span data-i18n="weekday_tue">Sal</span>
+                    <span data-i18n="weekday_wed">Çar</span>
+                    <span data-i18n="weekday_thu">Per</span>
+                    <span data-i18n="weekday_fri">Cum</span>
+                    <span data-i18n="weekday_sat">Cmt</span>
+                    <span data-i18n="weekday_sun">Paz</span>
+                </div>
+                <div class="history-calendar-grid" id="historyCalendarGrid"></div>
+            </div>
+            <div class="history-day-details" id="historyDayDetails">
+                <p class="report-empty" data-i18n="report_no_usage_days">Henüz kayıtlı bir kullanım günü yok.</p>
+            </div>
+        </div>
+
+        <div class="report-section">
+            <h3 data-i18n="report_learning_area_plan">📚 Gelişim Alanı Planı</h3>
+            <div id="learningAreaPlan" class="learning-area-plan"></div>
+        </div>
+
+        <div class="report-section">
+            <h3 data-i18n="report_sort_games">🧩 Sıralama Oyunları</h3>
+            <div id="sortGamesSummary" class="sort-games-summary">
+                <p class="report-empty" data-i18n="report_no_sort">Henüz sıralama oyunu oynanmadı.</p>
+            </div>
+        </div>
+
+        <!-- Konuşma Terapisi Özeti -->
+        <div class="report-section">
+            <h3 data-i18n="report_speech_summary">🎙️ Konuşma Pratiği Özeti</h3>
+            <div id="therapyLog" class="therapy-log">
+                <p class="report-empty" data-i18n="report_no_session">Henüz oturum yapılmadı.</p>
+            </div>
+        </div>
+
+        <!-- AI Değerlendirmesi -->
+        <div class="report-section ai-section">
+            <h3 data-i18n="report_ai_eval">🤖 Yıldız Can'ın Değerlendirmesi</h3>
+            <div id="aiEvaluation" class="ai-evaluation">
+                <div class="ai-eval-loading" id="aiEvalLoading">
+                    <div class="skel-line skel-full skeleton" style="height:14px;margin:4px 0"></div>
+                    <div class="skel-line skel-med skeleton" style="height:14px;margin:4px 0"></div>
+                    <div class="skel-line skel-full skeleton" style="height:14px;margin:4px 0"></div>
+                    <div class="skel-line skel-short skeleton" style="height:14px;margin:4px 0"></div>
+                </div>
+                <p id="aiEvalText" class="ai-eval-text" style="display:none"></p>
+            </div>
+        </div>
+
+        <!-- Tarih -->
+        <div class="report-footer-note" id="reportDate"></div>
     </div>
-</div>
+    </div><!-- /reportTabPanel -->
+
+    </div><!-- /analysis-wrapper -->
+</div><!-- /analysis-screen -->
 
 <!-- ===================== IEP HEDEFLERİ ===================== -->
 <div id="iep-screen">
@@ -1043,18 +1064,6 @@ document.addEventListener('DOMContentLoaded', function(){
                 <button type="button" class="aac-action-btn clear" onclick="clearTherapyAacSentence()">✕</button>
             </div>
         </div>
-    </div>
-</div>
-
-<!-- Yıldız Koleksiyonu modalı -->
-<div id="star-collection-modal" class="aac-search-overlay" style="display:none" onclick="if(event.target.id==='star-collection-modal')this.style.display='none'">
-    <div class="aac-search-box">
-        <div class="aac-search-head">
-            <h3 data-i18n="stars_title">⭐ Yıldız Koleksiyonu</h3>
-            <button type="button" class="aac-search-close" onclick="document.getElementById('star-collection-modal').style.display='none'">✕</button>
-        </div>
-        <div class="star-total" id="starTotal"></div>
-        <div class="star-accessories" id="starAccessories"></div>
     </div>
 </div>
 

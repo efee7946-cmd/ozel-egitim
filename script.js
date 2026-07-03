@@ -77,13 +77,24 @@ const STRINGS = {
     menu_aac: 'AAC',
     menu_sequence: 'Oyunlar',
     menu_parent_report: 'Veli Raporu',
-    stars_title: '⭐ Yıldız Koleksiyonu',
-    stars_count_label: 'yıldız topladın!',
-    stars_unlocked: '🎉 Yeni aksesuar açıldı: {item}!',
     stars_earned: '+{n} ⭐ kazandın!',
-    stars_equipped: 'Takılı ✓',
-    stars_tap_to_wear: 'Takmak için dokun',
-    acc_hat: 'Şapka', acc_scarf: 'Atkı', acc_glasses: 'Gözlük', acc_crown: 'Taç',
+    store_title: '👗 Giyim Mağazası',
+    store_cat_all: 'Tümü',
+    store_cat_hat: 'Şapkalar',
+    store_cat_face: 'Yüz',
+    store_cat_neck: 'Boyun',
+    store_buy_btn: 'Satın Al',
+    store_equip_btn: 'Giydir',
+    store_unequip_btn: 'Çıkar',
+    store_owned_label: 'Sahipsin',
+    store_equipped_label: 'Kullanılıyor ✓',
+    store_need_more: '{n} yıldız daha lazım',
+    store_bought_toast: '🎉 {item} satın alındı!',
+    store_not_enough_toast: 'Yeterli yıldızın yok — {n} yıldız daha topla!',
+    acc_cap: 'Kep', acc_bowtie: 'Papyon', acc_glasses: 'Gözlük', acc_sunhat: 'Güneş Şapkası',
+    acc_scarf: 'Atkı', acc_sunglasses: 'Güneş Gözlüğü', acc_gradcap: 'Mezuniyet Kepi',
+    acc_necklace: 'Kolye', acc_tophat: 'Silindir Şapka', acc_medal: 'Madalya',
+    acc_mask: 'Maske', acc_helmet: 'Kask', acc_crown: 'Taç',
     greet_child: 'Merhaba {name}! Bugün ne oynayalım?',
     nudge_therapy_gap: '{d} gündür konuşma pratiği yapılmadı — kısa bir seans?',
     nudge_sort_again: '{game}: son doğruluk %{acc} — tekrar dene!',
@@ -749,6 +760,8 @@ const STRINGS = {
     logout: 'Çıkış Yap',
     repeat_btn: '🔄 Tekrar Et',
     simplify_btn: '🟢 Daha Basit',
+    tab_analysis: 'Uzman Analizi',
+    tab_parent: 'Veli Özeti',
     analysis_title: 'Konuşma Pratiği Performans Analizi',
     analysis_date_label: 'Analiz tarihi:',
     analysis_lang_title: 'Dil ve Sosyal Uyum Göstergeleri',
@@ -1025,13 +1038,24 @@ const STRINGS = {
     menu_aac: 'AAC',
     menu_sequence: 'Games',
     menu_parent_report: 'Parent Report',
-    stars_title: '⭐ Star Collection',
-    stars_count_label: 'stars collected!',
-    stars_unlocked: '🎉 New accessory unlocked: {item}!',
     stars_earned: 'You earned +{n} ⭐!',
-    stars_equipped: 'Wearing ✓',
-    stars_tap_to_wear: 'Tap to wear',
-    acc_hat: 'Hat', acc_scarf: 'Scarf', acc_glasses: 'Glasses', acc_crown: 'Crown',
+    store_title: '👗 Clothing Store',
+    store_cat_all: 'All',
+    store_cat_hat: 'Hats',
+    store_cat_face: 'Face',
+    store_cat_neck: 'Neck',
+    store_buy_btn: 'Buy',
+    store_equip_btn: 'Wear',
+    store_unequip_btn: 'Remove',
+    store_owned_label: 'Owned',
+    store_equipped_label: 'Wearing ✓',
+    store_need_more: '{n} more stars needed',
+    store_bought_toast: '🎉 Bought {item}!',
+    store_not_enough_toast: 'Not enough stars — collect {n} more!',
+    acc_cap: 'Cap', acc_bowtie: 'Bow Tie', acc_glasses: 'Glasses', acc_sunhat: 'Sun Hat',
+    acc_scarf: 'Scarf', acc_sunglasses: 'Sunglasses', acc_gradcap: 'Graduation Cap',
+    acc_necklace: 'Necklace', acc_tophat: 'Top Hat', acc_medal: 'Medal',
+    acc_mask: 'Mask', acc_helmet: 'Helmet', acc_crown: 'Crown',
     greet_child: 'Hello {name}! What shall we play today?',
     nudge_therapy_gap: 'No speech practice for {d} days — a quick session?',
     nudge_sort_again: '{game}: last accuracy {acc}% — try again!',
@@ -1696,6 +1720,8 @@ const STRINGS = {
     logout: 'Log Out',
     repeat_btn: '🔄 Repeat',
     simplify_btn: '🟢 Simpler',
+    tab_analysis: 'Expert Analysis',
+    tab_parent: 'Parent Summary',
     analysis_title: 'Speech Practice Performance Analysis',
     analysis_date_label: 'Analysis date:',
     analysis_lang_title: 'Language and Social Indicators',
@@ -2146,8 +2172,8 @@ function celebrateCorrectAnswer() {
 let _restoringScreen = false;
 
 function showOnly(id) {
-    const screens = ['start-screen','student-setup-screen','menu-screen','game-container','report-screen','sort-screen',
-                      'schedule-screen','aac-screen','sequence-screen',
+    const screens = ['start-screen','student-setup-screen','menu-screen','game-container','sort-screen',
+                      'schedule-screen','aac-screen','sequence-screen','store-screen',
                       'login-screen','iep-screen','skills-screen','behavior-screen','auth-screen','analysis-screen'];
     const isNewScreen = currentScreenId !== id;
     const prevScreen = currentScreenId;
@@ -3082,11 +3108,9 @@ async function changeHistoryMonth(offset) {
 }
 
 // =============================================
-// VELİ RAPORU
+// VELİ RAPORU (Analiz ekranının "Veli Özeti" sekmesi)
 // =============================================
-async function goToReport() {
-    showOnly('report-screen');
-
+async function _populateReportTab() {
     // Temel bilgiler
     const now = new Date();
     document.getElementById('reportSubtitle').textContent =
@@ -5478,76 +5502,162 @@ async function addEmojiCard() {
 }
 
 // =============================================
-// ÖDÜL SİSTEMİ (TOKEN ECONOMY)
+// YILDIZ KOLEKSİYONU VE GİYİM MAĞAZASI (token ekonomisi)
 // =============================================
-// GİZLİ YILDIZ ÖDÜL — seans sonu otomatik
-// =============================================
-// =============================================
-// YILDIZ KOLEKSİYONU (token ekonomisi)
-// =============================================
-const BEAR_ACCESSORIES = [
-    { id: 'hat',     emoji: '🎩', cost: 5,  pos: 'top',    get label() { return t('acc_hat'); } },
-    { id: 'scarf',   emoji: '🧣', cost: 15, pos: 'bottom', get label() { return t('acc_scarf'); } },
-    { id: 'glasses', emoji: '🕶️', cost: 30, pos: 'mid',    get label() { return t('acc_glasses'); } },
-    { id: 'crown',   emoji: '👑', cost: 50, pos: 'top',    get label() { return t('acc_crown'); } },
+const CLOTHING_ITEMS = [
+    { id: 'cap',        cat: 'hat',  emoji: '🧢',   cost: 10,  pos: 'top',    get label() { return t('acc_cap'); } },
+    { id: 'bowtie',     cat: 'neck', emoji: '🎀',   cost: 15,  pos: 'bottom', get label() { return t('acc_bowtie'); } },
+    { id: 'glasses',    cat: 'face', emoji: '👓',   cost: 20,  pos: 'mid',    get label() { return t('acc_glasses'); } },
+    { id: 'sunhat',     cat: 'hat',  emoji: '👒',   cost: 25,  pos: 'top',    get label() { return t('acc_sunhat'); } },
+    { id: 'scarf',      cat: 'neck', emoji: '🧣',   cost: 30,  pos: 'bottom', get label() { return t('acc_scarf'); } },
+    { id: 'sunglasses', cat: 'face', emoji: '🕶️',  cost: 35,  pos: 'mid',    get label() { return t('acc_sunglasses'); } },
+    { id: 'gradcap',    cat: 'hat',  emoji: '🎓',   cost: 45,  pos: 'top',    get label() { return t('acc_gradcap'); } },
+    { id: 'necklace',   cat: 'neck', emoji: '📿',   cost: 55,  pos: 'bottom', get label() { return t('acc_necklace'); } },
+    { id: 'tophat',     cat: 'hat',  emoji: '🎩',   cost: 70,  pos: 'top',    get label() { return t('acc_tophat'); } },
+    { id: 'medal',      cat: 'neck', emoji: '🏅',   cost: 90,  pos: 'bottom', get label() { return t('acc_medal'); } },
+    { id: 'mask',       cat: 'face', emoji: '🎭',   cost: 110, pos: 'mid',    get label() { return t('acc_mask'); } },
+    { id: 'helmet',     cat: 'hat',  emoji: '⛑️',  cost: 130, pos: 'top',    get label() { return t('acc_helmet'); } },
+    { id: 'crown',      cat: 'hat',  emoji: '👑',   cost: 200, pos: 'top',    get label() { return t('acc_crown'); } },
 ];
+const STORE_CATS = ['all', 'hat', 'face', 'neck'];
 
 function _starsKey() { return 'stars_' + (activeStudentId || 'default'); }
-function getStarState() { return DB.getSync(_starsKey()) || { total: 0, equipped: null }; }
+function getStarState() {
+    const s = DB.getSync(_starsKey()) || {};
+    s.total = s.total || 0;
+    s.spent = s.spent || 0;
+    s.owned = Array.isArray(s.owned) ? s.owned : [];
+    s.equipped = s.equipped || null;
+    if (s.equipped && !s.owned.includes(s.equipped)) s.owned.push(s.equipped);
+    return s;
+}
+function storeBalance(s) { return Math.max(0, s.total - s.spent); }
 
 function addStars(n) {
     if (!n) return;
     const s = getStarState();
-    const before = s.total;
     s.total += n;
     DB.set(_starsKey(), s);
     showToast(t('stars_earned').replace('{n}', n));
-    const unlocked = BEAR_ACCESSORIES.find(a => before < a.cost && s.total >= a.cost);
-    if (unlocked) {
-        setTimeout(() => {
-            showToast(t('stars_unlocked').replace('{item}', unlocked.emoji + ' ' + unlocked.label));
-            if (typeof confetti === 'function') confetti({ particleCount: 90, spread: 75 });
-        }, 1400);
-    }
     updateStarBadge();
 }
 
 function updateStarBadge() {
     const s = getStarState();
     const badge = document.getElementById('welcomeStarBadge');
-    if (badge) { badge.style.display = ''; badge.textContent = '⭐ ' + s.total; }
+    if (badge) { badge.style.display = ''; badge.textContent = '⭐ ' + storeBalance(s); }
     const acc = document.getElementById('welcomeAccessory');
     if (acc) {
-        const a = BEAR_ACCESSORIES.find(x => x.id === s.equipped);
+        const a = CLOTHING_ITEMS.find(x => x.id === s.equipped);
         acc.textContent = a ? a.emoji : '';
         acc.className = 'welcome-accessory' + (a ? ' acc-' + a.pos : '');
     }
 }
 
-function openStarCollection() {
-    const s = getStarState();
-    document.getElementById('starTotal').innerHTML =
-        `<span class="star-total-num">⭐ ${s.total}</span> <span>${t('stars_count_label')}</span>`;
-    document.getElementById('starAccessories').innerHTML = BEAR_ACCESSORIES.map(a => {
-        const owned = s.total >= a.cost;
-        const equipped = s.equipped === a.id;
-        const pct = Math.min(100, Math.round((s.total / a.cost) * 100));
-        return `<button type="button" class="star-acc-card${owned ? '' : ' locked'}${equipped ? ' equipped' : ''}"
-            ${owned ? `onclick="toggleAccessory('${a.id}')"` : 'disabled'}>
-            <span class="star-acc-emoji">${a.emoji}</span>
-            <span class="star-acc-label">${a.label}</span>
-            <span class="star-acc-status">${owned ? (equipped ? t('stars_equipped') : t('stars_tap_to_wear')) : '⭐ ' + a.cost}</span>
-            ${owned ? '' : `<span class="star-acc-progress"><span style="width:${pct}%"></span></span>`}
-        </button>`;
-    }).join('');
-    document.getElementById('star-collection-modal').style.display = 'flex';
+let _storeCat = 'all';
+
+function goToStore() {
+    showOnly('store-screen');
+    _storeCat = 'all';
+    _renderStoreTabs();
+    _renderStoreMannequin();
+    _renderStoreGrid();
 }
 
-function toggleAccessory(id) {
+function _renderStoreTabs() {
+    const el = document.getElementById('storeCatTabs');
+    if (!el) return;
+    el.innerHTML = STORE_CATS.map(c =>
+        `<button type="button" class="store-cat-tab${c === _storeCat ? ' active' : ''}" onclick="_setStoreCat('${c}')">${t('store_cat_' + c)}</button>`
+    ).join('');
+}
+
+function _setStoreCat(cat) {
+    _storeCat = cat;
+    _renderStoreTabs();
+    _renderStoreGrid();
+}
+
+function _renderStoreMannequin() {
     const s = getStarState();
-    s.equipped = s.equipped === id ? null : id;
+    const balEl = document.getElementById('storeBalance');
+    if (balEl) balEl.textContent = '⭐ ' + storeBalance(s);
+    const itemEl = document.getElementById('storeMannequinItem');
+    if (itemEl) {
+        const a = CLOTHING_ITEMS.find(x => x.id === s.equipped);
+        itemEl.textContent = a ? a.emoji : '';
+        itemEl.className = 'store-mannequin-item' + (a ? ' acc-' + a.pos : '');
+    }
+}
+
+function _renderStoreGrid() {
+    const grid = document.getElementById('storeGrid');
+    if (!grid) return;
+    const s = getStarState();
+    const balance = storeBalance(s);
+    const items = _storeCat === 'all' ? CLOTHING_ITEMS : CLOTHING_ITEMS.filter(i => i.cat === _storeCat);
+    grid.innerHTML = items.map(item => {
+        const owned = s.owned.includes(item.id);
+        const equipped = s.equipped === item.id;
+        const affordable = balance >= item.cost;
+        let statusHtml, actionHtml;
+        if (equipped) {
+            statusHtml = `<span class="store-item-status equipped">${t('store_equipped_label')}</span>`;
+            actionHtml = `<button type="button" class="store-item-btn secondary" onclick="unequipStoreItem()">${t('store_unequip_btn')}</button>`;
+        } else if (owned) {
+            statusHtml = `<span class="store-item-status">${t('store_owned_label')}</span>`;
+            actionHtml = `<button type="button" class="store-item-btn" onclick="equipStoreItem('${item.id}')">${t('store_equip_btn')}</button>`;
+        } else {
+            statusHtml = `<span class="store-item-status price">⭐ ${item.cost}</span>`;
+            actionHtml = affordable
+                ? `<button type="button" class="store-item-btn primary" onclick="buyStoreItem('${item.id}')">${t('store_buy_btn')}</button>`
+                : `<span class="store-item-need">${t('store_need_more').replace('{n}', item.cost - balance)}</span>`;
+        }
+        return `<div class="store-item-card${equipped ? ' equipped' : ''}${!owned && !affordable ? ' locked' : ''}">
+            <span class="store-item-emoji">${item.emoji}</span>
+            <span class="store-item-label">${item.label}</span>
+            ${statusHtml}
+            ${actionHtml}
+        </div>`;
+    }).join('');
+}
+
+function buyStoreItem(id) {
+    const item = CLOTHING_ITEMS.find(i => i.id === id);
+    if (!item) return;
+    const s = getStarState();
+    if (s.owned.includes(id)) return;
+    if (storeBalance(s) < item.cost) {
+        showToast(t('store_not_enough_toast').replace('{n}', item.cost - storeBalance(s)));
+        return;
+    }
+    s.spent += item.cost;
+    s.owned.push(id);
+    s.equipped = id;
     DB.set(_starsKey(), s);
-    openStarCollection();
+    showToast(t('store_bought_toast').replace('{item}', item.emoji + ' ' + item.label));
+    if (typeof confetti === 'function') confetti({ particleCount: 90, spread: 75 });
+    _renderStoreMannequin();
+    _renderStoreGrid();
+    updateStarBadge();
+}
+
+function equipStoreItem(id) {
+    const s = getStarState();
+    if (!s.owned.includes(id)) return;
+    s.equipped = id;
+    DB.set(_starsKey(), s);
+    _renderStoreMannequin();
+    _renderStoreGrid();
+    updateStarBadge();
+}
+
+function unequipStoreItem() {
+    const s = getStarState();
+    s.equipped = null;
+    DB.set(_starsKey(), s);
+    _renderStoreMannequin();
+    _renderStoreGrid();
     updateStarBadge();
 }
 
@@ -6015,6 +6125,7 @@ window.speakAacSentence = speakAacSentence;
 window.clearAacSentence = clearAacSentence;
 window.closeStarModal = closeStarModal;
 window.goToSequence = goToSequence;
+window.goToStore = goToStore;
 window.startSequenceGame = startSequenceGame;
 window.tapSequenceCard = tapSequenceCard;
 window.selectCause = selectCause;
@@ -6674,8 +6785,24 @@ const BEP_CONDITION_LABELS = {
     get stereotipik() { return t('bep_cond_stereotipik'); },
 };
 
-async function goToAnalysis() {
+async function goToAnalysis(tab) {
     showOnly('analysis-screen');
+    await switchReportTab(tab || 'analysis');
+}
+
+async function switchReportTab(tab) {
+    const isReport = tab === 'report';
+    document.getElementById('repTabAnalysis')?.classList.toggle('active', !isReport);
+    document.getElementById('repTabParent')?.classList.toggle('active', isReport);
+    const analysisPanel = document.getElementById('analysisTabPanel');
+    const reportPanel = document.getElementById('reportTabPanel');
+    if (analysisPanel) analysisPanel.style.display = isReport ? 'none' : '';
+    if (reportPanel) reportPanel.style.display = isReport ? '' : 'none';
+    if (isReport) await _populateReportTab();
+    else await _populateAnalysisTab();
+}
+
+async function _populateAnalysisTab() {
     document.querySelectorAll('.az-card').forEach(c => c.classList.add('az-loading'));
     const insightEl = document.getElementById('azInsightText');
     if (insightEl) insightEl.innerHTML = `
@@ -6690,6 +6817,9 @@ async function goToAnalysis() {
     _renderAzMetrics(history);
     _renderAzTrend(history);
 }
+
+// Geriye dönük uyumluluk — eski cagrilar dogrudan Veli Ozeti sekmesini acar
+function goToReport() { return goToAnalysis('report'); }
 
 function _renderAzTrend(history) {
     const card = document.getElementById('azTrendCard');
