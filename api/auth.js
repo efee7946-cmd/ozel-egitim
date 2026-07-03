@@ -40,6 +40,8 @@ async function ensureAuthColumns() {
     await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS verify_hash TEXT');
     await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS verify_expires TIMESTAMPTZ');
     await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS verify_attempts INT DEFAULT 0');
+    await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS failed_logins INT DEFAULT 0');
+    await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS lock_until TIMESTAMPTZ');
     _columnsEnsured = true;
 }
 
@@ -149,11 +151,15 @@ export default async function handler(req, res) {
                 return res.status(400).json({ error: 'AUTH_FIELDS_REQUIRED' });
             const u = username.trim().toLowerCase();
 
+            await ensureAuthColumns();
             const rows = await query('SELECT * FROM users WHERE username = $1', [u]);
             if (!rows.length)
                 return res.status(401).json({ error: 'AUTH_INVALID_CREDENTIALS' });
 
             const user = rows[0];
+            if (user.lock_until && new Date(user.lock_until) > new Date())
+                return res.status(429).json({ error: 'AUTH_TOO_MANY_ATTEMPTS' });
+
             let valid = false;
             let needsMigration = false;
 
@@ -164,8 +170,21 @@ export default async function handler(req, res) {
                 if (valid) needsMigration = true;
             }
 
-            if (!valid)
+            if (!valid) {
+                const fails = (user.failed_logins || 0) + 1;
+                if (fails >= 5) {
+                    await query(
+                        `UPDATE users SET failed_logins = 0, lock_until = now() + interval '15 minutes' WHERE username = $1`,
+                        [u]
+                    );
+                    return res.status(429).json({ error: 'AUTH_TOO_MANY_ATTEMPTS' });
+                }
+                await query('UPDATE users SET failed_logins = $1 WHERE username = $2', [fails, u]);
                 return res.status(401).json({ error: 'AUTH_INVALID_CREDENTIALS' });
+            }
+
+            if (user.failed_logins || user.lock_until)
+                await query('UPDATE users SET failed_logins = 0, lock_until = NULL WHERE username = $1', [u]);
 
             // SHA-256 kullanan eski hesabı bcrypt'e geçir
             if (needsMigration) {
@@ -173,7 +192,6 @@ export default async function handler(req, res) {
                 await query('UPDATE users SET hash = $1, salt = $2 WHERE username = $3', [newHash, '', u]);
             }
 
-            await ensureAuthColumns();
             const tok = crypto.randomBytes(32).toString('hex');
             await query(
                 'INSERT INTO sessions (token, username, display_name, expires_at) VALUES ($1, $2, $3, $4)',
@@ -234,7 +252,7 @@ export default async function handler(req, res) {
             const newHash = await bcrypt.hash(newPassword, BCRYPT_ROUNDS);
             await query(
                 `UPDATE users SET hash = $1, salt = $2, reset_hash = NULL, reset_expires = NULL, reset_attempts = 0,
-                 email_verified = true WHERE username = $3`,
+                 failed_logins = 0, lock_until = NULL, email_verified = true WHERE username = $3`,
                 [newHash, '', user.username]
             );
             await query('DELETE FROM sessions WHERE username = $1', [user.username]);
@@ -345,7 +363,7 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'Geçersiz action' });
 
     } catch (err) {
-        console.error('Auth error:', err.message);
-        return res.status(500).json({ error: 'Sunucu hatası: ' + err.message });
+        console.error('Auth error:', err);
+        return res.status(500).json({ error: 'SERVER_ERROR' });
     }
 }

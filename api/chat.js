@@ -45,6 +45,7 @@ export default async function handler(req, res) {
 
         res.status(200).json(data);
     } catch (error) {
-        res.status(500).json({ error: 'Backend hatası: ' + error.message });
+        console.error('Chat error:', error);
+        res.status(500).json({ error: 'SERVER_ERROR' });
     }
 }

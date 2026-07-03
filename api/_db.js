@@ -11,9 +11,13 @@ function getPool() {
         if (!process.env.DATABASE_URL) throw new Error('DATABASE_URL tanımlı değil');
         // sslmode parametresini URL'den çıkar — SSL'i aşağıda direkt yapılandırıyoruz
         const connectionString = process.env.DATABASE_URL.replace(/([?&])sslmode=[^&]*/g, '$1').replace(/[?&]$/, '');
+        // DATABASE_CA_CERT: Aiven konsolundan indirilen ca.pem içeriği.
+        // Tanımlıysa sertifika doğrulanır; değilse eski davranışa düşülür.
         _pool = new Pool({
             connectionString,
-            ssl: { rejectUnauthorized: false },
+            ssl: process.env.DATABASE_CA_CERT
+                ? { rejectUnauthorized: true, ca: process.env.DATABASE_CA_CERT }
+                : { rejectUnauthorized: false },
             max: 3,
             idleTimeoutMillis: 20000,
         });

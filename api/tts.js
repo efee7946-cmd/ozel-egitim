@@ -75,6 +75,6 @@ export default async function handler(req, res) {
 
     } catch (error) {
         console.error('TTS backend hatası:', error);
-        res.status(500).json({ error: 'Backend hatası: ' + error.message });
+        res.status(500).json({ error: 'SERVER_ERROR' });
     }
 }

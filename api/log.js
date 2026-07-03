@@ -53,6 +53,7 @@ export default async function handler(req, res) {
 
         return res.status(405).json({ error: 'GET veya POST gerekli' });
     } catch (err) {
-        return res.status(500).json({ error: err.message });
+        console.error('Log error:', err);
+        return res.status(500).json({ error: 'SERVER_ERROR' });
     }
 }
