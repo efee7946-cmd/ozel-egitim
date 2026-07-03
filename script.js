@@ -140,6 +140,34 @@ const STRINGS = {
     item_elephant: 'Fil', item_mouse: 'Fare', item_house: 'Ev', item_bee: 'Arı',
     item_airplane2: 'Uçak', item_ant: 'Karınca', item_ring: 'Yüzük',
     item_world: 'Dünya', item_butterfly: 'Kelebek',
+    sort_game5_title: 'Hangi Renk?', sort_game6_title: 'Meyve mi, Sebze mi?',
+    sort_game7_title: 'Yazın mı, Kışın mı?', sort_game8_title: 'Nerede Yaşar?',
+    sort_game9_title: 'Sıcak mı, Soğuk mu?', sort_game10_title: 'Canlı mı, Cansız mı?',
+    sort_game11_title: 'Hangi Şekil?',
+    sort_cat_red: 'Kırmızı', sort_cat_blue: 'Mavi', sort_cat_yellow: 'Sarı',
+    sort_cat_fruit: 'Meyveler', sort_cat_veg: 'Sebzeler',
+    sort_cat_summer: 'Yaz', sort_cat_winter: 'Kış',
+    sort_cat_sky: 'Gökyüzü', sort_cat_sea: 'Deniz', sort_cat_land: 'Kara',
+    sort_cat_hot: 'Sıcak', sort_cat_cold: 'Soğuk',
+    sort_cat_living: 'Canlı', sort_cat_nonliving: 'Cansız',
+    sort_cat_round: 'Yuvarlak', sort_cat_square: 'Kare', sort_cat_triangle: 'Üçgen',
+    item_strawberry: 'Çilek', item_firetruck: 'İtfaiye', item_heart: 'Kalp',
+    item_blueberry: 'Yaban mersini', item_drop: 'Su damlası', item_whale: 'Balina', item_cap: 'Şapka',
+    item_sunflower: 'Ayçiçeği', item_star: 'Yıldız', item_lemon: 'Limon',
+    item_grapes: 'Üzüm', item_watermelon: 'Karpuz', item_peach: 'Şeftali',
+    item_broccoli: 'Brokoli', item_carrot: 'Havuç', item_eggplant: 'Patlıcan',
+    item_cucumber: 'Salatalık', item_corn: 'Mısır', item_onion: 'Soğan',
+    item_shorts: 'Şort', item_tshirt: 'Tişört', item_swimsuit: 'Mayo',
+    item_sun: 'Güneş', item_beach: 'Plaj',
+    item_coat: 'Mont', item_scarf: 'Atkı', item_gloves: 'Eldiven',
+    item_snowman: 'Kardan adam', item_snowflake: 'Kar tanesi', item_skis: 'Kayak',
+    item_eagle: 'Kartal', item_dolphin: 'Yunus', item_octopus: 'Ahtapot',
+    item_crab: 'Yengeç', item_rabbit: 'Tavşan',
+    item_fire: 'Ateş', item_tea: 'Çay', item_volcano: 'Yanardağ', item_soup: 'Çorba',
+    item_ice: 'Buz', item_colddrink: 'Soğuk içecek',
+    item_baby: 'Bebek', item_phone: 'Telefon', item_brick: 'Tuğla', item_pencil: 'Kalem',
+    item_moon: 'Ay', item_orange: 'Portakal', item_balloon: 'Balon',
+    item_box: 'Kutu', item_gift: 'Hediye', item_pine: 'Çam ağacı', item_ruler: 'Gönye',
     score_label: 'puan',
     sort_items_count: 'nesne',
     sort_tries: 'deneme',
@@ -1037,6 +1065,34 @@ const STRINGS = {
     item_elephant: 'Elephant', item_mouse: 'Mouse', item_house: 'House', item_bee: 'Bee',
     item_airplane2: 'Airplane', item_ant: 'Ant', item_ring: 'Ring',
     item_world: 'Earth', item_butterfly: 'Butterfly',
+    sort_game5_title: 'Which Color?', sort_game6_title: 'Fruit or Vegetable?',
+    sort_game7_title: 'Summer or Winter?', sort_game8_title: 'Where Does It Live?',
+    sort_game9_title: 'Hot or Cold?', sort_game10_title: 'Living or Non-living?',
+    sort_game11_title: 'Which Shape?',
+    sort_cat_red: 'Red', sort_cat_blue: 'Blue', sort_cat_yellow: 'Yellow',
+    sort_cat_fruit: 'Fruits', sort_cat_veg: 'Vegetables',
+    sort_cat_summer: 'Summer', sort_cat_winter: 'Winter',
+    sort_cat_sky: 'Sky', sort_cat_sea: 'Sea', sort_cat_land: 'Land',
+    sort_cat_hot: 'Hot', sort_cat_cold: 'Cold',
+    sort_cat_living: 'Living', sort_cat_nonliving: 'Non-living',
+    sort_cat_round: 'Round', sort_cat_square: 'Square', sort_cat_triangle: 'Triangle',
+    item_strawberry: 'Strawberry', item_firetruck: 'Fire Truck', item_heart: 'Heart',
+    item_blueberry: 'Blueberry', item_drop: 'Water Drop', item_whale: 'Whale', item_cap: 'Cap',
+    item_sunflower: 'Sunflower', item_star: 'Star', item_lemon: 'Lemon',
+    item_grapes: 'Grapes', item_watermelon: 'Watermelon', item_peach: 'Peach',
+    item_broccoli: 'Broccoli', item_carrot: 'Carrot', item_eggplant: 'Eggplant',
+    item_cucumber: 'Cucumber', item_corn: 'Corn', item_onion: 'Onion',
+    item_shorts: 'Shorts', item_tshirt: 'T-shirt', item_swimsuit: 'Swimsuit',
+    item_sun: 'Sun', item_beach: 'Beach',
+    item_coat: 'Coat', item_scarf: 'Scarf', item_gloves: 'Gloves',
+    item_snowman: 'Snowman', item_snowflake: 'Snowflake', item_skis: 'Skis',
+    item_eagle: 'Eagle', item_dolphin: 'Dolphin', item_octopus: 'Octopus',
+    item_crab: 'Crab', item_rabbit: 'Rabbit',
+    item_fire: 'Fire', item_tea: 'Tea', item_volcano: 'Volcano', item_soup: 'Soup',
+    item_ice: 'Ice', item_colddrink: 'Cold Drink',
+    item_baby: 'Baby', item_phone: 'Phone', item_brick: 'Brick', item_pencil: 'Pencil',
+    item_moon: 'Moon', item_orange: 'Orange', item_balloon: 'Balloon',
+    item_box: 'Box', item_gift: 'Gift', item_pine: 'Pine Tree', item_ruler: 'Set Square',
     score_label: 'pts',
     sort_items_count: 'items',
     sort_tries: 'tries',
@@ -3528,6 +3584,168 @@ const SORT_GAMES = [
             { emoji: '🦋', get label() { return t('item_butterfly'); }, cat: 'kucuk' },
             { emoji: '🚢', get label() { return t('item_ship'); },      cat: 'buyuk' },
         ]
+    },
+    {
+        key: 'colors',
+        get title() { return t('sort_game5_title'); },
+        icon: '🎨',
+        categories: [
+            { key: 'kirmizi', get label() { return t('sort_cat_red'); },    emoji: '🔴', color: '#fdd8d8' },
+            { key: 'mavi',    get label() { return t('sort_cat_blue'); },   emoji: '🔵', color: '#d1ecf1' },
+            { key: 'sari',    get label() { return t('sort_cat_yellow'); }, emoji: '🟡', color: '#fff3cd' }
+        ],
+        items: [
+            { emoji: '🍎', get label() { return t('item_apple'); },      cat: 'kirmizi' },
+            { emoji: '🍓', get label() { return t('item_strawberry'); }, cat: 'kirmizi' },
+            { emoji: '🚒', get label() { return t('item_firetruck'); },  cat: 'kirmizi' },
+            { emoji: '❤️', get label() { return t('item_heart'); },      cat: 'kirmizi' },
+            { emoji: '🫐', get label() { return t('item_blueberry'); },  cat: 'mavi' },
+            { emoji: '💧', get label() { return t('item_drop'); },       cat: 'mavi' },
+            { emoji: '🐳', get label() { return t('item_whale'); },      cat: 'mavi' },
+            { emoji: '🧢', get label() { return t('item_cap'); },        cat: 'mavi' },
+            { emoji: '🍌', get label() { return t('item_banana'); },     cat: 'sari' },
+            { emoji: '🌻', get label() { return t('item_sunflower'); },  cat: 'sari' },
+            { emoji: '⭐', get label() { return t('item_star'); },       cat: 'sari' },
+            { emoji: '🍋', get label() { return t('item_lemon'); },      cat: 'sari' },
+        ]
+    },
+    {
+        key: 'fruit-veg',
+        get title() { return t('sort_game6_title'); },
+        icon: '🥕',
+        categories: [
+            { key: 'meyve', get label() { return t('sort_cat_fruit'); }, emoji: '🍎', color: '#fdd8d8' },
+            { key: 'sebze', get label() { return t('sort_cat_veg'); },   emoji: '🥦', color: '#d4edda' }
+        ],
+        items: [
+            { emoji: '🍎', get label() { return t('item_apple'); },      cat: 'meyve' },
+            { emoji: '🍌', get label() { return t('item_banana'); },     cat: 'meyve' },
+            { emoji: '🍇', get label() { return t('item_grapes'); },     cat: 'meyve' },
+            { emoji: '🍓', get label() { return t('item_strawberry'); }, cat: 'meyve' },
+            { emoji: '🍉', get label() { return t('item_watermelon'); }, cat: 'meyve' },
+            { emoji: '🍑', get label() { return t('item_peach'); },      cat: 'meyve' },
+            { emoji: '🥦', get label() { return t('item_broccoli'); },   cat: 'sebze' },
+            { emoji: '🥕', get label() { return t('item_carrot'); },     cat: 'sebze' },
+            { emoji: '🍆', get label() { return t('item_eggplant'); },   cat: 'sebze' },
+            { emoji: '🥒', get label() { return t('item_cucumber'); },   cat: 'sebze' },
+            { emoji: '🌽', get label() { return t('item_corn'); },       cat: 'sebze' },
+            { emoji: '🧅', get label() { return t('item_onion'); },      cat: 'sebze' },
+        ]
+    },
+    {
+        key: 'summer-winter',
+        get title() { return t('sort_game7_title'); },
+        icon: '⛄',
+        categories: [
+            { key: 'yaz', get label() { return t('sort_cat_summer'); }, emoji: '☀️', color: '#fff3cd' },
+            { key: 'kis', get label() { return t('sort_cat_winter'); }, emoji: '❄️', color: '#d1ecf1' }
+        ],
+        items: [
+            { emoji: '🩳', get label() { return t('item_shorts'); },     cat: 'yaz' },
+            { emoji: '👕', get label() { return t('item_tshirt'); },     cat: 'yaz' },
+            { emoji: '🩱', get label() { return t('item_swimsuit'); },   cat: 'yaz' },
+            { emoji: '☀️', get label() { return t('item_sun'); },        cat: 'yaz' },
+            { emoji: '🏖️', get label() { return t('item_beach'); },     cat: 'yaz' },
+            { emoji: '🍦', get label() { return t('item_ice_cream'); },  cat: 'yaz' },
+            { emoji: '🧥', get label() { return t('item_coat'); },       cat: 'kis' },
+            { emoji: '🧣', get label() { return t('item_scarf'); },      cat: 'kis' },
+            { emoji: '🧤', get label() { return t('item_gloves'); },     cat: 'kis' },
+            { emoji: '⛄', get label() { return t('item_snowman'); },    cat: 'kis' },
+            { emoji: '❄️', get label() { return t('item_snowflake'); }, cat: 'kis' },
+            { emoji: '🎿', get label() { return t('item_skis'); },       cat: 'kis' },
+        ]
+    },
+    {
+        key: 'habitats',
+        get title() { return t('sort_game8_title'); },
+        icon: '🌍',
+        categories: [
+            { key: 'gok',   get label() { return t('sort_cat_sky'); },  emoji: '☁️', color: '#e3f2fd' },
+            { key: 'deniz', get label() { return t('sort_cat_sea'); },  emoji: '🌊', color: '#d1ecf1' },
+            { key: 'kara',  get label() { return t('sort_cat_land'); }, emoji: '🌳', color: '#d4edda' }
+        ],
+        items: [
+            { emoji: '🐦', get label() { return t('item_bird'); },      cat: 'gok' },
+            { emoji: '🦅', get label() { return t('item_eagle'); },     cat: 'gok' },
+            { emoji: '🦋', get label() { return t('item_butterfly'); }, cat: 'gok' },
+            { emoji: '🐝', get label() { return t('item_bee'); },       cat: 'gok' },
+            { emoji: '🐟', get label() { return t('item_fish'); },      cat: 'deniz' },
+            { emoji: '🐬', get label() { return t('item_dolphin'); },   cat: 'deniz' },
+            { emoji: '🐙', get label() { return t('item_octopus'); },   cat: 'deniz' },
+            { emoji: '🦀', get label() { return t('item_crab'); },      cat: 'deniz' },
+            { emoji: '🐱', get label() { return t('item_cat'); },       cat: 'kara' },
+            { emoji: '🐘', get label() { return t('item_elephant'); },  cat: 'kara' },
+            { emoji: '🦁', get label() { return t('item_lion'); },      cat: 'kara' },
+            { emoji: '🐰', get label() { return t('item_rabbit'); },    cat: 'kara' },
+        ]
+    },
+    {
+        key: 'hot-cold',
+        get title() { return t('sort_game9_title'); },
+        icon: '🌡️',
+        categories: [
+            { key: 'sicak', get label() { return t('sort_cat_hot'); },  emoji: '🔥', color: '#fdd8d8' },
+            { key: 'soguk', get label() { return t('sort_cat_cold'); }, emoji: '🧊', color: '#d1ecf1' }
+        ],
+        items: [
+            { emoji: '☀️', get label() { return t('item_sun'); },        cat: 'sicak' },
+            { emoji: '🔥', get label() { return t('item_fire'); },       cat: 'sicak' },
+            { emoji: '🍵', get label() { return t('item_tea'); },        cat: 'sicak' },
+            { emoji: '🌋', get label() { return t('item_volcano'); },    cat: 'sicak' },
+            { emoji: '🍲', get label() { return t('item_soup'); },       cat: 'sicak' },
+            { emoji: '❄️', get label() { return t('item_snowflake'); }, cat: 'soguk' },
+            { emoji: '⛄', get label() { return t('item_snowman'); },    cat: 'soguk' },
+            { emoji: '🧊', get label() { return t('item_ice'); },        cat: 'soguk' },
+            { emoji: '🍦', get label() { return t('item_ice_cream'); },  cat: 'soguk' },
+            { emoji: '🥤', get label() { return t('item_colddrink'); },  cat: 'soguk' },
+        ]
+    },
+    {
+        key: 'living-nonliving',
+        get title() { return t('sort_game10_title'); },
+        icon: '🌱',
+        categories: [
+            { key: 'canli',  get label() { return t('sort_cat_living'); },    emoji: '🐾', color: '#d4edda' },
+            { key: 'cansiz', get label() { return t('sort_cat_nonliving'); }, emoji: '🪑', color: '#e8e8e8' }
+        ],
+        items: [
+            { emoji: '🐱', get label() { return t('item_cat'); },       cat: 'canli' },
+            { emoji: '🌳', get label() { return t('item_tree'); },      cat: 'canli' },
+            { emoji: '👶', get label() { return t('item_baby'); },      cat: 'canli' },
+            { emoji: '🐟', get label() { return t('item_fish'); },      cat: 'canli' },
+            { emoji: '🦋', get label() { return t('item_butterfly'); }, cat: 'canli' },
+            { emoji: '🌻', get label() { return t('item_sunflower'); }, cat: 'canli' },
+            { emoji: '🪑', get label() { return t('item_chair'); },     cat: 'cansiz' },
+            { emoji: '📱', get label() { return t('item_phone'); },     cat: 'cansiz' },
+            { emoji: '⚽', get label() { return t('item_ball'); },      cat: 'cansiz' },
+            { emoji: '🚗', get label() { return t('item_car'); },       cat: 'cansiz' },
+            { emoji: '🧱', get label() { return t('item_brick'); },     cat: 'cansiz' },
+            { emoji: '✏️', get label() { return t('item_pencil'); },   cat: 'cansiz' },
+        ]
+    },
+    {
+        key: 'shapes',
+        get title() { return t('sort_game11_title'); },
+        icon: '🔺',
+        categories: [
+            { key: 'yuvarlak', get label() { return t('sort_cat_round'); },    emoji: '🔴', color: '#fdd8d8' },
+            { key: 'kare',     get label() { return t('sort_cat_square'); },   emoji: '🟦', color: '#d1ecf1' },
+            { key: 'ucgen',    get label() { return t('sort_cat_triangle'); }, emoji: '🔺', color: '#fff3cd' }
+        ],
+        items: [
+            { emoji: '⚽', get label() { return t('item_ball'); },     cat: 'yuvarlak' },
+            { emoji: '🌕', get label() { return t('item_moon'); },     cat: 'yuvarlak' },
+            { emoji: '🍊', get label() { return t('item_orange'); },   cat: 'yuvarlak' },
+            { emoji: '🎈', get label() { return t('item_balloon'); },  cat: 'yuvarlak' },
+            { emoji: '📦', get label() { return t('item_box'); },      cat: 'kare' },
+            { emoji: '🧊', get label() { return t('item_ice'); },      cat: 'kare' },
+            { emoji: '📺', get label() { return t('item_tv'); },       cat: 'kare' },
+            { emoji: '🎁', get label() { return t('item_gift'); },     cat: 'kare' },
+            { emoji: '🍕', get label() { return t('item_pizza'); },    cat: 'ucgen' },
+            { emoji: '⛺', get label() { return t('item_tent'); },     cat: 'ucgen' },
+            { emoji: '🎄', get label() { return t('item_pine'); },     cat: 'ucgen' },
+            { emoji: '📐', get label() { return t('item_ruler'); },    cat: 'ucgen' },
+        ]
     }
 ];
 
@@ -3569,7 +3787,12 @@ function renderSortMenu() {
 function startSortGame(key) {
     _sortGame = SORT_GAMES.find(g => g.key === key);
     if (!_sortGame) return;
-    _sortItems = [..._sortGame.items].sort(() => Math.random() - 0.5);
+    const pool = [..._sortGame.items];
+    for (let i = pool.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [pool[i], pool[j]] = [pool[j], pool[i]];
+    }
+    _sortItems = pool.slice(0, 10);
     _sortSorted = {};
     _sortErrors = 0;
     _sortSelected = null;
@@ -3623,6 +3846,7 @@ function _renderSortItems() {
 function _renderSortBaskets() {
     const area = document.getElementById('sortBasketsArea');
     if (!area || !_sortGame) return;
+    area.style.gridTemplateColumns = `repeat(${_sortGame.categories.length}, 1fr)`;
     area.innerHTML = _sortGame.categories.map(cat => {
         const count = Object.values(_sortSorted).filter(c => c === cat.key).length;
         return `<div class="sort-basket${_sortSelected !== null ? ' sort-basket-ready' : ''}" data-cat="${cat.key}" style="background:${cat.color}"
