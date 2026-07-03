@@ -241,6 +241,31 @@ const STRINGS = {
     weekday_fri: 'Cum', weekday_sat: 'Cmt', weekday_sun: 'Paz',
     // AAC ekranı
     aac_sentence_placeholder: 'Kart seç, cümle oluştur...',
+    aac_edit_btn: 'Düzenle',
+    aac_edit_done: 'Bitti',
+    aac_hold_to_edit: 'Düzenlemek için 2 saniye basılı tutun',
+    aac_add_symbol: '+ Sembol',
+    aac_add_category: '+ Kategori',
+    aac_edit_category: '✏️ Kategori',
+    aac_new_board_name: 'Yeni kategori adı:',
+    aac_card_edit_title: '✏️ Kartı Düzenle',
+    aac_board_edit_title: '✏️ Kategoriyi Düzenle',
+    aac_card_label: 'Kart adı',
+    aac_card_spoken: 'Söylenecek metin',
+    aac_board_label: 'Kategori adı',
+    aac_save: 'Kaydet',
+    aac_delete: '🗑️ Sil',
+    aac_move: '↔️ Taşı',
+    aac_move_hint: 'Taşımak için boş bir kutuya dokun',
+    aac_move_other_board: 'Bu kartı taşımak için önce kendi kategorisine geç',
+    aac_delete_confirm: 'Bu kart silinsin mi?',
+    aac_board_delete_confirm: 'Bu kategori ve içindeki tüm kartlar silinsin mi?',
+    aac_last_board: 'Son kategori silinemez',
+    aac_settings_title: '⚙️ AAC Ayarları',
+    aac_grid_size: 'Izgara boyutu (satır × sütun)',
+    aac_core_strip: 'Çekirdek şerit (üstteki hızlı kartlar)',
+    aac_tts_rate: 'Konuşma hızı',
+    aac_shrink_warn: 'Küçültme bazı kartları gizleyecek (silinmez, ızgara büyütülünce geri gelir). Devam edilsin mi?',
     aac_searching: 'Aranıyor...',
     aac_no_results: 'Sonuç bulunamadı. Farklı bir kelime deneyin.',
     aac_connection_error: 'Bağlantı hatası. İnternet bağlantınızı kontrol edin.',
@@ -1110,6 +1135,31 @@ const STRINGS = {
     weekday_fri: 'Fri', weekday_sat: 'Sat', weekday_sun: 'Sun',
     // AAC screen
     aac_sentence_placeholder: 'Pick a card, build a sentence...',
+    aac_edit_btn: 'Edit',
+    aac_edit_done: 'Done',
+    aac_hold_to_edit: 'Hold for 2 seconds to edit',
+    aac_add_symbol: '+ Symbol',
+    aac_add_category: '+ Category',
+    aac_edit_category: '✏️ Category',
+    aac_new_board_name: 'New category name:',
+    aac_card_edit_title: '✏️ Edit Card',
+    aac_board_edit_title: '✏️ Edit Category',
+    aac_card_label: 'Card name',
+    aac_card_spoken: 'Spoken text',
+    aac_board_label: 'Category name',
+    aac_save: 'Save',
+    aac_delete: '🗑️ Delete',
+    aac_move: '↔️ Move',
+    aac_move_hint: 'Tap an empty slot to move',
+    aac_move_other_board: "Switch to this card's category first to move it",
+    aac_delete_confirm: 'Delete this card?',
+    aac_board_delete_confirm: 'Delete this category and all its cards?',
+    aac_last_board: "The last category can't be deleted",
+    aac_settings_title: '⚙️ AAC Settings',
+    aac_grid_size: 'Grid size (rows × columns)',
+    aac_core_strip: 'Core strip (quick cards at the top)',
+    aac_tts_rate: 'Speech rate',
+    aac_shrink_warn: 'Shrinking will hide some cards (not deleted; they return when the grid grows). Continue?',
     aac_searching: 'Searching...',
     aac_no_results: 'No results found. Try a different word.',
     aac_connection_error: 'Connection error. Please check your internet connection.',
@@ -4324,12 +4374,12 @@ function sanitizeForSpeech(text) {
         .trim();
 }
 
-function speakFallback(t, callback) {
+function speakFallback(t, callback, rate) {
     try {
         t = sanitizeForSpeech(t);
         window.speechSynthesis.cancel();
         var u = new SpeechSynthesisUtterance(t);
-        u.lang = _lang === 'en' ? 'en-US' : 'tr-TR'; u.pitch = 1.2; u.rate = 0.7;
+        u.lang = _lang === 'en' ? 'en-US' : 'tr-TR'; u.pitch = 1.2; u.rate = rate || 0.7;
         var ended = false;
         var safeEnd = function() { if (ended) return; ended = true; if (callback) callback(); };
         u.onend = safeEnd;
@@ -4557,9 +4607,23 @@ let _aacBoards = [];
 let _aacCurrentBoardId = null;
 let _aacSentence = []; // [{ label, spoken }]
 
+let _aacEditMode = false;
+let _aacJustEnteredEdit = false;
+let _aacHoldTimer = null;
+let _aacAddTarget = null;
+let _aacMoveCardId = null;
+let _aacMoveBoardId = null;
+let _aacEditingCardId = null;
+let _aacEditingBoardId = null;
+let _aacTtsRate = 1.0;
+
 async function goToAac() {
     showOnly('aac-screen');
     _aacSentence = [];
+    _aacEditMode = false;
+    _aacAddTarget = null;
+    _aacMoveCardId = null;
+    _aacMoveBoardId = null;
     const sid = activeStudentId || 'default';
     await AACData.migrateLegacyIfNeeded(sid);
     await AACData.migrateV2IfNeeded(sid);
@@ -4568,10 +4632,66 @@ async function goToAac() {
     await _aacRenderAll();
 }
 
+function aacSetEditMode(on) {
+    _aacEditMode = on;
+    _aacAddTarget = null;
+    _aacMoveCardId = null;
+    _aacMoveBoardId = null;
+    if (on) _aacJustEnteredEdit = true;
+    _aacRenderAll();
+}
+
+function aacEditHoldStart() {
+    if (_aacEditMode) return;
+    clearTimeout(_aacHoldTimer);
+    document.getElementById('aacEditBtn').classList.add('holding');
+    _aacHoldTimer = setTimeout(() => {
+        _aacHoldTimer = null;
+        document.getElementById('aacEditBtn').classList.remove('holding');
+        aacSetEditMode(true);
+    }, 2000);
+}
+
+function aacEditHoldEnd() {
+    document.getElementById('aacEditBtn').classList.remove('holding');
+    if (_aacHoldTimer) {
+        clearTimeout(_aacHoldTimer);
+        _aacHoldTimer = null;
+        if (!_aacEditMode) showToast(t('aac_hold_to_edit'));
+    }
+}
+
+function aacEditBtnClick() {
+    if (_aacJustEnteredEdit) { _aacJustEnteredEdit = false; return; }
+    if (_aacEditMode) aacSetEditMode(false);
+}
+
+function _aacUpdateToolbar() {
+    const show = (id, on) => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = on ? '' : 'none';
+    };
+    show('aacAddSymbolBtn', _aacEditMode);
+    show('aacAddBoardBtn', _aacEditMode);
+    show('aacEditBoardBtn', _aacEditMode);
+    show('aacSettingsBtn', _aacEditMode);
+    show('aacCardSearch', !_aacEditMode);
+    const btn = document.getElementById('aacEditBtn');
+    if (btn) {
+        btn.classList.toggle('editing', _aacEditMode);
+        btn.innerHTML = _aacEditMode
+            ? '✓ ' + escapeHtml(t('aac_edit_done'))
+            : '🔒 ' + escapeHtml(t('aac_edit_btn'));
+    }
+}
+
 
 async function _aacRenderAll() {
     const sid = activeStudentId || 'default';
     const settings = await AACData.getSettings(sid);
+    _aacTtsRate = settings.ttsRate || 1.0;
+
+    _aacUpdateToolbar();
 
     // Çekirdek şerit
     const coreStrip = document.getElementById('aacCoreStrip');
@@ -4583,7 +4703,7 @@ async function _aacRenderAll() {
         }
         coreStrip.style.display = coreCards.length ? 'flex' : 'none';
         coreStrip.innerHTML = coreCards.map(c => `
-            <button type="button" class="aac-core-card" onclick="tapAacCard('${escapeHtml(c.id)}','${escapeHtml(c.spoken || c.label)}','${escapeHtml(c.label)}')">
+            <button type="button" class="aac-core-card" onclick="tapAacCard('${escapeHtml(c.id)}','${escapeHtml(c.spoken || c.label)}','${escapeHtml(c.label)}','${escapeHtml(c.boardId)}')">
                 ${_aacVisualHtml(c.visual, 'aac-card-emoji')}
                 <span style="font-size:0.65rem;font-weight:700;">${escapeHtml(c.label)}</span>
             </button>
@@ -4610,19 +4730,24 @@ async function _aacRenderAll() {
         const grid = document.getElementById('aacGrid');
         grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
         grid.style.gridTemplateRows    = `repeat(${rows}, 1fr)`;
-        grid.innerHTML = matrix.flat().map(card => {
-            if (!card) return '<div class="aac-card empty"></div>';
+        grid.classList.toggle('aac-moving', !!_aacMoveCardId);
+        grid.innerHTML = matrix.map((rowArr, r) => rowArr.map((card, c) => {
+            if (!card) {
+                return _aacEditMode
+                    ? `<button type="button" class="aac-card empty add" onclick="aacEmptySlotTap(${r},${c})">＋</button>`
+                    : '<div class="aac-card empty"></div>';
+            }
             return `
-                <button type="button" class="aac-card"
+                <button type="button" class="aac-card${_aacEditMode ? ' editable' : ''}"
                     data-label="${escapeHtml(card.label)}"
-                    onclick="tapAacCard('${escapeHtml(card.id)}','${escapeHtml(card.spoken || card.label)}','${escapeHtml(card.label)}')">
+                    onclick="tapAacCard('${escapeHtml(card.id)}','${escapeHtml(card.spoken || card.label)}','${escapeHtml(card.label)}','${escapeHtml(card.boardId)}')">
                     ${_aacVisualHtml(card.visual, 'aac-card-emoji')}
                     <span class="aac-card-text">${escapeHtml(card.label)}</span>
                 </button>
             `;
-        }).join('');
+        }).join('')).join('');
         const searchInput = document.getElementById('aacCardSearch');
-        if (searchInput && searchInput.value) filterAacCards(searchInput.value);
+        if (searchInput && searchInput.value && !_aacEditMode) filterAacCards(searchInput.value);
     }
 
     _aacUpdateSentenceBar();
@@ -4643,10 +4768,144 @@ async function setAacBoard(boardId) {
     await _aacRenderAll();
 }
 
-function tapAacCard(cardId, spoken, label) {
+function tapAacCard(cardId, spoken, label, boardId) {
+    if (_aacEditMode) {
+        openAacCardEdit(boardId || _aacCurrentBoardId, cardId);
+        return;
+    }
     _aacSentence.push({ label, spoken });
     _aacUpdateSentenceBar();
-    speakFallback(spoken);
+    speakFallback(spoken, null, _aacTtsRate);
+}
+
+async function aacEmptySlotTap(row, col) {
+    if (_aacMoveCardId) {
+        if (_aacMoveBoardId !== _aacCurrentBoardId) {
+            showToast(t('aac_move_other_board'));
+            _aacMoveCardId = null;
+            _aacMoveBoardId = null;
+            await _aacRenderAll();
+            return;
+        }
+        const board = _aacBoards.find(b => b.id === _aacMoveBoardId);
+        try {
+            await AACData.moveCard(board, _aacMoveCardId, row, col);
+        } catch {}
+        _aacMoveCardId = null;
+        _aacMoveBoardId = null;
+        await _aacRenderAll();
+        return;
+    }
+    _aacAddTarget = { row, col };
+    openAacSearch();
+}
+
+async function openAacCardEdit(boardId, cardId) {
+    const cards = await AACData.listCards(boardId);
+    const card = cards.find(c => c.id === cardId);
+    if (!card) return;
+    _aacEditingCardId = cardId;
+    _aacEditingBoardId = boardId;
+    document.getElementById('aacEditCardLabel').value = card.label;
+    document.getElementById('aacEditCardSpoken').value = card.spoken || card.label;
+    document.getElementById('aac-card-edit-modal').style.display = 'flex';
+}
+
+async function saveAacCardEdit() {
+    const label = (document.getElementById('aacEditCardLabel').value || '').trim();
+    const spoken = (document.getElementById('aacEditCardSpoken').value || '').trim();
+    if (!label) { document.getElementById('aacEditCardLabel').focus(); return; }
+    await AACData.updateCard(_aacEditingBoardId, _aacEditingCardId, { label, spoken: spoken || label });
+    document.getElementById('aac-card-edit-modal').style.display = 'none';
+    await _aacRenderAll();
+}
+
+async function deleteAacCard() {
+    if (!confirm(t('aac_delete_confirm'))) return;
+    await AACData.clearSlot(_aacEditingBoardId, _aacEditingCardId);
+    document.getElementById('aac-card-edit-modal').style.display = 'none';
+    await _aacRenderAll();
+}
+
+async function startAacCardMove() {
+    if (_aacEditingBoardId !== _aacCurrentBoardId) {
+        showToast(t('aac_move_other_board'));
+        return;
+    }
+    _aacMoveCardId = _aacEditingCardId;
+    _aacMoveBoardId = _aacEditingBoardId;
+    document.getElementById('aac-card-edit-modal').style.display = 'none';
+    showToast(t('aac_move_hint'));
+    await _aacRenderAll();
+}
+
+async function aacAddBoard() {
+    const name = prompt(t('aac_new_board_name'));
+    if (!name || !name.trim()) return;
+    const sid = activeStudentId || 'default';
+    const board = await AACData.createBoard(sid, { label: name.trim() });
+    _aacBoards = await AACData.listBoards(sid);
+    _aacCurrentBoardId = board.id;
+    await _aacRenderAll();
+}
+
+function openAacBoardEdit() {
+    const board = _aacBoards.find(b => b.id === _aacCurrentBoardId);
+    if (!board) return;
+    document.getElementById('aacEditBoardLabel').value = board.label;
+    document.getElementById('aac-board-edit-modal').style.display = 'flex';
+}
+
+async function saveAacBoardEdit() {
+    const label = (document.getElementById('aacEditBoardLabel').value || '').trim();
+    if (!label) { document.getElementById('aacEditBoardLabel').focus(); return; }
+    const sid = activeStudentId || 'default';
+    await AACData.updateBoard(sid, _aacCurrentBoardId, { label });
+    _aacBoards = await AACData.listBoards(sid);
+    document.getElementById('aac-board-edit-modal').style.display = 'none';
+    await _aacRenderAll();
+}
+
+async function deleteAacBoard() {
+    if (_aacBoards.length <= 1) { showToast(t('aac_last_board')); return; }
+    if (!confirm(t('aac_board_delete_confirm'))) return;
+    const sid = activeStudentId || 'default';
+    await AACData.deleteBoard(sid, _aacCurrentBoardId);
+    _aacBoards = await AACData.listBoards(sid);
+    _aacCurrentBoardId = _aacBoards[0]?.id || null;
+    document.getElementById('aac-board-edit-modal').style.display = 'none';
+    await _aacRenderAll();
+}
+
+async function openAacSettings() {
+    const sid = activeStudentId || 'default';
+    const s = await AACData.getSettings(sid);
+    document.getElementById('aacSetRows').value = String(s.grid.rows);
+    document.getElementById('aacSetCols').value = String(s.grid.cols);
+    document.getElementById('aacSetCore').checked = !!s.coreStrip;
+    document.getElementById('aacSetRate').value = String(s.ttsRate || 1.0);
+    document.getElementById('aacRateVal').textContent = (s.ttsRate || 1.0) + '×';
+    document.getElementById('aac-settings-modal').style.display = 'flex';
+}
+
+async function saveAacSettings() {
+    const sid = activeStudentId || 'default';
+    const rows = parseInt(document.getElementById('aacSetRows').value, 10);
+    const cols = parseInt(document.getElementById('aacSetCols').value, 10);
+    try {
+        await AACData.setGrid(sid, { rows, cols });
+    } catch (e) {
+        if (e && e.code === 'SHRINK_WOULD_ORPHAN') {
+            if (!confirm(t('aac_shrink_warn'))) return;
+            await AACData.setGrid(sid, { rows, cols }, { force: true });
+        }
+    }
+    await AACData.updateSettings(sid, {
+        coreStrip: document.getElementById('aacSetCore').checked,
+        ttsRate: parseFloat(document.getElementById('aacSetRate').value),
+    });
+    document.getElementById('aac-settings-modal').style.display = 'none';
+    await _aacRenderAll();
 }
 
 function _aacUpdateSentenceBar() {
@@ -4668,9 +4927,28 @@ function removeAacWord(index) {
     _aacUpdateSentenceBar();
 }
 
-function speakAacSentence() {
+async function speakAacSentence() {
     if (!_aacSentence.length) return;
-    speakFallback(_aacSentence.map(w => w.spoken).join('. '));
+    const text = sanitizeForSpeech(_aacSentence.map(w => w.spoken).join(' '));
+    try {
+        const ctrl = new AbortController();
+        const timer = setTimeout(() => ctrl.abort(), 8000);
+        const res = await fetch(API_BASE + '/api/tts', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', ...apiAuthHeaders() },
+            body: JSON.stringify({ text, lang: _lang }),
+            signal: ctrl.signal
+        });
+        clearTimeout(timer);
+        if (!res.ok) return speakFallback(text, null, _aacTtsRate);
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        const audio = new Audio(url);
+        audio.onended = () => URL.revokeObjectURL(url);
+        await audio.play();
+    } catch {
+        speakFallback(text, null, _aacTtsRate);
+    }
 }
 
 function clearAacSentence() {
@@ -4709,6 +4987,11 @@ const _aacEmojiCatLabelKeys = {
     'Semboller': 'aac_cat_symbols',
 };
 let _aacPickedEmoji = '';
+
+function aacOpenAddSymbol() {
+    _aacAddTarget = null;
+    openAacSearch();
+}
 
 function openAacSearch() {
     document.getElementById('aac-search-modal').style.display = 'flex';
@@ -4812,11 +5095,17 @@ async function addEmojiCard() {
 
     const { rows, cols, matrix } = await AACData.buildGrid(sid, _aacCurrentBoardId);
     let targetRow = -1, targetCol = -1;
-    outer: for (let r = 0; r < rows; r++) {
-        for (let c = 0; c < cols; c++) {
-            if (!matrix[r][c]) { targetRow = r; targetCol = c; break outer; }
+    if (_aacAddTarget && !matrix[_aacAddTarget.row]?.[_aacAddTarget.col]) {
+        targetRow = _aacAddTarget.row;
+        targetCol = _aacAddTarget.col;
+    } else {
+        outer: for (let r = 0; r < rows; r++) {
+            for (let c = 0; c < cols; c++) {
+                if (!matrix[r][c]) { targetRow = r; targetCol = c; break outer; }
+            }
         }
     }
+    _aacAddTarget = null;
     if (targetRow === -1) {
         await AACData.growGrid(sid, { rows: rows + 1, cols });
         targetRow = rows;

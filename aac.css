@@ -185,6 +185,118 @@
 }
 .aac-add-symbol-btn:hover { background: rgba(108,99,255,0.16); }
 
+/* ---- Düzenleme modu ---- */
+.aac-edit-btn {
+  padding: 7px 14px;
+  border-radius: 20px;
+  border: 1.5px solid rgba(0,0,0,0.12);
+  background: #f0f4f8;
+  color: #4b6079;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+  position: relative;
+  overflow: hidden;
+}
+.aac-edit-btn.holding::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(108,99,255,0.25);
+  animation: aacHoldFill 2s linear forwards;
+  transform-origin: left;
+}
+@keyframes aacHoldFill {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+.aac-edit-btn.editing {
+  background: var(--aac-accent);
+  color: #fff;
+  border-color: var(--aac-accent);
+}
+
+.aac-card.empty.add {
+  pointer-events: auto;
+  opacity: 0.6;
+  cursor: pointer !important;
+  border: 2px dashed rgba(108,99,255,0.5) !important;
+  color: var(--aac-accent);
+  font-size: 1.6rem;
+  font-weight: 800;
+  background: rgba(108,99,255,0.05) !important;
+}
+.aac-grid.aac-moving .aac-card.empty.add {
+  opacity: 1;
+  background: rgba(108,99,255,0.15) !important;
+}
+.aac-card.editable { outline: 2px dashed rgba(108,99,255,0.45); outline-offset: -2px; }
+
+.aac-edit-label {
+  display: block;
+  margin: 10px 2px 4px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #4b6079;
+}
+.aac-edit-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1.5px solid rgba(0,0,0,0.15);
+  border-radius: 10px;
+  font-size: 0.95rem;
+}
+.aac-edit-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+}
+.aac-edit-action-btn {
+  flex: 1;
+  min-height: 44px;
+  padding: 10px 8px;
+  border-radius: 12px;
+  border: 1.5px solid rgba(0,0,0,0.12);
+  background: #f0f4f8;
+  color: #4b6079;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.aac-edit-action-btn.primary {
+  background: var(--aac-accent);
+  border-color: var(--aac-accent);
+  color: #fff;
+}
+.aac-edit-action-btn.danger {
+  background: #fdecea;
+  border-color: #f5c6c1;
+  color: #c0392b;
+}
+.aac-settings-grid-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.aac-settings-grid-row .aac-edit-input { width: auto; flex: 1; }
+.aac-settings-check-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 2px 4px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #4b6079;
+  cursor: pointer;
+  min-height: 44px;
+}
+.aac-settings-check-row input { width: 22px; height: 22px; }
+
 /* ---- Kart grid'i ---- */
 .aac-grid-wrap {
   flex: 1;
