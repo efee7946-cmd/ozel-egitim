@@ -5962,9 +5962,17 @@ async function authApi(action, body = {}) {
     }
 }
 
+const _splashShownAt = Date.now();
+let _splashHiding = false;
 function hideSplash() {
     const splash = document.getElementById('splash-screen');
-    if (splash) splash.style.display = 'none';
+    if (!splash || _splashHiding) return;
+    _splashHiding = true;
+    const wait = Math.max(0, 1600 - (Date.now() - _splashShownAt));
+    setTimeout(() => {
+        splash.classList.add('splash-hide');
+        setTimeout(() => { splash.style.display = 'none'; }, 380);
+    }, wait);
 }
 
 async function checkAuthSession() {
