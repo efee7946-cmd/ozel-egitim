@@ -1986,9 +1986,11 @@ video { width: 100%; height: 100%; object-fit: cover; }
     position: relative;
 }
 .sort-wrapper {
+    width: 100%;
     max-width: 640px;
     margin: 0 auto;
     padding: 70px 16px 40px;
+    box-sizing: border-box;
 }
 .sort-menu-header { text-align: center; margin-bottom: 24px; }
 .sort-menu-header h2 { font-size: 1.7rem; color: #2d3a5c; margin-bottom: 6px; }
@@ -2022,7 +2024,7 @@ video { width: 100%; height: 100%; object-fit: cover; }
     justify-content: space-between;
     margin-bottom: 16px;
 }
-.sort-game-title { font-size: 1.15rem; font-weight: 800; color: #2d3a5c; margin: 0; }
+.sort-game-title { font-size: 1.3rem; font-weight: 800; color: #2d3a5c; margin: 0; }
 .sort-score {
     font-size: 1rem; font-weight: 700; color: #6C63FF;
     background: #f0eeff; padding: 4px 16px; border-radius: 20px;
@@ -2030,18 +2032,19 @@ video { width: 100%; height: 100%; object-fit: cover; }
 
 .sort-items-area {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 10px;
-    margin-bottom: 18px;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 22px;
 }
 .sort-item {
     display: flex; flex-direction: column;
     align-items: center; justify-content: center;
-    gap: 4px;
+    gap: 6px;
+    min-height: 96px;
     background: #fff;
     border: 2.5px solid #e0e7ff;
-    border-radius: 14px;
-    padding: 10px 4px 8px;
+    border-radius: 18px;
+    padding: 12px 6px 10px;
     cursor: grab;
     touch-action: none;
     transition: transform 0.12s, border-color 0.12s, box-shadow 0.12s, opacity 0.12s;
@@ -2054,8 +2057,8 @@ video { width: 100%; height: 100%; object-fit: cover; }
     box-shadow: 0 4px 14px rgba(108,99,255,0.2);
     transform: translateY(-2px) scale(1.06);
 }
-.sort-item-emoji { font-size: 2.1rem; line-height: 1.1; }
-.sort-item-label { font-size: 0.62rem; color: #4a5568; font-weight: 600; text-align: center; line-height: 1.2; }
+.sort-item-emoji { font-size: 2.8rem; line-height: 1.1; }
+.sort-item-label { font-size: 0.8rem; color: #4a5568; font-weight: 700; text-align: center; line-height: 1.2; }
 .sort-item-selected {
     border-color: #6C63FF !important;
     background: #f0eeff !important;
@@ -2099,13 +2102,13 @@ video { width: 100%; height: 100%; object-fit: cover; }
     margin-top: 6px;
 }
 .sort-basket {
-    border-radius: 20px;
-    padding: 18px 10px 14px;
+    border-radius: 24px;
+    padding: 22px 10px 16px;
     text-align: center;
-    border: 2.5px dashed rgba(0,0,0,0.14);
+    border: 3px dashed rgba(0,0,0,0.16);
     transition: transform 0.12s, border-color 0.12s, box-shadow 0.12s;
     cursor: pointer;
-    min-height: 120px;
+    min-height: 150px;
     touch-action: manipulation;
 }
 .sort-basket-hover {
@@ -2123,8 +2126,8 @@ video { width: 100%; height: 100%; object-fit: cover; }
     border-style: solid;
     animation: basketReadyPulse 1.1s ease-in-out infinite;
 }
-.sort-basket-emoji { font-size: 2.6rem; }
-.sort-basket-label { font-size: 0.92rem; font-weight: 700; color: #2d3a5c; margin: 5px 0 3px; }
+.sort-basket-emoji { font-size: 3.4rem; }
+.sort-basket-label { font-size: 1.08rem; font-weight: 800; color: #2d3a5c; margin: 6px 0 3px; }
 .sort-basket-count { font-size: 1.4rem; font-weight: 800; color: #6C63FF; min-height: 28px; }
 
 .sort-complete { text-align: center; padding: 40px 16px 20px; }
@@ -2206,8 +2209,8 @@ video { width: 100%; height: 100%; object-fit: cover; }
     .question-bar { font-size: 1.1rem; padding: 10px; }
     .btn-mic { width: 70px; height: 70px; font-size: 2.2rem; }
     .mic-ring { width: 70px; height: 70px; }
-    .sort-items-area { grid-template-columns: repeat(4, 1fr); gap: 8px; }
-    .sort-item-emoji { font-size: 1.8rem; }
+    .sort-items-area { grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .sort-item-emoji { font-size: 2.5rem; }
     .sort-menu-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
     .sort-menu-card { padding: 14px 10px; }
     .sort-menu-icon { font-size: 1.9rem; }
@@ -3876,6 +3879,7 @@ body.a11y-reduce-motion * { transition: none !important; animation: none !import
     width: 100%;
     max-width: 520px;
     min-height: 100vh;
+    margin: 0 auto;
     background: linear-gradient(180deg, #f0f4ff 0%, #fff 60%);
     box-sizing: border-box;
     padding: 0 20px 40px;
@@ -3888,7 +3892,21 @@ body.a11y-reduce-motion * { transition: none !important; animation: none !import
     gap: 20px;
     padding-top: 40px;
 }
-.login-logo { width: 72px; height: 72px; border-radius: 18px; }
+.login-logo {
+    width: 96px; height: 96px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid #fff;
+    box-shadow: 0 10px 28px rgba(40,84,145,0.2);
+    background: #fff;
+}
+.login-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    text-align: center;
+}
 .login-title {
     font-size: 1.8rem; font-weight: 900; color: #1a2f4a;
     margin: 0; text-align: center;
@@ -3896,8 +3914,9 @@ body.a11y-reduce-motion * { transition: none !important; animation: none !import
 .login-subtitle { margin: 0; color: #7a8fa8; font-size: 1rem; }
 .login-students {
     width: 100%;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     gap: 14px;
 }
 .login-student-card {
@@ -3905,17 +3924,24 @@ body.a11y-reduce-motion * { transition: none !important; animation: none !import
     flex-direction: column;
     align-items: center;
     gap: 10px;
+    width: 140px;
     background: white;
     border: 2.5px solid #e4edf8;
     border-radius: 22px;
-    padding: 22px 12px;
+    padding: 18px 12px;
     cursor: pointer;
     transition: all 0.2s;
     box-shadow: 0 4px 16px rgba(40,84,145,0.06);
 }
 .login-student-card:hover { transform: translateY(-4px); border-color: #a8c8ff; box-shadow: 0 12px 32px rgba(40,84,145,0.12); }
 .login-student-card:active { transform: scale(0.97); }
-.login-student-emoji { font-size: 3rem; line-height: 1; }
+.login-student-emoji {
+    width: 68px; height: 68px;
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(180deg, #f0f6ff, #e4edf8);
+    border-radius: 50%;
+    font-size: 2.3rem; line-height: 1;
+}
 .login-student-name { font-size: 0.9rem; font-weight: 800; color: #1a2f4a; text-align: center; }
 .login-empty { text-align: center; padding: 32px; color: #a0b4c8; font-size: 0.9rem; line-height: 1.7; }
 
@@ -4908,7 +4934,7 @@ body.a11y-reduce-motion * { transition: none !important; animation: none !import
    RESPONSIVE
    ============================================= */
 @media (max-width: 480px) {
-    .login-students { grid-template-columns: repeat(2, 1fr); }
+    .login-student-card { width: calc(50% - 8px); }
     .iep-form-row { grid-template-columns: 1fr; }
     .iep-trial-btns { gap: 8px; }
     .skills-grid { grid-template-columns: 1fr; }
@@ -5373,8 +5399,8 @@ body.has-bottom-nav #behavior-screen {
 
 /* Öğrenci kartı iskeleti */
 .login-student-card.skeleton {
-    height: 100px;
-    width: 100%;
+    height: 120px;
+    width: 140px;
     border-radius: 16px;
 }
 
