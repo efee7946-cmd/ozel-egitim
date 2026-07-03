@@ -4165,7 +4165,9 @@ function _updateTherapyAacSentence() {
 async function submitTherapyAacAnswer() {
     if (!_thAacSentence.length) return;
     const micBtn = document.getElementById('micBtn');
-    if (isWaiting || (micBtn && micBtn.disabled)) {
+    // micBtn aktif = uygulama cevap bekliyor (isWaiting soru okununca true
+    // kalir, "AI konusuyor" anlamina gelmez — kapi olarak kullanilamaz)
+    if (micBtn && micBtn.disabled) {
         showToast(t('therapy_wait_turn'));
         return;
     }
