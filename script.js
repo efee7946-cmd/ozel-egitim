@@ -69,7 +69,7 @@ const STRINGS = {
     setup_btn: 'Başla',
     menu_greeting_default: 'Merhaba!',
     menu_therapy: 'Konuşma Pratiği',
-    menu_schedule: 'Günlük Plan',
+    menu_schedule: 'Günlük Görevler',
     menu_skills: 'Beceri Takibi',
     menu_behavior: 'Davranış',
     menu_bep: 'BEP',
@@ -237,15 +237,6 @@ const STRINGS = {
     data_saved: 'Kaydedildi',
     copy_success: 'Kopyalandı',
     no_student: 'Öğrenci seçilmedi',
-    // Schedule ekranı
-    schedule_empty: 'Henüz etkinlik eklenmedi.',
-    schedule_help: '"+ Etkinlik Ekle" butonuyla bu öğrencinin programını oluşturun.',
-    schedule_progress: '{done} / {total} tamamlandı',
-    schedule_activity_done: '{label} tamamlandı!',
-    schedule_undo: 'Geri al',
-    schedule_mark_done: 'Tamamlandı işaretle',
-    schedule_delete: 'Sil',
-    schedule_activity_ph: 'Etkinlik adı',
     // Skills ekranı
     skill_mastered: 'Kazanıldı!',
     skill_learning_status: 'Öğreniliyor',
@@ -761,7 +752,7 @@ const STRINGS = {
     bottom_nav_home: 'Ana Ekran',
     bottom_nav_therapy: 'Konuşma',
     bottom_nav_aac: 'AAC',
-    bottom_nav_schedule: 'Program',
+    bottom_nav_schedule: 'Görevler',
     bottom_nav_analysis: 'Analiz',
     mic_prompt: 'Konuşmak için mikrofona bas!',
     welcome_sub: 'Bugün ne yapmak istersin?',
@@ -892,9 +883,15 @@ const STRINGS = {
     student_notes_ph: 'Destek notu, ilgi alanı...',
     btn_create: 'Oluştur',
     auth_waiting: 'Bekleniyor...',
-    schedule_screen_title: '📅 Günlük Program',
-    schedule_add_btn: '✓ Ekle',
-    schedule_reset: '🔄 Günü Sıfırla',
+    schedule_screen_title: '🎯 Günlük Görevler',
+    schedule_sub: 'Her gün farklı görevler seni bekliyor. Tamamladıkça yıldız kazanırsın!',
+    task_therapy: '🎤 {n} konuşma pratiği seansı tamamla',
+    task_sort: '🧺 {n} sınıflandırma oyunu tamamla',
+    task_sequence: '🧩 {n} sıralama/sebep-sonuç oyunu tamamla',
+    task_completed: '✓ Görev tamamlandı: {label} — +5 ⭐',
+    task_all_done_toast: '🏆 Bugünün tüm görevlerini bitirdin! +10 ⭐ bonus',
+    task_all_done_title: 'Bugünü Tamamladın!',
+    task_all_done_sub: 'Yarın yeni görevler seni bekliyor. Harikasın!',
     behavior_new_entry: 'Yeni Kayıt',
     behavior_history: 'Geçmiş Kayıtlar',
     behavior_consequence_ph: 'Ne yapıldı?',
@@ -906,7 +903,6 @@ const STRINGS = {
     aac_photo_hint: 'Türkçe veya İngilizce kelime yaz, fotoğraflar gelsin.',
     aac_card_name_ph: 'Kart adı yaz...',
     a11y_account: 'Hesap',
-    schedule_add_activity: '+ Etkinlik Ekle',
     iep_new_goal: 'Yeni Hedef Ekle',
     iep_domain: 'Alan',
     iep_target_date: 'Hedef Tarih',
@@ -946,8 +942,8 @@ const STRINGS = {
     analysis_trend_col_pct: 'Bağımsız %',
     ob_step1_title: 'Konuşma Pratiği ile başlayın',
     ob_step1_text: 'Bir konu yazın (örn. "alışveriş"), Yıldız Can o konuda sorular sorsun. Çocuk mikrofona konuşarak yanıt verir, anında teşvik alır.',
-    ob_step2_title: 'Program ve AAC her zaman elinizde',
-    ob_step2_text: 'Günlük Program ile rutinleri görselleştirin, AAC panosuyla konuşamayan anlarda kartlara dokunarak iletişim kurun.',
+    ob_step2_title: 'Günlük Görevler ve AAC her zaman elinizde',
+    ob_step2_text: 'Günlük Görevler ile çocuğu her gün farklı hedeflere yönlendirin, AAC panosuyla konuşamayan anlarda kartlara dokunarak iletişim kurun.',
     ob_step3_title: 'Gelişim kendiliğinden kaydedilir',
     ob_step3_text: 'Her seans otomatik kaydedilir. Analiz ekranında gelişim grafiğini görün, veli raporu ve BEP taslağı oluşturun.',
     ob_skip: 'Atla',
@@ -1038,7 +1034,7 @@ const STRINGS = {
     setup_btn: 'Start',
     menu_greeting_default: 'Hello!',
     menu_therapy: 'Speech Practice',
-    menu_schedule: 'Daily Schedule',
+    menu_schedule: 'Daily Tasks',
     menu_skills: 'Skill Tracking',
     menu_behavior: 'Behavior',
     menu_bep: 'IEP',
@@ -1205,15 +1201,6 @@ const STRINGS = {
     data_saved: 'Saved',
     copy_success: 'Copied',
     no_student: 'No student selected',
-    // Schedule screen
-    schedule_empty: 'No activities added yet.',
-    schedule_help: 'Use the "+ Add Activity" button to build this student\'s schedule.',
-    schedule_progress: '{done} / {total} completed',
-    schedule_activity_done: '{label} completed!',
-    schedule_undo: 'Undo',
-    schedule_mark_done: 'Mark as completed',
-    schedule_delete: 'Delete',
-    schedule_activity_ph: 'Activity name',
     // Skills screen
     skill_mastered: 'Mastered!',
     skill_learning_status: 'Learning',
@@ -1729,7 +1716,7 @@ const STRINGS = {
     bottom_nav_home: 'Home',
     bottom_nav_therapy: 'Speech',
     bottom_nav_aac: 'AAC',
-    bottom_nav_schedule: 'Schedule',
+    bottom_nav_schedule: 'Tasks',
     bottom_nav_analysis: 'Analysis',
     mic_prompt: 'Press the microphone to speak!',
     welcome_sub: 'What would you like to do today?',
@@ -1860,9 +1847,15 @@ const STRINGS = {
     student_notes_ph: 'Support note, interests...',
     btn_create: 'Create',
     auth_waiting: 'Please wait...',
-    schedule_screen_title: '📅 Daily Schedule',
-    schedule_add_btn: '✓ Add',
-    schedule_reset: '🔄 Reset Day',
+    schedule_screen_title: '🎯 Daily Tasks',
+    schedule_sub: 'Different tasks await you every day. Complete them to earn stars!',
+    task_therapy: '🎤 Complete {n} speech practice session(s)',
+    task_sort: '🧺 Complete {n} classification game(s)',
+    task_sequence: '🧩 Complete {n} sequencing/cause-effect game(s)',
+    task_completed: '✓ Task complete: {label} — +5 ⭐',
+    task_all_done_toast: '🏆 You finished all of today\'s tasks! +10 ⭐ bonus',
+    task_all_done_title: 'You Completed Today!',
+    task_all_done_sub: 'New tasks await tomorrow. You\'re amazing!',
     behavior_new_entry: 'New Entry',
     behavior_history: 'Past Entries',
     behavior_consequence_ph: 'What was done?',
@@ -1874,7 +1867,6 @@ const STRINGS = {
     aac_photo_hint: 'Type a Turkish or English word to get photos.',
     aac_card_name_ph: 'Type a card name...',
     a11y_account: 'Account',
-    schedule_add_activity: '+ Add Activity',
     iep_new_goal: 'Add New Goal',
     iep_domain: 'Domain',
     iep_target_date: 'Target Date',
@@ -1914,8 +1906,8 @@ const STRINGS = {
     analysis_trend_col_pct: 'Independent %',
     ob_step1_title: 'Start with Speech Practice',
     ob_step1_text: 'Type a topic (e.g. "shopping") and Yıldız Can will ask questions about it. The child answers by speaking into the microphone and gets instant encouragement.',
-    ob_step2_title: 'Schedule and AAC always at hand',
-    ob_step2_text: 'Visualize routines with the Daily Schedule, and use the AAC board to communicate by tapping cards when speaking is hard.',
+    ob_step2_title: 'Daily Tasks and AAC always at hand',
+    ob_step2_text: 'Daily Tasks guide the child toward a different goal every day, and use the AAC board to communicate by tapping cards when speaking is hard.',
     ob_step3_title: 'Progress is recorded automatically',
     ob_step3_text: 'Every session is saved automatically. See the progress chart on the Analysis screen and generate parent reports and IEP drafts.',
     ob_skip: 'Skip',
@@ -4030,6 +4022,7 @@ function _showSortComplete() {
     if (!gameSection) return;
     _saveSortResult().catch(() => {});
     addStars(_sortErrors === 0 ? 3 : (_sortErrors <= 2 ? 2 : 1));
+    incrementDailyTask('sort');
     confetti({ particleCount: 120, spread: 90 });
     speakFallback(t('sort_complete_title') + ' ' + (_lang === 'en' ? 'Well done!' : 'Çok güzel yaptın!'), () => {});
     gameSection.innerHTML = `
@@ -4209,6 +4202,7 @@ function showTherapySessionComplete() {
     document.getElementById('micBtn').disabled = true;
     document.getElementById('nextBtn').classList.remove('pulse-anim');
     document.querySelectorAll('#therapyMainCard .therapy-session-ui').forEach(el => el.style.display = 'none');
+    incrementDailyTask('therapy');
     confetti({ particleCount: 120, spread: 90 });
     speakFallback(t('therapy_complete_msg'), () => {});
     const card = document.getElementById('therapyMainCard');
@@ -4865,29 +4859,65 @@ async function speakWithLipsync(text, onEnd, emotion = CharacterEmotion.NEUTRAL)
 // =============================================
 // Activities (the list itself) are per-student and persist across days.
 // Completion status is per-student per-day.
-function scheduleActivitiesKey() {
-    return `sched_acts_${activeStudentId || 'default'}`;
-}
-function scheduleCompletionKey() {
-    const today = new Date().toISOString().slice(0, 10);
-    return `sched_done_${activeStudentId || 'default'}_${today}`;
+// =============================================
+// GÜNLÜK GÖREVLER (daily quest sistemi)
+// =============================================
+function _dailyDateKey() { return new Date().toISOString().slice(0, 10); }
+function _dailyProgressKey() {
+    return `daily_${activeStudentId || 'default'}_${_dailyDateKey()}`;
 }
 
-function loadScheduleActivities() {
-    const raw = localStorage.getItem(scheduleActivitiesKey());
-    if (raw) { try { return JSON.parse(raw); } catch(e) {} }
-    return [];
+function _seededRandom(seedStr) {
+    let h = 0;
+    for (let i = 0; i < seedStr.length; i++) { h = (h * 31 + seedStr.charCodeAt(i)) >>> 0; }
+    return function () { h = (h * 1103515245 + 12345) >>> 0; return (h % 10000) / 10000; };
 }
-function saveScheduleActivities(acts) {
-    localStorage.setItem(scheduleActivitiesKey(), JSON.stringify(acts));
+
+const DAILY_TASK_DEFS = {
+    therapy:  { icon: '🎤', choices: [1, 1, 2],    get key() { return 'task_therapy'; },  action: 'goToTherapy' },
+    sort:     { icon: '🧺', choices: [2, 3, 3, 4], get key() { return 'task_sort'; },     action: 'goToSort' },
+    sequence: { icon: '🧩', choices: [2, 2, 3],    get key() { return 'task_sequence'; }, action: 'goToSequence' },
+};
+
+function getDailyTasks() {
+    const seed = _seededRandom(_dailyDateKey() + ':' + (activeStudentId || 'default'));
+    return Object.entries(DAILY_TASK_DEFS).map(([type, def]) => {
+        const target = def.choices[Math.floor(seed() * def.choices.length)];
+        return { type, target, icon: def.icon, action: def.action, get label() { return t(def.key).replace('{n}', target); } };
+    });
 }
-function loadScheduleCompletion() {
-    const raw = localStorage.getItem(scheduleCompletionKey());
-    if (raw) { try { return JSON.parse(raw); } catch(e) {} }
-    return {};
+
+function loadDailyProgress() {
+    const raw = localStorage.getItem(_dailyProgressKey());
+    const p = raw ? (() => { try { return JSON.parse(raw); } catch (e) { return {}; } })() : {};
+    p.counts = p.counts || { therapy: 0, sort: 0, sequence: 0 };
+    p.claimed = p.claimed || { therapy: false, sort: false, sequence: false, all: false };
+    return p;
 }
-function saveScheduleCompletion(done) {
-    localStorage.setItem(scheduleCompletionKey(), JSON.stringify(done));
+function saveDailyProgress(p) {
+    localStorage.setItem(_dailyProgressKey(), JSON.stringify(p));
+}
+
+function incrementDailyTask(type) {
+    const p = loadDailyProgress();
+    p.counts[type] = (p.counts[type] || 0) + 1;
+    const tasks = getDailyTasks();
+    const task = tasks.find(x => x.type === type);
+    if (task && !p.claimed[type] && p.counts[type] >= task.target) {
+        p.claimed[type] = true;
+        addStars(5);
+        showToast(t('task_completed').replace('{label}', task.label));
+        if (tasks.every(x => p.claimed[x.type]) && !p.claimed.all) {
+            p.claimed.all = true;
+            setTimeout(() => {
+                addStars(10);
+                showToast(t('task_all_done_toast'));
+                if (typeof confetti === 'function') confetti({ particleCount: 150, spread: 100 });
+            }, 900);
+        }
+    }
+    saveDailyProgress(p);
+    if (currentScreenId === 'schedule-screen') renderDailyTasks();
 }
 
 function goToSchedule() {
@@ -4895,101 +4925,36 @@ function goToSchedule() {
     const today = new Date();
     document.getElementById('scheduleDate').textContent =
         today.toLocaleDateString(_lang === 'en' ? 'en-US' : 'tr-TR', { weekday: 'long', day: 'numeric', month: 'long' });
-    cancelAddActivity();
-    renderSchedule();
+    renderDailyTasks();
 }
 
-function renderSchedule() {
-    const activities = loadScheduleActivities();
-    const done = loadScheduleCompletion();
+function renderDailyTasks() {
+    const tasks = getDailyTasks();
+    const progress = loadDailyProgress();
     const list = document.getElementById('scheduleList');
-    const progressWrap = document.getElementById('scheduleProgressWrap');
-    const resetBtn = document.getElementById('scheduleResetBtn');
+    if (!list) return;
 
-    if (!activities.length) {
-        list.innerHTML = `
-            <div class="schedule-empty">
-                <span>📋</span>
-                <p>${t('schedule_empty')}</p>
-                <p><strong>${t('schedule_help')}</strong></p>
-            </div>`;
-        progressWrap.style.display = 'none';
-        resetBtn.style.display = 'none';
-        return;
-    }
+    const allDone = tasks.every(t2 => progress.claimed[t2.type]);
 
-    progressWrap.style.display = '';
-    resetBtn.style.display = '';
-    const doneCount = activities.filter(a => done[a.id]).length;
-    const pct = Math.round((doneCount / activities.length) * 100);
-    document.getElementById('scheduleProgress').textContent =
-        t('schedule_progress').replace('{done}', doneCount).replace('{total}', activities.length);
-    document.getElementById('scheduleProgressFill').style.width = pct + '%';
-
-    list.innerHTML = activities.map(a => `
-        <div class="schedule-item ${done[a.id] ? 'done' : ''}">
-            <button class="schedule-check-btn" onclick="toggleScheduleActivity('${escapeHtml(a.id)}')"
-                aria-label="${done[a.id] ? t('schedule_undo') : t('schedule_mark_done')}">
-                ${done[a.id] ? '✅' : '⬜'}
-            </button>
-            <span class="schedule-item-emoji">${escapeHtml(a.emoji)}</span>
-            <span class="schedule-item-label">${escapeHtml(a.label)}</span>
-            ${a.time ? `<span class="schedule-item-time">${escapeHtml(a.time)}</span>` : ''}
-            <button class="schedule-delete-btn" onclick="deleteScheduleActivity('${escapeHtml(a.id)}')"
-                aria-label="${t('schedule_delete')}">✕</button>
-        </div>
-    `).join('');
-}
-
-function showAddActivityForm() {
-    document.getElementById('scheduleAddForm').style.display = '';
-    document.getElementById('scheduleLabelInput').focus();
-}
-
-function cancelAddActivity() {
-    const form = document.getElementById('scheduleAddForm');
-    if (form) form.style.display = 'none';
-    ['scheduleEmojiInput','scheduleLabelInput','scheduleTimeInput'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.value = '';
-    });
-}
-
-function saveNewActivity() {
-    const emoji = (document.getElementById('scheduleEmojiInput').value.trim()) || '📌';
-    const label = document.getElementById('scheduleLabelInput').value.trim();
-    const time  = document.getElementById('scheduleTimeInput').value;
-    if (!label) { document.getElementById('scheduleLabelInput').focus(); return; }
-    const acts = loadScheduleActivities();
-    acts.push({ id: 'a_' + Date.now(), emoji, label, time });
-    saveScheduleActivities(acts);
-    cancelAddActivity();
-    renderSchedule();
-}
-
-function deleteScheduleActivity(id) {
-    saveScheduleActivities(loadScheduleActivities().filter(a => a.id !== id));
-    const done = loadScheduleCompletion();
-    delete done[id];
-    saveScheduleCompletion(done);
-    renderSchedule();
-}
-
-function toggleScheduleActivity(id) {
-    const done = loadScheduleCompletion();
-    const wasDone = !!done[id];
-    if (wasDone) { delete done[id]; } else { done[id] = true; }
-    saveScheduleCompletion(done);
-    if (!wasDone) {
-        const act = loadScheduleActivities().find(a => a.id === id);
-        if (act) speakFallback(t('schedule_activity_done').replace('{label}', act.label));
-    }
-    renderSchedule();
-}
-
-function resetSchedule() {
-    saveScheduleCompletion({});
-    renderSchedule();
+    list.innerHTML = tasks.map(task => {
+        const count = Math.min(progress.counts[task.type] || 0, task.target);
+        const done = progress.claimed[task.type];
+        const pct = Math.round((count / task.target) * 100);
+        return `
+            <button type="button" class="task-card${done ? ' done' : ''}" onclick="${task.action}()">
+                <span class="task-icon">${done ? '✅' : task.icon}</span>
+                <span class="task-body">
+                    <span class="task-label">${escapeHtml(task.label)}</span>
+                    <span class="task-progress-track"><span class="task-progress-fill" style="width:${pct}%"></span></span>
+                    <span class="task-progress-text">${count} / ${task.target}</span>
+                </span>
+            </button>`;
+    }).join('') + (allDone ? `
+        <div class="task-all-done">
+            <span>🎉</span>
+            <strong>${t('task_all_done_title')}</strong>
+            <p>${t('task_all_done_sub')}</p>
+        </div>` : '');
 }
 
 // =============================================
@@ -5934,6 +5899,7 @@ function tapSequenceCard(cardIndex) {
                 speakFallback(t('seq_correct_order_speak'));
                 if (typeof confetti === 'function') confetti({ particleCount: 80, spread: 60, origin: {y: 0.6} });
                 addStars(seqState.errors === 0 ? 3 : (seqState.errors <= 2 ? 2 : 1));
+                incrementDailyTask('sequence');
             }, 300);
         }
     } else {
@@ -6018,6 +5984,7 @@ function selectEffect(i) {
                 speakFallback(t('seq_all_pairs_found_speak'));
                 if (typeof confetti === 'function') confetti({ particleCount: 80, spread: 60, origin: {y: 0.6} });
                 addStars(seqState.errors === 0 ? 3 : (seqState.errors <= 2 ? 2 : 1));
+                incrementDailyTask('sequence');
             }, 300);
         }
     } else {
@@ -6134,12 +6101,6 @@ window.rereadQuestion = rereadQuestion;
 window.askAIMode = askAIMode;
 // Yeni özellikler
 window.goToSchedule = goToSchedule;
-window.showAddActivityForm = showAddActivityForm;
-window.cancelAddActivity = cancelAddActivity;
-window.saveNewActivity = saveNewActivity;
-window.deleteScheduleActivity = deleteScheduleActivity;
-window.toggleScheduleActivity = toggleScheduleActivity;
-window.resetSchedule = resetSchedule;
 window.goToAac = goToAac;
 window.setAacBoard = setAacBoard;
 window.tapAacCard = tapAacCard;

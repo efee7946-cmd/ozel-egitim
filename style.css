@@ -3603,124 +3603,60 @@ body.a11y-reduce-motion * { transition: none !important; animation: none !import
     font-weight: 700;
     white-space: nowrap;
 }
-.schedule-progress-wrap {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-.schedule-progress-track {
-    flex: 1;
-    height: 10px;
-    background: #ffe0b2;
-    border-radius: 5px;
-    overflow: hidden;
-}
-.schedule-progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #ff9f43, #ff6b35);
-    border-radius: 5px;
-    transition: width 0.4s ease;
-}
-.schedule-progress-text { font-size: 0.82rem; color: #7a8fa8; white-space: nowrap; }
+.schedule-sub { margin: 0; font-size: 0.86rem; color: #7a8fa8; line-height: 1.4; }
 
-.schedule-list { display: flex; flex-direction: column; gap: 10px; }
-.schedule-item {
+.schedule-list { display: flex; flex-direction: column; gap: 12px; }
+.task-card {
     display: flex;
     align-items: center;
     gap: 14px;
+    width: 100%;
+    text-align: left;
     background: white;
     border: 2px solid #ffe0b2;
-    border-radius: 16px;
-    padding: 14px 16px;
+    border-radius: 18px;
+    padding: 16px;
     cursor: pointer;
     transition: all 0.18s ease;
     box-shadow: 0 2px 8px rgba(255,159,67,0.07);
-    user-select: none;
 }
-.schedule-item:hover { border-color: #ff9f43; transform: translateX(4px); }
-.schedule-item.done {
-    background: #fff5e6;
-    border-color: #ff9f43;
-    opacity: 0.8;
+.task-card:hover { border-color: #ff9f43; transform: translateY(-2px); }
+.task-card.done {
+    background: #f0fff4;
+    border-color: #38a169;
+    opacity: 0.85;
 }
-.schedule-item.done .schedule-item-label { text-decoration: line-through; color: #a0a8b4; }
-.schedule-item-time { font-size: 0.76rem; color: #7a8fa8; min-width: 36px; font-weight: 600; margin-left: auto; }
-.schedule-item-emoji { font-size: 1.5rem; }
-.schedule-item-label { flex: 1; font-size: 0.93rem; font-weight: 600; color: #1a2f4a; }
-.schedule-check-btn {
-    background: none; border: none; font-size: 1.3rem;
-    cursor: pointer; padding: 0; flex-shrink: 0;
+.task-icon { font-size: 1.8rem; flex-shrink: 0; }
+.task-body { flex: 1; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.task-label { font-size: 0.92rem; font-weight: 700; color: #1a2f4a; }
+.task-card.done .task-label { color: #2f855a; }
+.task-progress-track {
+    height: 8px;
+    background: #ffe0b2;
+    border-radius: 4px;
+    overflow: hidden;
 }
-.schedule-delete-btn {
-    background: none; border: none; color: #c8d0de;
-    font-size: 0.8rem; cursor: pointer; padding: 4px 6px;
-    border-radius: 6px; transition: all 0.15s; flex-shrink: 0;
+.task-card.done .task-progress-track { background: #c6f6d5; }
+.task-progress-fill {
+    display: block;
+    height: 100%;
+    background: linear-gradient(90deg, #ff9f43, #ff6b35);
+    border-radius: 4px;
+    transition: width 0.4s ease;
 }
-.schedule-delete-btn:hover { background: #fde8e8; color: #e74c3c; }
+.task-card.done .task-progress-fill { background: linear-gradient(90deg, #38a169, #2f855a); }
+.task-progress-text { font-size: 0.76rem; color: #7a8fa8; font-weight: 600; }
 
-.schedule-empty {
+.task-all-done {
     text-align: center;
-    padding: 48px 24px;
-    color: #a0b4c8;
+    padding: 28px 20px;
+    background: linear-gradient(135deg, #fff8ec, #fff);
+    border: 2px dashed #f7b520;
+    border-radius: 18px;
 }
-.schedule-empty span { font-size: 3rem; display: block; margin-bottom: 12px; }
-.schedule-empty p { margin: 4px 0; font-size: 0.9rem; line-height: 1.5; }
-
-.schedule-add-form {
-    background: white;
-    border: 2px solid #ff9f43;
-    border-radius: 16px;
-    padding: 14px 16px;
-    margin-bottom: 14px;
-    box-shadow: 0 4px 16px rgba(255,159,67,0.12);
-}
-.schedule-form-row {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    margin-bottom: 10px;
-}
-.schedule-emoji-input {
-    width: 48px; text-align: center; font-size: 1.3rem;
-    border: 2px solid #ffe0b2; border-radius: 10px; padding: 8px 4px;
-}
-.schedule-label-input {
-    flex: 1; border: 2px solid #ffe0b2; border-radius: 10px;
-    padding: 8px 12px; font-size: 0.9rem;
-}
-.schedule-time-input {
-    border: 2px solid #ffe0b2; border-radius: 10px;
-    padding: 8px 10px; font-size: 0.85rem; width: 96px;
-}
-.schedule-form-actions { display: flex; gap: 8px; }
-.schedule-save-btn {
-    flex: 1; background: #ff9f43; border: none; border-radius: 10px;
-    padding: 10px; font-size: 0.9rem; font-weight: 700; color: white;
-    cursor: pointer; transition: background 0.15s;
-}
-.schedule-save-btn:hover { background: #e07020; }
-.schedule-cancel-btn {
-    background: #f0f3f8; border: 2px solid #dde3ee; border-radius: 10px;
-    padding: 10px 18px; font-size: 0.88rem; font-weight: 600; color: #7a8fa8;
-    cursor: pointer;
-}
-
-.schedule-footer-btns { margin-top: 16px; display: flex; gap: 10px; flex-wrap: wrap; }
-.schedule-add-btn {
-    flex: 1;
-    background: linear-gradient(135deg, #ff9f43, #ffbe76);
-    border: none; border-radius: 14px; padding: 14px;
-    font-size: 0.95rem; font-weight: 800; color: white;
-    cursor: pointer; transition: all 0.18s;
-    box-shadow: 0 4px 16px rgba(255,159,67,0.3);
-}
-.schedule-add-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(255,159,67,0.4); }
-.schedule-reset-btn {
-    background: #fff5e6; border: 2px solid #ff9f43; border-radius: 14px;
-    padding: 14px 20px; font-size: 0.88rem; font-weight: 700; color: #e07020;
-    cursor: pointer; transition: all 0.18s;
-}
-.schedule-reset-btn:hover { background: #ff9f43; color: white; }
+.task-all-done span { font-size: 2.6rem; display: block; margin-bottom: 8px; }
+.task-all-done strong { display: block; font-size: 1.05rem; color: #1a2f4a; margin-bottom: 4px; }
+.task-all-done p { margin: 0; font-size: 0.86rem; color: #7a8fa8; }
 
 /* ======================================================
    AAC PANOSU

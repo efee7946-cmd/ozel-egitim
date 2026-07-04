@@ -340,8 +340,8 @@
             <span class="tile-label" data-i18n="menu_therapy">Konuşma Pratiği</span>
         </button>
         <button class="menu-tile tile-schedule" type="button" onclick="goToSchedule()">
-            <span class="tile-icon">📅</span>
-            <span class="tile-label" data-i18n="menu_schedule">Günlük Program</span>
+            <span class="tile-icon">🎯</span>
+            <span class="tile-label" data-i18n="menu_schedule">Günlük Görevler</span>
         </button>
         <button class="menu-tile tile-aac" type="button" onclick="goToAac()">
             <span class="tile-icon">🗣️</span>
@@ -394,8 +394,8 @@
         <span class="bottom-nav-label" data-i18n="bottom_nav_games">Oyunlar</span>
     </button>
     <button class="bottom-nav-item" id="bnSchedule" onclick="goToSchedule()">
-        <span class="bottom-nav-icon">📅</span>
-        <span class="bottom-nav-label" data-i18n="bottom_nav_schedule">Program</span>
+        <span class="bottom-nav-icon">🎯</span>
+        <span class="bottom-nav-label" data-i18n="bottom_nav_schedule">Görevler</span>
     </button>
     <button class="bottom-nav-item" id="bnAnalysis" onclick="goToAnalysis()">
         <span class="bottom-nav-icon">📊</span>
@@ -638,39 +638,13 @@ document.addEventListener('DOMContentLoaded', function(){
     <div class="schedule-wrapper">
         <div class="schedule-header">
             <div class="schedule-title-row">
-                <h2 class="schedule-title" data-i18n="schedule_screen_title">📅 Günlük Program</h2>
+                <h2 class="schedule-title" data-i18n="schedule_screen_title">🎯 Günlük Görevler</h2>
                 <span class="schedule-date-badge" id="scheduleDate"></span>
             </div>
-            <div class="schedule-progress-wrap" id="scheduleProgressWrap" style="display:none">
-                <div class="schedule-progress-track">
-                    <div class="schedule-progress-fill" id="scheduleProgressFill"></div>
-                </div>
-                <span class="schedule-progress-text" id="scheduleProgress"></span>
-            </div>
-        </div>
-
-        <!-- Etkinlik ekleme formu -->
-        <div class="schedule-add-form" id="scheduleAddForm" style="display:none">
-            <div class="schedule-form-row">
-                <input type="text" id="scheduleEmojiInput" class="schedule-emoji-input"
-                    placeholder="📌" maxlength="4">
-                <input type="text" id="scheduleLabelInput" class="schedule-label-input"
-                    data-i18n-placeholder="schedule_activity_ph" placeholder="Etkinlik adı" maxlength="60">
-                <input type="time" id="scheduleTimeInput" class="schedule-time-input">
-            </div>
-            <div class="schedule-form-actions">
-                <button type="button" class="schedule-save-btn" onclick="saveNewActivity()" data-i18n="schedule_add_btn">✓ Ekle</button>
-                <button type="button" class="schedule-cancel-btn" onclick="cancelAddActivity()" data-i18n="cancel">İptal</button>
-            </div>
+            <p class="schedule-sub" data-i18n="schedule_sub">Her gün farklı görevler seni bekliyor. Tamamladıkça yıldız kazanırsın!</p>
         </div>
 
         <div class="schedule-list" id="scheduleList"></div>
-
-        <div class="schedule-footer-btns">
-            <button type="button" class="schedule-add-btn" onclick="showAddActivityForm()" data-i18n="schedule_add_activity">+ Etkinlik Ekle</button>
-            <button type="button" class="schedule-reset-btn" id="scheduleResetBtn"
-                onclick="resetSchedule()" style="display:none" data-i18n="schedule_reset">🔄 Günü Sıfırla</button>
-        </div>
     </div>
 </div>
 
