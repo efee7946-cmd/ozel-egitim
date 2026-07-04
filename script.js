@@ -80,6 +80,12 @@ const STRINGS = {
     menu_store: 'Giyim Mağazası',
     menu_parent_report: 'Veli Raporu',
     stars_earned: '+{n} ⭐ kazandın!',
+    star_info_title: '⭐ Yıldızlar Nasıl Kazanılır?',
+    star_info_therapy: 'Konuşma pratiğinde yardım almadan mikrofona konuşarak',
+    star_info_sort: 'Sınıflandırma oyunlarını hatasız veya az hatayla tamamlayarak',
+    star_info_sequence: 'Sıralama ve Sebep-Sonuç oyunlarını tamamlayarak',
+    star_info_purpose: "Kazandığın yıldızları Giyim Mağazası'nda ayı için şapka, gözlük ve daha fazla aksesuar satın almak için harcayabilirsin!",
+    star_info_goto_store: 'Giyim Mağazasına Git',
     store_title: '👗 Giyim Mağazası',
     store_cat_all: 'Tümü',
     store_cat_hat: 'Şapkalar',
@@ -1043,6 +1049,12 @@ const STRINGS = {
     menu_store: 'Clothing Store',
     menu_parent_report: 'Parent Report',
     stars_earned: 'You earned +{n} ⭐!',
+    star_info_title: '⭐ How to Earn Stars?',
+    star_info_therapy: 'Speak into the microphone without help during speech practice',
+    star_info_sort: 'Complete classification games with no or few mistakes',
+    star_info_sequence: 'Complete Sequencing and Cause & Effect games',
+    star_info_purpose: "Spend the stars you earn in the Clothing Store to buy hats, glasses and more accessories for the bear!",
+    star_info_goto_store: 'Go to Clothing Store',
     store_title: '👗 Clothing Store',
     store_cat_all: 'All',
     store_cat_hat: 'Hats',
@@ -5556,6 +5568,13 @@ function updateStarBadge() {
         acc.textContent = a ? a.emoji : '';
         acc.className = 'welcome-accessory' + (a ? ' acc-' + a.pos : '');
     }
+}
+
+function openStarInfo() {
+    const s = getStarState();
+    const balEl = document.getElementById('starInfoBalance');
+    if (balEl) balEl.textContent = '⭐ ' + storeBalance(s);
+    document.getElementById('star-info-modal').style.display = 'flex';
 }
 
 let _storeCat = 'all';

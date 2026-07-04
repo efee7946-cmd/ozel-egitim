@@ -323,7 +323,7 @@
 
     <!-- Karşılama alanı -->
     <div class="menu-welcome">
-        <button type="button" class="welcome-avatar-wrap" id="welcomeAvatarWrap" onclick="goToStore()">
+        <button type="button" class="welcome-avatar-wrap" id="welcomeAvatarWrap" onclick="openStarInfo()">
             <img src="avatar.png" class="welcome-avatar" alt="Yıldız Can">
             <span class="welcome-accessory" id="welcomeAccessory"></span>
             <span class="welcome-star-badge" id="welcomeStarBadge" style="display:none">⭐ 0</span>
@@ -524,6 +524,28 @@ document.addEventListener('DOMContentLoaded', function(){
         </div>
         <div class="store-cat-tabs" id="storeCatTabs"></div>
         <div class="store-grid" id="storeGrid"></div>
+    </div>
+</div>
+
+<!-- Yıldız Bilgi Modalı -->
+<div id="star-info-modal" class="aac-search-overlay" style="display:none" onclick="if(event.target.id==='star-info-modal')this.style.display='none'">
+    <div class="aac-search-box">
+        <div class="aac-search-head">
+            <h3 data-i18n="star_info_title">⭐ Yıldızlar Nasıl Kazanılır?</h3>
+            <button type="button" class="aac-search-close" onclick="document.getElementById('star-info-modal').style.display='none'">✕</button>
+        </div>
+        <div class="star-info-body">
+            <div class="star-info-balance" id="starInfoBalance">⭐ 0</div>
+            <ul class="star-info-list">
+                <li>🎤 <span data-i18n="star_info_therapy">Konuşma pratiğinde yardım almadan mikrofona konuşarak</span></li>
+                <li>🧺 <span data-i18n="star_info_sort">Sınıflandırma oyunlarını hatasız veya az hatayla tamamlayarak</span></li>
+                <li>🧩 <span data-i18n="star_info_sequence">Sıralama ve Sebep-Sonuç oyunlarını tamamlayarak</span></li>
+            </ul>
+            <p class="star-info-purpose" data-i18n="star_info_purpose">Kazandığın yıldızları Giyim Mağazası'nda ayı için şapka, gözlük ve daha fazla aksesuar satın almak için harcayabilirsin!</p>
+            <button type="button" class="star-info-store-btn" onclick="document.getElementById('star-info-modal').style.display='none'; goToStore();">
+                👗 <span data-i18n="star_info_goto_store">Giyim Mağazasına Git</span>
+            </button>
+        </div>
     </div>
 </div>
 
