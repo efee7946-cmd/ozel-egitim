@@ -689,6 +689,23 @@ const STRINGS = {
     games_group_order: '📋 Sıralama',
     games_group_cause: '🔗 Sebep-Sonuç',
     games_sort_hero_sub: '{n} farklı eşleştirme oyunu',
+    games_group_object: '🔍 Nesne Tanıma',
+    object_title: '🔍 Nesne Tanıma',
+    object_rotate_hint: '👆 Döndürmek için sürükle',
+    object_prompt: 'Bu ne? Mikrofona söyle ya da yaz',
+    object_type_ph: 'Cevabını yaz...',
+    object_submit_btn: 'Gönder',
+    object_no_input: 'Bir şey duyamadım, tekrar dener misin?',
+    object_correct: 'Doğru! Aferin!',
+    object_try_again: 'Tekrar dene!',
+    object_wrong: 'Olmadı, bir daha dene!',
+    object_progress: '{a} / {t}',
+    object_complete_title: 'Hepsini Bildin!',
+    object_complete_sub: 'Nesne tanımada harikaydın!',
+    object_play_again: '🔁 Tekrar Oyna',
+    obj_ball: 'Top',
+    obj_cube: 'Küp',
+    obj_star: 'Yıldız',
     seq_menu_type_cause: 'Sebep-Sonuç',
     seq_menu_type_order: 'Sıralama',
     seq_back_to_menu: '← Oyun Seçimine Dön',
@@ -1653,6 +1670,23 @@ const STRINGS = {
     games_group_order: '📋 Sequencing',
     games_group_cause: '🔗 Cause & Effect',
     games_sort_hero_sub: '{n} different matching games',
+    games_group_object: '🔍 Object Recognition',
+    object_title: '🔍 Object Recognition',
+    object_rotate_hint: '👆 Drag to rotate',
+    object_prompt: 'What is this? Say it or type it',
+    object_type_ph: 'Type your answer...',
+    object_submit_btn: 'Submit',
+    object_no_input: "I didn't catch that, try again?",
+    object_correct: 'Correct! Well done!',
+    object_try_again: 'Try again!',
+    object_wrong: "Not quite, try again!",
+    object_progress: '{a} / {t}',
+    object_complete_title: 'You Got Them All!',
+    object_complete_sub: 'Great job recognizing objects!',
+    object_play_again: '🔁 Play Again',
+    obj_ball: 'Ball',
+    obj_cube: 'Cube',
+    obj_star: 'Star',
     seq_menu_type_cause: 'Cause-Effect',
     seq_menu_type_order: 'Sequencing',
     seq_back_to_menu: '← Back to Game Selection',
@@ -2186,7 +2220,7 @@ let _restoringScreen = false;
 
 function showOnly(id) {
     const screens = ['start-screen','student-setup-screen','menu-screen','game-container','sort-screen',
-                      'schedule-screen','aac-screen','sequence-screen','store-screen',
+                      'schedule-screen','aac-screen','sequence-screen','store-screen','object-screen',
                       'login-screen','iep-screen','skills-screen','behavior-screen','auth-screen','analysis-screen'];
     const isNewScreen = currentScreenId !== id;
     const prevScreen = currentScreenId;
@@ -5839,6 +5873,13 @@ function renderSequenceMenu() {
         <div class="seq-menu-grid">${orderGames.map((x, k) => card(x, k, 0)).join('')}</div>
         <div class="games-group-title">${t('games_group_cause')}</div>
         <div class="seq-menu-grid">${causeGames.map((x, k) => card(x, k, 2)).join('')}</div>
+        <div class="games-group-title">${t('games_group_object')}</div>
+        <div class="seq-menu-grid">
+            <button type="button" class="seq-menu-card gc3" onclick="goToObjectRecognition()">
+                <span class="seq-menu-emoji">🔍</span>
+                <span class="seq-menu-label">${t('games_group_object')}</span>
+            </button>
+        </div>
     `;
 }
 
@@ -6000,6 +6041,299 @@ function selectEffect(i) {
         document.getElementById('seqFeedback').textContent = t('seq_wrong_match');
         speakFallback(t('seq_try_again_speak'));
     }
+}
+
+// =============================================
+// NESNE TANIMA (3D)
+// =============================================
+// Yeni nesne eklemek için: Blender'da modeli hazırla, .glb olarak dışa aktar
+// (dokular gömülü, orijin merkezli), models/objects/ klasörüne koy, aşağıya
+// { id, type:'glb', model:'models/objects/dosya.glb', answers:{tr:[...],en:[...]} }
+// şeklinde bir satır ekle. type:'primitive' olanlar Blender gerektirmez.
+const OBJECT_RECOGNITION_ITEMS = [
+    { id: 'ball', type: 'primitive', shape: 'sphere', color: 0xe74c3c,
+        answers: { tr: ['top', 'küre'], en: ['ball', 'sphere'] },
+        get label() { return t('obj_ball'); } },
+    { id: 'cube', type: 'primitive', shape: 'box', color: 0x3498db,
+        answers: { tr: ['küp', 'kutu'], en: ['cube', 'box'] },
+        get label() { return t('obj_cube'); } },
+    { id: 'star', type: 'primitive', shape: 'star', color: 0xf7b520,
+        answers: { tr: ['yıldız'], en: ['star'] },
+        get label() { return t('obj_star'); } },
+];
+
+let _objThree = null, _objGLTFLoader = null;
+let _objScene = null, _objCamera = null, _objRenderer = null, _objControls = null, _objMesh = null;
+let _objItems = [], _objIndex = 0, _objErrors = 0, _objAnimating = false, _objBusy = false;
+
+async function goToObjectRecognition() {
+    showOnly('object-screen');
+    document.getElementById('objComplete').style.display = 'none';
+    document.querySelector('.object-canvas-card').style.display = '';
+    document.querySelector('.object-answer-row').style.display = '';
+    document.querySelector('.object-prompt').style.display = '';
+
+    _objItems = [...OBJECT_RECOGNITION_ITEMS].sort(() => Math.random() - 0.5);
+    _objIndex = 0;
+    _objErrors = 0;
+
+    const ok = await _objInitThree();
+    if (!ok) {
+        // WebGL yok — 3D olmadan devam: emoji + metinle
+        const card = document.querySelector('.object-canvas-card');
+        if (card) card.innerHTML = `<div class="object-fallback" id="objFallback" style="display:flex;align-items:center;justify-content:center;height:100%;font-size:4rem;"></div>`;
+    }
+    _objShowCurrent();
+}
+
+async function _objInitThree() {
+    if (_objRenderer) return true;
+    const canvas = document.getElementById('objectCanvas');
+    if (!canvas) return false;
+    try {
+        const [THREE, controlsMod, gltfMod] = await Promise.all([
+            import('three'),
+            import('three/addons/controls/OrbitControls.js'),
+            import('three/addons/loaders/GLTFLoader.js'),
+        ]);
+        _objThree = THREE;
+        const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(35, 1, 0.1, 100);
+        scene.add(new THREE.AmbientLight(0xffffff, 1.3));
+        const key = new THREE.DirectionalLight(0xffffff, 1.4);
+        key.position.set(3, 4, 5);
+        scene.add(key);
+        const fill = new THREE.DirectionalLight(0xd0e8ff, 0.6);
+        fill.position.set(-3, 1, 2);
+        scene.add(fill);
+
+        const controls = new controlsMod.OrbitControls(camera, renderer.domElement);
+        controls.enableZoom = false;
+        controls.enablePan = false;
+        controls.autoRotate = true;
+        controls.autoRotateSpeed = 2.2;
+        controls.addEventListener('start', () => { controls.autoRotate = false; });
+
+        _objRenderer = renderer; _objScene = scene; _objCamera = camera; _objControls = controls;
+        _objGLTFLoader = new gltfMod.GLTFLoader();
+
+        function resize() {
+            const w = canvas.clientWidth || 260, h = canvas.clientHeight || 260;
+            renderer.setSize(w, h, false);
+            camera.aspect = w / h;
+            camera.updateProjectionMatrix();
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            renderer.render(scene, camera);
+        }
+        animate();
+        return true;
+    } catch (e) {
+        console.error('Nesne Tanıma: WebGL başlatılamadı', e);
+        return false;
+    }
+}
+
+function _objBuildPrimitiveGeometry(THREE, shape) {
+    if (shape === 'sphere') return new THREE.SphereGeometry(1, 32, 32);
+    if (shape === 'box') return new THREE.BoxGeometry(1.5, 1.5, 1.5);
+    if (shape === 'star') {
+        const pts = [];
+        const spikes = 5, outerR = 1.3, innerR = 0.55;
+        for (let i = 0; i < spikes * 2; i++) {
+            const r = i % 2 === 0 ? outerR : innerR;
+            const a = (Math.PI / spikes) * i - Math.PI / 2;
+            pts.push(new THREE.Vector2(Math.cos(a) * r, Math.sin(a) * r));
+        }
+        const shape2d = new THREE.Shape(pts);
+        return new THREE.ExtrudeGeometry(shape2d, { depth: 0.5, bevelEnabled: true, bevelSize: 0.05, bevelThickness: 0.05, bevelSegments: 2 });
+    }
+    return new THREE.BoxGeometry(1, 1, 1);
+}
+
+function _objFrameToObject(object) {
+    const THREE = _objThree;
+    const box = new THREE.Box3().setFromObject(object);
+    const size = box.getSize(new THREE.Vector3());
+    const center = box.getCenter(new THREE.Vector3());
+    object.position.sub(center);
+    const maxSize = Math.max(size.x, size.y, size.z) || 1;
+    const distance = (maxSize / (2 * Math.atan((Math.PI * _objCamera.fov) / 360))) * 1.6;
+    _objCamera.position.set(0, 0, distance);
+    _objCamera.near = distance / 100;
+    _objCamera.far = distance * 100;
+    _objCamera.updateProjectionMatrix();
+    _objControls.target.set(0, 0, 0);
+    _objControls.update();
+}
+
+async function _objShowCurrent() {
+    const item = _objItems[_objIndex];
+    document.getElementById('objProgress').textContent =
+        t('object_progress').replace('{a}', _objIndex + 1).replace('{t}', _objItems.length);
+    document.getElementById('objFeedback').textContent = '';
+    document.getElementById('objFeedback').className = 'object-feedback';
+    document.getElementById('objTextInput').value = '';
+
+    const fallback = document.getElementById('objFallback');
+    if (fallback) {
+        fallback.textContent = item.type === 'primitive'
+            ? { sphere: '⚽', box: '📦', star: '⭐' }[item.shape] || '❓'
+            : '❓';
+        return;
+    }
+    if (!_objRenderer) return;
+
+    if (_objMesh) { _objScene.remove(_objMesh); _objMesh = null; }
+    const THREE = _objThree;
+
+    if (item.type === 'glb' && item.model) {
+        try {
+            const gltf = await _objGLTFLoader.loadAsync(item.model);
+            _objMesh = gltf.scene;
+        } catch (e) {
+            console.error('Nesne Tanıma: model yüklenemedi', item.model, e);
+            _objMesh = new THREE.Mesh(
+                new THREE.BoxGeometry(1, 1, 1),
+                new THREE.MeshStandardMaterial({ color: 0xcccccc })
+            );
+        }
+    } else {
+        const geo = _objBuildPrimitiveGeometry(THREE, item.shape);
+        const mat = new THREE.MeshStandardMaterial({ color: item.color, roughness: 0.4, metalness: 0.1 });
+        _objMesh = new THREE.Mesh(geo, mat);
+    }
+    _objScene.add(_objMesh);
+    _objFrameToObject(_objMesh);
+    if (_objControls) _objControls.autoRotate = true;
+}
+
+function _objFeedbackShow(correct, text) {
+    const el = document.getElementById('objFeedback');
+    el.textContent = text;
+    el.className = 'object-feedback ' + (correct ? 'correct' : 'wrong');
+}
+
+function _objNormalize(s) {
+    return String(s || '').toLocaleLowerCase(_lang === 'en' ? 'en' : 'tr').trim();
+}
+
+function _objCheckAnswer(raw) {
+    if (_objBusy) return;
+    const heard = _objNormalize(raw);
+    if (!heard) {
+        _objFeedbackShow(false, t('object_no_input'));
+        return;
+    }
+    const item = _objItems[_objIndex];
+    const accepted = (item.answers[_lang] || item.answers.tr || []).map(_objNormalize);
+    const correct = accepted.some(a => a && heard.includes(a));
+
+    if (correct) {
+        _objBusy = true;
+        _objFeedbackShow(true, t('object_correct'));
+        speakFallback(t('object_correct'));
+        if (typeof confetti === 'function') confetti({ particleCount: 60, spread: 60, origin: { y: 0.5 } });
+        setTimeout(() => { _objBusy = false; _objNext(); }, 1300);
+    } else {
+        _objErrors++;
+        _objFeedbackShow(false, t('object_wrong'));
+        speakFallback(t('object_try_again'));
+    }
+}
+
+function objSubmitText() {
+    const input = document.getElementById('objTextInput');
+    const val = input.value;
+    input.value = '';
+    _objCheckAnswer(val);
+}
+
+async function objRecMic() {
+    if (_objBusy) return;
+    const btn = document.getElementById('objMicBtn');
+    btn.disabled = true;
+    btn.classList.add('listening');
+    try {
+        const heard = await recognizeSpeechOnce();
+        _objCheckAnswer(heard);
+    } finally {
+        btn.disabled = false;
+        btn.classList.remove('listening');
+    }
+}
+
+function _objNext() {
+    _objIndex++;
+    if (_objIndex >= _objItems.length) {
+        _objComplete();
+    } else {
+        _objShowCurrent();
+    }
+}
+
+function _objComplete() {
+    document.querySelector('.object-canvas-card').style.display = 'none';
+    document.querySelector('.object-answer-row').style.display = 'none';
+    document.querySelector('.object-prompt').style.display = 'none';
+    document.getElementById('objFeedback').textContent = '';
+    document.getElementById('objComplete').style.display = '';
+    addStars(_objErrors === 0 ? 3 : (_objErrors <= 2 ? 2 : 1));
+    if (typeof confetti === 'function') confetti({ particleCount: 120, spread: 90 });
+    speakFallback(t('object_complete_title'));
+}
+
+/**
+ * Genel amaçlı tek seferlik ses tanıma. Native (Capacitor) eklentisi varsa onu,
+ * yoksa Web Speech API'yi kullanır. Belirli bir ekranın DOM elemanlarına bağlı
+ * değildir — tanınan metni (veya boş string) döndürür.
+ */
+async function recognizeSpeechOnce() {
+    const native = _getNativeSpeech();
+    if (native) {
+        try {
+            const avail = await native.available();
+            if (!avail || !avail.available) return '';
+            try {
+                const perm = await native.requestPermissions();
+                if (perm && perm.speechRecognition === 'denied') return '';
+            } catch (_) {}
+            const res = await native.start({
+                language: _lang === 'en' ? 'en-US' : 'tr-TR',
+                maxResults: 1, partialResults: false, popup: false
+            });
+            return (res && Array.isArray(res.matches) && res.matches[0]) ? res.matches[0].trim() : '';
+        } catch (_) { return ''; }
+    }
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) return '';
+    const isSafari = !window.SpeechRecognition && !!window.webkitSpeechRecognition;
+
+    return new Promise((resolve) => {
+        const recognition = new SpeechRecognition();
+        recognition.lang = _lang === 'en' ? 'en-US' : 'tr-TR';
+        recognition.interimResults = false;
+        recognition.maxAlternatives = 1;
+        recognition.continuous = false;
+        let done = false;
+        const finish = (val) => { if (done) return; done = true; try { recognition.stop(); } catch (_) {} resolve(val); };
+        recognition.onresult = (e) => {
+            const text = e.results && e.results[0] && e.results[0][0] ? e.results[0][0].transcript : '';
+            finish((text || '').trim());
+        };
+        recognition.onerror = () => finish('');
+        recognition.onend = () => finish('');
+        setTimeout(() => finish(''), isSafari ? 6000 : 8000);
+        try { recognition.start(); } catch (_) { finish(''); }
+    });
 }
 
 // =============================================

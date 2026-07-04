@@ -508,6 +508,39 @@ document.addEventListener('DOMContentLoaded', function(){
     </div>
 </div>
 
+<!-- ===================== NESNE TANIMA ===================== -->
+<div id="object-screen">
+    <button class="btn-back" onclick="goToSequence()"><span data-i18n="back_menu">← Menü</span></button>
+    <div class="object-wrapper">
+        <div class="object-header">
+            <h2 data-i18n="object_title">🔍 Nesne Tanıma</h2>
+            <span class="object-progress-badge" id="objProgress">1 / 3</span>
+        </div>
+        <div class="object-canvas-card">
+            <canvas id="objectCanvas"></canvas>
+            <div class="object-hint" data-i18n="object_rotate_hint">👆 Döndürmek için sürükle</div>
+        </div>
+        <p class="object-prompt" data-i18n="object_prompt">Bu ne? Mikrofona söyle ya da yaz</p>
+        <div class="object-feedback" id="objFeedback"></div>
+        <div class="object-answer-row">
+            <button type="button" class="object-mic-btn" id="objMicBtn" onclick="objRecMic()" aria-label="Mikrofon">🎙️</button>
+            <input type="text" id="objTextInput" class="object-text-input"
+                data-i18n-placeholder="object_type_ph" placeholder="Cevabını yaz..." maxlength="40"
+                onkeydown="if(event.key==='Enter') objSubmitText()">
+            <button type="button" class="object-submit-btn" onclick="objSubmitText()" data-i18n="object_submit_btn">Gönder</button>
+        </div>
+        <div class="object-complete" id="objComplete" style="display:none">
+            <div class="object-complete-icon">🏆</div>
+            <h2 data-i18n="object_complete_title">Hepsini Bildin!</h2>
+            <p data-i18n="object_complete_sub">Nesne tanımada harikaydın!</p>
+            <div class="sort-complete-btns">
+                <button type="button" class="btn-primary-gradient" onclick="goToObjectRecognition()" data-i18n="object_play_again">🔁 Tekrar Oyna</button>
+                <button type="button" class="menu-ghost-btn" onclick="goToSequence()" data-i18n="sort_back">← Oyun Seçimine Dön</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- ===================== GİYİM MAĞAZASI ===================== -->
 <div id="store-screen">
     <button class="btn-back" onclick="goToMenu()"><span data-i18n="back_menu">← Menü</span></button>

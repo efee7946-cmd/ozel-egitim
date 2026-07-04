@@ -3152,6 +3152,109 @@ video { width: 100%; height: 100%; object-fit: cover; }
     cursor: pointer;
 }
 
+/* ========== NESNE TANIMA ========== */
+#object-screen {
+    min-height: 100vh;
+    background: linear-gradient(180deg, #eef4ff 0%, #fff 55%);
+}
+.object-wrapper {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 64px 16px 40px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+.object-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.object-header h2 { margin: 0; font-size: 1.25rem; color: #1a2f4a; }
+.object-progress-badge {
+    background: #6C63FF;
+    color: #fff;
+    font-weight: 800;
+    font-size: 0.8rem;
+    padding: 5px 12px;
+    border-radius: 999px;
+}
+.object-canvas-card {
+    position: relative;
+    background: #fff;
+    border-radius: 22px;
+    box-shadow: 0 8px 28px rgba(40,84,145,0.12);
+    height: 280px;
+    overflow: hidden;
+}
+#objectCanvas { width: 100%; height: 100%; display: block; touch-action: none; }
+.object-hint {
+    position: absolute;
+    bottom: 10px; left: 0; right: 0;
+    text-align: center;
+    font-size: 0.76rem;
+    color: #8a93a8;
+    pointer-events: none;
+}
+.object-prompt {
+    text-align: center;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #2d3a5c;
+    margin: 0;
+}
+.object-feedback {
+    min-height: 26px;
+    text-align: center;
+    font-weight: 800;
+    font-size: 0.95rem;
+}
+.object-feedback.correct { color: #38a169; }
+.object-feedback.wrong { color: #e74c3c; animation: sortShake 0.4s ease; }
+.object-answer-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.object-mic-btn {
+    flex-shrink: 0;
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    border: none;
+    background: linear-gradient(135deg, #6C63FF, #8e7cf7);
+    color: #fff;
+    font-size: 1.3rem;
+    cursor: pointer;
+    box-shadow: 0 6px 16px rgba(108,99,255,0.3);
+}
+.object-mic-btn.listening { animation: basketReadyPulse 1s ease-in-out infinite; }
+.object-mic-btn:disabled { opacity: 0.6; cursor: default; }
+.object-text-input {
+    flex: 1;
+    min-height: 48px;
+    border: 2px solid #e4edf8;
+    border-radius: 14px;
+    padding: 0 14px;
+    font-size: 0.92rem;
+}
+.object-submit-btn {
+    flex-shrink: 0;
+    min-height: 48px;
+    padding: 0 18px;
+    border-radius: 14px;
+    border: none;
+    background: #2d3a5c;
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.88rem;
+    cursor: pointer;
+}
+.object-complete { text-align: center; padding: 40px 16px 20px; }
+.object-complete-icon { font-size: 5rem; margin-bottom: 14px; }
+.object-complete h2 { font-size: 1.7rem; color: #2d3a5c; margin-bottom: 8px; }
+.object-complete p { color: #6b7b93; font-size: 1rem; margin-bottom: 20px; }
+
 /* ========== GİYİM MAĞAZASI ========== */
 #store-screen {
     min-height: 100vh;
@@ -5558,6 +5661,7 @@ body.has-bottom-nav #analysis-screen,
 body.has-bottom-nav #sort-screen,
 body.has-bottom-nav #sequence-screen,
 body.has-bottom-nav #store-screen,
+body.has-bottom-nav #object-screen,
 body.has-bottom-nav #iep-screen,
 body.has-bottom-nav #skills-screen,
 body.has-bottom-nav #behavior-screen {
@@ -5575,6 +5679,7 @@ body.has-bottom-nav #behavior-screen {
     body.has-bottom-nav #sort-screen,
     body.has-bottom-nav #sequence-screen,
     body.has-bottom-nav #store-screen,
+    body.has-bottom-nav #object-screen,
     body.has-bottom-nav #iep-screen,
     body.has-bottom-nav #skills-screen,
     body.has-bottom-nav #behavior-screen {
