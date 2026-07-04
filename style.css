@@ -3313,7 +3313,7 @@ video { width: 100%; height: 100%; object-fit: cover; }
 .tile-schedule .tile-label,
 .tile-aac .tile-label,
 .tile-sequence .tile-label,
-.tile-sort .tile-label,
+.tile-store .tile-label,
 .tile-analysis .tile-label {
     color: white;
 }
@@ -3400,7 +3400,7 @@ video { width: 100%; height: 100%; object-fit: cover; }
 .tile-aac      { background: linear-gradient(140deg, #48dbfb 0%, #0abde3 100%); border-color: transparent; box-shadow: 0 8px 24px rgba(72,219,251,0.28); color: white; }
 
 .tile-sequence { background: linear-gradient(140deg, #a29bfe 0%, #6c5ce7 100%); border-color: transparent; box-shadow: 0 8px 24px rgba(162,155,254,0.28); color: white; }
-.tile-sort     { background: linear-gradient(140deg, #fd79a8 0%, #e84393 100%); border-color: transparent; box-shadow: 0 8px 24px rgba(253,121,168,0.28); color: white; }
+.tile-store    { background: linear-gradient(140deg, #fd79a8 0%, #e84393 100%); border-color: transparent; box-shadow: 0 8px 24px rgba(253,121,168,0.28); color: white; }
 .tile-analysis { background: linear-gradient(140deg, #00b894 0%, #00cec9 100%); border-color: transparent; box-shadow: 0 8px 24px rgba(0,184,148,0.28); color: white; }
 
 /* Erişilebilirlik topbar butonu */
