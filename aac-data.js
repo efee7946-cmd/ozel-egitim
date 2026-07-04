@@ -759,6 +759,7 @@
         spoken: (c.spoken || lbl).trim(),
         visual: normVisual(c.visual),
         isCore: !!c.isCore,
+        ...(c.key ? { key: c.key } : {}),
       });
     });
     if (cards.length > capacity) {
@@ -800,6 +801,59 @@
     return true;
   }
 
+  /**
+   * Dil değiştirildiğinde varsayılan (şablon kökenli) kart/kategori metinlerini
+   * aktif dile çevirir. Kullanıcının elle değiştirdiği kartlara DOKUNMAZ:
+   * bir kartın metni ancak DIĞER dildeki varsayılan değerle birebir eşleşirse
+   * "henüz çevrilmemiş varsayılan" sayılıp güncellenir.
+   * Eski kartlarda `key` saklanmadığı için (row,col) konumu üzerinden eşleştirme
+   * yapılır; bu da grid yeniden boyutlandırılmadıysa ve kart taşınmadıysa güvenilirdir.
+   */
+  async function resyncLanguage(studentId) {
+    const active = _activeLang();
+    const otherDefs = active === 'en' ? ALL_BOARDS_TR : ALL_BOARDS_EN;
+    const newDefs = active === 'en' ? ALL_BOARDS_EN : ALL_BOARDS_TR;
+    const boards = await listBoards(studentId);
+    const { grid } = await getSettings(studentId);
+    let boardsChanged = false;
+
+    for (const board of boards) {
+      if (!board.key) continue;
+      const otherBoardDef = otherDefs.find(b => b.key === board.key);
+      const newBoardDef = newDefs.find(b => b.key === board.key);
+      if (!otherBoardDef || !newBoardDef) continue;
+
+      if (board.label === otherBoardDef.label && board.label !== newBoardDef.label) {
+        await updateBoard(studentId, board.id, { label: newBoardDef.label });
+        boardsChanged = true;
+      }
+
+      const cards = await listCards(board.id);
+      let cardsChanged = false;
+      const nextCards = cards.map(card => {
+        let otherItem = null, newItem = null;
+        if (card.key) {
+          otherItem = otherBoardDef.cards.find(c => c.key === card.key);
+          newItem = newBoardDef.cards.find(c => c.key === card.key);
+        } else {
+          const idx = card.row * grid.cols + card.col;
+          otherItem = otherBoardDef.cards[idx] || null;
+          newItem = newBoardDef.cards[idx] || null;
+        }
+        if (!otherItem || !newItem) return card;
+        const untouched = card.label === otherItem.label && card.spoken === otherItem.spoken;
+        if (!untouched) return card;
+        cardsChanged = true;
+        return { ...card, label: newItem.label, spoken: newItem.spoken, key: newItem.key };
+      });
+      if (cardsChanged) {
+        await saveCards(board.id, nextCards);
+        boardsChanged = true;
+      }
+    }
+    return boardsChanged;
+  }
+
   /* ---- Dışa aktarım ------------------------------------------------------ */
   const AACData = {
     getSettings, updateSettings, setGrid, growGrid, findCardsOutsideGrid,
@@ -807,7 +861,7 @@
     listCards, placeCard, updateCard, clearSlot, moveCard, cardAt,
     buildGrid,
     imageFileToDataURL, supportsWebP,
-    importBoard, migrateLegacyIfNeeded, migrateV2IfNeeded,
+    importBoard, migrateLegacyIfNeeded, migrateV2IfNeeded, resyncLanguage,
     get _boards() { return getActiveBoards(); },
     inBounds, AACError,
     _keys: k,

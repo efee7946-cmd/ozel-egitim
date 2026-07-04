@@ -1943,6 +1943,11 @@ function setLang(lang) {
   _lang = lang;
   localStorage.setItem('lms_lang', lang);
   applyLang();
+  if (activeStudentId && typeof AACData !== 'undefined') {
+    AACData.resyncLanguage(activeStudentId).then(changed => {
+      if (changed && currentScreenId === 'aac-screen') _aacRenderAll();
+    }).catch(() => {});
+  }
 }
 
 function applyLang() {
@@ -4985,6 +4990,7 @@ async function goToAac() {
     const sid = activeStudentId || 'default';
     await AACData.migrateLegacyIfNeeded(sid);
     await AACData.migrateV2IfNeeded(sid);
+    await AACData.resyncLanguage(sid);
     _aacBoards = await AACData.listBoards(sid);
     _aacCurrentBoardId = _aacBoards[0]?.id || null;
     await _aacRenderAll();
