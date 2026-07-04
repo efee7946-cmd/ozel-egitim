@@ -708,7 +708,6 @@ const STRINGS = {
     obj_star: 'Yıldız',
     obj_apple: 'Elma',
     obj_balloon: 'Balon',
-    obj_car: 'Araba',
     seq_menu_type_cause: 'Sebep-Sonuç',
     seq_menu_type_order: 'Sıralama',
     seq_back_to_menu: '← Oyun Seçimine Dön',
@@ -1692,7 +1691,6 @@ const STRINGS = {
     obj_star: 'Star',
     obj_apple: 'Apple',
     obj_balloon: 'Balloon',
-    obj_car: 'Car',
     seq_menu_type_cause: 'Cause-Effect',
     seq_menu_type_order: 'Sequencing',
     seq_back_to_menu: '← Back to Game Selection',
@@ -6072,9 +6070,6 @@ const OBJECT_RECOGNITION_ITEMS = [
     { id: 'balloon', type: 'glb', model: 'models/objects/balon.glb',
         answers: { tr: ['balon'], en: ['balloon'] },
         get label() { return t('obj_balloon'); } },
-    { id: 'car', type: 'glb', model: 'models/objects/araba.glb',
-        answers: { tr: ['araba'], en: ['car'] },
-        get label() { return t('obj_car'); } },
 ];
 
 let _objThree = null, _objGLTFLoader = null;
@@ -6200,7 +6195,7 @@ async function _objShowCurrent() {
     const fallback = document.getElementById('objFallback');
     if (fallback) {
         const shapeEmoji = { sphere: '⚽', box: '📦', star: '⭐' };
-        const idEmoji = { ball: '⚽', cube: '📦', star: '⭐', apple: '🍎', balloon: '🎈', car: '🚗' };
+        const idEmoji = { ball: '⚽', cube: '📦', star: '⭐', apple: '🍎', balloon: '🎈' };
         fallback.textContent = (item.type === 'primitive' ? shapeEmoji[item.shape] : idEmoji[item.id]) || '❓';
         return;
     }
