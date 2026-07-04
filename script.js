@@ -706,6 +706,9 @@ const STRINGS = {
     obj_ball: 'Top',
     obj_cube: 'Küp',
     obj_star: 'Yıldız',
+    obj_apple: 'Elma',
+    obj_balloon: 'Balon',
+    obj_car: 'Araba',
     seq_menu_type_cause: 'Sebep-Sonuç',
     seq_menu_type_order: 'Sıralama',
     seq_back_to_menu: '← Oyun Seçimine Dön',
@@ -1687,6 +1690,9 @@ const STRINGS = {
     obj_ball: 'Ball',
     obj_cube: 'Cube',
     obj_star: 'Star',
+    obj_apple: 'Apple',
+    obj_balloon: 'Balloon',
+    obj_car: 'Car',
     seq_menu_type_cause: 'Cause-Effect',
     seq_menu_type_order: 'Sequencing',
     seq_back_to_menu: '← Back to Game Selection',
@@ -6051,15 +6057,24 @@ function selectEffect(i) {
 // { id, type:'glb', model:'models/objects/dosya.glb', answers:{tr:[...],en:[...]} }
 // şeklinde bir satır ekle. type:'primitive' olanlar Blender gerektirmez.
 const OBJECT_RECOGNITION_ITEMS = [
-    { id: 'ball', type: 'primitive', shape: 'sphere', color: 0xe74c3c,
+    { id: 'ball', type: 'glb', model: 'models/objects/top.glb',
         answers: { tr: ['top', 'küre'], en: ['ball', 'sphere'] },
         get label() { return t('obj_ball'); } },
     { id: 'cube', type: 'primitive', shape: 'box', color: 0x3498db,
         answers: { tr: ['küp', 'kutu'], en: ['cube', 'box'] },
         get label() { return t('obj_cube'); } },
-    { id: 'star', type: 'primitive', shape: 'star', color: 0xf7b520,
-        answers: { tr: ['yıldız'], en: ['star'] },
+    { id: 'star', type: 'glb', model: 'models/objects/yildiz.glb',
+        answers: { tr: ['yıldız', 'yildiz'], en: ['star'] },
         get label() { return t('obj_star'); } },
+    { id: 'apple', type: 'glb', model: 'models/objects/elma.glb',
+        answers: { tr: ['elma'], en: ['apple'] },
+        get label() { return t('obj_apple'); } },
+    { id: 'balloon', type: 'glb', model: 'models/objects/balon.glb',
+        answers: { tr: ['balon'], en: ['balloon'] },
+        get label() { return t('obj_balloon'); } },
+    { id: 'car', type: 'glb', model: 'models/objects/araba.glb',
+        answers: { tr: ['araba'], en: ['car'] },
+        get label() { return t('obj_car'); } },
 ];
 
 let _objThree = null, _objGLTFLoader = null;
@@ -6184,9 +6199,9 @@ async function _objShowCurrent() {
 
     const fallback = document.getElementById('objFallback');
     if (fallback) {
-        fallback.textContent = item.type === 'primitive'
-            ? { sphere: '⚽', box: '📦', star: '⭐' }[item.shape] || '❓'
-            : '❓';
+        const shapeEmoji = { sphere: '⚽', box: '📦', star: '⭐' };
+        const idEmoji = { ball: '⚽', cube: '📦', star: '⭐', apple: '🍎', balloon: '🎈', car: '🚗' };
+        fallback.textContent = (item.type === 'primitive' ? shapeEmoji[item.shape] : idEmoji[item.id]) || '❓';
         return;
     }
     if (!_objRenderer) return;
