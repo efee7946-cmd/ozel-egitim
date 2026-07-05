@@ -1,6 +1,6 @@
 # Nesne Tanıma — 3D model ekleme rehberi
 
-Bu klasördeki `.glb` dosyaları, Oyunlar → 🔍 Nesne Tanıma ekranında çocuğun
+Bu klasördeki `.glb` dosyaları, ana menüdeki 🔍 Nesne Tanıma ekranında çocuğun
 döndürüp tanımaya çalıştığı 3D nesnelerdir.
 
 ## Blender'da hazırlarken dikkat edilecekler

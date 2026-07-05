@@ -11,12 +11,13 @@ npm test              # Playwright e2e testleri
 ```
 
 ## Temel Dosyalar
-- `index.html` — Tüm ekranların HTML'i (tek sayfa)
-- `script.js` — Uygulama mantığının tamamı (~4200 satır, vanilla JS)
-- `style.css` — Tasarım sistemi (~4900 satır)
-- `db-client.js` — localStorage + Vercel KV çift modlu veri katmanı
+- `index.html` — Tüm ekranların HTML'i (tek sayfa, ~1250 satır)
+- `script.js` — Uygulama mantığının tamamı (~7000 satır, vanilla JS)
+- `style.css` — Tasarım sistemi (~5500 satır)
+- `db-client.js` — localStorage + sessionStorage (şifreli cache) + `/api/data` (Aiven Postgres) çift modlu veri katmanı
 - `server.js` — Express geliştirme sunucusu (port 3000)
-- `api/` — Vercel serverless fonksiyonlar (auth, chat, tts, data, video, _db)
+- `api/` — Vercel serverless fonksiyonlar (`auth`, `data`, `chat`, `tts`, `video`, `photo`, `log`, ve dahili `_db`/`_auth`/`_mail`)
+- `models/objects/*.glb` — Nesne Tanıma için Blender'da üretilen 3D modeller
 
 ## State Yönetimi
 Framework yok — global değişkenler (`childName`, `activeStudentId`, `currentScreenId`). Ekran geçişleri `showOnly()` ile DOM göster/gizle (History API entegre, Android geri tuşu çalışır). Veri: localStorage (önce) → arka planda `/api/data` → PostgreSQL.
@@ -47,4 +48,7 @@ Tüm anahtarlar `lms_` öneki ile başlar: `lms_students`, `lms_iep_<studentId>`
 Playwright ile e2e. Test dosyası: `tests/app.spec.js`. CI: GitHub Actions, Node 24.
 
 ## Deploy
-Vercel — `main` branch her push'ta otomatik deploy edilir.
+Vercel — `main` branch her push'ta otomatik deploy edilir (https://ozel-egitim.vercel.app).
+
+## Android
+Capacitor ile paketlenir (`capacitor.config.json`, appId `app.yildizcan`), WebView içinde canlı Vercel URL'sini açar (yerel dosya kopyası değil). `.github/workflows/android-build.yml` ile CI'da APK/AAB üretilir; Play Store'da kapalı test aşamasında.
