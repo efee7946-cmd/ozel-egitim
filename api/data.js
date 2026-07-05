@@ -45,8 +45,12 @@ export default async function handler(req, res) {
             const scoped = `${username}:${key}`;
             let rows = await query('SELECT value, updated_at FROM app_data WHERE user_key = $1', [scoped]);
 
-            // Geçiş köprüsü: kullanıcı adını içeren eski (kapsamsız) anahtarları taşı
-            if (!rows.length && key.includes(username)) {
+            // Geçiş köprüsü: eski (kapsamsız) bep_profile_<kullanıcıadı> anahtarını taşı.
+            // Tam eşleşme şart — aksi halde başka bir kullanıcının adı bu
+            // kullanıcının key'ine alt dizge olarak denk gelirse (örn. "def"
+            // kullanıcısı "sometarget:stars_default" isteyip ".includes"
+            // ile kapsamsız bir kaydı okuyabilirdi) yetkisiz veri erişimi olurdu.
+            if (!rows.length && key === `bep_profile_${username}`) {
                 const legacy = await query('SELECT value, updated_at FROM app_data WHERE user_key = $1', [key]);
                 if (legacy.length) {
                     await query(
