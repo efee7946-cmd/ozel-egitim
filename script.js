@@ -75,7 +75,7 @@ const STRINGS = {
     menu_bep: 'BEP',
     menu_report: 'Rapor',
     menu_aac: 'AAC',
-    menu_sequence: 'Oyunlar',
+    menu_sequence: 'Nesne Tanıma',
     menu_analysis_report: 'Analiz & Rapor',
     menu_store: 'Giyim Mağazası',
     menu_parent_report: 'Veli Raporu',
@@ -107,30 +107,15 @@ const STRINGS = {
     nudge_therapy_gap: '{d} gündür konuşma pratiği yapılmadı — kısa bir seans?',
     nudge_sort_again: '{game}: son doğruluk %{acc} — tekrar dene!',
     nudge_first: 'Hadi başlayalım! İlk konuşma pratiğini yap',
-    menu_sort: 'Sınıflandırma',
     menu_analysis: 'Analiz',
     therapy_title: 'Konuşma Pratiği',
     therapy_hint: 'Hazırlanıyorum...',
-    sort_title: 'Sınıflandırma',
-    sort_subtitle: 'Nesneleri doğru sepete sürükle!',
-    sort_back: '← Oyun Seçimine Dön',
-    sort_correct: 'Harika!',
-    sort_wrong: 'Tekrar dene!',
-    sort_complete_title: 'Tebrikler!',
-    sort_complete_msg: 'Tüm nesneleri doğru sepete koydun!',
-    sort_play_again: 'Tekrar Oyna',
-    sort_other_game: 'Başka Oyun',
-    sort_perfect: '🌟 Mükemmel!',
-    report_sort_games: '🧩 Sıralama Oyunları',
-    report_no_sort: 'Henüz sıralama oyunu oynanmadı.',
-    sort_summary_line: '{plays} oyun • %{acc} doğruluk • {perfect} hatasız',
     report_title: 'Rapor',
     report_generate: 'Rapor Oluştur',
     bep_title: 'Dönemsel BEP Taslağı',
     bep_generate: 'BEP Taslağı Oluştur',
     bep_disclaimer: '⚠️ Bu taslak yalnızca rehberlik amaçlıdır. Lisanslı özel eğitim uzmanı tarafından gözden geçirilmelidir.',
     aac_title: 'AAC Panosu',
-    sequence_title: 'Sıralama Oyunları',
     skills_title: 'Beceri Takibi',
     behavior_title: 'Davranış Takibi',
     a11y_title: '⚙️ Erişilebilirlik',
@@ -146,62 +131,7 @@ const STRINGS = {
     a11y_delete: '🗑️ Hesabı Sil',
     a11y_privacy: 'Gizlilik Politikası & KVKK',
     lang_toggle: 'EN',
-    // Sort oyunu kategorileri ve sepetler
-    sort_game1_title: 'Hayvan mı, Araç mı?',
-    sort_game2_title: 'Yiyecek mi, Oyuncak mı?',
-    sort_game3_title: 'Dışarıda mı, İçeride mi?',
-    sort_game4_title: 'Büyük mü, Küçük mü?',
-    sort_cat_animals: 'Hayvanlar',
-    sort_cat_vehicles: 'Araçlar',
-    sort_cat_food: 'Yiyecekler',
-    sort_cat_toys: 'Oyuncaklar',
-    sort_cat_outside: 'Dışarısı',
-    sort_cat_inside: 'İçerisi',
-    sort_cat_big: 'Büyük',
-    sort_cat_small: 'Küçük',
-    item_cat: 'Kedi', item_car: 'Araba', item_dog: 'Köpek', item_plane: 'Uçak',
-    item_bird: 'Kuş', item_ship: 'Gemi', item_fish: 'Balık', item_bike: 'Bisiklet',
-    item_lion: 'Aslan', item_helicopter: 'Helikopter',
-    item_apple: 'Elma', item_teddy: 'Oyun Ayısı', item_pizza: 'Pizza', item_ball: 'Top',
-    item_banana: 'Muz', item_gamepad: 'Oyun Kolu', item_ice_cream: 'Dondurma',
-    item_paint: 'Boya Seti', item_cake: 'Pasta', item_target: 'Hedef Tahtası',
-    item_flower: 'Çiçek', item_sofa: 'Kanepe', item_cloud: 'Bulut', item_tv: 'Televizyon',
-    item_tree: 'Ağaç', item_bed: 'Yatak', item_sea: 'Deniz', item_chair: 'Sandalye',
-    item_tent: 'Çadır', item_computer: 'Bilgisayar',
-    item_elephant: 'Fil', item_mouse: 'Fare', item_house: 'Ev', item_bee: 'Arı',
-    item_airplane2: 'Uçak', item_ant: 'Karınca', item_ring: 'Yüzük',
-    item_world: 'Dünya', item_butterfly: 'Kelebek',
-    sort_game5_title: 'Hangi Renk?', sort_game6_title: 'Meyve mi, Sebze mi?',
-    sort_game7_title: 'Yazın mı, Kışın mı?', sort_game8_title: 'Nerede Yaşar?',
-    sort_game9_title: 'Sıcak mı, Soğuk mu?', sort_game10_title: 'Canlı mı, Cansız mı?',
-    sort_game11_title: 'Hangi Şekil?',
-    sort_cat_red: 'Kırmızı', sort_cat_blue: 'Mavi', sort_cat_yellow: 'Sarı',
-    sort_cat_fruit: 'Meyveler', sort_cat_veg: 'Sebzeler',
-    sort_cat_summer: 'Yaz', sort_cat_winter: 'Kış',
-    sort_cat_sky: 'Gökyüzü', sort_cat_sea: 'Deniz', sort_cat_land: 'Kara',
-    sort_cat_hot: 'Sıcak', sort_cat_cold: 'Soğuk',
-    sort_cat_living: 'Canlı', sort_cat_nonliving: 'Cansız',
-    sort_cat_round: 'Yuvarlak', sort_cat_square: 'Kare', sort_cat_triangle: 'Üçgen',
-    item_strawberry: 'Çilek', item_firetruck: 'İtfaiye', item_heart: 'Kalp',
-    item_blueberry: 'Yaban mersini', item_drop: 'Su damlası', item_whale: 'Balina', item_cap: 'Şapka',
-    item_sunflower: 'Ayçiçeği', item_star: 'Yıldız', item_lemon: 'Limon',
-    item_grapes: 'Üzüm', item_watermelon: 'Karpuz', item_peach: 'Şeftali',
-    item_broccoli: 'Brokoli', item_carrot: 'Havuç', item_eggplant: 'Patlıcan',
-    item_cucumber: 'Salatalık', item_corn: 'Mısır', item_onion: 'Soğan',
-    item_shorts: 'Şort', item_tshirt: 'Tişört', item_swimsuit: 'Mayo',
-    item_sun: 'Güneş', item_beach: 'Plaj',
-    item_coat: 'Mont', item_scarf: 'Atkı', item_gloves: 'Eldiven',
-    item_snowman: 'Kardan adam', item_snowflake: 'Kar tanesi', item_skis: 'Kayak',
-    item_eagle: 'Kartal', item_dolphin: 'Yunus', item_octopus: 'Ahtapot',
-    item_crab: 'Yengeç', item_rabbit: 'Tavşan',
-    item_fire: 'Ateş', item_tea: 'Çay', item_volcano: 'Yanardağ', item_soup: 'Çorba',
-    item_ice: 'Buz', item_colddrink: 'Soğuk içecek',
-    item_baby: 'Bebek', item_phone: 'Telefon', item_brick: 'Tuğla', item_pencil: 'Kalem',
-    item_moon: 'Ay', item_orange: 'Portakal', item_balloon: 'Balon',
-    item_box: 'Kutu', item_gift: 'Hediye', item_pine: 'Çam ağacı', item_ruler: 'Gönye',
     score_label: 'puan',
-    sort_items_count: 'nesne',
-    sort_tries: 'deneme',
     choose_student: 'Öğrenci seç veya ekle',
     add_new_student: '+ Yeni Öğrenci Ekle',
     student_placeholder: 'Öğrenci adı',
@@ -375,17 +305,6 @@ const STRINGS = {
     student_updated: 'Öğrenci bilgileri güncellendi.',
     no_students_yet: 'Henüz öğrenci eklenmemiş. Devam etmek için ilk öğrencini oluştur.',
     select_or_add_student: 'Bir öğrenciyi seçebilir ya da yeni öğrenci ekleyebilirsin.',
-    // Sıra kartı oyunu geri bildirimleri
-    seq_correct_order: '🎉 Harika! Doğru sıraladın!',
-    seq_correct_order_speak: 'Harika! Doğru sıraladın!',
-    seq_wrong_order: '❌ Bu doğru sıra değil, tekrar dene!',
-    seq_try_again_speak: 'Tekrar dene!',
-    seq_select_cause_first: 'Önce bir sebep seç!',
-    seq_correct_match: '✅ Doğru eşleştirme!',
-    seq_correct_match_speak: 'Doğru! Aferin!',
-    seq_all_pairs_found: '🎉 Tüm çiftleri buldun!',
-    seq_all_pairs_found_speak: 'Tüm çiftleri buldun! Harika!',
-    seq_wrong_match: '❌ Bu doğru eşleşme değil!',
 
     therapy_daily_life_label: 'Günlük Hayat',
     therapy_daily_life_summary: 'Rutinler, ihtiyaçlar ve ev-okul yaşamı üzerine kısa konuşmalar.',
@@ -684,12 +603,6 @@ const STRINGS = {
     skill_motor_6: 'Çizgi takibi',
     skill_motor_7: 'Denge',
 
-    seq_menu_title: '🧩 Oyunlar',
-    games_group_sort: 'Sınıflandırma',
-    games_group_order: '📋 Sıralama',
-    games_group_cause: '🔗 Sebep-Sonuç',
-    games_sort_hero_sub: '{n} farklı eşleştirme oyunu',
-    games_group_object: '🔍 Nesne Tanıma',
     object_title: '🔍 Nesne Tanıma',
     object_rotate_hint: '👆 Döndürmek için sürükle',
     object_prompt: 'Bu ne? Mikrofona söyle ya da yaz',
@@ -705,6 +618,9 @@ const STRINGS = {
     object_complete_title: 'Hepsini Bildin!',
     object_complete_sub: 'Nesne tanımada harikaydın!',
     object_play_again: '🔁 Tekrar Oyna',
+    object_back_to_menu: '← Menüye Dön',
+    report_no_obj: 'Henüz nesne tanıma oynanmadı.',
+    obj_summary_line: '{plays} oyun • %{acc} doğruluk • {perfect} hatasız',
     obj_ball: 'Top',
     obj_star: 'Yıldız',
     obj_apple: 'Elma',
@@ -718,46 +634,6 @@ const STRINGS = {
     obj_banana: 'Muz',
     obj_train: 'Tren',
     obj_plane: 'Uçak',
-    seq_menu_type_cause: 'Sebep-Sonuç',
-    seq_menu_type_order: 'Sıralama',
-    seq_back_to_menu: '← Oyun Seçimine Dön',
-    seq_order_hint: 'Adımları doğru sıraya diz!',
-    seq_cause_hint: 'Sebebi seç, sonra sonucuna dokun!',
-    seq_cause_col_title: 'Sebep',
-    seq_effect_col_title: 'Sonuç',
-
-    seq_game_morning_title: 'Sabah Rutini',
-    seq_game_morning_item0: 'Uyan',
-    seq_game_morning_item1: 'Diş Fırçala',
-    seq_game_morning_item2: 'Giy',
-    seq_game_morning_item3: 'Kahvaltı Et',
-    seq_game_morning_item4: 'Çantanı Al',
-    seq_game_morning_item5: 'Okula Git',
-
-    seq_game_washing_title: 'El Yıkama',
-    seq_game_washing_item0: 'Musluğu Aç',
-    seq_game_washing_item1: 'Elleri Islatır',
-    seq_game_washing_item2: 'Sabun Al',
-    seq_game_washing_item3: 'Ova Ova Yıka',
-    seq_game_washing_item4: 'Durula',
-    seq_game_washing_item5: 'Kurula',
-
-    seq_game_meal_title: 'Yemek Hazırlığı',
-    seq_game_meal_item0: 'Masaya Otur',
-    seq_game_meal_item1: 'Önlük Tak',
-    seq_game_meal_item2: 'Kaşık Al',
-    seq_game_meal_item3: 'Ye',
-    seq_game_meal_item4: 'Masayı Temizle',
-
-    seq_game_cause_title: 'Sebep-Sonuç',
-    seq_game_cause_pair0_cause: 'Yağmur yağıyor',
-    seq_game_cause_pair0_effect: 'Şemsiye alıyoruz',
-    seq_game_cause_pair1_cause: 'Düşüp acıdı',
-    seq_game_cause_pair1_effect: 'Ağlıyor',
-    seq_game_cause_pair2_cause: 'Çiçeği suladım',
-    seq_game_cause_pair2_effect: 'Çiçek açtı',
-    seq_game_cause_pair3_cause: 'Hava karardı',
-    seq_game_cause_pair3_effect: 'Işık yaktık',
 
     therapy_topic_title: 'Hangi konuyu çalışalım?',
     therapy_topic_sub: 'Bir konu yaz, Yıldız Can o konuyla ilgili sorular soracak.',
@@ -915,8 +791,7 @@ const STRINGS = {
     schedule_screen_title: '🎯 Günlük Görevler',
     schedule_sub: 'Her gün farklı görevler seni bekliyor. Tamamladıkça yıldız kazanırsın!',
     task_therapy: '🎤 {n} konuşma pratiği seansı tamamla',
-    task_sort: '🧺 {n} sınıflandırma oyunu tamamla',
-    task_sequence: '🧩 {n} sıralama/sebep-sonuç oyunu tamamla',
+    task_object: '🔍 {n} nesne tanıma sorusu tamamla',
     task_completed: '✓ Görev tamamlandı: {label} — +5 ⭐',
     task_all_done_toast: '🏆 Bugünün tüm görevlerini bitirdin! +10 ⭐ bonus',
     task_all_done_title: 'Bugünü Tamamladın!',
@@ -945,7 +820,7 @@ const STRINGS = {
     info_mic_permission: 'Mikrofon izni gerekli.',
     auth_login_success: 'Başarıyla giriş yapıldı! 👋',
     auth_register_success: 'Kayıt tamamlandı, hoş geldiniz! 🎉',
-    bottom_nav_games: 'Oyunlar',
+    bottom_nav_games: 'Nesne Tanıma',
     auth_forgot_link: 'Şifremi unuttum',
     auth_identifier_label: 'Kullanıcı Adı veya E-posta',
     auth_identifier_ph: 'kullaniciadi veya ornek@gmail.com',
@@ -1069,7 +944,7 @@ const STRINGS = {
     menu_bep: 'IEP',
     menu_report: 'Report',
     menu_aac: 'AAC',
-    menu_sequence: 'Games',
+    menu_sequence: 'Object Recognition',
     menu_analysis_report: 'Analysis & Report',
     menu_store: 'Clothing Store',
     menu_parent_report: 'Parent Report',
@@ -1101,30 +976,15 @@ const STRINGS = {
     nudge_therapy_gap: 'No speech practice for {d} days — a quick session?',
     nudge_sort_again: '{game}: last accuracy {acc}% — try again!',
     nudge_first: "Let's begin! Do your first speech practice",
-    menu_sort: 'Sorting',
     menu_analysis: 'Analysis',
     therapy_title: 'Speech Practice',
     therapy_hint: 'Getting ready...',
-    sort_title: 'Sorting',
-    sort_subtitle: 'Drag objects into the correct basket!',
-    sort_back: '← Game Selection',
-    sort_correct: 'Great!',
-    sort_wrong: 'Try again!',
-    sort_complete_title: 'Congratulations!',
-    sort_complete_msg: 'You sorted all objects correctly!',
-    sort_play_again: 'Play Again',
-    sort_other_game: 'Other Game',
-    sort_perfect: '🌟 Perfect!',
-    report_sort_games: '🧩 Sorting Games',
-    report_no_sort: 'No sorting games played yet.',
-    sort_summary_line: '{plays} plays • {acc}% accuracy • {perfect} flawless',
     report_title: 'Report',
     report_generate: 'Generate Report',
     bep_title: 'IEP Draft',
     bep_generate: 'Generate IEP Draft',
     bep_disclaimer: '⚠️ This draft is for guidance only. It must be reviewed by a licensed special education specialist.',
     aac_title: 'AAC Board',
-    sequence_title: 'Sorting Games',
     skills_title: 'Skill Tracking',
     behavior_title: 'Behavior Tracking',
     a11y_title: '⚙️ Accessibility',
@@ -1140,61 +1000,7 @@ const STRINGS = {
     a11y_delete: '🗑️ Delete Account',
     a11y_privacy: 'Privacy Policy & KVKK',
     lang_toggle: 'TR',
-    sort_game1_title: 'Animal or Vehicle?',
-    sort_game2_title: 'Food or Toy?',
-    sort_game3_title: 'Outside or Inside?',
-    sort_game4_title: 'Big or Small?',
-    sort_cat_animals: 'Animals',
-    sort_cat_vehicles: 'Vehicles',
-    sort_cat_food: 'Foods',
-    sort_cat_toys: 'Toys',
-    sort_cat_outside: 'Outside',
-    sort_cat_inside: 'Inside',
-    sort_cat_big: 'Big',
-    sort_cat_small: 'Small',
-    item_cat: 'Cat', item_car: 'Car', item_dog: 'Dog', item_plane: 'Plane',
-    item_bird: 'Bird', item_ship: 'Ship', item_fish: 'Fish', item_bike: 'Bicycle',
-    item_lion: 'Lion', item_helicopter: 'Helicopter',
-    item_apple: 'Apple', item_teddy: 'Teddy Bear', item_pizza: 'Pizza', item_ball: 'Ball',
-    item_banana: 'Banana', item_gamepad: 'Gamepad', item_ice_cream: 'Ice Cream',
-    item_paint: 'Paint Set', item_cake: 'Cake', item_target: 'Target Board',
-    item_flower: 'Flower', item_sofa: 'Sofa', item_cloud: 'Cloud', item_tv: 'TV',
-    item_tree: 'Tree', item_bed: 'Bed', item_sea: 'Sea', item_chair: 'Chair',
-    item_tent: 'Tent', item_computer: 'Computer',
-    item_elephant: 'Elephant', item_mouse: 'Mouse', item_house: 'House', item_bee: 'Bee',
-    item_airplane2: 'Airplane', item_ant: 'Ant', item_ring: 'Ring',
-    item_world: 'Earth', item_butterfly: 'Butterfly',
-    sort_game5_title: 'Which Color?', sort_game6_title: 'Fruit or Vegetable?',
-    sort_game7_title: 'Summer or Winter?', sort_game8_title: 'Where Does It Live?',
-    sort_game9_title: 'Hot or Cold?', sort_game10_title: 'Living or Non-living?',
-    sort_game11_title: 'Which Shape?',
-    sort_cat_red: 'Red', sort_cat_blue: 'Blue', sort_cat_yellow: 'Yellow',
-    sort_cat_fruit: 'Fruits', sort_cat_veg: 'Vegetables',
-    sort_cat_summer: 'Summer', sort_cat_winter: 'Winter',
-    sort_cat_sky: 'Sky', sort_cat_sea: 'Sea', sort_cat_land: 'Land',
-    sort_cat_hot: 'Hot', sort_cat_cold: 'Cold',
-    sort_cat_living: 'Living', sort_cat_nonliving: 'Non-living',
-    sort_cat_round: 'Round', sort_cat_square: 'Square', sort_cat_triangle: 'Triangle',
-    item_strawberry: 'Strawberry', item_firetruck: 'Fire Truck', item_heart: 'Heart',
-    item_blueberry: 'Blueberry', item_drop: 'Water Drop', item_whale: 'Whale', item_cap: 'Cap',
-    item_sunflower: 'Sunflower', item_star: 'Star', item_lemon: 'Lemon',
-    item_grapes: 'Grapes', item_watermelon: 'Watermelon', item_peach: 'Peach',
-    item_broccoli: 'Broccoli', item_carrot: 'Carrot', item_eggplant: 'Eggplant',
-    item_cucumber: 'Cucumber', item_corn: 'Corn', item_onion: 'Onion',
-    item_shorts: 'Shorts', item_tshirt: 'T-shirt', item_swimsuit: 'Swimsuit',
-    item_sun: 'Sun', item_beach: 'Beach',
-    item_coat: 'Coat', item_scarf: 'Scarf', item_gloves: 'Gloves',
-    item_snowman: 'Snowman', item_snowflake: 'Snowflake', item_skis: 'Skis',
-    item_eagle: 'Eagle', item_dolphin: 'Dolphin', item_octopus: 'Octopus',
-    item_crab: 'Crab', item_rabbit: 'Rabbit',
-    item_fire: 'Fire', item_tea: 'Tea', item_volcano: 'Volcano', item_soup: 'Soup',
-    item_ice: 'Ice', item_colddrink: 'Cold Drink',
-    item_baby: 'Baby', item_phone: 'Phone', item_brick: 'Brick', item_pencil: 'Pencil',
-    item_moon: 'Moon', item_orange: 'Orange', item_balloon: 'Balloon',
-    item_box: 'Box', item_gift: 'Gift', item_pine: 'Pine Tree', item_ruler: 'Set Square',
     score_label: 'pts',
-    sort_items_count: 'items',
-    sort_tries: 'tries',
     choose_student: 'Select or add a student',
     add_new_student: '+ Add New Student',
     student_placeholder: 'Student name',
@@ -1368,17 +1174,6 @@ const STRINGS = {
     student_updated: 'Student information updated.',
     no_students_yet: 'No students added yet. Create your first student to continue.',
     select_or_add_student: 'You can select a student or add a new one.',
-    // Sequence game feedback
-    seq_correct_order: '🎉 Great! You sequenced it correctly!',
-    seq_correct_order_speak: 'Great! You sequenced it correctly!',
-    seq_wrong_order: '❌ That\'s not the right order, try again!',
-    seq_try_again_speak: 'Try again!',
-    seq_select_cause_first: 'Select a cause first!',
-    seq_correct_match: '✅ Correct match!',
-    seq_correct_match_speak: 'Correct! Well done!',
-    seq_all_pairs_found: '🎉 You found all the pairs!',
-    seq_all_pairs_found_speak: 'You found all the pairs! Great job!',
-    seq_wrong_match: '❌ That\'s not the right match!',
 
     therapy_daily_life_label: 'Daily Life',
     therapy_daily_life_summary: 'Short conversations about routines, needs, and home-school life.',
@@ -1677,12 +1472,6 @@ const STRINGS = {
     skill_motor_6: 'Line tracing',
     skill_motor_7: 'Balance',
 
-    seq_menu_title: '🧩 Games',
-    games_group_sort: 'Classification',
-    games_group_order: '📋 Sequencing',
-    games_group_cause: '🔗 Cause & Effect',
-    games_sort_hero_sub: '{n} different matching games',
-    games_group_object: '🔍 Object Recognition',
     object_title: '🔍 Object Recognition',
     object_rotate_hint: '👆 Drag to rotate',
     object_prompt: 'What is this? Say it or type it',
@@ -1698,6 +1487,9 @@ const STRINGS = {
     object_complete_title: 'You Got Them All!',
     object_complete_sub: 'Great job recognizing objects!',
     object_play_again: '🔁 Play Again',
+    object_back_to_menu: '← Back to Menu',
+    report_no_obj: 'No object recognition played yet.',
+    obj_summary_line: '{plays} plays • {acc}% accuracy • {perfect} flawless',
     obj_ball: 'Ball',
     obj_star: 'Star',
     obj_apple: 'Apple',
@@ -1711,46 +1503,6 @@ const STRINGS = {
     obj_banana: 'Banana',
     obj_train: 'Train',
     obj_plane: 'Plane',
-    seq_menu_type_cause: 'Cause-Effect',
-    seq_menu_type_order: 'Sequencing',
-    seq_back_to_menu: '← Back to Game Selection',
-    seq_order_hint: 'Put the steps in the right order!',
-    seq_cause_hint: 'Pick a cause, then tap its effect!',
-    seq_cause_col_title: 'Cause',
-    seq_effect_col_title: 'Effect',
-
-    seq_game_morning_title: 'Morning Routine',
-    seq_game_morning_item0: 'Wake Up',
-    seq_game_morning_item1: 'Brush Teeth',
-    seq_game_morning_item2: 'Get Dressed',
-    seq_game_morning_item3: 'Eat Breakfast',
-    seq_game_morning_item4: 'Grab Your Bag',
-    seq_game_morning_item5: 'Go to School',
-
-    seq_game_washing_title: 'Handwashing',
-    seq_game_washing_item0: 'Turn On the Tap',
-    seq_game_washing_item1: 'Wet Your Hands',
-    seq_game_washing_item2: 'Get Soap',
-    seq_game_washing_item3: 'Scrub Well',
-    seq_game_washing_item4: 'Rinse',
-    seq_game_washing_item5: 'Dry Off',
-
-    seq_game_meal_title: 'Mealtime Prep',
-    seq_game_meal_item0: 'Sit at the Table',
-    seq_game_meal_item1: 'Put on a Bib',
-    seq_game_meal_item2: 'Get a Spoon',
-    seq_game_meal_item3: 'Eat',
-    seq_game_meal_item4: 'Clean the Table',
-
-    seq_game_cause_title: 'Cause-Effect',
-    seq_game_cause_pair0_cause: 'It is raining',
-    seq_game_cause_pair0_effect: 'We grab an umbrella',
-    seq_game_cause_pair1_cause: 'You fell and got hurt',
-    seq_game_cause_pair1_effect: 'You are crying',
-    seq_game_cause_pair2_cause: 'I watered the flower',
-    seq_game_cause_pair2_effect: 'The flower bloomed',
-    seq_game_cause_pair3_cause: 'It got dark out',
-    seq_game_cause_pair3_effect: 'We turned on the light',
 
     therapy_topic_title: 'What topic shall we work on?',
     therapy_topic_sub: 'Type a topic and Yıldız Can will ask questions about it.',
@@ -1908,8 +1660,7 @@ const STRINGS = {
     schedule_screen_title: '🎯 Daily Tasks',
     schedule_sub: 'Different tasks await you every day. Complete them to earn stars!',
     task_therapy: '🎤 Complete {n} speech practice session(s)',
-    task_sort: '🧺 Complete {n} classification game(s)',
-    task_sequence: '🧩 Complete {n} sequencing/cause-effect game(s)',
+    task_object: '🔍 Complete {n} object recognition question(s)',
     task_completed: '✓ Task complete: {label} — +5 ⭐',
     task_all_done_toast: '🏆 You finished all of today\'s tasks! +10 ⭐ bonus',
     task_all_done_title: 'You Completed Today!',
@@ -1938,7 +1689,7 @@ const STRINGS = {
     info_mic_permission: 'Microphone permission is required.',
     auth_login_success: 'Signed in successfully! 👋',
     auth_register_success: 'Registration complete, welcome! 🎉',
-    bottom_nav_games: 'Games',
+    bottom_nav_games: 'Object Recognition',
     auth_forgot_link: 'Forgot my password',
     auth_identifier_label: 'Username or Email',
     auth_identifier_ph: 'username or example@gmail.com',
@@ -2243,8 +1994,8 @@ function celebrateCorrectAnswer() {
 let _restoringScreen = false;
 
 function showOnly(id) {
-    const screens = ['start-screen','student-setup-screen','menu-screen','game-container','sort-screen',
-                      'schedule-screen','aac-screen','sequence-screen','store-screen','object-screen',
+    const screens = ['start-screen','student-setup-screen','menu-screen','game-container',
+                      'schedule-screen','aac-screen','store-screen','object-screen',
                       'login-screen','iep-screen','skills-screen','behavior-screen','auth-screen','analysis-screen'];
     const isNewScreen = currentScreenId !== id;
     const prevScreen = currentScreenId;
@@ -2293,8 +2044,7 @@ function _updateBottomNav(screenId) {
         'aac-screen': 'bnAAC',
         'schedule-screen': 'bnSchedule',
         'analysis-screen': 'bnAnalysis',
-        'sequence-screen': 'bnGames',
-        'sort-screen': 'bnGames',
+        'object-screen': 'bnGames',
     };
     nav.querySelectorAll('.bottom-nav-item').forEach(btn => btn.classList.remove('active'));
     const activeId = map[screenId];
@@ -3191,7 +2941,7 @@ async function _populateReportTab() {
 
     const history = await persistSessionSnapshot();
     renderReportHistory(history);
-    renderSortGamesSummary();
+    renderObjResultsSummary();
 
     // İstatistikler son 7 günü anlatır — rapor ne zaman açılırsa açılsın dolu
     const weekAgo = Date.now() - 7 * 86400000;
@@ -3236,8 +2986,8 @@ async function _populateReportTab() {
 
     // AI değerlendirmesi — anlamli veri yoksa bolumu gizle, Gemini'yi cagirma
     const aiSection = document.getElementById('aiEvalText')?.closest('.report-section');
-    const hasSortData = (DB.getSync('sort_results_' + (activeStudentId || 'default')) || []).length > 0;
-    if (!week.length && !hasSortData && !sessionData.therapyTurns.length) {
+    const hasObjData = (DB.getSync('obj_results_' + (activeStudentId || 'default')) || []).length > 0;
+    if (!week.length && !hasObjData && !sessionData.therapyTurns.length) {
         if (aiSection) aiSection.style.display = 'none';
     } else {
         if (aiSection) aiSection.style.display = '';
@@ -3285,12 +3035,11 @@ function _buildSkillsContextText() {
 }
 
 async function generateAIEvaluation(weekSessions, weekMinutes, weekMic, weekTurns) {
-    const sortResults = (DB.getSync('sort_results_' + (activeStudentId || 'default')) || []).slice(0, 6);
-    const sortText = sortResults.map(r => {
-        const game = SORT_GAMES.find(g => g.key === r.game);
+    const objResults = (DB.getSync('obj_results_' + (activeStudentId || 'default')) || []).slice(0, 6);
+    const sortText = objResults.map(r => {
         const acc = r.items + (r.errors || 0) > 0
             ? Math.round((r.items / (r.items + (r.errors || 0))) * 100) : 100;
-        return `- ${game ? game.title : r.game}: %${acc} doğruluk (${r.errors || 0} hata)`;
+        return `- Nesne Tanıma: %${acc} doğruluk (${r.errors || 0} hata)`;
     }).join('\n') || 'Henüz oyun oynanmadı.';
 
     const therapySample = sessionData.therapyTurns.slice(0, 5).map(t =>
@@ -3567,543 +3316,6 @@ let isWaiting = false;
 let chatHistory = [];
 let idleTimer;
 let turnCount = 0;
-
-// =============================================
-// SINIFLANDIRMA OYUNU (SÜRÜKLE & BIRAK)
-// =============================================
-const SORT_GAMES = [
-    {
-        key: 'animals-vehicles',
-        get title() { return t('sort_game1_title'); },
-        icon: '🐾',
-        categories: [
-            { key: 'hayvan', get label() { return t('sort_cat_animals'); }, emoji: '🐾', color: '#d4edda' },
-            { key: 'arac',   get label() { return t('sort_cat_vehicles'); }, emoji: '🚗', color: '#d1ecf1' }
-        ],
-        items: [
-            { emoji: '🐱', get label() { return t('item_cat'); },        cat: 'hayvan' },
-            { emoji: '🚗', get label() { return t('item_car'); },        cat: 'arac'   },
-            { emoji: '🐶', get label() { return t('item_dog'); },        cat: 'hayvan' },
-            { emoji: '✈️', get label() { return t('item_plane'); },      cat: 'arac'   },
-            { emoji: '🐦', get label() { return t('item_bird'); },       cat: 'hayvan' },
-            { emoji: '🚢', get label() { return t('item_ship'); },       cat: 'arac'   },
-            { emoji: '🐠', get label() { return t('item_fish'); },       cat: 'hayvan' },
-            { emoji: '🚲', get label() { return t('item_bike'); },       cat: 'arac'   },
-            { emoji: '🦁', get label() { return t('item_lion'); },       cat: 'hayvan' },
-            { emoji: '🚁', get label() { return t('item_helicopter'); }, cat: 'arac'   },
-        ]
-    },
-    {
-        key: 'food-toys',
-        get title() { return t('sort_game2_title'); },
-        icon: '🍎',
-        categories: [
-            { key: 'yiyecek', get label() { return t('sort_cat_food'); },  emoji: '🍽️', color: '#fff3cd' },
-            { key: 'oyuncak', get label() { return t('sort_cat_toys'); },  emoji: '🧸', color: '#fce4ec' }
-        ],
-        items: [
-            { emoji: '🍎', get label() { return t('item_apple'); },      cat: 'yiyecek' },
-            { emoji: '🧸', get label() { return t('item_teddy'); },      cat: 'oyuncak' },
-            { emoji: '🍕', get label() { return t('item_pizza'); },      cat: 'yiyecek' },
-            { emoji: '⚽', get label() { return t('item_ball'); },       cat: 'oyuncak' },
-            { emoji: '🍌', get label() { return t('item_banana'); },     cat: 'yiyecek' },
-            { emoji: '🎮', get label() { return t('item_gamepad'); },    cat: 'oyuncak' },
-            { emoji: '🍦', get label() { return t('item_ice_cream'); },  cat: 'yiyecek' },
-            { emoji: '🎨', get label() { return t('item_paint'); },      cat: 'oyuncak' },
-            { emoji: '🍰', get label() { return t('item_cake'); },       cat: 'yiyecek' },
-            { emoji: '🎯', get label() { return t('item_target'); },     cat: 'oyuncak' },
-        ]
-    },
-    {
-        key: 'nature-home',
-        get title() { return t('sort_game3_title'); },
-        icon: '🌳',
-        categories: [
-            { key: 'disari', get label() { return t('sort_cat_outside'); }, emoji: '🌳', color: '#d4edda' },
-            { key: 'iceri',  get label() { return t('sort_cat_inside'); },  emoji: '🏠', color: '#e8d5f5' }
-        ],
-        items: [
-            { emoji: '🌻', get label() { return t('item_flower'); },    cat: 'disari' },
-            { emoji: '🛋️', get label() { return t('item_sofa'); },     cat: 'iceri'  },
-            { emoji: '⛅', get label() { return t('item_cloud'); },     cat: 'disari' },
-            { emoji: '📺', get label() { return t('item_tv'); },        cat: 'iceri'  },
-            { emoji: '🌲', get label() { return t('item_tree'); },      cat: 'disari' },
-            { emoji: '🛏️', get label() { return t('item_bed'); },      cat: 'iceri'  },
-            { emoji: '🌊', get label() { return t('item_sea'); },       cat: 'disari' },
-            { emoji: '🪑', get label() { return t('item_chair'); },     cat: 'iceri'  },
-            { emoji: '⛺', get label() { return t('item_tent'); },      cat: 'disari' },
-            { emoji: '🖥️', get label() { return t('item_computer'); }, cat: 'iceri'  },
-        ]
-    },
-    {
-        key: 'big-small',
-        get title() { return t('sort_game4_title'); },
-        icon: '🐘',
-        categories: [
-            { key: 'buyuk', get label() { return t('sort_cat_big'); },   emoji: '🐘', color: '#d1ecf1' },
-            { key: 'kucuk', get label() { return t('sort_cat_small'); }, emoji: '🐭', color: '#fff3cd' }
-        ],
-        items: [
-            { emoji: '🐘', get label() { return t('item_elephant'); },  cat: 'buyuk' },
-            { emoji: '🐭', get label() { return t('item_mouse'); },     cat: 'kucuk' },
-            { emoji: '🏠', get label() { return t('item_house'); },     cat: 'buyuk' },
-            { emoji: '🐝', get label() { return t('item_bee'); },       cat: 'kucuk' },
-            { emoji: '✈️', get label() { return t('item_airplane2'); }, cat: 'buyuk' },
-            { emoji: '🐜', get label() { return t('item_ant'); },       cat: 'kucuk' },
-            { emoji: '💍', get label() { return t('item_ring'); },      cat: 'kucuk' },
-            { emoji: '🌍', get label() { return t('item_world'); },     cat: 'buyuk' },
-            { emoji: '🦋', get label() { return t('item_butterfly'); }, cat: 'kucuk' },
-            { emoji: '🚢', get label() { return t('item_ship'); },      cat: 'buyuk' },
-        ]
-    },
-    {
-        key: 'colors',
-        get title() { return t('sort_game5_title'); },
-        icon: '🎨',
-        categories: [
-            { key: 'kirmizi', get label() { return t('sort_cat_red'); },    emoji: '🔴', color: '#fdd8d8' },
-            { key: 'mavi',    get label() { return t('sort_cat_blue'); },   emoji: '🔵', color: '#d1ecf1' },
-            { key: 'sari',    get label() { return t('sort_cat_yellow'); }, emoji: '🟡', color: '#fff3cd' }
-        ],
-        items: [
-            { emoji: '🍎', get label() { return t('item_apple'); },      cat: 'kirmizi' },
-            { emoji: '🍓', get label() { return t('item_strawberry'); }, cat: 'kirmizi' },
-            { emoji: '🚒', get label() { return t('item_firetruck'); },  cat: 'kirmizi' },
-            { emoji: '❤️', get label() { return t('item_heart'); },      cat: 'kirmizi' },
-            { emoji: '🫐', get label() { return t('item_blueberry'); },  cat: 'mavi' },
-            { emoji: '💧', get label() { return t('item_drop'); },       cat: 'mavi' },
-            { emoji: '🐳', get label() { return t('item_whale'); },      cat: 'mavi' },
-            { emoji: '🧢', get label() { return t('item_cap'); },        cat: 'mavi' },
-            { emoji: '🍌', get label() { return t('item_banana'); },     cat: 'sari' },
-            { emoji: '🌻', get label() { return t('item_sunflower'); },  cat: 'sari' },
-            { emoji: '⭐', get label() { return t('item_star'); },       cat: 'sari' },
-            { emoji: '🍋', get label() { return t('item_lemon'); },      cat: 'sari' },
-        ]
-    },
-    {
-        key: 'fruit-veg',
-        get title() { return t('sort_game6_title'); },
-        icon: '🥕',
-        categories: [
-            { key: 'meyve', get label() { return t('sort_cat_fruit'); }, emoji: '🍎', color: '#fdd8d8' },
-            { key: 'sebze', get label() { return t('sort_cat_veg'); },   emoji: '🥦', color: '#d4edda' }
-        ],
-        items: [
-            { emoji: '🍎', get label() { return t('item_apple'); },      cat: 'meyve' },
-            { emoji: '🍌', get label() { return t('item_banana'); },     cat: 'meyve' },
-            { emoji: '🍇', get label() { return t('item_grapes'); },     cat: 'meyve' },
-            { emoji: '🍓', get label() { return t('item_strawberry'); }, cat: 'meyve' },
-            { emoji: '🍉', get label() { return t('item_watermelon'); }, cat: 'meyve' },
-            { emoji: '🍑', get label() { return t('item_peach'); },      cat: 'meyve' },
-            { emoji: '🥦', get label() { return t('item_broccoli'); },   cat: 'sebze' },
-            { emoji: '🥕', get label() { return t('item_carrot'); },     cat: 'sebze' },
-            { emoji: '🍆', get label() { return t('item_eggplant'); },   cat: 'sebze' },
-            { emoji: '🥒', get label() { return t('item_cucumber'); },   cat: 'sebze' },
-            { emoji: '🌽', get label() { return t('item_corn'); },       cat: 'sebze' },
-            { emoji: '🧅', get label() { return t('item_onion'); },      cat: 'sebze' },
-        ]
-    },
-    {
-        key: 'summer-winter',
-        get title() { return t('sort_game7_title'); },
-        icon: '⛄',
-        categories: [
-            { key: 'yaz', get label() { return t('sort_cat_summer'); }, emoji: '☀️', color: '#fff3cd' },
-            { key: 'kis', get label() { return t('sort_cat_winter'); }, emoji: '❄️', color: '#d1ecf1' }
-        ],
-        items: [
-            { emoji: '🩳', get label() { return t('item_shorts'); },     cat: 'yaz' },
-            { emoji: '👕', get label() { return t('item_tshirt'); },     cat: 'yaz' },
-            { emoji: '🩱', get label() { return t('item_swimsuit'); },   cat: 'yaz' },
-            { emoji: '☀️', get label() { return t('item_sun'); },        cat: 'yaz' },
-            { emoji: '🏖️', get label() { return t('item_beach'); },     cat: 'yaz' },
-            { emoji: '🍦', get label() { return t('item_ice_cream'); },  cat: 'yaz' },
-            { emoji: '🧥', get label() { return t('item_coat'); },       cat: 'kis' },
-            { emoji: '🧣', get label() { return t('item_scarf'); },      cat: 'kis' },
-            { emoji: '🧤', get label() { return t('item_gloves'); },     cat: 'kis' },
-            { emoji: '⛄', get label() { return t('item_snowman'); },    cat: 'kis' },
-            { emoji: '❄️', get label() { return t('item_snowflake'); }, cat: 'kis' },
-            { emoji: '🎿', get label() { return t('item_skis'); },       cat: 'kis' },
-        ]
-    },
-    {
-        key: 'habitats',
-        get title() { return t('sort_game8_title'); },
-        icon: '🌍',
-        categories: [
-            { key: 'gok',   get label() { return t('sort_cat_sky'); },  emoji: '☁️', color: '#e3f2fd' },
-            { key: 'deniz', get label() { return t('sort_cat_sea'); },  emoji: '🌊', color: '#d1ecf1' },
-            { key: 'kara',  get label() { return t('sort_cat_land'); }, emoji: '🌳', color: '#d4edda' }
-        ],
-        items: [
-            { emoji: '🐦', get label() { return t('item_bird'); },      cat: 'gok' },
-            { emoji: '🦅', get label() { return t('item_eagle'); },     cat: 'gok' },
-            { emoji: '🦋', get label() { return t('item_butterfly'); }, cat: 'gok' },
-            { emoji: '🐝', get label() { return t('item_bee'); },       cat: 'gok' },
-            { emoji: '🐟', get label() { return t('item_fish'); },      cat: 'deniz' },
-            { emoji: '🐬', get label() { return t('item_dolphin'); },   cat: 'deniz' },
-            { emoji: '🐙', get label() { return t('item_octopus'); },   cat: 'deniz' },
-            { emoji: '🦀', get label() { return t('item_crab'); },      cat: 'deniz' },
-            { emoji: '🐱', get label() { return t('item_cat'); },       cat: 'kara' },
-            { emoji: '🐘', get label() { return t('item_elephant'); },  cat: 'kara' },
-            { emoji: '🦁', get label() { return t('item_lion'); },      cat: 'kara' },
-            { emoji: '🐰', get label() { return t('item_rabbit'); },    cat: 'kara' },
-        ]
-    },
-    {
-        key: 'hot-cold',
-        get title() { return t('sort_game9_title'); },
-        icon: '🌡️',
-        categories: [
-            { key: 'sicak', get label() { return t('sort_cat_hot'); },  emoji: '🔥', color: '#fdd8d8' },
-            { key: 'soguk', get label() { return t('sort_cat_cold'); }, emoji: '🧊', color: '#d1ecf1' }
-        ],
-        items: [
-            { emoji: '☀️', get label() { return t('item_sun'); },        cat: 'sicak' },
-            { emoji: '🔥', get label() { return t('item_fire'); },       cat: 'sicak' },
-            { emoji: '🍵', get label() { return t('item_tea'); },        cat: 'sicak' },
-            { emoji: '🌋', get label() { return t('item_volcano'); },    cat: 'sicak' },
-            { emoji: '🍲', get label() { return t('item_soup'); },       cat: 'sicak' },
-            { emoji: '❄️', get label() { return t('item_snowflake'); }, cat: 'soguk' },
-            { emoji: '⛄', get label() { return t('item_snowman'); },    cat: 'soguk' },
-            { emoji: '🧊', get label() { return t('item_ice'); },        cat: 'soguk' },
-            { emoji: '🍦', get label() { return t('item_ice_cream'); },  cat: 'soguk' },
-            { emoji: '🥤', get label() { return t('item_colddrink'); },  cat: 'soguk' },
-        ]
-    },
-    {
-        key: 'living-nonliving',
-        get title() { return t('sort_game10_title'); },
-        icon: '🌱',
-        categories: [
-            { key: 'canli',  get label() { return t('sort_cat_living'); },    emoji: '🐾', color: '#d4edda' },
-            { key: 'cansiz', get label() { return t('sort_cat_nonliving'); }, emoji: '🪑', color: '#e8e8e8' }
-        ],
-        items: [
-            { emoji: '🐱', get label() { return t('item_cat'); },       cat: 'canli' },
-            { emoji: '🌳', get label() { return t('item_tree'); },      cat: 'canli' },
-            { emoji: '👶', get label() { return t('item_baby'); },      cat: 'canli' },
-            { emoji: '🐟', get label() { return t('item_fish'); },      cat: 'canli' },
-            { emoji: '🦋', get label() { return t('item_butterfly'); }, cat: 'canli' },
-            { emoji: '🌻', get label() { return t('item_sunflower'); }, cat: 'canli' },
-            { emoji: '🪑', get label() { return t('item_chair'); },     cat: 'cansiz' },
-            { emoji: '📱', get label() { return t('item_phone'); },     cat: 'cansiz' },
-            { emoji: '⚽', get label() { return t('item_ball'); },      cat: 'cansiz' },
-            { emoji: '🚗', get label() { return t('item_car'); },       cat: 'cansiz' },
-            { emoji: '🧱', get label() { return t('item_brick'); },     cat: 'cansiz' },
-            { emoji: '✏️', get label() { return t('item_pencil'); },   cat: 'cansiz' },
-        ]
-    },
-    {
-        key: 'shapes',
-        get title() { return t('sort_game11_title'); },
-        icon: '🔺',
-        categories: [
-            { key: 'yuvarlak', get label() { return t('sort_cat_round'); },    emoji: '🔴', color: '#fdd8d8' },
-            { key: 'kare',     get label() { return t('sort_cat_square'); },   emoji: '🟦', color: '#d1ecf1' },
-            { key: 'ucgen',    get label() { return t('sort_cat_triangle'); }, emoji: '🔺', color: '#fff3cd' }
-        ],
-        items: [
-            { emoji: '⚽', get label() { return t('item_ball'); },     cat: 'yuvarlak' },
-            { emoji: '🌕', get label() { return t('item_moon'); },     cat: 'yuvarlak' },
-            { emoji: '🍊', get label() { return t('item_orange'); },   cat: 'yuvarlak' },
-            { emoji: '🎈', get label() { return t('item_balloon'); },  cat: 'yuvarlak' },
-            { emoji: '📦', get label() { return t('item_box'); },      cat: 'kare' },
-            { emoji: '🧊', get label() { return t('item_ice'); },      cat: 'kare' },
-            { emoji: '📺', get label() { return t('item_tv'); },       cat: 'kare' },
-            { emoji: '🎁', get label() { return t('item_gift'); },     cat: 'kare' },
-            { emoji: '🍕', get label() { return t('item_pizza'); },    cat: 'ucgen' },
-            { emoji: '⛺', get label() { return t('item_tent'); },     cat: 'ucgen' },
-            { emoji: '🎄', get label() { return t('item_pine'); },     cat: 'ucgen' },
-            { emoji: '📐', get label() { return t('item_ruler'); },    cat: 'ucgen' },
-        ]
-    }
-];
-
-let _sortGame = null;
-let _sortItems = [];
-let _sortSorted = {};
-let _sortErrors = 0;
-let _sortSelected = null;
-let _dragGhost = null;
-let _dragOriginEl = null;
-let _dragItemIndex = null;
-let _dragStartX = 0;
-let _dragStartY = 0;
-let _dragMoved = false;
-
-function goToSort() {
-    showOnly('sort-screen');
-    renderSortMenu();
-}
-
-function renderSortMenu() {
-    _sortGame = null;
-    _sortSelected = null;
-    const menuSection = document.getElementById('sortMenuSection');
-    const gameSection = document.getElementById('sortGameSection');
-    if (menuSection) menuSection.style.display = 'block';
-    if (gameSection) gameSection.style.display = 'none';
-    const grid = document.getElementById('sortMenuGrid');
-    if (!grid) return;
-    grid.innerHTML = SORT_GAMES.map(g => `
-        <button type="button" class="sort-menu-card" onclick="startSortGame('${g.key}')">
-            <div class="sort-menu-icon">${g.icon}</div>
-            <strong>${g.title}</strong>
-            <p>${g.categories.map(c => c.emoji + ' ' + c.label).join(' & ')}</p>
-        </button>
-    `).join('');
-}
-
-function startSortGame(key) {
-    _sortGame = SORT_GAMES.find(g => g.key === key);
-    if (!_sortGame) return;
-    const pool = [..._sortGame.items];
-    for (let i = pool.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [pool[i], pool[j]] = [pool[j], pool[i]];
-    }
-    _sortItems = pool.slice(0, 10);
-    _sortSorted = {};
-    _sortErrors = 0;
-    _sortSelected = null;
-    const menuSection = document.getElementById('sortMenuSection');
-    const gameSection = document.getElementById('sortGameSection');
-    if (menuSection) menuSection.style.display = 'none';
-    if (gameSection) {
-        gameSection.style.display = 'block';
-        gameSection.innerHTML = `
-            <div class="sort-header-row">
-                <h3 class="sort-game-title" id="sortGameTitle"></h3>
-                <div class="sort-score" id="sortScore">0 / 0</div>
-            </div>
-            <div class="sort-items-area" id="sortItemsArea"></div>
-            <div class="sort-baskets-area" id="sortBasketsArea"></div>
-            <button type="button" class="menu-ghost-btn sort-back-btn" onclick="renderSortMenu()">${t('sort_back')}</button>
-        `;
-    }
-    const titleEl = document.getElementById('sortGameTitle');
-    if (titleEl) titleEl.textContent = _sortGame.title;
-    renderSortGame();
-    speakFallback(_sortGame.title + '!', () => {});
-}
-
-function renderSortGame() {
-    _renderSortItems();
-    _renderSortBaskets();
-    _updateSortScore();
-}
-
-function _renderSortItems() {
-    const area = document.getElementById('sortItemsArea');
-    if (!area || !_sortGame) return;
-    area.innerHTML = _sortItems.map((item, i) => {
-        const sorted = _sortSorted[i] !== undefined;
-        const selected = _sortSelected === i;
-        return `<button type="button"
-            class="sort-item${sorted ? ' sort-item-done' : ''}${selected ? ' sort-item-selected' : ''}"
-            data-index="${i}"
-            ${sorted ? 'disabled' : ''}
-            ontouchstart="_sortPointerDown(event,${i})"
-            onmousedown="_sortPointerDown(event,${i})"
-            onclick="_sortTap(${i})">
-            <span class="sort-item-emoji">${item.emoji}</span>
-            <span class="sort-item-label">${item.label}</span>
-            ${sorted ? '<span class="sort-item-check">✓</span>' : ''}
-        </button>`;
-    }).join('');
-}
-
-function _renderSortBaskets() {
-    const area = document.getElementById('sortBasketsArea');
-    if (!area || !_sortGame) return;
-    area.style.gridTemplateColumns = `repeat(${_sortGame.categories.length}, 1fr)`;
-    area.innerHTML = _sortGame.categories.map(cat => {
-        const count = Object.values(_sortSorted).filter(c => c === cat.key).length;
-        return `<div class="sort-basket${_sortSelected !== null ? ' sort-basket-ready' : ''}" data-cat="${cat.key}" style="background:${cat.color}"
-            onclick="_sortBasketTap('${cat.key}')">
-            <div class="sort-basket-emoji">${cat.emoji}</div>
-            <div class="sort-basket-label">${cat.label}</div>
-            <div class="sort-basket-count">${count > 0 ? count : ''}</div>
-        </div>`;
-    }).join('');
-}
-
-function _updateSortScore() {
-    const el = document.getElementById('sortScore');
-    if (el) el.textContent = `${Object.keys(_sortSorted).length} / ${_sortItems.length}`;
-}
-
-function _sortTap(idx) {
-    if (_dragMoved) { _dragMoved = false; return; }
-    if (_sortSorted[idx] !== undefined) return;
-    _sortSelected = (_sortSelected === idx) ? null : idx;
-    _renderSortItems();
-    _renderSortBaskets();
-}
-
-function _sortBasketTap(cat) {
-    if (_sortSelected === null) return;
-    _checkSortDrop(_sortSelected, cat);
-    _sortSelected = null;
-}
-
-function _sortPointerDown(e, idx) {
-    if (e.type === 'mousedown' && e.button !== 0) return;
-    if (_sortSorted[idx] !== undefined) return;
-    e.preventDefault();
-    e.stopPropagation();
-    const pt = e.touches ? e.touches[0] : e;
-    _dragItemIndex = idx;
-    _dragOriginEl = e.currentTarget;
-    _dragStartX = pt.clientX;
-    _dragStartY = pt.clientY;
-    _dragMoved = false;
-    document.addEventListener('mousemove', _onSortDragMove, { passive: false });
-    document.addEventListener('touchmove', _onSortDragMove, { passive: false });
-    document.addEventListener('mouseup', _onSortDragEnd);
-    document.addEventListener('touchend', _onSortDragEnd);
-}
-
-function _onSortDragMove(e) {
-    e.preventDefault();
-    const pt = e.touches ? e.touches[0] : e;
-    const dx = pt.clientX - _dragStartX;
-    const dy = pt.clientY - _dragStartY;
-    if (!_dragMoved && Math.sqrt(dx * dx + dy * dy) > 8) {
-        _dragMoved = true;
-        _dragGhost = document.createElement('div');
-        _dragGhost.className = 'sort-drag-ghost';
-        _dragGhost.textContent = _sortItems[_dragItemIndex].emoji;
-        document.body.appendChild(_dragGhost);
-        if (_dragOriginEl) _dragOriginEl.style.opacity = '0.3';
-    }
-    if (_dragGhost) {
-        _dragGhost.style.left = (pt.clientX - 44) + 'px';
-        _dragGhost.style.top  = (pt.clientY - 44) + 'px';
-        document.querySelectorAll('.sort-basket').forEach(b => {
-            const r = b.getBoundingClientRect();
-            b.classList.toggle('sort-basket-hover',
-                pt.clientX >= r.left && pt.clientX <= r.right &&
-                pt.clientY >= r.top  && pt.clientY <= r.bottom);
-        });
-    }
-}
-
-function _onSortDragEnd(e) {
-    document.removeEventListener('mousemove', _onSortDragMove);
-    document.removeEventListener('touchmove', _onSortDragMove);
-    document.removeEventListener('mouseup', _onSortDragEnd);
-    document.removeEventListener('touchend', _onSortDragEnd);
-    document.querySelectorAll('.sort-basket').forEach(b => b.classList.remove('sort-basket-hover'));
-    if (_dragGhost) { _dragGhost.remove(); _dragGhost = null; }
-    if (_dragOriginEl) { _dragOriginEl.style.opacity = ''; _dragOriginEl = null; }
-    if (!_dragMoved) {
-        const tappedIdx = _dragItemIndex;
-        _dragItemIndex = null;
-        if (e.type === 'touchend' && tappedIdx !== null) _sortTap(tappedIdx);
-        return;
-    }
-    const pt = e.changedTouches ? e.changedTouches[0] : e;
-    let droppedCat = null;
-    document.querySelectorAll('.sort-basket').forEach(b => {
-        const r = b.getBoundingClientRect();
-        if (pt.clientX >= r.left && pt.clientX <= r.right &&
-            pt.clientY >= r.top  && pt.clientY <= r.bottom) droppedCat = b.dataset.cat;
-    });
-    if (droppedCat && _dragItemIndex !== null) _checkSortDrop(_dragItemIndex, droppedCat);
-    _dragItemIndex = null;
-    _dragMoved = false;
-}
-
-function _checkSortDrop(idx, cat) {
-    const item = _sortItems[idx];
-    if (!item) return;
-    if (item.cat === cat) {
-        _sortSorted[idx] = cat;
-        speakFallback(t('sort_correct') + ' ' + item.label + '!', () => {});
-        confetti({ particleCount: 25, spread: 40, origin: { y: 0.7 }, scalar: 0.8 });
-        renderSortGame();
-        if (Object.keys(_sortSorted).length === _sortItems.length) setTimeout(_showSortComplete, 600);
-    } else {
-        _sortErrors++;
-        speakFallback(t('sort_wrong'), () => {});
-        const el = document.querySelector(`.sort-item[data-index="${idx}"]`);
-        if (el) { el.classList.add('sort-item-shake'); setTimeout(() => el.classList.remove('sort-item-shake'), 500); }
-    }
-}
-
-async function _saveSortResult() {
-    const sid = activeStudentId || 'default';
-    const key = 'sort_results_' + sid;
-    const list = await DB.get(key) || [];
-    list.unshift({
-        game: _sortGame.key,
-        date: new Date().toISOString(),
-        items: _sortItems.length,
-        errors: _sortErrors,
-    });
-    if (list.length > 100) list.splice(100);
-    await DB.set(key, list);
-}
-
-async function renderSortGamesSummary() {
-    const el = document.getElementById('sortGamesSummary');
-    if (!el) return;
-    const sid = activeStudentId || 'default';
-    const list = await DB.get('sort_results_' + sid) || [];
-    if (!list.length) {
-        el.innerHTML = `<p class="report-empty">${t('report_no_sort')}</p>`;
-        return;
-    }
-    const byGame = {};
-    list.forEach(r => { (byGame[r.game] = byGame[r.game] || []).push(r); });
-    el.innerHTML = Object.entries(byGame).map(([key, results]) => {
-        const game = SORT_GAMES.find(g => g.key === key);
-        if (!game) return '';
-        const plays = results.length;
-        const items = results.reduce((s, r) => s + (r.items || 0), 0);
-        const errors = results.reduce((s, r) => s + (r.errors || 0), 0);
-        const acc = items + errors > 0 ? Math.round((items / (items + errors)) * 100) : 100;
-        const perfect = results.filter(r => !r.errors).length;
-        const last = new Date(results[0].date).toLocaleDateString(
-            _lang === 'en' ? 'en-US' : 'tr-TR', { day: 'numeric', month: 'short' });
-        const line = t('sort_summary_line')
-            .replace('{plays}', plays).replace('{acc}', acc).replace('{perfect}', perfect);
-        return `<div class="sort-summary-row">
-            <span class="sort-summary-icon">${game.icon}</span>
-            <div class="sort-summary-info">
-                <strong>${escapeHtml(game.title)}</strong>
-                <span>${line} • ${escapeHtml(last)}</span>
-            </div>
-        </div>`;
-    }).join('');
-}
-
-function _showSortComplete() {
-    const gameSection = document.getElementById('sortGameSection');
-    if (!gameSection) return;
-    _saveSortResult().catch(() => {});
-    addStars(_sortErrors === 0 ? 3 : (_sortErrors <= 2 ? 2 : 1));
-    incrementDailyTask('sort');
-    confetti({ particleCount: 120, spread: 90 });
-    speakFallback(t('sort_complete_title') + ' ' + (_lang === 'en' ? 'Well done!' : 'Çok güzel yaptın!'), () => {});
-    gameSection.innerHTML = `
-        <div class="sort-complete">
-            <div class="sort-complete-icon">🏆</div>
-            <h2>${t('sort_complete_title')}</h2>
-            <p>${t('sort_complete_msg')}</p>
-            <div class="sort-complete-stats">
-                <span>✓ ${_sortItems.length} ${t('sort_items_count')}</span>
-                ${_sortErrors > 0 ? `<span>↺ ${_sortErrors} ${t('sort_tries')}</span>` : `<span>${t('sort_perfect')}</span>`}
-            </div>
-            <div class="sort-complete-btns">
-                <button type="button" class="btn-primary-gradient" onclick="startSortGame('${_sortGame.key}')">${t('sort_play_again')}</button>
-                <button type="button" class="menu-ghost-btn" onclick="renderSortMenu()">${t('sort_other_game')}</button>
-            </div>
-        </div>
-    `;
-}
 
 // =============================================
 // İLERLEME & YARDIMCI FONKSIYONLAR
@@ -4937,9 +4149,8 @@ function _seededRandom(seedStr) {
 }
 
 const DAILY_TASK_DEFS = {
-    therapy:  { icon: '🎤', choices: [1, 1, 2],    get key() { return 'task_therapy'; },  action: 'goToTherapy' },
-    sort:     { icon: '🧺', choices: [2, 3, 3, 4], get key() { return 'task_sort'; },     action: 'goToSort' },
-    sequence: { icon: '🧩', choices: [2, 2, 3],    get key() { return 'task_sequence'; }, action: 'goToSequence' },
+    therapy: { icon: '🎤', choices: [1, 1, 2],     get key() { return 'task_therapy'; }, action: 'goToTherapy' },
+    object:  { icon: '🔍', choices: [3, 4, 5, 6],  get key() { return 'task_object'; },  action: 'goToObjectRecognition' },
 };
 
 function getDailyTasks() {
@@ -4953,8 +4164,8 @@ function getDailyTasks() {
 function loadDailyProgress() {
     const raw = localStorage.getItem(_dailyProgressKey());
     const p = raw ? (() => { try { return JSON.parse(raw); } catch (e) { return {}; } })() : {};
-    p.counts = p.counts || { therapy: 0, sort: 0, sequence: 0 };
-    p.claimed = p.claimed || { therapy: false, sort: false, sequence: false, all: false };
+    p.counts = p.counts || { therapy: 0, object: 0 };
+    p.claimed = p.claimed || { therapy: false, object: false, all: false };
     return p;
 }
 function saveDailyProgress(p) {
@@ -5731,7 +4942,7 @@ async function renderMenuNudge() {
     el.style.display = 'none';
     if (!activeStudentId) return;
     try {
-        const results = await DB.get('sort_results_' + activeStudentId) || [];
+        const results = await DB.get('obj_results_' + activeStudentId) || [];
         const history = await loadReportHistory();
         const lastTherapy = history[0];
         const daysSince = lastTherapy
@@ -5744,13 +4955,10 @@ async function renderMenuNudge() {
             action = () => goToTherapy();
         } else if (results[0]) {
             const last = results[0];
-            const game = SORT_GAMES.find(g => g.key === last.game);
-            if (game) {
-                const acc = last.items + (last.errors || 0) > 0
-                    ? Math.round((last.items / (last.items + (last.errors || 0))) * 100) : 100;
-                text = `🧺 ` + t('nudge_sort_again').replace('{game}', game.title).replace('{acc}', acc);
-                action = () => { goToSort(); setTimeout(() => startSortGame(game.key), 120); };
-            }
+            const acc = last.items + (last.errors || 0) > 0
+                ? Math.round((last.items / (last.items + (last.errors || 0))) * 100) : 100;
+            text = `🔍 ` + t('nudge_sort_again').replace('{game}', t('object_title')).replace('{acc}', acc);
+            action = () => goToObjectRecognition();
         } else if (!history.length) {
             text = '✨ ' + t('nudge_first');
             action = () => goToTherapy();
@@ -5813,259 +5021,11 @@ function closeStarModal() {
 }
 
 // =============================================
-// SIRALAMA OYUNLARI
+// OYUNLAR — artik dogrudan Nesne Tanima'ya yonlendiriyor
+// (Siniflandirma/Siralama/Sebep-Sonuc oyunlari kaldirildi)
 // =============================================
-const SEQUENCE_GAMES = [
-    {
-        id: 'morning', get title() { return t('seq_game_morning_title'); }, emoji: '🌅',
-        type: 'order',
-        items: [
-            { emoji: '😴', get text() { return t('seq_game_morning_item0'); } },
-            { emoji: '🦷', get text() { return t('seq_game_morning_item1'); } },
-            { emoji: '👕', get text() { return t('seq_game_morning_item2'); } },
-            { emoji: '🍳', get text() { return t('seq_game_morning_item3'); } },
-            { emoji: '🎒', get text() { return t('seq_game_morning_item4'); } },
-            { emoji: '🚌', get text() { return t('seq_game_morning_item5'); } },
-        ]
-    },
-    {
-        id: 'washing', get title() { return t('seq_game_washing_title'); }, emoji: '🧼',
-        type: 'order',
-        items: [
-            { emoji: '🚰', get text() { return t('seq_game_washing_item0'); } },
-            { emoji: '💧', get text() { return t('seq_game_washing_item1'); } },
-            { emoji: '🧴', get text() { return t('seq_game_washing_item2'); } },
-            { emoji: '🤲', get text() { return t('seq_game_washing_item3'); } },
-            { emoji: '🚿', get text() { return t('seq_game_washing_item4'); } },
-            { emoji: '🧻', get text() { return t('seq_game_washing_item5'); } },
-        ]
-    },
-    {
-        id: 'meal', get title() { return t('seq_game_meal_title'); }, emoji: '🍽️',
-        type: 'order',
-        items: [
-            { emoji: '🪑', get text() { return t('seq_game_meal_item0'); } },
-            { emoji: '🧺', get text() { return t('seq_game_meal_item1'); } },
-            { emoji: '🥄', get text() { return t('seq_game_meal_item2'); } },
-            { emoji: '😋', get text() { return t('seq_game_meal_item3'); } },
-            { emoji: '🧹', get text() { return t('seq_game_meal_item4'); } },
-        ]
-    },
-    {
-        id: 'cause', get title() { return t('seq_game_cause_title'); }, emoji: '🔗',
-        type: 'cause',
-        pairs: [
-            { cause: { emoji: '🌧️', get text() { return t('seq_game_cause_pair0_cause'); } }, effect: { emoji: '☂️', get text() { return t('seq_game_cause_pair0_effect'); } } },
-            { cause: { emoji: '😢', get text() { return t('seq_game_cause_pair1_cause'); } }, effect: { emoji: '😭', get text() { return t('seq_game_cause_pair1_effect'); } } },
-            { cause: { emoji: '🌱', get text() { return t('seq_game_cause_pair2_cause'); } }, effect: { emoji: '🌸', get text() { return t('seq_game_cause_pair2_effect'); } } },
-            { cause: { emoji: '🌑', get text() { return t('seq_game_cause_pair3_cause'); } }, effect: { emoji: '💡', get text() { return t('seq_game_cause_pair3_effect'); } } },
-        ]
-    },
-];
-
-let seqState = null;
-
-function goToSequence() {
-    showOnly('sequence-screen');
-    seqState = null;
-    document.getElementById('sequenceGame').style.display = 'none';
-    document.getElementById('sequenceMenu').style.display = '';
-    renderSequenceMenu();
-}
-
-function renderSequenceMenu() {
-    const menu = document.getElementById('sequenceMenu');
-    const orderGames = SEQUENCE_GAMES.map((g, i) => ({ g, i })).filter(x => x.g.type !== 'cause');
-    const causeGames = SEQUENCE_GAMES.map((g, i) => ({ g, i })).filter(x => x.g.type === 'cause');
-    const colors = ['gc1', 'gc2', 'gc3', 'gc4'];
-    const card = (x, k, shift) => `
-        <button type="button" class="seq-menu-card ${colors[(k + shift) % 4]}" onclick="startSequenceGame(${x.i})">
-            <span class="seq-menu-emoji">${escapeHtml(x.g.emoji)}</span>
-            <span class="seq-menu-label">${escapeHtml(x.g.title)}</span>
-        </button>`;
-    menu.innerHTML = `
-        <h2 class="seq-menu-title">${t('seq_menu_title')}</h2>
-        <button type="button" class="games-hero-card" onclick="goToSort()">
-            <span class="games-hero-icon">🧺</span>
-            <span class="games-hero-text">
-                <strong>${t('games_group_sort')}</strong>
-                <span>${t('games_sort_hero_sub').replace('{n}', SORT_GAMES.length)}</span>
-            </span>
-            <span class="games-hero-preview">${SORT_GAMES.slice(0, 4).map(g => g.icon).join(' ')}</span>
-        </button>
-        <div class="games-group-title">${t('games_group_order')}</div>
-        <div class="seq-menu-grid">${orderGames.map((x, k) => card(x, k, 0)).join('')}</div>
-        <div class="games-group-title">${t('games_group_cause')}</div>
-        <div class="seq-menu-grid">${causeGames.map((x, k) => card(x, k, 2)).join('')}</div>
-        <div class="games-group-title">${t('games_group_object')}</div>
-        <div class="seq-menu-grid">
-            <button type="button" class="seq-menu-card gc3" onclick="goToObjectRecognition()">
-                <span class="seq-menu-emoji">🔍</span>
-                <span class="seq-menu-label">${t('games_group_object')}</span>
-            </button>
-        </div>
-    `;
-}
-
-function goToGames() {
-    goToSequence();
-}
-
-function startSequenceGame(index) {
-    const game = SEQUENCE_GAMES[index];
-    document.getElementById('sequenceMenu').style.display = 'none';
-    document.getElementById('sequenceGame').style.display = '';
-    if (game.type === 'cause') {
-        renderCauseEffectGame(game);
-    } else {
-        renderOrderingGame(game);
-    }
-}
-
-function renderOrderingGame(game) {
-    const shuffled = [...game.items].sort(() => Math.random() - 0.5);
-    seqState = { game, shuffled, selected: null, placed: [], errors: 0 };
-    const el = document.getElementById('sequenceGame');
-    el.innerHTML = `
-        <div class="seq-game-header">
-            <h3>${escapeHtml(game.emoji)} ${escapeHtml(game.title)}</h3>
-            <p class="seq-hint">${t('seq_order_hint')}</p>
-        </div>
-        <div class="seq-target-slots" id="seqTargetSlots">
-            ${game.items.map((_, i) => `<div class="seq-slot" id="seqSlot_${i}">${i+1}</div>`).join('')}
-        </div>
-        <div class="seq-cards-pool" id="seqCardsPool">
-            ${shuffled.map((item, i) => `
-                <button type="button" class="seq-card" id="seqCard_${i}"
-                    onclick="tapSequenceCard(${i})">
-                    <span class="seq-card-emoji">${escapeHtml(item.emoji)}</span>
-                    <span class="seq-card-text">${escapeHtml(item.text)}</span>
-                </button>
-            `).join('')}
-        </div>
-        <div class="seq-feedback" id="seqFeedback"></div>
-        <button type="button" class="seq-back-btn" onclick="goToSequence()">${t('seq_back_to_menu')}</button>
-    `;
-}
-
-function tapSequenceCard(cardIndex) {
-    if (!seqState || seqState.placed.includes(cardIndex)) return;
-    const item = seqState.shuffled[cardIndex];
-    const nextPos = seqState.placed.length;
-    const correctItem = seqState.game.items[nextPos];
-    const cardEl = document.getElementById('seqCard_' + cardIndex);
-
-    if (item.text === correctItem.text) {
-        seqState.placed.push(cardIndex);
-        const slot = document.getElementById('seqSlot_' + (nextPos));
-        if (slot) slot.innerHTML = `<span>${escapeHtml(item.emoji)}</span><span>${escapeHtml(item.text)}</span>`;
-        if (slot) slot.classList.add('filled');
-        if (cardEl) { cardEl.classList.add('used'); cardEl.disabled = true; }
-        speakFallback(item.text);
-        document.getElementById('seqFeedback').textContent = '';
-
-        if (seqState.placed.length === seqState.game.items.length) {
-            setTimeout(() => {
-                document.getElementById('seqFeedback').textContent = t('seq_correct_order');
-                speakFallback(t('seq_correct_order_speak'));
-                if (typeof confetti === 'function') confetti({ particleCount: 80, spread: 60, origin: {y: 0.6} });
-                addStars(seqState.errors === 0 ? 3 : (seqState.errors <= 2 ? 2 : 1));
-                incrementDailyTask('sequence');
-            }, 300);
-        }
-    } else {
-        seqState.errors++;
-        if (cardEl) cardEl.classList.add('shake');
-        setTimeout(() => { if (cardEl) cardEl.classList.remove('shake'); }, 500);
-        document.getElementById('seqFeedback').textContent = t('seq_wrong_order');
-        speakFallback(t('seq_try_again_speak'));
-    }
-}
-
-function renderCauseEffectGame(game) {
-    const pairs = [...game.pairs].sort(() => Math.random() - 0.5);
-    const effectsShuffled = [...pairs].sort(() => Math.random() - 0.5);
-    seqState = { game, pairs, effectsShuffled, selectedCause: null, matched: 0, errors: 0 };
-
-    const el = document.getElementById('sequenceGame');
-    el.innerHTML = `
-        <div class="seq-game-header">
-            <h3>${escapeHtml(game.emoji)} ${escapeHtml(game.title)}</h3>
-            <p class="seq-hint">${t('seq_cause_hint')}</p>
-        </div>
-        <div class="cause-effect-area">
-            <div class="cause-col">
-                <h4>${t('seq_cause_col_title')}</h4>
-                <div class="cause-cards" id="causeCards">
-                    ${pairs.map((p, i) => `
-                        <button type="button" class="seq-card cause-card" id="causeCard_${i}"
-                            onclick="selectCause(${i})">
-                            <span class="seq-card-emoji">${escapeHtml(p.cause.emoji)}</span>
-                            <span class="seq-card-text">${escapeHtml(p.cause.text)}</span>
-                        </button>
-                    `).join('')}
-                </div>
-            </div>
-            <div class="effect-col">
-                <h4>${t('seq_effect_col_title')}</h4>
-                <div class="effect-cards" id="effectCards">
-                    ${effectsShuffled.map((p, i) => `
-                        <button type="button" class="seq-card effect-card" id="effectCard_${i}"
-                            onclick="selectEffect(${i})">
-                            <span class="seq-card-emoji">${escapeHtml(p.effect.emoji)}</span>
-                            <span class="seq-card-text">${escapeHtml(p.effect.text)}</span>
-                        </button>
-                    `).join('')}
-                </div>
-            </div>
-        </div>
-        <div class="seq-feedback" id="seqFeedback"></div>
-        <button type="button" class="seq-back-btn" onclick="goToSequence()">${t('seq_back_to_menu')}</button>
-    `;
-}
-
-function selectCause(i) {
-    document.querySelectorAll('.cause-card').forEach(c => c.classList.remove('selected'));
-    const el = document.getElementById('causeCard_' + i);
-    if (el) el.classList.add('selected');
-    seqState.selectedCause = i;
-    speakFallback(seqState.pairs[i].cause.text);
-}
-
-function selectEffect(i) {
-    if (seqState.selectedCause === null) {
-        document.getElementById('seqFeedback').textContent = t('seq_select_cause_first');
-        return;
-    }
-    const causePair = seqState.pairs[seqState.selectedCause];
-    const effectPair = seqState.effectsShuffled[i];
-
-    if (causePair.effect.text === effectPair.effect.text) {
-        const causeEl = document.getElementById('causeCard_' + seqState.selectedCause);
-        const effectEl = document.getElementById('effectCard_' + i);
-        if (causeEl) { causeEl.classList.add('used'); causeEl.disabled = true; }
-        if (effectEl) { effectEl.classList.add('used'); effectEl.disabled = true; }
-        seqState.matched++;
-        seqState.selectedCause = null;
-        document.getElementById('seqFeedback').textContent = t('seq_correct_match');
-        speakFallback(t('seq_correct_match_speak'));
-        if (seqState.matched === seqState.pairs.length) {
-            setTimeout(() => {
-                document.getElementById('seqFeedback').textContent = t('seq_all_pairs_found');
-                speakFallback(t('seq_all_pairs_found_speak'));
-                if (typeof confetti === 'function') confetti({ particleCount: 80, spread: 60, origin: {y: 0.6} });
-                addStars(seqState.errors === 0 ? 3 : (seqState.errors <= 2 ? 2 : 1));
-                incrementDailyTask('sequence');
-            }, 300);
-        }
-    } else {
-        seqState.errors++;
-        const effectEl = document.getElementById('effectCard_' + i);
-        if (effectEl) { effectEl.classList.add('shake'); setTimeout(() => effectEl.classList.remove('shake'), 500); }
-        document.getElementById('seqFeedback').textContent = t('seq_wrong_match');
-        speakFallback(t('seq_try_again_speak'));
-    }
-}
+function goToSequence() { return goToObjectRecognition(); }
+function goToGames() { return goToObjectRecognition(); }
 
 // =============================================
 // NESNE TANIMA (3D)
@@ -6297,6 +5257,7 @@ function _objCheckAnswer(raw) {
         _objFeedbackShow(true, t('object_correct'));
         speakFallback(t('object_correct'));
         if (typeof confetti === 'function') confetti({ particleCount: 60, spread: 60, origin: { y: 0.5 } });
+        incrementDailyTask('object');
         setTimeout(() => { _objBusy = false; _objNext(); }, 1300);
     } else {
         _objErrors++;
@@ -6354,9 +5315,50 @@ function _objComplete() {
     document.getElementById('objSkipBtn').style.display = 'none';
     document.getElementById('objFeedback').textContent = '';
     document.getElementById('objComplete').style.display = '';
+    _saveObjResult().catch(() => {});
     addStars(_objErrors === 0 ? 3 : (_objErrors <= 2 ? 2 : 1));
     if (typeof confetti === 'function') confetti({ particleCount: 120, spread: 90 });
     speakFallback(t('object_complete_title'));
+}
+
+async function _saveObjResult() {
+    const sid = activeStudentId || 'default';
+    const key = 'obj_results_' + sid;
+    const list = await DB.get(key) || [];
+    list.unshift({
+        date: new Date().toISOString(),
+        items: _objItems.length,
+        errors: _objErrors,
+    });
+    if (list.length > 100) list.splice(100);
+    await DB.set(key, list);
+}
+
+async function renderObjResultsSummary() {
+    const el = document.getElementById('objResultsSummary');
+    if (!el) return;
+    const sid = activeStudentId || 'default';
+    const list = await DB.get('obj_results_' + sid) || [];
+    if (!list.length) {
+        el.innerHTML = `<p class="report-empty">${t('report_no_obj')}</p>`;
+        return;
+    }
+    const plays = list.length;
+    const items = list.reduce((s, r) => s + (r.items || 0), 0);
+    const errors = list.reduce((s, r) => s + (r.errors || 0), 0);
+    const acc = items + errors > 0 ? Math.round((items / (items + errors)) * 100) : 100;
+    const perfect = list.filter(r => !r.errors).length;
+    const last = new Date(list[0].date).toLocaleDateString(
+        _lang === 'en' ? 'en-US' : 'tr-TR', { day: 'numeric', month: 'short' });
+    const line = t('obj_summary_line')
+        .replace('{plays}', plays).replace('{acc}', acc).replace('{perfect}', perfect);
+    el.innerHTML = `<div class="report-summary-row">
+        <span class="report-summary-icon">🔍</span>
+        <div class="report-summary-info">
+            <strong>${t('object_title')}</strong>
+            <span>${line} • ${escapeHtml(last)}</span>
+        </div>
+    </div>`;
 }
 
 /**
@@ -6500,12 +5502,6 @@ window.createStudent = createStudent;
 window.updateStudent = updateStudent;
 window.selectStudent = selectStudent;
 window.changeHistoryMonth = changeHistoryMonth;
-window.goToSort = goToSort;
-window.renderSortMenu = renderSortMenu;
-window.startSortGame = startSortGame;
-window._sortTap = _sortTap;
-window._sortBasketTap = _sortBasketTap;
-window._sortPointerDown = _sortPointerDown;
 window.rereadQuestion = rereadQuestion;
 window.askAIMode = askAIMode;
 // Yeni özellikler
@@ -6519,10 +5515,6 @@ window.clearAacSentence = clearAacSentence;
 window.closeStarModal = closeStarModal;
 window.goToSequence = goToSequence;
 window.goToStore = goToStore;
-window.startSequenceGame = startSequenceGame;
-window.tapSequenceCard = tapSequenceCard;
-window.selectCause = selectCause;
-window.selectEffect = selectEffect;
 window.toggleA11yPanel = toggleA11yPanel;
 window.applyA11y = applyA11y;
 window.switchAuthTab = switchAuthTab;

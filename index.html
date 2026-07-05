@@ -349,8 +349,8 @@
         </button>
 
         <button class="menu-tile tile-sequence" type="button" onclick="goToSequence()">
-            <span class="tile-icon">🧩</span>
-            <span class="tile-label" data-i18n="menu_sequence">Oyunlar</span>
+            <span class="tile-icon">🔍</span>
+            <span class="tile-label" data-i18n="menu_sequence">Nesne Tanıma</span>
         </button>
         <button class="menu-tile tile-analysis" type="button" onclick="goToAnalysis()">
             <span class="tile-icon">📊</span>
@@ -390,8 +390,8 @@
         <span class="bottom-nav-label" data-i18n="bottom_nav_aac">AAC</span>
     </button>
     <button class="bottom-nav-item" id="bnGames" onclick="goToGames()">
-        <span class="bottom-nav-icon">🧩</span>
-        <span class="bottom-nav-label" data-i18n="bottom_nav_games">Oyunlar</span>
+        <span class="bottom-nav-icon">🔍</span>
+        <span class="bottom-nav-label" data-i18n="bottom_nav_games">Nesne Tanıma</span>
     </button>
     <button class="bottom-nav-item" id="bnSchedule" onclick="goToSchedule()">
         <span class="bottom-nav-icon">🎯</span>
@@ -407,8 +407,8 @@
 <script>
 document.addEventListener('DOMContentLoaded', function(){
     const hide = id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; };
-    ['start-screen','student-setup-screen','menu-screen','report-screen','game-container',
-     'sort-screen','schedule-screen','aac-screen','sequence-screen',
+    ['start-screen','student-setup-screen','menu-screen','game-container',
+     'schedule-screen','aac-screen','store-screen','object-screen',
      'iep-screen','skills-screen','behavior-screen','login-screen','analysis-screen'].forEach(hide);
     const authEl = document.getElementById('auth-screen');
     if (authEl) authEl.style.display = 'flex';
@@ -485,32 +485,9 @@ document.addEventListener('DOMContentLoaded', function(){
         </div>
     </div>
 </div>
-<!-- ===================== SINIFLANDIRMA OYUNU ===================== -->
-<div id="sort-screen">
-    <button class="btn-back" onclick="goToMenu()"><span data-i18n="back_menu">← Menü</span></button>
-    <div class="sort-wrapper">
-        <div id="sortMenuSection">
-            <div class="sort-menu-header">
-                <h2>🗂️ <span data-i18n="sort_title">Sınıflandırma</span></h2>
-                <p data-i18n="sort_subtitle">Nesneleri doğru sepete sürükle!</p>
-            </div>
-            <div class="sort-menu-grid" id="sortMenuGrid"></div>
-        </div>
-        <div id="sortGameSection" style="display:none">
-            <div class="sort-header-row">
-                <h3 class="sort-game-title" id="sortGameTitle"></h3>
-                <div class="sort-score" id="sortScore">0 / 0</div>
-            </div>
-            <div class="sort-items-area" id="sortItemsArea"></div>
-            <div class="sort-baskets-area" id="sortBasketsArea"></div>
-            <button type="button" class="menu-ghost-btn sort-back-btn" onclick="renderSortMenu()"><span data-i18n="sort_back">← Oyun Seçimine Dön</span></button>
-        </div>
-    </div>
-</div>
-
 <!-- ===================== NESNE TANIMA ===================== -->
 <div id="object-screen">
-    <button class="btn-back" onclick="goToSequence()"><span data-i18n="back_menu">← Menü</span></button>
+    <button class="btn-back" onclick="goToMenu()"><span data-i18n="back_menu">← Menü</span></button>
     <div class="object-wrapper">
         <div class="object-header">
             <h2 data-i18n="object_title">🔍 Nesne Tanıma</h2>
@@ -534,9 +511,9 @@ document.addEventListener('DOMContentLoaded', function(){
             <div class="object-complete-icon">🏆</div>
             <h2 data-i18n="object_complete_title">Hepsini Bildin!</h2>
             <p data-i18n="object_complete_sub">Nesne tanımada harikaydın!</p>
-            <div class="sort-complete-btns">
+            <div class="object-complete-btns">
                 <button type="button" class="btn-primary-gradient" onclick="goToObjectRecognition()" data-i18n="object_play_again">🔁 Tekrar Oyna</button>
-                <button type="button" class="menu-ghost-btn" onclick="goToSequence()" data-i18n="sort_back">← Oyun Seçimine Dön</button>
+                <button type="button" class="menu-ghost-btn" onclick="goToMenu()" data-i18n="object_back_to_menu">← Menüye Dön</button>
             </div>
         </div>
     </div>
@@ -716,15 +693,6 @@ document.addEventListener('DOMContentLoaded', function(){
     </div>
 </div>
 
-<!-- ===================== SIRALAMA OYUNLARI ===================== -->
-<div id="sequence-screen">
-    <button class="btn-back" onclick="goToMenu()"><span data-i18n="back_menu">← Menü</span></button>
-    <div class="sequence-wrapper">
-        <div id="sequenceMenu"></div>
-        <div id="sequenceGame" style="display:none"></div>
-    </div>
-</div>
-
 <!-- ===================== ANALİZ / BEP EKRANI ===================== -->
 <div id="analysis-screen">
     <div class="analysis-wrapper">
@@ -884,9 +852,9 @@ document.addEventListener('DOMContentLoaded', function(){
         </div>
 
         <div class="report-section">
-            <h3 data-i18n="report_sort_games">🧩 Sıralama Oyunları</h3>
-            <div id="sortGamesSummary" class="sort-games-summary">
-                <p class="report-empty" data-i18n="report_no_sort">Henüz sıralama oyunu oynanmadı.</p>
+            <h3 data-i18n="object_title">🔍 Nesne Tanıma</h3>
+            <div id="objResultsSummary" class="sort-games-summary">
+                <p class="report-empty" data-i18n="report_no_obj">Henüz nesne tanıma oynanmadı.</p>
             </div>
         </div>
 
