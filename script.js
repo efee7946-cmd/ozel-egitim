@@ -1907,6 +1907,7 @@ const sessionData = {
     simplifyByCategory: {},
     noResponseByCategory: {},
     reportEntryId: null,
+    lastRewardedTotal: 0,
 };
 
 let selectedHistoryDateKey = null;
@@ -2156,6 +2157,7 @@ async function startApp(resetSession) {
         sessionData.simplifyByCategory = {};
         sessionData.noResponseByCategory = {};
         sessionData.reportEntryId = null;
+        sessionData.lastRewardedTotal = 0;
     }
 
     document.getElementById('menu-greeting').textContent = t('menu_greeting_named').replace('{name}', childName);
@@ -2799,8 +2801,8 @@ function updateAdaptiveState() {
     const existing = DB.getSync(key) || {};
     const catStats = existing.categoryStats || {};
 
-    sessionData.therapyTurns.forEach(t => {
-        const c = t.category || t('report_other');
+    sessionData.therapyTurns.forEach(turn => {
+        const c = turn.category || t('report_other');
         if (!catStats[c]) catStats[c] = { turns: 0, simplify: 0, noResponse: 0 };
         catStats[c].turns++;
     });
@@ -5048,7 +5050,9 @@ function _showStarReward() {
     const repeat = sessionData.repeatUsed || 0;
     const simplify = sessionData.simplifyUsed || 0;
     const total = mic + card + repeat + simplify;
-    if (total === 0) return;
+    // goToMenu() her cagrildiginda calisir; yeni bir aktivite olmadan tekrar
+    // menuye donulmesi ayni odulu sonsuza kadar tekrar tekrar vermesin.
+    if (total === 0 || total <= sessionData.lastRewardedTotal) return;
 
     const indPct = Math.round(((mic + card) / total) * 100);
     let stars, title, sub;
@@ -5071,6 +5075,7 @@ function _showStarReward() {
     const subEl = document.getElementById('starModalSub');
     const modal = document.getElementById('starRewardModal');
     if (!modal) return;
+    sessionData.lastRewardedTotal = total;
 
     starsEl.innerHTML = Array.from({ length: 5 }, (_, i) =>
         `<span class="star-icon ${i < stars ? 'star-on' : 'star-off'}" style="animation-delay:${i * 0.12}s">⭐</span>`
