@@ -7,6 +7,7 @@ import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 import { query } from './_db.js';
 import { sendMail, resetCodeEmailHtml, verifyCodeEmailHtml } from './_mail.js';
+import { checkRateLimit } from './_rateLimit.js';
 
 const SESSION_DAYS = 14;
 const BCRYPT_ROUNDS = 12;
@@ -15,6 +16,13 @@ function cors(res) {
     res.setHeader('Access-Control-Allow-Origin', process.env.ALLOWED_ORIGIN || '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+}
+
+// Vercel gercek istemci IP'sini x-forwarded-for'un ilk degerinde verir
+function getClientIp(req) {
+    const fwd = req.headers['x-forwarded-for'];
+    if (fwd) return String(fwd).split(',')[0].trim();
+    return req.socket?.remoteAddress || 'unknown';
 }
 
 // Legacy SHA-256 — kullanıcı geçişi sırasında kontrol için korunuyor
@@ -94,6 +102,8 @@ export default async function handler(req, res) {
     try {
         /* ---- KAYIT OL ---- */
         if (action === 'register') {
+            if (!(await checkRateLimit('register_ip:' + getClientIp(req), 5)))
+                return res.status(429).json({ error: 'AUTH_RATE_LIMITED' });
             if (!username || !password)
                 return res.status(400).json({ error: 'AUTH_FIELDS_REQUIRED' });
             const u = username.trim().toLowerCase();
@@ -205,6 +215,10 @@ export default async function handler(req, res) {
 
         /* ---- SIFIRLAMA KODU GÖNDER (kullanıcı adı veya e-posta) ---- */
         if (action === 'request_reset') {
+            // IP basina: tek bir hesaba deneme sinirinin (reset_expires) yani
+            // sira, farkli birçok hesaba e-posta spraylemeyi de engelle
+            if (!(await checkRateLimit('reset_ip:' + getClientIp(req), 10)))
+                return res.status(429).json({ error: 'AUTH_RATE_LIMITED' });
             const ident = identifier || username;
             if (!ident) return res.status(400).json({ error: 'AUTH_FIELDS_REQUIRED' });
             await ensureAuthColumns();
@@ -275,6 +289,11 @@ export default async function handler(req, res) {
                 return res.status(400).json({ error: 'AUTH_EMAIL_INVALID' });
             const rows = await query('SELECT username FROM sessions WHERE token = $1 AND expires_at > now()', [token]);
             if (!rows.length) return res.status(401).json({ error: 'Geçersiz oturum' });
+            // Bu action herhangi bir e-postaya sahiplik dogrulamasi olmadan
+            // dogrulama maili gonderiyor - sinirsiz cagriya izin verilirse
+            // herhangi bir hedef adres bombalanabilir
+            if (!(await checkRateLimit('set_email:' + rows[0].username, 5)))
+                return res.status(429).json({ error: 'AUTH_RATE_LIMITED' });
             await ensureAuthColumns();
             if (await emailInUse(userEmail, rows[0].username))
                 return res.status(409).json({ error: 'AUTH_EMAIL_TAKEN' });
