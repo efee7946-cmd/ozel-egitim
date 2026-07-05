@@ -2743,7 +2743,7 @@ video { width: 100%; height: 100%; object-fit: cover; }
     border: none;
     padding: 0;
     margin: 0;
-    background: #f4f7fc;
+    background: linear-gradient(160deg, #e8f0ff 0%, #f1ecff 30%, #ffeef5 62%, #fff8ec 100%);
     overflow-x: hidden;
 }
 
@@ -3249,7 +3249,7 @@ video { width: 100%; height: 100%; object-fit: cover; }
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 5px;
     padding: 22px 12px;
     border-radius: 22px;
     border: 2px solid #e4edf8;
@@ -3300,13 +3300,37 @@ video { width: 100%; height: 100%; object-fit: cover; }
     line-height: 1.3;
 }
 
+.tile-desc {
+    font-size: 0.74rem;
+    font-weight: 600;
+    color: #7a8fa8;
+    text-align: center;
+    line-height: 1.25;
+    opacity: 0.9;
+}
+
 .tile-primary .tile-label,
 .tile-schedule .tile-label,
 .tile-aac .tile-label,
 .tile-sequence .tile-label,
 .tile-store .tile-label,
-.tile-analysis .tile-label {
+.tile-analysis .tile-label,
+.tile-primary .tile-desc,
+.tile-schedule .tile-desc,
+.tile-aac .tile-desc,
+.tile-sequence .tile-desc,
+.tile-store .tile-desc,
+.tile-analysis .tile-desc {
     color: white;
+}
+
+.tile-primary .tile-desc,
+.tile-schedule .tile-desc,
+.tile-aac .tile-desc,
+.tile-sequence .tile-desc,
+.tile-store .tile-desc,
+.tile-analysis .tile-desc {
+    opacity: 0.85;
 }
 
 /* Dinamik eklenen karmaşık elementleri gizle */
@@ -3789,6 +3813,7 @@ body.a11y-reduce-motion * { transition: none !important; animation: none !import
 
     .tile-icon { font-size: 2rem; }
     .tile-label { font-size: 0.8rem; }
+    .tile-desc { font-size: 0.68rem; }
 
     .welcome-title { font-size: 1.6rem; }
     .menu-welcome { padding: 32px 16px 20px; }
@@ -5184,6 +5209,7 @@ button:active, .menu-tile:active {
     }
     .tile-icon { font-size: 2.6rem; }
     .tile-label { font-size: 0.92rem; font-weight: 700; }
+    .tile-desc { font-size: 0.76rem; }
     .welcome-title { font-size: 1.8rem; }
     .welcome-sub { font-size: 1rem; }
     .btn-mic { width: 80px; height: 80px; font-size: 2.5rem; }
