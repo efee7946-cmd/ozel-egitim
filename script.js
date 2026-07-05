@@ -3424,21 +3424,27 @@ async function _renderTherapyAacPicker() {
     const tabs = document.getElementById('thAacTabs');
     tabs.innerHTML = _thAacBoards.map(b => `
         <button type="button" class="aac-nav-btn${b.id === _thAacBoardId ? ' active' : ''}"
-            onclick="setTherapyAacBoard('${escapeHtml(b.id)}')">
+            data-board-id="${escapeHtml(b.id)}">
             ${_aacVisualHtml(b.visual, 'aac-card-emoji', '1rem')} ${escapeHtml(b.label)}
         </button>
     `).join('');
+    tabs.querySelectorAll('.aac-nav-btn').forEach(btn => {
+        btn.addEventListener('click', () => setTherapyAacBoard(btn.dataset.boardId));
+    });
     const cards = (await AACData.listCards(_thAacBoardId))
         .slice()
         .sort((a, b) => a.row - b.row || a.col - b.col);
     const grid = document.getElementById('thAacGrid');
     grid.innerHTML = cards.length ? cards.map(c => `
         <button type="button" class="aac-card"
-            onclick="tapTherapyAacCard('${escapeHtml(c.spoken || c.label)}','${escapeHtml(c.label)}')">
+            data-spoken="${escapeHtml(c.spoken || c.label)}" data-label="${escapeHtml(c.label)}">
             ${_aacVisualHtml(c.visual, 'aac-card-emoji')}
             <span class="aac-card-text">${escapeHtml(c.label)}</span>
         </button>
     `).join('') : `<p class="aac-photo-hint">${t('aac_no_results')}</p>`;
+    grid.querySelectorAll('.aac-card').forEach(btn => {
+        btn.addEventListener('click', () => tapTherapyAacCard(btn.dataset.spoken, btn.dataset.label));
+    });
     _updateTherapyAacSentence();
 }
 
@@ -4382,11 +4388,16 @@ async function _aacRenderAll() {
         }
         coreStrip.style.display = coreCards.length ? 'flex' : 'none';
         coreStrip.innerHTML = coreCards.map(c => `
-            <button type="button" class="aac-core-card" onclick="tapAacCard('${escapeHtml(c.id)}','${escapeHtml(c.spoken || c.label)}','${escapeHtml(c.label)}','${escapeHtml(c.boardId)}')">
+            <button type="button" class="aac-core-card"
+                data-card-id="${escapeHtml(c.id)}" data-spoken="${escapeHtml(c.spoken || c.label)}"
+                data-label="${escapeHtml(c.label)}" data-board-id="${escapeHtml(c.boardId)}">
                 ${_aacVisualHtml(c.visual, 'aac-card-emoji')}
                 <span style="font-size:0.65rem;font-weight:700;">${escapeHtml(c.label)}</span>
             </button>
         `).join('');
+        coreStrip.querySelectorAll('.aac-core-card').forEach(btn => {
+            btn.addEventListener('click', () => tapAacCard(btn.dataset.cardId, btn.dataset.spoken, btn.dataset.label, btn.dataset.boardId));
+        });
     } else {
         coreStrip.style.display = 'none';
     }
@@ -4397,11 +4408,14 @@ async function _aacRenderAll() {
     const tabs = _aacBoards.map(b => `
         <button type="button"
             class="aac-nav-btn${b.id === _aacCurrentBoardId ? ' active' : ''}"
-            onclick="setAacBoard('${escapeHtml(b.id)}')">
+            data-board-id="${escapeHtml(b.id)}">
             ${_aacVisualHtml(b.visual, 'aac-card-emoji', '1rem')} ${escapeHtml(b.label)}
         </button>
     `).join('');
     nav.innerHTML = backBtn + tabs;
+    nav.querySelectorAll('.aac-nav-btn[data-board-id]').forEach(btn => {
+        btn.addEventListener('click', () => setAacBoard(btn.dataset.boardId));
+    });
 
     // Grid
     if (_aacCurrentBoardId) {
@@ -4413,18 +4427,24 @@ async function _aacRenderAll() {
         grid.innerHTML = matrix.map((rowArr, r) => rowArr.map((card, c) => {
             if (!card) {
                 return _aacEditMode
-                    ? `<button type="button" class="aac-card empty add" onclick="aacEmptySlotTap(${r},${c})">＋</button>`
+                    ? `<button type="button" class="aac-card empty add" data-empty-row="${r}" data-empty-col="${c}">＋</button>`
                     : '<div class="aac-card empty"></div>';
             }
             return `
                 <button type="button" class="aac-card${_aacEditMode ? ' editable' : ''}"
-                    data-label="${escapeHtml(card.label)}"
-                    onclick="tapAacCard('${escapeHtml(card.id)}','${escapeHtml(card.spoken || card.label)}','${escapeHtml(card.label)}','${escapeHtml(card.boardId)}')">
+                    data-label="${escapeHtml(card.label)}" data-card-id="${escapeHtml(card.id)}"
+                    data-spoken="${escapeHtml(card.spoken || card.label)}" data-board-id="${escapeHtml(card.boardId)}">
                     ${_aacVisualHtml(card.visual, 'aac-card-emoji')}
                     <span class="aac-card-text">${escapeHtml(card.label)}</span>
                 </button>
             `;
         }).join('')).join('');
+        grid.querySelectorAll('.aac-card.empty.add').forEach(btn => {
+            btn.addEventListener('click', () => aacEmptySlotTap(+btn.dataset.emptyRow, +btn.dataset.emptyCol));
+        });
+        grid.querySelectorAll('.aac-card[data-card-id]').forEach(btn => {
+            btn.addEventListener('click', () => tapAacCard(btn.dataset.cardId, btn.dataset.spoken, btn.dataset.label, btn.dataset.boardId));
+        });
         const searchInput = document.getElementById('aacCardSearch');
         if (searchInput && searchInput.value && !_aacEditMode) filterAacCards(searchInput.value);
     }
@@ -4715,10 +4735,13 @@ async function searchAacPhoto() {
         grid.innerHTML = d.photos.map(p => {
             const thumb = p.src.small;
             const alt = escapeHtml(p.alt || q);
-            return `<button type="button" class="aac-photo-item" onclick="selectAacPhoto('${escapeHtml(thumb)}','${alt}')">
+            return `<button type="button" class="aac-photo-item" data-thumb="${escapeHtml(thumb)}" data-alt="${alt}">
                 <img src="${escapeHtml(thumb)}" alt="${alt}" loading="lazy">
             </button>`;
         }).join('');
+        grid.querySelectorAll('.aac-photo-item').forEach(btn => {
+            btn.addEventListener('click', () => selectAacPhoto(btn.dataset.thumb, btn.dataset.alt));
+        });
     } catch {
         grid.innerHTML = `<p class="aac-photo-hint">${t('aac_connection_error')}</p>`;
     }
