@@ -706,6 +706,7 @@ const STRINGS = {
     report_eval_fallback: '{name}\'in bu oturumda uygulamaya aktif katılım gösterdiği görülmektedir. Düzenli oturumlar çocuğun konuşma güveni ve ifade becerilerini destekleyecektir. Yıldız Can ile çalışmaya devam etmenizi öneririz.',
     info_next_question: 'Hadi yeni soruya geçelim! ➡️',
     info_no_speech_support: 'Tarayıcı ses tanımayı desteklemiyor. Chrome veya Edge kullanmayı dene.',
+    info_no_speech_native: 'Bu cihazda konuşma tanıma kullanılamıyor. Lütfen tekrar dene ya da farklı bir cihazla dene.',
     info_press_next: 'İleri butonuna basabilirsin! ➡️',
     info_listening: 'Seni dinliyorum... 🎙️',
     info_no_sound: 'Sesi duymadım, tekrar dene!',
@@ -1597,6 +1598,7 @@ const STRINGS = {
     report_eval_fallback: '{name} showed active engagement with the app during this session. Regular sessions will support the child\'s speech confidence and expressive skills. We recommend continuing to work with Yıldız Can.',
     info_next_question: "Let's move on to a new question! ➡️",
     info_no_speech_support: 'Your browser does not support speech recognition. Try Chrome or Edge.',
+    info_no_speech_native: 'Speech recognition is not available on this device. Please try again or use a different device.',
     info_press_next: 'You can press the next button! ➡️',
     info_listening: "I'm listening... 🎙️",
     info_no_sound: "I didn't hear you, try again!",
@@ -3827,7 +3829,7 @@ async function recNative(SR) {
     try {
         const avail = await SR.available();
         if (!avail || !avail.available) {
-            infoEl.innerText = t('info_no_speech_support');
+            infoEl.innerText = t('info_no_speech_native');
             micBtn.disabled = false;
             return;
         }
