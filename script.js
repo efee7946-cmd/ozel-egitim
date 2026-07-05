@@ -5698,24 +5698,53 @@ async function syncUserDataFromCloud() {
     try {
         const userId = await getCurrentUserId();
         if (!userId || userId === 'guest') return;
-        const keys = [
-            'teacher_students_' + userId,
+        // Not: eskiden burada 'teacher_students_' + userId kullanılıyordu ama
+        // gerçek öğrenci listesi anahtarı studentsKey() — bu yüzden aşağıdaki
+        // per-öğrenci anahtarlar (yıldız, nesne tanıma, AAC vb.) hiçbir zaman
+        // gerçekten uzlaştırılmıyordu; iki cihaz sessizce birbirinden
+        // ayrışıyordu (aynı hesap farklı ilerleme gösteriyordu).
+        const sKey = studentsKey();
+
+        // 1. adım: kullanıcı seviyesi anahtarlar (öğrenci listesi dahil).
+        // Per-öğrenci anahtarları bundan ÖNCE bir arada uzlaştırmaya
+        // çalışmak işe yaramaz — o anahtarların hangi öğrenci id'lerine
+        // ait olduğunu bilmek için önce güncel öğrenci listesine ihtiyaç var.
+        const changed1 = await DB.refreshKeys([
+            sKey,
             'session_history_' + userId,
             'bep_profile_' + userId,
             'active_student_' + userId,
-        ];
-        const students = DB.getSync('teacher_students_' + userId) || [];
-        students.forEach(s => {
-            keys.push('schedule_' + s.id, 'iep_' + s.id, 'skills_' + s.id,
-                      'behavior_' + s.id, 'adaptive_' + s.id, 'trials_' + s.id);
-        });
-        const changed = await DB.refreshKeys(keys);
-        if (!changed.length) return;
-        // Öğrenci listesi değiştiyse açık ekranı tazele
-        if (changed.includes('teacher_students_' + userId)) {
-            studentsCache = DB.getSync('teacher_students_' + userId) || [];
+        ]);
+        if (changed1.includes(sKey)) {
+            studentsCache = DB.getSync(sKey) || [];
             if (currentScreenId === 'login-screen') initLoginScreen();
             else if (currentScreenId === 'menu-screen') { renderRoleDashboard(); renderStudentDetailPanel(); }
+        }
+
+        // 2. adım: (artık güncel olan) öğrenci listesine göre per-öğrenci
+        // "konteyner" anahtarlarını uzlaştır
+        const students = DB.getSync(sKey) || [];
+        if (!students.length) return;
+        const containerKeys = [];
+        students.forEach(s => {
+            containerKeys.push('stars_' + s.id, 'obj_results_' + s.id,
+                'aac_settings_' + s.id, 'aac_boards_' + s.id,
+                'iep_' + s.id, 'skills_' + s.id, 'behavior_' + s.id, 'adaptive_' + s.id);
+        });
+        const changed2 = await DB.refreshKeys(containerKeys);
+
+        // 3. adım: (artık güncel olan) AAC pano / IEP hedef listelerine göre
+        // yaprak anahtarları (kartlar / denemeler) uzlaştır
+        const leafKeys = [];
+        students.forEach(s => {
+            (DB.getSync('aac_boards_' + s.id) || []).forEach(b => leafKeys.push('aac_cards_' + b.id));
+            (DB.getSync('iep_' + s.id) || []).forEach(g => leafKeys.push('trials_' + g.id));
+        });
+        if (leafKeys.length) await DB.refreshKeys(leafKeys);
+
+        // Aktif öğrencinin yıldız bakiyesi güncellendiyse menüdeki rozeti tazele
+        if (activeStudentId && changed2.includes('stars_' + activeStudentId) && currentScreenId === 'menu-screen') {
+            updateStarBadge();
         }
     } catch(_) {}
 }

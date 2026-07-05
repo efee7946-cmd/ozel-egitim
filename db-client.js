@@ -15,6 +15,7 @@ const DB = (function () {
     let _cloudRetryTimer = null;
     let _lastSyncAt = null;
     let _encKey = null; // AES-GCM CryptoKey, bellekte, diske yazılmaz
+    let _legacyEncKey = null; // eski sabit-salt anahtarı — sadece geriye dönük okuma için
 
     function _cloudDown() {
         _cloud = false;
@@ -55,13 +56,20 @@ const DB = (function () {
     }
 
     /* ---------- Şifreleme ---------- */
-    async function _deriveKey(token) {
+    // useLegacySalt=false: token başına benzersiz salt (token'ın kendi
+    // hash'inden türetilir — ekstra depolama gerekmez). useLegacySalt=true:
+    // eski sabit salt — yalnızca daha önce o salt'la şifrelenmiş mevcut
+    // verileri çözebilmek için tutuluyor (bkz. _decrypt).
+    async function _deriveKey(token, useLegacySalt) {
         const enc = new TextEncoder();
         const km = await crypto.subtle.importKey(
             'raw', enc.encode(token), 'PBKDF2', false, ['deriveKey']
         );
+        const salt = useLegacySalt
+            ? enc.encode('yldzSNF26')
+            : new Uint8Array(await crypto.subtle.digest('SHA-256', enc.encode('yldzSNF26:' + token)));
         return crypto.subtle.deriveKey(
-            { name: 'PBKDF2', salt: enc.encode('yldzSNF26'), iterations: 100000, hash: 'SHA-256' },
+            { name: 'PBKDF2', salt, iterations: 100000, hash: 'SHA-256' },
             km, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']
         );
     }
@@ -79,17 +87,28 @@ const DB = (function () {
         return 'ENC1:' + btoa(String.fromCharCode(...buf));
     }
 
+    async function _decryptWithKey(key, buf) {
+        const pt = await crypto.subtle.decrypt(
+            { name: 'AES-GCM', iv: buf.slice(0, 12) }, key, buf.slice(12)
+        );
+        return JSON.parse(new TextDecoder().decode(pt));
+    }
+
     async function _decrypt(raw) {
         if (!raw) return null;
         if (!raw.startsWith('ENC1:')) { try { return JSON.parse(raw); } catch { return null; } }
         if (!_encKey) return null;
+        const buf = Uint8Array.from(atob(raw.slice(5)), c => c.charCodeAt(0));
         try {
-            const buf = Uint8Array.from(atob(raw.slice(5)), c => c.charCodeAt(0));
-            const pt = await crypto.subtle.decrypt(
-                { name: 'AES-GCM', iv: buf.slice(0, 12) }, _encKey, buf.slice(12)
-            );
-            return JSON.parse(new TextDecoder().decode(pt));
-        } catch { return null; }
+            return await _decryptWithKey(_encKey, buf);
+        } catch {
+            // Yeni (kullanıcıya özel salt) anahtarla çözülemedi — eski sabit
+            // salt'la şifrelenmiş olabilir, onunla dene. Bir sonraki yazımda
+            // otomatik olarak yeni anahtara göç eder.
+            if (!_legacyEncKey) return null;
+            try { return await _decryptWithKey(_legacyEncKey, buf); }
+            catch { return null; }
+        }
     }
 
     /* ---------- sessionStorage (plaintext hızlı cache) ---------- */
@@ -186,7 +205,8 @@ const DB = (function () {
         async initEncryption(sessionToken) {
             if (!sessionToken || _encKey) return;
             try {
-                _encKey = await _deriveKey(sessionToken);
+                _encKey = await _deriveKey(sessionToken, false);
+                _legacyEncKey = await _deriveKey(sessionToken, true);
                 // Şifreli localStorage → sessionStorage (sync erişim için)
                 for (const pfx of SENSITIVE) {
                     for (let i = 0; i < localStorage.length; i++) {
