@@ -708,6 +708,16 @@ const STRINGS = {
     obj_star: 'Yıldız',
     obj_apple: 'Elma',
     obj_balloon: 'Balon',
+    obj_tree: 'Ağaç',
+    obj_fish: 'Balık',
+    obj_cup: 'Bardak',
+    obj_strawberry: 'Çilek',
+    obj_icecream: 'Dondurma',
+    obj_sun: 'Güneş',
+    obj_butterfly: 'Kelebek',
+    obj_banana: 'Muz',
+    obj_train: 'Tren',
+    obj_plane: 'Uçak',
     seq_menu_type_cause: 'Sebep-Sonuç',
     seq_menu_type_order: 'Sıralama',
     seq_back_to_menu: '← Oyun Seçimine Dön',
@@ -1691,6 +1701,16 @@ const STRINGS = {
     obj_star: 'Star',
     obj_apple: 'Apple',
     obj_balloon: 'Balloon',
+    obj_tree: 'Tree',
+    obj_fish: 'Fish',
+    obj_cup: 'Cup',
+    obj_strawberry: 'Strawberry',
+    obj_icecream: 'Ice Cream',
+    obj_sun: 'Sun',
+    obj_butterfly: 'Butterfly',
+    obj_banana: 'Banana',
+    obj_train: 'Train',
+    obj_plane: 'Plane',
     seq_menu_type_cause: 'Cause-Effect',
     seq_menu_type_order: 'Sequencing',
     seq_back_to_menu: '← Back to Game Selection',
@@ -6070,6 +6090,33 @@ const OBJECT_RECOGNITION_ITEMS = [
     { id: 'balloon', type: 'glb', model: 'models/objects/balon.glb',
         answers: { tr: ['balon'], en: ['balloon'] },
         get label() { return t('obj_balloon'); } },
+    { id: 'tree', type: 'glb', model: 'models/objects/agac.glb',
+        answers: { tr: ['ağaç', 'agac'], en: ['tree'] },
+        get label() { return t('obj_tree'); } },
+    { id: 'fish', type: 'glb', model: 'models/objects/balik.glb',
+        answers: { tr: ['balık', 'balik'], en: ['fish'] },
+        get label() { return t('obj_fish'); } },
+    { id: 'cup', type: 'glb', model: 'models/objects/bardak.glb',
+        answers: { tr: ['bardak'], en: ['cup', 'glass'] },
+        get label() { return t('obj_cup'); } },
+    { id: 'strawberry', type: 'glb', model: 'models/objects/cilek.glb',
+        answers: { tr: ['çilek', 'cilek'], en: ['strawberry'] },
+        get label() { return t('obj_strawberry'); } },
+    { id: 'icecream', type: 'glb', model: 'models/objects/dondurma.glb',
+        answers: { tr: ['dondurma'], en: ['ice cream', 'icecream'] },
+        get label() { return t('obj_icecream'); } },
+    { id: 'sun', type: 'glb', model: 'models/objects/gunes.glb',
+        answers: { tr: ['güneş', 'gunes'], en: ['sun'] },
+        get label() { return t('obj_sun'); } },
+    { id: 'butterfly', type: 'glb', model: 'models/objects/kelebek.glb',
+        answers: { tr: ['kelebek'], en: ['butterfly'] },
+        get label() { return t('obj_butterfly'); } },
+    { id: 'train', type: 'glb', model: 'models/objects/tren.glb',
+        answers: { tr: ['tren'], en: ['train'] },
+        get label() { return t('obj_train'); } },
+    { id: 'plane', type: 'glb', model: 'models/objects/ucak.glb',
+        answers: { tr: ['uçak', 'ucak'], en: ['plane', 'airplane'] },
+        get label() { return t('obj_plane'); } },
 ];
 
 let _objThree = null, _objGLTFLoader = null;
@@ -6195,7 +6242,11 @@ async function _objShowCurrent() {
     const fallback = document.getElementById('objFallback');
     if (fallback) {
         const shapeEmoji = { sphere: '⚽', box: '📦', star: '⭐' };
-        const idEmoji = { ball: '⚽', cube: '📦', star: '⭐', apple: '🍎', balloon: '🎈' };
+        const idEmoji = {
+            ball: '⚽', cube: '📦', star: '⭐', apple: '🍎', balloon: '🎈',
+            tree: '🌳', fish: '🐟', cup: '🥛', strawberry: '🍓', icecream: '🍦',
+            sun: '☀️', butterfly: '🦋', banana: '🍌', train: '🚂', plane: '✈️',
+        };
         fallback.textContent = (item.type === 'primitive' ? shapeEmoji[item.shape] : idEmoji[item.id]) || '❓';
         return;
     }
