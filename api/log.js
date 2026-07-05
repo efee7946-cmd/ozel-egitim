@@ -1,4 +1,12 @@
+import crypto from 'crypto';
 import { query } from './_db.js';
+
+function safeCompare(a, b) {
+    const bufA = Buffer.from(String(a || ''));
+    const bufB = Buffer.from(String(b || ''));
+    if (bufA.length !== bufB.length) return false;
+    return crypto.timingSafeEqual(bufA, bufB);
+}
 
 let _tableEnsured = false;
 async function ensureTable() {
@@ -47,8 +55,10 @@ export default async function handler(req, res) {
 
         if (req.method === 'GET') {
             const adminKey = process.env.ADMIN_KEY;
-            const provided = req.headers['x-admin-key'] || req.query.key;
-            if (!adminKey || provided !== adminKey) {
+            // Sadece header uzerinden kabul edilir - query string tarayici
+            // gecmisine, sunucu loglarina ve Referer header'ina sizabilir.
+            const provided = req.headers['x-admin-key'];
+            if (!adminKey || !provided || !safeCompare(provided, adminKey)) {
                 return res.status(401).json({ error: 'Yetkisiz' });
             }
             await query("DELETE FROM client_errors WHERE created_at < now() - interval '30 days'");
