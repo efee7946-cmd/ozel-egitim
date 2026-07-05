@@ -814,8 +814,8 @@ const STRINGS = {
     auth_waiting: 'Bekleniyor...',
     schedule_screen_title: '🎯 Günlük Görevler',
     schedule_sub: 'Her gün farklı görevler seni bekliyor. Tamamladıkça yıldız kazanırsın!',
-    task_therapy: '🎤 {n} konuşma pratiği seansı tamamla',
-    task_object: '🔍 {n} nesne tanıma sorusu tamamla',
+    task_therapy: '{n} konuşma pratiği seansı tamamla',
+    task_object: '{n} nesne tanıma sorusu tamamla',
     task_completed: '✓ Görev tamamlandı: {label} — +5 ⭐',
     task_all_done_toast: '🏆 Bugünün tüm görevlerini bitirdin! +10 ⭐ bonus',
     task_all_done_title: 'Bugünü Tamamladın!',
@@ -1707,8 +1707,8 @@ const STRINGS = {
     auth_waiting: 'Please wait...',
     schedule_screen_title: '🎯 Daily Tasks',
     schedule_sub: 'Different tasks await you every day. Complete them to earn stars!',
-    task_therapy: '🎤 Complete {n} speech practice session(s)',
-    task_object: '🔍 Complete {n} object recognition question(s)',
+    task_therapy: 'Complete {n} speech practice session(s)',
+    task_object: 'Complete {n} object recognition question(s)',
     task_completed: '✓ Task complete: {label} — +5 ⭐',
     task_all_done_toast: '🏆 You finished all of today\'s tasks! +10 ⭐ bonus',
     task_all_done_title: 'You Completed Today!',
@@ -1800,6 +1800,9 @@ function setLang(lang) {
   _lang = lang;
   localStorage.setItem('lms_lang', lang);
   applyLang();
+  // Menu ipucu banner'ı data-i18n değil, JS ile textContent yazıyor —
+  // applyLang() bunu göremez, dil değişince manuel yeniden render gerekir.
+  if (currentScreenId === 'menu-screen') renderMenuNudge();
   if (activeStudentId && typeof AACData !== 'undefined') {
     AACData.resyncLanguage(activeStudentId).then(changed => {
       if (changed && currentScreenId === 'aac-screen') _aacRenderAll();
