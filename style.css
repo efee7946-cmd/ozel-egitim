@@ -5065,6 +5065,47 @@ body.a11y-reduce-motion * { transition: none !important; animation: none !import
 }
 .a11y-kvkk-link:hover { text-decoration: underline; }
 
+/* ---- Yardım paneli ---- */
+.help-section { padding: 18px 20px; border-bottom: 1px solid #eef2f7; }
+.help-section:last-child { border-bottom: none; }
+.help-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 10px 0;
+}
+.help-item-icon {
+    font-size: 1.3rem;
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f5f2ff;
+    border-radius: 12px;
+}
+.help-item-text strong { display: block; font-size: 0.92rem; color: #1a2f4a; margin-bottom: 2px; }
+.help-item-text p { margin: 0; font-size: 0.82rem; color: #7a8fa8; line-height: 1.45; }
+.help-faq-item {
+    border: 1.5px solid #eef2f7;
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-bottom: 10px;
+}
+.help-faq-item:last-child { margin-bottom: 0; }
+.help-faq-item summary {
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #2d2a5c;
+    cursor: pointer;
+    list-style: none;
+}
+.help-faq-item summary::-webkit-details-marker { display: none; }
+.help-faq-item summary::after { content: '+'; float: right; color: #6C63FF; font-weight: 800; }
+.help-faq-item[open] summary::after { content: '−'; }
+.help-faq-item p { margin: 10px 0 0; font-size: 0.84rem; color: #6b7b93; line-height: 1.5; }
+
 /* =============================================
    AAC TOOLBAR & EMOJİ PICKER
    ============================================= */

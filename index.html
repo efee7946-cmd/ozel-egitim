@@ -304,6 +304,7 @@
                 <span class="pill-chevron">›</span>
             </button>
             <button id="langToggleBtn" class="lang-toggle-btn" type="button" onclick="setLang(document.documentElement.lang==='en'?'tr':'en')">EN</button>
+            <button class="icon-btn-a11y" type="button" onclick="toggleHelpPanel()" title="Yardım">❓</button>
             <button class="icon-btn-a11y" type="button" onclick="toggleA11yPanel()" title="Erişilebilirlik Ayarları">⚙️</button>
         </div>
         <!-- JS uyumluluğu için gizli elementler -->
@@ -646,6 +647,82 @@ document.addEventListener('DOMContentLoaded', function(){
                     </span>
                     <input type="checkbox" id="a11y-voice-label" class="a11y-toggle" onchange="applyA11y()">
                 </label>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===================== YARDIM ===================== -->
+<div id="help-panel" class="a11y-panel" style="display:none" role="dialog" aria-label="Yardım">
+    <div class="a11y-panel-inner">
+        <div class="a11y-panel-head">
+            <h3 data-i18n="help_title">❓ Yardım</h3>
+            <button type="button" class="a11y-close-btn" onclick="toggleHelpPanel()">✕</button>
+        </div>
+        <div class="a11y-panel-body">
+            <div class="help-section">
+                <div class="a11y-section-title" data-i18n="help_sections_title">Bölümler Ne İşe Yarar?</div>
+                <div class="help-item">
+                    <span class="help-item-icon">🎤</span>
+                    <div class="help-item-text">
+                        <strong data-i18n="menu_therapy">Konuşma Pratiği</strong>
+                        <p data-i18n="help_therapy_desc">Yapay zeka çocuğa sorular sorar, çocuk sesli cevap verir; konuşma becerisi zamanla takip edilir.</p>
+                    </div>
+                </div>
+                <div class="help-item">
+                    <span class="help-item-icon">🔍</span>
+                    <div class="help-item-text">
+                        <strong data-i18n="menu_sequence">Nesne Tanıma</strong>
+                        <p data-i18n="help_object_desc">Çocuk 3D nesneyi inceleyip döndürür, ne olduğunu söyler ya da yazar; doğru cevapta bir sonraki nesneye geçilir.</p>
+                    </div>
+                </div>
+                <div class="help-item">
+                    <span class="help-item-icon">🗣️</span>
+                    <div class="help-item-text">
+                        <strong data-i18n="menu_aac">AAC Panosu</strong>
+                        <p data-i18n="help_aac_desc">Sözel iletişimde zorlanan çocuklar için görsel kartlarla ihtiyaç ve duygularını ifade etme.</p>
+                    </div>
+                </div>
+                <div class="help-item">
+                    <span class="help-item-icon">🎯</span>
+                    <div class="help-item-text">
+                        <strong data-i18n="menu_schedule">Günlük Görevler</strong>
+                        <p data-i18n="help_schedule_desc">Her gün otomatik belirlenen küçük görevler tamamlandıkça yıldız kazandırır.</p>
+                    </div>
+                </div>
+                <div class="help-item">
+                    <span class="help-item-icon">📊</span>
+                    <div class="help-item-text">
+                        <strong data-i18n="menu_analysis_report">Analiz & Rapor</strong>
+                        <p data-i18n="help_analysis_desc">Çocuğun gelişimini zaman içinde takip eder, veli ve uzmanlar için özet rapor oluşturur.</p>
+                    </div>
+                </div>
+                <div class="help-item">
+                    <span class="help-item-icon">👗</span>
+                    <div class="help-item-text">
+                        <strong data-i18n="menu_store">Giyim Mağazası</strong>
+                        <p data-i18n="help_store_desc">Kazanılan yıldızlarla karakteri giydirmeyi sağlayan bir ödül/motivasyon sistemi.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="help-section">
+                <div class="a11y-section-title" data-i18n="help_faq_title">Sık Sorulan Sorular</div>
+                <details class="help-faq-item">
+                    <summary data-i18n="help_faq_q1">⭐ Yıldızları nasıl kazanırım?</summary>
+                    <p data-i18n="help_faq_a1">Konuşma pratiği, nesne tanıma ve günlük görevleri tamamlayarak yıldız kazanılır. Yıldızlar Giyim Mağazası'nda harcanabilir.</p>
+                </details>
+                <details class="help-faq-item">
+                    <summary data-i18n="help_faq_q2">👥 Birden fazla öğrenci ekleyebilir miyim?</summary>
+                    <p data-i18n="help_faq_a2">Evet. Öğrenci seç kısmından "Yeni Öğrenci Ekle" ile istediğiniz kadar öğrenci ekleyip aralarında geçiş yapabilirsiniz.</p>
+                </details>
+                <details class="help-faq-item">
+                    <summary data-i18n="help_faq_q3">🔑 Şifremi unuttum, ne yapmalıyım?</summary>
+                    <p data-i18n="help_faq_a3">Giriş ekranındaki "Şifremi unuttum" bağlantısına tıklayıp e-postanıza gelen kodla yeni şifre belirleyebilirsiniz.</p>
+                </details>
+                <details class="help-faq-item">
+                    <summary data-i18n="help_faq_q4">🔒 Verilerim güvende mi?</summary>
+                    <p data-i18n="help_faq_a4">Veriler önce cihazınızda saklanır, ardından hesabınıza bağlı olarak şifrelenmiş şekilde sunucuya yedeklenir. Verilerinizi Erişilebilirlik panelinden indirebilir veya kalıcı olarak silebilirsiniz.</p>
+                </details>
             </div>
         </div>
     </div>

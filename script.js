@@ -85,6 +85,23 @@ const STRINGS = {
     menu_store: 'Giyim Mağazası',
     menu_store_desc: 'Yıldızlarını harca, giydir',
     menu_parent_report: 'Veli Raporu',
+    help_title: '❓ Yardım',
+    help_sections_title: 'Bölümler Ne İşe Yarar?',
+    help_therapy_desc: 'Yapay zeka çocuğa sorular sorar, çocuk sesli cevap verir; konuşma becerisi zamanla takip edilir.',
+    help_object_desc: 'Çocuk 3D nesneyi inceleyip döndürür, ne olduğunu söyler ya da yazar; doğru cevapta bir sonraki nesneye geçilir.',
+    help_aac_desc: 'Sözel iletişimde zorlanan çocuklar için görsel kartlarla ihtiyaç ve duygularını ifade etme.',
+    help_schedule_desc: 'Her gün otomatik belirlenen küçük görevler tamamlandıkça yıldız kazandırır.',
+    help_analysis_desc: 'Çocuğun gelişimini zaman içinde takip eder, veli ve uzmanlar için özet rapor oluşturur.',
+    help_store_desc: 'Kazanılan yıldızlarla karakteri giydirmeyi sağlayan bir ödül/motivasyon sistemi.',
+    help_faq_title: 'Sık Sorulan Sorular',
+    help_faq_q1: '⭐ Yıldızları nasıl kazanırım?',
+    help_faq_a1: 'Konuşma pratiği, nesne tanıma ve günlük görevleri tamamlayarak yıldız kazanılır. Yıldızlar Giyim Mağazası\'nda harcanabilir.',
+    help_faq_q2: '👥 Birden fazla öğrenci ekleyebilir miyim?',
+    help_faq_a2: 'Evet. Öğrenci seç kısmından "Yeni Öğrenci Ekle" ile istediğiniz kadar öğrenci ekleyip aralarında geçiş yapabilirsiniz.',
+    help_faq_q3: '🔑 Şifremi unuttum, ne yapmalıyım?',
+    help_faq_a3: 'Giriş ekranındaki "Şifremi unuttum" bağlantısına tıklayıp e-postanıza gelen kodla yeni şifre belirleyebilirsiniz.',
+    help_faq_q4: '🔒 Verilerim güvende mi?',
+    help_faq_a4: 'Veriler önce cihazınızda saklanır, ardından hesabınıza bağlı olarak şifrelenmiş şekilde sunucuya yedeklenir. Verilerinizi Erişilebilirlik panelinden indirebilir veya kalıcı olarak silebilirsiniz.',
     stars_earned: '+{n} ⭐ kazandın!',
     star_info_title: '⭐ Yıldızlar Nasıl Kazanılır?',
     star_info_therapy: 'Konuşma pratiğinde yardım almadan mikrofona konuşarak',
@@ -960,6 +977,23 @@ const STRINGS = {
     menu_store: 'Clothing Store',
     menu_store_desc: 'Spend your stars, dress up',
     menu_parent_report: 'Parent Report',
+    help_title: '❓ Help',
+    help_sections_title: 'What Do The Sections Do?',
+    help_therapy_desc: 'The AI asks the child questions and the child answers out loud; speech progress is tracked over time.',
+    help_object_desc: 'The child inspects and rotates a 3D object, then says or types what it is; a correct answer moves to the next object.',
+    help_aac_desc: 'Picture cards that help children who struggle with verbal communication express their needs and feelings.',
+    help_schedule_desc: 'A different set of small tasks appears each day; completing them earns stars.',
+    help_analysis_desc: 'Tracks the child\'s progress over time and generates a summary report for parents and specialists.',
+    help_store_desc: 'A reward/motivation system where earned stars are spent to dress up the character.',
+    help_faq_title: 'Frequently Asked Questions',
+    help_faq_q1: '⭐ How do I earn stars?',
+    help_faq_a1: 'Stars are earned by completing speech practice, object recognition, and daily tasks. They can be spent in the Clothing Store.',
+    help_faq_q2: '👥 Can I add more than one student?',
+    help_faq_a2: 'Yes. Use "Add New Student" from the student selection screen to add as many students as you like and switch between them.',
+    help_faq_q3: '🔑 I forgot my password, what do I do?',
+    help_faq_a3: 'Tap "Forgot my password" on the login screen and set a new password with the code sent to your email.',
+    help_faq_q4: '🔒 Is my data safe?',
+    help_faq_a4: 'Your data is stored on your device first, then backed up encrypted to the server tied to your account. You can export or permanently delete your data from the Accessibility panel.',
     stars_earned: 'You earned +{n} ⭐!',
     star_info_title: '⭐ How to Earn Stars?',
     star_info_therapy: 'Speak into the microphone without help during speech practice',
@@ -5485,6 +5519,13 @@ function toggleA11yPanel() {
     }
 }
 
+function toggleHelpPanel() {
+    const panel = document.getElementById('help-panel');
+    if (!panel) return;
+    const isOpen = panel.style.display !== 'none';
+    panel.style.display = isOpen ? 'none' : 'flex';
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     const settings = loadA11ySettings();
     applyA11yClasses(settings);
@@ -5528,6 +5569,7 @@ window.closeStarModal = closeStarModal;
 window.goToSequence = goToSequence;
 window.goToStore = goToStore;
 window.toggleA11yPanel = toggleA11yPanel;
+window.toggleHelpPanel = toggleHelpPanel;
 window.applyA11y = applyA11y;
 window.switchAuthTab = switchAuthTab;
 window.handleLogin = handleLogin;
