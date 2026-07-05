@@ -584,67 +584,69 @@ document.addEventListener('DOMContentLoaded', function(){
             <h3 data-i18n="a11y_title">⚙️ Erişilebilirlik</h3>
             <button type="button" class="a11y-close-btn" onclick="toggleA11yPanel()">✕</button>
         </div>
-        <div class="a11y-account-section" id="a11yAccountSection" style="display:none">
-            <div class="a11y-section-title" data-i18n="a11y_account">Hesap</div>
-            <div class="a11y-account-user" id="a11yAccountUser"></div>
-            <div class="a11y-account-actions">
-                <button type="button" class="a11y-account-btn" onclick="promptSetEmail()"><span data-i18n="a11y_set_email">📧 E-posta Ekle/Güncelle</span></button>
-                <button type="button" class="a11y-account-btn" onclick="exportMyData()"><span data-i18n="a11y_export">📥 Verilerimi İndir</span></button>
-                <button type="button" class="a11y-account-btn a11y-danger-btn" onclick="deleteAccount()"><span data-i18n="a11y_delete">🗑️ Hesabı Sil</span></button>
+        <div class="a11y-panel-body">
+            <div class="a11y-account-section" id="a11yAccountSection" style="display:none">
+                <div class="a11y-section-title" data-i18n="a11y_account">Hesap</div>
+                <div class="a11y-account-user" id="a11yAccountUser"></div>
+                <div class="a11y-account-actions">
+                    <button type="button" class="a11y-account-btn" onclick="promptSetEmail()"><span data-i18n="a11y_set_email">📧 E-posta Ekle/Güncelle</span></button>
+                    <button type="button" class="a11y-account-btn" onclick="exportMyData()"><span data-i18n="a11y_export">📥 Verilerimi İndir</span></button>
+                    <button type="button" class="a11y-account-btn a11y-danger-btn" onclick="deleteAccount()"><span data-i18n="a11y_delete">🗑️ Hesabı Sil</span></button>
+                </div>
+                <a href="#" class="a11y-kvkk-link" onclick="openKvkkModal(event)"><span data-i18n="a11y_privacy">Gizlilik Politikası & KVKK</span></a>
             </div>
-            <a href="#" class="a11y-kvkk-link" onclick="openKvkkModal(event)"><span data-i18n="a11y_privacy">Gizlilik Politikası & KVKK</span></a>
-        </div>
-        <div class="a11y-settings-list">
-            <label class="a11y-setting-row">
-                <span class="a11y-setting-label">
-                    <span class="a11y-setting-icon">🔡</span>
-                    <span>
-                        <strong data-i18n="a11y_large_text_label">Büyük Metin</strong>
-                        <small data-i18n="a11y_large_text_hint">Yazı boyutunu artırır</small>
+            <div class="a11y-settings-list">
+                <label class="a11y-setting-row">
+                    <span class="a11y-setting-label">
+                        <span class="a11y-setting-icon">🔡</span>
+                        <span>
+                            <strong data-i18n="a11y_large_text_label">Büyük Metin</strong>
+                            <small data-i18n="a11y_large_text_hint">Yazı boyutunu artırır</small>
+                        </span>
                     </span>
-                </span>
-                <input type="checkbox" id="a11y-large-text" class="a11y-toggle" onchange="applyA11y()">
-            </label>
-            <label class="a11y-setting-row">
-                <span class="a11y-setting-label">
-                    <span class="a11y-setting-icon">🌓</span>
-                    <span>
-                        <strong data-i18n="a11y_high_contrast_label">Yüksek Kontrast</strong>
-                        <small data-i18n="a11y_high_contrast_hint">Renkleri belirginleştirir</small>
+                    <input type="checkbox" id="a11y-large-text" class="a11y-toggle" onchange="applyA11y()">
+                </label>
+                <label class="a11y-setting-row">
+                    <span class="a11y-setting-label">
+                        <span class="a11y-setting-icon">🌓</span>
+                        <span>
+                            <strong data-i18n="a11y_high_contrast_label">Yüksek Kontrast</strong>
+                            <small data-i18n="a11y_high_contrast_hint">Renkleri belirginleştirir</small>
+                        </span>
                     </span>
-                </span>
-                <input type="checkbox" id="a11y-high-contrast" class="a11y-toggle" onchange="applyA11y()">
-            </label>
-            <label class="a11y-setting-row">
-                <span class="a11y-setting-label">
-                    <span class="a11y-setting-icon">👆</span>
-                    <span>
-                        <strong data-i18n="a11y_large_touch_label">Büyük Dokunma Hedefi</strong>
-                        <small data-i18n="a11y_large_touch_hint">Butonları daha kolay tıklanır hale getirir</small>
+                    <input type="checkbox" id="a11y-high-contrast" class="a11y-toggle" onchange="applyA11y()">
+                </label>
+                <label class="a11y-setting-row">
+                    <span class="a11y-setting-label">
+                        <span class="a11y-setting-icon">👆</span>
+                        <span>
+                            <strong data-i18n="a11y_large_touch_label">Büyük Dokunma Hedefi</strong>
+                            <small data-i18n="a11y_large_touch_hint">Butonları daha kolay tıklanır hale getirir</small>
+                        </span>
                     </span>
-                </span>
-                <input type="checkbox" id="a11y-large-touch" class="a11y-toggle" onchange="applyA11y()">
-            </label>
-            <label class="a11y-setting-row">
-                <span class="a11y-setting-label">
-                    <span class="a11y-setting-icon">🔕</span>
-                    <span>
-                        <strong data-i18n="a11y_reduce_motion_label">Animasyonları Azalt</strong>
-                        <small data-i18n="a11y_reduce_motion_hint">Hareket ve geçişleri kapatır</small>
+                    <input type="checkbox" id="a11y-large-touch" class="a11y-toggle" onchange="applyA11y()">
+                </label>
+                <label class="a11y-setting-row">
+                    <span class="a11y-setting-label">
+                        <span class="a11y-setting-icon">🔕</span>
+                        <span>
+                            <strong data-i18n="a11y_reduce_motion_label">Animasyonları Azalt</strong>
+                            <small data-i18n="a11y_reduce_motion_hint">Hareket ve geçişleri kapatır</small>
+                        </span>
                     </span>
-                </span>
-                <input type="checkbox" id="a11y-reduce-motion" class="a11y-toggle" onchange="applyA11y()">
-            </label>
-            <label class="a11y-setting-row">
-                <span class="a11y-setting-label">
-                    <span class="a11y-setting-icon">🔊</span>
-                    <span>
-                        <strong data-i18n="a11y_voice_label_label">Sesli Etiket</strong>
-                        <small data-i18n="a11y_voice_label_hint">Her butona basıldığında sesli okur</small>
+                    <input type="checkbox" id="a11y-reduce-motion" class="a11y-toggle" onchange="applyA11y()">
+                </label>
+                <label class="a11y-setting-row">
+                    <span class="a11y-setting-label">
+                        <span class="a11y-setting-icon">🔊</span>
+                        <span>
+                            <strong data-i18n="a11y_voice_label_label">Sesli Etiket</strong>
+                            <small data-i18n="a11y_voice_label_hint">Her butona basıldığında sesli okur</small>
+                        </span>
                     </span>
-                </span>
-                <input type="checkbox" id="a11y-voice-label" class="a11y-toggle" onchange="applyA11y()">
-            </label>
+                    <input type="checkbox" id="a11y-voice-label" class="a11y-toggle" onchange="applyA11y()">
+                </label>
+            </div>
         </div>
     </div>
 </div>
