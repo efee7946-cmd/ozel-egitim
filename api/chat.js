@@ -1,4 +1,5 @@
 import { sessionUsername } from './_auth.js';
+import { checkRateLimit } from './_rateLimit.js';
 
 export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Origin', process.env.ALLOWED_ORIGIN || '*');
@@ -13,8 +14,12 @@ export default async function handler(req, res) {
         return res.status(405).json({ error: 'Sadece POST isteği atılabilir.' });
     }
 
-    if (!(await sessionUsername(req))) {
+    const username = await sessionUsername(req);
+    if (!username) {
         return res.status(401).json({ error: 'AUTH_REQUIRED' });
+    }
+    if (!(await checkRateLimit('chat:' + username, 60))) {
+        return res.status(429).json({ error: 'RATE_LIMITED' });
     }
 
     const { contents, system_instruction } = req.body;

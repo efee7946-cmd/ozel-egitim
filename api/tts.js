@@ -1,5 +1,6 @@
 import { GoogleAuth } from 'google-auth-library';
 import { sessionUsername } from './_auth.js';
+import { checkRateLimit } from './_rateLimit.js';
 
 let _authClient = null;
 
@@ -26,8 +27,12 @@ export default async function handler(req, res) {
         return res.status(405).json({ error: 'Sadece POST isteği atılabilir.' });
     }
 
-    if (!(await sessionUsername(req))) {
+    const username = await sessionUsername(req);
+    if (!username) {
         return res.status(401).json({ error: 'AUTH_REQUIRED' });
+    }
+    if (!(await checkRateLimit('tts:' + username, 120))) {
+        return res.status(429).json({ error: 'RATE_LIMITED' });
     }
 
     if (!process.env.GOOGLE_TTS_CREDENTIALS) {
