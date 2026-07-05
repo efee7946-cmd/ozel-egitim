@@ -695,6 +695,8 @@ const STRINGS = {
     object_prompt: 'Bu ne? Mikrofona söyle ya da yaz',
     object_type_ph: 'Cevabını yaz...',
     object_submit_btn: 'Gönder',
+    object_skip_btn: 'Bilmiyorum, geç →',
+    object_skip_answer: 'Cevap: {label} idi',
     object_no_input: 'Bir şey duyamadım, tekrar dener misin?',
     object_correct: 'Doğru! Aferin!',
     object_try_again: 'Tekrar dene!',
@@ -1688,6 +1690,8 @@ const STRINGS = {
     object_prompt: 'What is this? Say it or type it',
     object_type_ph: 'Type your answer...',
     object_submit_btn: 'Submit',
+    object_skip_btn: "I don't know, skip →",
+    object_skip_answer: 'The answer was: {label}',
     object_no_input: "I didn't catch that, try again?",
     object_correct: 'Correct! Well done!',
     object_try_again: 'Try again!',
@@ -6129,6 +6133,7 @@ async function goToObjectRecognition() {
     document.querySelector('.object-canvas-card').style.display = '';
     document.querySelector('.object-answer-row').style.display = '';
     document.querySelector('.object-prompt').style.display = '';
+    document.getElementById('objSkipBtn').style.display = '';
 
     _objItems = [...OBJECT_RECOGNITION_ITEMS].sort(() => Math.random() - 0.5);
     _objIndex = 0;
@@ -6310,6 +6315,18 @@ function _objCheckAnswer(raw) {
     }
 }
 
+function objSkip() {
+    if (_objBusy) return;
+    _objBusy = true;
+    _objErrors++;
+    const item = _objItems[_objIndex];
+    const answerText = t('object_skip_answer').replace('{label}', item.label);
+    _objFeedbackShow(false, answerText);
+    document.getElementById('objFeedback').classList.add('skip');
+    speakFallback(answerText);
+    setTimeout(() => { _objBusy = false; _objNext(); }, 1800);
+}
+
 function objSubmitText() {
     const input = document.getElementById('objTextInput');
     const val = input.value;
@@ -6344,6 +6361,7 @@ function _objComplete() {
     document.querySelector('.object-canvas-card').style.display = 'none';
     document.querySelector('.object-answer-row').style.display = 'none';
     document.querySelector('.object-prompt').style.display = 'none';
+    document.getElementById('objSkipBtn').style.display = 'none';
     document.getElementById('objFeedback').textContent = '';
     document.getElementById('objComplete').style.display = '';
     addStars(_objErrors === 0 ? 3 : (_objErrors <= 2 ? 2 : 1));
