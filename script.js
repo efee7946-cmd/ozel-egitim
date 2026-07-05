@@ -105,12 +105,11 @@ const STRINGS = {
     stars_earned: '+{n} ⭐ kazandın!',
     star_info_title: '⭐ Yıldızlar Nasıl Kazanılır?',
     star_info_therapy: 'Konuşma pratiğinde yardım almadan mikrofona konuşarak',
-    star_info_sort: 'Sınıflandırma oyunlarını hatasız veya az hatayla tamamlayarak',
-    star_info_sequence: 'Sıralama ve Sebep-Sonuç oyunlarını tamamlayarak',
+    star_info_object: 'Nesne tanımayı hatasız veya az hatayla tamamlayarak',
+    star_info_schedule: 'Günlük görevleri tamamlayarak',
     star_info_purpose: "Kazandığın yıldızları Giyim Mağazası'nda ayı için şapka, gözlük ve daha fazla aksesuar satın almak için harcayabilirsin!",
     star_info_goto_store: 'Giyim Mağazasına Git',
-    store_title: '👗 Giyim Mağazası',
-    store_cat_all: 'Tümü',
+    store_title: '🏪 Giyim Mağazası',
     store_cat_hat: 'Şapkalar',
     store_cat_face: 'Yüz',
     store_cat_neck: 'Boyun',
@@ -687,7 +686,7 @@ const STRINGS = {
     logout: 'Çıkış Yap',
     repeat_btn: '🔄 Tekrar Et',
     simplify_btn: '🟢 Daha Basit',
-    tab_analysis: 'Uzman Analizi',
+    tab_analysis: 'BEP Analizi',
     tab_parent: 'Veli Özeti',
     analysis_title: 'Konuşma Pratiği Performans Analizi',
     analysis_date_label: 'Analiz tarihi:',
@@ -997,12 +996,11 @@ const STRINGS = {
     stars_earned: 'You earned +{n} ⭐!',
     star_info_title: '⭐ How to Earn Stars?',
     star_info_therapy: 'Speak into the microphone without help during speech practice',
-    star_info_sort: 'Complete classification games with no or few mistakes',
-    star_info_sequence: 'Complete Sequencing and Cause & Effect games',
+    star_info_object: 'Complete object recognition with no or few mistakes',
+    star_info_schedule: 'Complete daily tasks',
     star_info_purpose: "Spend the stars you earn in the Clothing Store to buy hats, glasses and more accessories for the bear!",
     star_info_goto_store: 'Go to Clothing Store',
-    store_title: '👗 Clothing Store',
-    store_cat_all: 'All',
+    store_title: '🏪 Clothing Store',
     store_cat_hat: 'Hats',
     store_cat_face: 'Face',
     store_cat_neck: 'Neck',
@@ -1579,7 +1577,7 @@ const STRINGS = {
     logout: 'Log Out',
     repeat_btn: '🔄 Repeat',
     simplify_btn: '🟢 Simpler',
-    tab_analysis: 'Expert Analysis',
+    tab_analysis: 'IEP Analysis',
     tab_parent: 'Parent Summary',
     analysis_title: 'Speech Practice Performance Analysis',
     analysis_date_label: 'Analysis date:',
@@ -4821,7 +4819,7 @@ const CLOTHING_ITEMS = [
     { id: 'helmet',     cat: 'hat',  emoji: '⛑️',  cost: 130, pos: 'top',    get label() { return t('acc_helmet'); } },
     { id: 'crown',      cat: 'hat',  emoji: '👑',   cost: 200, pos: 'top',    get label() { return t('acc_crown'); } },
 ];
-const STORE_CATS = ['all', 'hat', 'face', 'neck'];
+const STORE_CATS = ['hat', 'face', 'neck'];
 
 function _starsKey() { return 'stars_' + (activeStudentId || 'default'); }
 function getStarState() {
@@ -4863,11 +4861,11 @@ function openStarInfo() {
     document.getElementById('star-info-modal').style.display = 'flex';
 }
 
-let _storeCat = 'all';
+let _storeCat = STORE_CATS[0];
 
 function goToStore() {
     showOnly('store-screen');
-    _storeCat = 'all';
+    _storeCat = STORE_CATS[0];
     _renderStoreTabs();
     _renderStoreMannequin();
     _renderStoreGrid();
@@ -4904,7 +4902,7 @@ function _renderStoreGrid() {
     if (!grid) return;
     const s = getStarState();
     const balance = storeBalance(s);
-    const items = _storeCat === 'all' ? CLOTHING_ITEMS : CLOTHING_ITEMS.filter(i => i.cat === _storeCat);
+    const items = CLOTHING_ITEMS.filter(i => i.cat === _storeCat);
     grid.innerHTML = items.map(item => {
         const owned = s.owned.includes(item.id);
         const equipped = s.equipped === item.id;
