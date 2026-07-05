@@ -706,7 +706,6 @@ const STRINGS = {
     object_complete_sub: 'Nesne tanımada harikaydın!',
     object_play_again: '🔁 Tekrar Oyna',
     obj_ball: 'Top',
-    obj_cube: 'Küp',
     obj_star: 'Yıldız',
     obj_apple: 'Elma',
     obj_balloon: 'Balon',
@@ -716,7 +715,6 @@ const STRINGS = {
     obj_strawberry: 'Çilek',
     obj_icecream: 'Dondurma',
     obj_sun: 'Güneş',
-    obj_butterfly: 'Kelebek',
     obj_banana: 'Muz',
     obj_train: 'Tren',
     obj_plane: 'Uçak',
@@ -1701,7 +1699,6 @@ const STRINGS = {
     object_complete_sub: 'Great job recognizing objects!',
     object_play_again: '🔁 Play Again',
     obj_ball: 'Ball',
-    obj_cube: 'Cube',
     obj_star: 'Star',
     obj_apple: 'Apple',
     obj_balloon: 'Balloon',
@@ -1711,7 +1708,6 @@ const STRINGS = {
     obj_strawberry: 'Strawberry',
     obj_icecream: 'Ice Cream',
     obj_sun: 'Sun',
-    obj_butterfly: 'Butterfly',
     obj_banana: 'Banana',
     obj_train: 'Train',
     obj_plane: 'Plane',
@@ -6082,9 +6078,6 @@ const OBJECT_RECOGNITION_ITEMS = [
     { id: 'ball', type: 'glb', model: 'models/objects/top.glb',
         answers: { tr: ['top', 'küre'], en: ['ball', 'sphere'] },
         get label() { return t('obj_ball'); } },
-    { id: 'cube', type: 'primitive', shape: 'box', color: 0x3498db,
-        answers: { tr: ['küp', 'kutu'], en: ['cube', 'box'] },
-        get label() { return t('obj_cube'); } },
     { id: 'star', type: 'glb', model: 'models/objects/yildiz.glb',
         answers: { tr: ['yıldız', 'yildiz'], en: ['star'] },
         get label() { return t('obj_star'); } },
@@ -6112,9 +6105,6 @@ const OBJECT_RECOGNITION_ITEMS = [
     { id: 'sun', type: 'glb', model: 'models/objects/gunes.glb',
         answers: { tr: ['güneş', 'gunes'], en: ['sun'] },
         get label() { return t('obj_sun'); } },
-    { id: 'butterfly', type: 'glb', model: 'models/objects/kelebek.glb',
-        answers: { tr: ['kelebek'], en: ['butterfly'] },
-        get label() { return t('obj_butterfly'); } },
     { id: 'train', type: 'glb', model: 'models/objects/tren.glb',
         answers: { tr: ['tren'], en: ['train'] },
         get label() { return t('obj_train'); } },
@@ -6248,9 +6238,9 @@ async function _objShowCurrent() {
     if (fallback) {
         const shapeEmoji = { sphere: '⚽', box: '📦', star: '⭐' };
         const idEmoji = {
-            ball: '⚽', cube: '📦', star: '⭐', apple: '🍎', balloon: '🎈',
+            ball: '⚽', star: '⭐', apple: '🍎', balloon: '🎈',
             tree: '🌳', fish: '🐟', cup: '🥛', strawberry: '🍓', icecream: '🍦',
-            sun: '☀️', butterfly: '🦋', banana: '🍌', train: '🚂', plane: '✈️',
+            sun: '☀️', banana: '🍌', train: '🚂', plane: '✈️',
         };
         fallback.textContent = (item.type === 'primitive' ? shapeEmoji[item.shape] : idEmoji[item.id]) || '❓';
         return;
