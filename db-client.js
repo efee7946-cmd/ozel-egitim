@@ -1,8 +1,10 @@
 // LMS Veri Katmanı
-// Hassas veriler (öğrenci, BEP, IEP, beceri, davranış) AES-GCM ile şifrelenir.
+// Hassas veriler (öğrenci, BEP, IEP, beceri, davranış) AES-GCM ile şifrelenir —
+// hem localStorage'da hem de /api/data üzerinden sunucuya giderken; sunucu
+// yalnızca opak şifreli metni görür, anahtar hiçbir zaman cihazdan çıkmaz.
 // sessionStorage: hızlı sync okuma için plaintext cache (sekme kapanınca silinir).
 // localStorage: şifreli kalıcı cache (offline destek).
-// /api/data üzerinden Vercel KV ile cihazlar arası senkronizasyon.
+// /api/data üzerinden Aiven PostgreSQL ile cihazlar arası senkronizasyon.
 
 const DB = (function () {
     const PFX = 'lms_';
@@ -123,6 +125,10 @@ const DB = (function () {
     }
 
     /* ---------- Cloud ---------- */
+    // Hassas anahtarlar sunucuya da AES-GCM ile şifreli gönderilir; sunucu
+    // yalnızca opak bir metin görür. Eski (şifresiz) kayıtlar geriye dönük
+    // uyumluluk için düz nesne olarak da kabul edilir (bir sonraki yazımda
+    // otomatik şifrelenir).
     async function cloudFetch(key) {
         if (!_cloud || isLocalOnly(key)) return null;
         const token = _apiToken();
@@ -136,21 +142,25 @@ const DB = (function () {
             const d = await r.json();
             if (d.fallback) { _cloudDown(); return null; }
             _lastSyncAt = Date.now();
-            return { value: d.value ?? null, ts: d.updatedAt ? Date.parse(d.updatedAt) : 0 };
+            const value = (isSensitive(key) && typeof d.value === 'string')
+                ? await _decrypt(d.value)
+                : (d.value ?? null);
+            return { value, ts: d.updatedAt ? Date.parse(d.updatedAt) : 0 };
         } catch { _cloudDown(); return null; }
     }
     async function cloudGet(key) {
         const r = await cloudFetch(key);
         return r ? r.value : null;
     }
-    function cloudPut(key, val) {
+    async function cloudPut(key, val) {
         if (!_cloud || isLocalOnly(key)) return;
         const token = _apiToken();
         if (!token) return;
+        const body = isSensitive(key) ? await _encrypt(val) : val;
         fetch('/api/data', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-            body: JSON.stringify({ key, value: val }),
+            body: JSON.stringify({ key, value: body }),
             signal: AbortSignal.timeout(6000),
         }).then(r => r.json()).then(d => {
             if (d && d.updatedAt) _tsSet(key, Date.parse(d.updatedAt));
@@ -249,7 +259,7 @@ const DB = (function () {
                 const full = localStorage.key(i);
                 if (full && full.startsWith(PFX)) {
                     const k = full.slice(PFX.length);
-                    // Hassas veri: cloud'a şifresiz gönder (cloud kendi güvenliği var)
+                    // Hassas veri: cloudPut kendi içinde şifreliyor (bkz. yukarısı)
                     if (isSensitive(k)) {
                         const ss = ssGet(k);
                         if (ss !== null) cloudPut(k, ss);

@@ -59,8 +59,10 @@ export default async function handler(req, res) {
             }
 
             const raw = rows.length ? rows[0].value : null;
+            let value = null;
+            if (raw) { try { value = JSON.parse(raw); } catch { value = raw; } }
             return res.json({
-                value: raw ? JSON.parse(raw) : null,
+                value,
                 updatedAt: rows.length ? rows[0].updated_at : null
             });
         }
@@ -68,7 +70,7 @@ export default async function handler(req, res) {
         if (req.method === 'POST') {
             const { key, value } = req.body || {};
             if (!key) return res.status(400).json({ error: 'key gerekli' });
-            const v = typeof value === 'string' ? value : JSON.stringify(value);
+            const v = JSON.stringify(value);
             if (v && v.length > 262144)
                 return res.status(413).json({ error: 'VALUE_TOO_LARGE' });
             const rows = await query(
