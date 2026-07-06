@@ -26,18 +26,16 @@ function getPool() {
             ssl: process.env.DATABASE_CA_CERT
                 ? { rejectUnauthorized: true, ca: process.env.DATABASE_CA_CERT }
                 : { rejectUnauthorized: false },
-            max: 3,
+            max: 1,
             idleTimeoutMillis: 20000,
+            connectionTimeoutMillis: 10000,
         });
     }
     return _pool;
 }
 
 export async function query(sql, params = []) {
-    const client = await getPool().connect();
-    try {
-        return (await client.query(sql, params)).rows;
-    } finally {
-        client.release();
-    }
+    const pool = getPool();
+    const { rows } = await pool.query(sql, params);
+    return rows;
 }
