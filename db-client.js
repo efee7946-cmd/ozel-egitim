@@ -310,31 +310,55 @@ const DB = (function () {
         async refreshKeys(keys) {
             const changed = [];
             const SKEW_MS = 5000;
-            for (const key of keys) {
-                if (!key) continue;
-                const remote = await cloudFetch(key);
-                if (!remote) continue; // cloud kapalı/erişilemedi
-                const localTs = _tsGet(key);
-                const localVal = isSensitive(key) ? ssGet(key) : (() => {
-                    try { const r = localStorage.getItem(PFX + key); return r ? JSON.parse(r) : null; } catch { return null; }
-                })();
+            const validKeys = Array.isArray(keys) ? keys.filter(k => typeof k === 'string' && k.trim()) : [];
+            if (!validKeys.length) return changed;
 
-                if (remote.value === null) {
-                    // Bulutta hiç yok — yerel varsa gönder
-                    if (localVal !== null) cloudPut(key, localVal);
-                    continue;
+            const token = _apiToken();
+            if (!_cloud || !token) return changed;
+
+            try {
+                const r = await fetch('/api/data/batch', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                    body: JSON.stringify({ keys: validKeys }),
+                    signal: AbortSignal.timeout(6000)
+                });
+                if (!r.ok) {
+                    if (r.status === 401) return changed;
+                    throw new Error('Batch fetch failed: ' + r.status);
                 }
-                if (localVal === null || remote.ts > localTs + SKEW_MS) {
-                    // Bulut daha yeni — yereli güncelle
-                    if (isSensitive(key)) { ssPut(key, remote.value); lsPut(key, remote.value); }
-                    else { try { localStorage.setItem(PFX + key, JSON.stringify(remote.value)); } catch {} }
-                    _tsSet(key, remote.ts);
-                    changed.push(key);
-                } else if (localTs > remote.ts + SKEW_MS) {
-                    // Yerel daha yeni (çevrimdışı yazılmış) — buluta gönder
-                    cloudPut(key, localVal);
+
+                const results = await r.json();
+                _lastSyncAt = Date.now();
+
+                for (const item of results) {
+                    const key = item?.key;
+                    if (!key) continue;
+                    const remote = { value: item.value, ts: item.updatedAt ? Date.parse(item.updatedAt) : 0 };
+                    if (!remote.value && remote.value !== null) continue;
+
+                    const localTs = _tsGet(key);
+                    const localVal = isSensitive(key) ? ssGet(key) : (() => {
+                        try { const r = localStorage.getItem(PFX + key); return r ? JSON.parse(r) : null; } catch { return null; }
+                    })();
+
+                    if (remote.value === null) {
+                        if (localVal !== null) cloudPut(key, localVal);
+                        continue;
+                    }
+                    if (localVal === null || remote.ts > localTs + SKEW_MS) {
+                        if (isSensitive(key)) { ssPut(key, remote.value); lsPut(key, remote.value); }
+                        else { try { localStorage.setItem(PFX + key, JSON.stringify(remote.value)); } catch {} }
+                        _tsSet(key, remote.ts);
+                        changed.push(key);
+                    } else if (localTs > remote.ts + SKEW_MS) {
+                        cloudPut(key, localVal);
+                    }
                 }
+            } catch (err) {
+                _cloudDown();
             }
+
             return changed;
         },
     };
