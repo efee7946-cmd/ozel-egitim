@@ -8,11 +8,13 @@ CREATE TABLE IF NOT EXISTS users (
     salt           TEXT NOT NULL,
     email          TEXT,
     email_verified BOOLEAN DEFAULT false,
+    data_key       TEXT,
     created_at     TIMESTAMPTZ DEFAULT now()
 );
 
 ALTER TABLE users ADD COLUMN IF NOT EXISTS email TEXT;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verified BOOLEAN DEFAULT false;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS data_key TEXT;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS reset_hash TEXT;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS reset_expires TIMESTAMPTZ;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS reset_attempts INT DEFAULT 0;

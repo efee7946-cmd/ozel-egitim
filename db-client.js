@@ -16,6 +16,7 @@ const DB = (function () {
     let _lastSyncAt = null;
     let _encKey = null; // AES-GCM CryptoKey, bellekte, diske yazılmaz
     let _legacyEncKey = null; // eski sabit-salt anahtarı — sadece geriye dönük okuma için
+    let _encKeyMaterial = null;
 
     function _cloudDown() {
         _cloud = false;
@@ -43,7 +44,7 @@ const DB = (function () {
     function isSensitive(key) { return SENSITIVE.some(p => key.startsWith(p)); }
 
     // Cihaza özel anahtarlar — buluta asla gönderilmez (oturum güvenliği)
-    const LOCAL_ONLY = ['auth_token', 'auth_user'];
+    const LOCAL_ONLY = ['auth_token', 'auth_user', 'auth_data_key'];
     function isLocalOnly(key) { return LOCAL_ONLY.includes(key); }
 
     function _apiToken() {
@@ -176,7 +177,7 @@ const DB = (function () {
         const token = _apiToken();
         if (!token) return;
         const body = isSensitive(key) ? await _encrypt(val) : val;
-        fetch('/api/data', {
+        return fetch('/api/data', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
             body: JSON.stringify({ key, value: body }),
@@ -203,8 +204,12 @@ const DB = (function () {
          * Mevcut şifreli localStorage verilerini sessionStorage'a yükler.
          */
         async initEncryption(sessionToken) {
-            if (!sessionToken || _encKey) return;
+            if (!sessionToken) return;
+            if (_encKey && _encKeyMaterial === sessionToken) return;
             try {
+                _encKey = null;
+                _legacyEncKey = null;
+                _encKeyMaterial = sessionToken;
                 _encKey = await _deriveKey(sessionToken, false);
                 _legacyEncKey = await _deriveKey(sessionToken, true);
                 // Şifreli localStorage → sessionStorage (sync erişim için)
@@ -255,15 +260,15 @@ const DB = (function () {
         },
 
         /** Yazar: anında (ss+ls), cloud'a arka planda */
-        set(key, val) {
+        async set(key, val) {
             if (isSensitive(key)) {
                 ssPut(key, val);
-                lsPut(key, val); // async, fire-and-forget
+                await lsPut(key, val);
             } else {
                 try { localStorage.setItem(PFX + key, JSON.stringify(val)); } catch {}
             }
             _tsSet(key, Date.now());
-            cloudPut(key, val);
+            await cloudPut(key, val);
         },
 
         del(key) {

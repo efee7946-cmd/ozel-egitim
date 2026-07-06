@@ -8,6 +8,7 @@ import bcrypt from 'bcryptjs';
 import { query } from './_db.js';
 import { sendMail, resetCodeEmailHtml, verifyCodeEmailHtml } from './_mail.js';
 import { checkRateLimit } from './_rateLimit.js';
+import { isPasswordPwned } from './_pwned.js';
 
 const SESSION_DAYS = 14;
 const BCRYPT_ROUNDS = 12;
@@ -42,6 +43,7 @@ async function ensureAuthColumns() {
     if (_columnsEnsured) return;
     await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS email TEXT');
     await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verified BOOLEAN DEFAULT false');
+    await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS data_key TEXT');
     await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS reset_hash TEXT');
     await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS reset_expires TIMESTAMPTZ');
     await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS reset_attempts INT DEFAULT 0');
@@ -81,6 +83,14 @@ function generateSixDigitCode() {
     return String(crypto.randomInt(100000, 1000000));
 }
 
+async function ensureDataKey(username) {
+    const rows = await query('SELECT data_key FROM users WHERE username = $1', [username]);
+    if (rows[0]?.data_key) return rows[0].data_key;
+    const dataKey = crypto.randomBytes(32).toString('hex');
+    await query('UPDATE users SET data_key = $1 WHERE username = $2', [dataKey, username]);
+    return dataKey;
+}
+
 // Doğrulama kodu üretir, kaydeder ve e-postayla gönderir (best-effort)
 async function sendVerificationCode(username, userEmail) {
     const code = generateSixDigitCode();
@@ -109,10 +119,12 @@ export default async function handler(req, res) {
             const u = username.trim().toLowerCase();
             if (u.length < 3)
                 return res.status(400).json({ error: 'AUTH_USERNAME_TOO_SHORT' });
-            if (password.length < 6)
+            if (password.length < 8)
                 return res.status(400).json({ error: 'AUTH_PASSWORD_TOO_SHORT' });
             if (!/^[a-z0-9_]+$/.test(u))
                 return res.status(400).json({ error: 'AUTH_USERNAME_INVALID_CHARS' });
+            if (await isPasswordPwned(password))
+                return res.status(400).json({ error: 'AUTH_PASSWORD_PWNED' });
 
             const existing = await query('SELECT username FROM users WHERE username = $1', [u]);
             if (existing.length > 0)
@@ -129,9 +141,10 @@ export default async function handler(req, res) {
 
             const hash = await bcrypt.hash(password, BCRYPT_ROUNDS);
             const displayName = username.trim();
+            const dataKey = crypto.randomBytes(32).toString('hex');
             await query(
-                'INSERT INTO users (username, display_name, hash, salt, email) VALUES ($1, $2, $3, $4, $5)',
-                [u, displayName, hash, '', userEmail]  // bcrypt hash'i salt içeriyor, ayrı sütun boş
+                'INSERT INTO users (username, display_name, hash, salt, email, data_key) VALUES ($1, $2, $3, $4, $5, $6)',
+                [u, displayName, hash, '', userEmail, dataKey]  // bcrypt hash'i salt içeriyor, ayrı sütun boş
             );
 
             // Doğrulama kodu gönder — mail hatası kaydı engellemesin
@@ -149,7 +162,7 @@ export default async function handler(req, res) {
                 [tok, u, displayName, expiresAt()]
             );
             return res.json({
-                ok: true, token: tok, displayName,
+                ok: true, token: tok, displayName, dataKey,
                 emailVerificationPending,
                 emailMasked: userEmail ? maskEmail(userEmail) : null
             });
@@ -203,12 +216,13 @@ export default async function handler(req, res) {
             }
 
             const tok = crypto.randomBytes(32).toString('hex');
+            const dataKey = user.data_key || await ensureDataKey(u);
             await query(
                 'INSERT INTO sessions (token, username, display_name, expires_at) VALUES ($1, $2, $3, $4)',
                 [tok, u, user.display_name, expiresAt()]
             );
             return res.json({
-                ok: true, token: tok, displayName: user.display_name,
+                ok: true, token: tok, displayName: user.display_name, dataKey,
                 hasEmail: !!user.email, emailVerified: !!user.email_verified
             });
         }
@@ -250,7 +264,7 @@ export default async function handler(req, res) {
             const ident = identifier || username;
             if (!ident || !code || !newPassword)
                 return res.status(400).json({ error: 'AUTH_FIELDS_REQUIRED' });
-            if (newPassword.length < 6)
+            if (newPassword.length < 8)
                 return res.status(400).json({ error: 'AUTH_PASSWORD_TOO_SHORT' });
             await ensureAuthColumns();
             const user = await findUserByIdentifier(ident);
@@ -264,6 +278,8 @@ export default async function handler(req, res) {
                 await query('UPDATE users SET reset_attempts = reset_attempts + 1 WHERE username = $1', [user.username]);
                 return res.status(401).json({ error: 'AUTH_RESET_CODE_INVALID' });
             }
+            if (await isPasswordPwned(newPassword))
+                return res.status(400).json({ error: 'AUTH_PASSWORD_PWNED' });
 
             const newHash = await bcrypt.hash(newPassword, BCRYPT_ROUNDS);
             await query(
@@ -274,11 +290,12 @@ export default async function handler(req, res) {
             await query('DELETE FROM sessions WHERE username = $1', [user.username]);
 
             const tok = crypto.randomBytes(32).toString('hex');
+            const dataKey = user.data_key || await ensureDataKey(user.username);
             await query(
                 'INSERT INTO sessions (token, username, display_name, expires_at) VALUES ($1, $2, $3, $4)',
                 [tok, user.username, user.display_name, expiresAt()]
             );
-            return res.json({ ok: true, token: tok, displayName: user.display_name, username: user.username });
+            return res.json({ ok: true, token: tok, displayName: user.display_name, username: user.username, dataKey });
         }
 
         /* ---- E-POSTA EKLE/GÜNCELLE (oturumlu) ---- */
@@ -357,7 +374,8 @@ export default async function handler(req, res) {
                 [token]
             );
             if (!rows.length) return res.json({ valid: false });
-            return res.json({ valid: true, username: rows[0].username, displayName: rows[0].display_name });
+            const dataKey = await ensureDataKey(rows[0].username);
+            return res.json({ valid: true, username: rows[0].username, displayName: rows[0].display_name, dataKey });
         }
 
         /* ---- ÇIKIŞ ---- */

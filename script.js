@@ -27,7 +27,7 @@ const STRINGS = {
     auth_tagline: 'Özel eğitim yönetim platformu',
     auth_username_label: 'Kullanıcı Adı',
     auth_password_label: 'Şifre',
-    auth_password_hint: '(en az 6 karakter)',
+    auth_password_hint: '(en az 8 karakter)',
     auth_password_repeat: 'Şifre Tekrar',
     auth_student_name: 'Öğrencinin Adı',
     auth_student_emoji: 'Öğrenci Emojisi',
@@ -52,11 +52,12 @@ const STRINGS = {
     auth_kvkk_agree: "'nı okudum, kabul ediyorum.",
     auth_fill_all: 'Tüm alanları doldurun',
     auth_passwords_mismatch: 'Şifreler uyuşmuyor',
-    auth_password_short: 'Şifre en az 6 karakter olmalı',
+    auth_password_short: 'Şifre en az 8 karakter olmalı',
     auth_kvkk_required: 'Devam etmek için Aydınlatma Metni\'ni kabul etmelisiniz',
     AUTH_FIELDS_REQUIRED: 'Kullanıcı adı ve şifre gerekli',
     AUTH_USERNAME_TOO_SHORT: 'Kullanıcı adı en az 3 karakter olmalı',
-    AUTH_PASSWORD_TOO_SHORT: 'Şifre en az 6 karakter olmalı',
+    AUTH_PASSWORD_TOO_SHORT: 'Şifre en az 8 karakter olmalı',
+    AUTH_PASSWORD_PWNED: 'Bu şifre daha önce bir veri ihlalinde açığa çıkmış. Lütfen farklı bir şifre seç.',
     AUTH_USERNAME_INVALID_CHARS: 'Sadece harf, rakam ve alt çizgi kullanabilirsin',
     AUTH_USERNAME_TAKEN: 'Bu kullanıcı adı zaten alınmış',
     AUTH_INVALID_CREDENTIALS: 'Kullanıcı adı veya şifre yanlış',
@@ -5619,6 +5620,7 @@ let _authMode     = 'login'; // 'login' | 'register'
 
 function authStorageKey()  { return 'auth_token'; }
 function authUserStorageKey() { return 'auth_user'; }
+function authDataKeyStorageKey() { return 'auth_data_key'; }
 
 async function authApi(action, body = {}) {
     try {
@@ -5652,11 +5654,12 @@ async function checkAuthSession() {
     try {
         const savedToken = DB.getSync(authStorageKey());
         const savedUser  = DB.getSync(authUserStorageKey());
+        const savedDataKey = DB.getSync(authDataKeyStorageKey());
 
         if (savedToken && savedUser) {
             _authToken = savedToken;
             _authUser  = savedUser;
-            await DB.initEncryption(savedToken).catch(() => {});
+            await DB.initEncryption(savedDataKey || savedToken).catch(() => {});
             hideSplash();
             onAuthSuccess();
 
@@ -5665,11 +5668,18 @@ async function checkAuthSession() {
                 if (res && !res.valid && !res.fallback) {
                     DB.del(authStorageKey());
                     DB.del(authUserStorageKey());
+                    DB.del(authDataKeyStorageKey());
                     _authToken = null;
                     _authUser  = null;
                     showOnly('auth-screen');
                 } else if (res && res.valid) {
                     _authUser = { username: res.username, displayName: res.displayName };
+                    if (res.dataKey) {
+                        DB.set(authDataKeyStorageKey(), res.dataKey);
+                        DB.initEncryption(res.dataKey)
+                            .then(() => { try { DB.pushAll(); } catch(_) {} })
+                            .catch(() => {});
+                    }
                 }
             }).catch(() => {});
             return;
@@ -5888,9 +5898,10 @@ async function handleResetPassword(e) {
 
     _authToken = res.token;
     _authUser  = { username: res.username || identifier.toLowerCase(), displayName: res.displayName };
-    await DB.initEncryption(res.token);
+    await DB.initEncryption(res.dataKey || res.token);
     DB.set(authStorageKey(), _authToken);
     DB.set(authUserStorageKey(), _authUser);
+    if (res.dataKey) DB.set(authDataKeyStorageKey(), res.dataKey);
     localStorage.setItem('lms_last_user', _authUser.username);
 
     hideResetForm();
@@ -5947,9 +5958,10 @@ async function handleLogin(e) {
     if (!res.ok) return showAuthError(t(res.error) || t('auth_fill_all'));
     _authToken = res.token;
     _authUser  = { username: username.toLowerCase(), displayName: res.displayName };
-    await DB.initEncryption(res.token);
+    await DB.initEncryption(res.dataKey || res.token);
     DB.set(authStorageKey(), _authToken);
     DB.set(authUserStorageKey(), _authUser);
+    if (res.dataKey) DB.set(authDataKeyStorageKey(), res.dataKey);
     localStorage.setItem('lms_last_user', _authUser.username);
 
     // Öğrenci varsa direkt menüye, yoksa öğrenci seçim ekranına
@@ -5990,9 +6002,10 @@ async function handleRegister(e) {
     if (!res.ok) return showAuthError(t(res.error) || t('auth_fill_all'));
     _authToken = res.token;
     _authUser  = { username: username.toLowerCase(), displayName: res.displayName };
-    await DB.initEncryption(res.token);
+    await DB.initEncryption(res.dataKey || res.token);
     DB.set(authStorageKey(), _authToken);
     DB.set(authUserStorageKey(), _authUser);
+    if (res.dataKey) DB.set(authDataKeyStorageKey(), res.dataKey);
 
     // BEP profilini kaydet
     const level = document.querySelector('input[name="regLevel"]:checked')?.value || 'egit';
@@ -6016,6 +6029,7 @@ async function authLogout() {
     }
     DB.del(authStorageKey());
     DB.del(authUserStorageKey());
+    DB.del(authDataKeyStorageKey());
     _authToken = null;
     _authUser  = null;
     showOnly('auth-screen');
@@ -6071,7 +6085,7 @@ async function exportMyData() {
     if (!_authUser) return;
     const data = {
         kullanici: _authUser,
-        ogrenciler: await DB.get('lms_students') || [],
+        ogrenciler: await DB.get(studentsKey()) || [],
         verme_tarihi: new Date().toISOString(),
     };
     const keys = Object.keys(localStorage).filter(k => k.startsWith('lms_'));
@@ -6179,7 +6193,7 @@ async function loadStudents() {
 }
 
 async function saveStudents(list) {
-    DB.set(studentsKey(), list);
+    return DB.set(studentsKey(), list);
 }
 
 let _cachedLoginStudents = [];
@@ -7097,9 +7111,4 @@ window.behaviorBack = behaviorBack;
 window.behaviorCountChange = behaviorCountChange;
 window.saveBehaviorEntry = saveBehaviorEntry;
 window.deleteBehaviorEntry = deleteBehaviorEntry;
-
-
-
-
-
 
