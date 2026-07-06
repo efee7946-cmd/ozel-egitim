@@ -13,9 +13,13 @@ function cors(res) {
 let _cleanupDone = false;
 async function cleanupLeakedAuthKeys() {
     if (_cleanupDone) return;
-    // Eski sürüm oturum token'larını paylaşılan anahtarlara yazmıştı — temizle
-    await query("DELETE FROM app_data WHERE user_key IN ('auth_token', 'auth_user')");
     _cleanupDone = true;
+    try {
+        // Eski sürüm oturum token'larını paylaşılan anahtarlara yazmıştı — temizle
+        await query("DELETE FROM app_data WHERE user_key IN ('auth_token', 'auth_user')");
+    } catch (err) {
+        console.warn('cleanupLeakedAuthKeys failed:', err);
+    }
 }
 
 async function authUsername(req) {

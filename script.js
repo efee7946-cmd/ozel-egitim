@@ -5676,9 +5676,11 @@ async function checkAuthSession() {
                     _authUser = { username: res.username, displayName: res.displayName };
                     if (res.dataKey) {
                         DB.set(authDataKeyStorageKey(), res.dataKey);
-                        DB.initEncryption(res.dataKey)
-                            .then(() => { try { DB.pushAll(); } catch(_) {} })
-                            .catch(() => {});
+                        if (res.dataKey !== savedDataKey) {
+                            DB.initEncryption(res.dataKey)
+                                .then(() => { try { DB.pushAll(); } catch(_) {} })
+                                .catch(() => {});
+                        }
                     }
                 }
             }).catch(() => {});

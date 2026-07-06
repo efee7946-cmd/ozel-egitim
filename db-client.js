@@ -187,6 +187,40 @@ const DB = (function () {
             _lastSyncAt = Date.now();
         }).catch(() => { _cloudDown(); });
     }
+    async function cloudPutBatch(items) {
+        if (!_cloud || !Array.isArray(items) || !items.length) return;
+        const token = _apiToken();
+        if (!token) return;
+
+        const payload = [];
+        for (const item of items) {
+            const key = item?.key;
+            if (!key || isLocalOnly(key)) continue;
+            const value = await (isSensitive(key) ? _encrypt(item.value) : Promise.resolve(item.value));
+            payload.push({ key, value });
+        }
+        if (!payload.length) return;
+
+        try {
+            const r = await fetch('/api/data/batch', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                body: JSON.stringify({ items: payload }),
+                signal: AbortSignal.timeout(10000)
+            });
+            if (!r.ok) {
+                if (r.status === 401) return;
+                throw new Error('Batch write failed: ' + r.status);
+            }
+            const json = await r.json();
+            _lastSyncAt = Date.now();
+            for (const row of json) {
+                if (row?.key && row.updatedAt) _tsSet(row.key, Date.parse(row.updatedAt));
+            }
+        } catch (_) {
+            _cloudDown();
+        }
+    }
     function cloudDel(key) {
         if (!_cloud || isLocalOnly(key)) return;
         const token = _apiToken();
@@ -278,24 +312,26 @@ const DB = (function () {
         },
 
         /** LS'deki tüm lms_ verilerini cloud'a yükler */
-        pushAll() {
+        async pushAll() {
             if (!_cloud) return;
+            const items = [];
             for (let i = 0; i < localStorage.length; i++) {
                 const full = localStorage.key(i);
                 if (full && full.startsWith(PFX)) {
                     const k = full.slice(PFX.length);
-                    // Hassas veri: cloudPut kendi içinde şifreliyor (bkz. yukarısı)
+                    if (!k || isLocalOnly(k)) continue;
                     if (isSensitive(k)) {
                         const ss = ssGet(k);
-                        if (ss !== null) cloudPut(k, ss);
+                        if (ss !== null) items.push({ key: k, value: ss });
                     } else {
                         try {
                             const raw = localStorage.getItem(full);
-                            if (raw) cloudPut(k, JSON.parse(raw));
+                            if (raw) items.push({ key: k, value: JSON.parse(raw) });
                         } catch {}
                     }
                 }
             }
+            if (items.length) await cloudPutBatch(items);
         },
 
         isCloud() { return _cloud; },
@@ -343,7 +379,7 @@ const DB = (function () {
                     })();
 
                     if (remote.value === null) {
-                        if (localVal !== null) cloudPut(key, localVal);
+                        if (localVal !== null) writes.push({ key, value: localVal });
                         continue;
                     }
                     if (localVal === null || remote.ts > localTs + SKEW_MS) {
@@ -352,9 +388,10 @@ const DB = (function () {
                         _tsSet(key, remote.ts);
                         changed.push(key);
                     } else if (localTs > remote.ts + SKEW_MS) {
-                        cloudPut(key, localVal);
+                        writes.push({ key, value: localVal });
                     }
                 }
+                if (writes.length) await cloudPutBatch(writes);
             } catch (err) {
                 _cloudDown();
             }
