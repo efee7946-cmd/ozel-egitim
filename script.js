@@ -6181,19 +6181,55 @@ async function initLoginScreen() {
     applyA11yClasses(settings);
 }
 
+function getActiveAuthUser() {
+    if (_authUser && _authUser.username) return _authUser;
+    if (typeof window !== 'undefined' && window._authUser && window._authUser.username) return window._authUser;
+    const saved = DB.getSync(authUserStorageKey());
+    return saved && saved.username ? saved : null;
+}
+
 function studentsKey() {
-    return _authUser ? 'students_' + _authUser.username : 'students';
+    const user = getActiveAuthUser();
+    return user ? 'students_' + user.username : 'students';
+}
+
+function legacyStudentsKey() {
+    const user = getActiveAuthUser();
+    return user ? 'teacher_students_' + user.username : 'teacher_students';
 }
 
 async function loadStudents() {
     const key = studentsKey();
+    const legacyKey = legacyStudentsKey();
     let list = DB.getSync(key);
     if (!list) list = await DB.get(key);
-    return list || [];
+
+    if (!list || !list.length) {
+        const legacyList = DB.getSync(legacyKey);
+        if (!legacyList) {
+            const remoteLegacy = await DB.get(legacyKey);
+            if (remoteLegacy && remoteLegacy.length) {
+                list = remoteLegacy;
+            }
+        } else if (legacyList.length) {
+            list = legacyList;
+        }
+    }
+
+    if (list && list.length) {
+        try {
+            await saveStudents(list);
+        } catch (_) {}
+    }
+
+    return Array.isArray(list) ? list : [];
 }
 
 async function saveStudents(list) {
-    return DB.set(studentsKey(), list);
+    const normalized = Array.isArray(list) ? list : [];
+    await DB.set(studentsKey(), normalized);
+    await DB.set(legacyStudentsKey(), normalized);
+    return normalized;
 }
 
 let _cachedLoginStudents = [];
