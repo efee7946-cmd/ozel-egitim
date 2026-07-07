@@ -886,6 +886,7 @@ const STRINGS = {
     auth_code_sent_info: 'Kod {email} adresine gönderildi. 📁 Gelen kutunuzda yoksa SPAM/Gereksiz klasörüne bakın!',
     auth_code_sent_generic: 'Bilgileriniz kayıtlıysa e-posta adresinize kod gönderildi. 📁 SPAM/Gereksiz klasörünü de kontrol edin!',
     auth_code_sent_toast: 'Sıfırlama kodu gönderildi! 📧',
+    auth_email_not_verified_register: 'Bu hesabın e-postası henüz doğrulanmamış. Kod gelmediyse Kayıt Ol sekmesinden tekrar deneyin.',
     auth_use_recovery_code: 'Kurtarma kodum var',
     auth_use_email_code: 'E-posta ile sıfırla',
     AUTH_NO_EMAIL: 'Bu hesapta kayıtlı e-posta yok. Kurtarma kodunuzla sıfırlayabilirsiniz.',
@@ -1779,6 +1780,7 @@ const STRINGS = {
     auth_code_sent_info: 'Code sent to {email}. 📁 Not in your inbox? Check your SPAM/Junk folder!',
     auth_code_sent_generic: 'If your details are registered, a code was sent to your email. 📁 Check your SPAM/Junk folder too!',
     auth_code_sent_toast: 'Reset code sent! 📧',
+    auth_email_not_verified_register: 'This account email is not verified yet. If no code arrives, try again from the Register tab.',
     auth_use_recovery_code: 'I have a recovery code',
     auth_use_email_code: 'Reset via email',
     AUTH_NO_EMAIL: 'No email on this account. You can reset with your recovery code.',
@@ -5675,10 +5677,14 @@ async function checkAuthSession() {
             _authUser  = savedUser;
             await DB.initEncryption(savedDataKey || savedToken).catch(() => {});
             if (savedEmailVerified === false) {
+                if (savedToken && !String(savedToken).startsWith('demo_')) {
+                    authApi('logout', { token: savedToken }).catch(() => {});
+                }
+                await clearAuthSessionLocal();
                 hideSplash();
                 showOnly('auth-screen');
-                _pendingPostVerifyAction = () => continueAuthenticatedEntry();
-                showEmailVerifyModal(null, false, true, 'logout');
+                switchAuthTab('register');
+                showAuthError(t('auth_email_not_verified_register'));
                 return;
             }
             const res = await authApi('verify', { token: savedToken });
@@ -5705,9 +5711,11 @@ async function checkAuthSession() {
                     }
                 }
                 if (res.hasEmail && !res.emailVerified) {
+                    authApi('logout', { token: savedToken }).catch(() => {});
+                    await clearAuthSessionLocal();
                     showOnly('auth-screen');
-                    _pendingPostVerifyAction = () => continueAuthenticatedEntry();
-                    showEmailVerifyModal(null, false, true, 'logout');
+                    switchAuthTab('register');
+                    showAuthError(t('auth_email_not_verified_register'));
                     return;
                 }
             }
@@ -6088,9 +6096,13 @@ async function handleLogin(e) {
     localStorage.setItem('lms_last_user', _authUser.username);
 
     if (res.hasEmail && !res.emailVerified) {
-        _pendingPostVerifyAction = () => continueAuthenticatedEntry();
+        await authApi('logout', { token: _authToken }).catch(() => {});
+        const attemptedUsername = _authUser.username;
+        await clearAuthSessionLocal();
         showOnly('auth-screen');
-        showEmailVerifyModal(null, false, true, 'logout');
+        switchAuthTab('register');
+        document.getElementById('regUsername').value = attemptedUsername || '';
+        showAuthError(t('auth_email_not_verified_register'));
         return;
     }
 
