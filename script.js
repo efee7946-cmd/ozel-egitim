@@ -5740,7 +5740,7 @@ async function checkAuthSession() {
                     return;
                 }
             }
-            onAuthSuccess();
+            await continueAuthenticatedEntry();
             return;
         }
     } catch (e) {}
@@ -5749,11 +5749,11 @@ async function checkAuthSession() {
     showOnly('auth-screen');
 }
 
-function continueAsGuest() {
+async function continueAsGuest() {
     _authToken = 'demo_' + Date.now();
     _authUser = { username: 'guest', displayName: _lang === 'en' ? 'Guest' : 'Misafir' };
-    DB.initEncryption(_authToken).catch(() => {});
-    onAuthSuccess();
+    await DB.initEncryption(_authToken).catch(() => {});
+    await continueAuthenticatedEntry();
 }
 
 function onAuthSuccess() {
