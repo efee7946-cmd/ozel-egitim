@@ -345,6 +345,7 @@ const DB = (function () {
          */
         async refreshKeys(keys) {
             const changed = [];
+            const writes = [];
             const SKEW_MS = 5000;
             const validKeys = Array.isArray(keys) ? keys.filter(k => typeof k === 'string' && k.trim()) : [];
             if (!validKeys.length) return changed;
@@ -370,7 +371,11 @@ const DB = (function () {
                 for (const item of results) {
                     const key = item?.key;
                     if (!key) continue;
-                    const remote = { value: item.value, ts: item.updatedAt ? Date.parse(item.updatedAt) : 0 };
+                    let remoteValue = item.value;
+                    if (isSensitive(key) && typeof remoteValue === 'string') {
+                        remoteValue = await _decrypt(remoteValue);
+                    }
+                    const remote = { value: remoteValue, ts: item.updatedAt ? Date.parse(item.updatedAt) : 0 };
                     if (!remote.value && remote.value !== null) continue;
 
                     const localTs = _tsGet(key);
