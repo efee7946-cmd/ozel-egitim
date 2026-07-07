@@ -2057,7 +2057,10 @@ function setCharacterEmotion(emotion) {
 
 function celebrateCorrectAnswer() {
     setCharacterEmotion(CharacterEmotion.EXCITED);
-    confetti({ particleCount: 60, spread: 70 });
+    confetti({ particleCount: 100, spread: 80, origin: { y: 0.5 } });
+    if (window.avatar3d && window.avatar3d.triggerCelebration) {
+        window.avatar3d.triggerCelebration();
+    }
     setTimeout(() => setCharacterEmotion(CharacterEmotion.NEUTRAL), 3000);
 }
 
@@ -3845,7 +3848,14 @@ async function processTherapySpeech(speech, source) {
         isWaiting = false;
         return;
     }
-    document.getElementById('info').innerText = t('thinking');
+    document.getElementById('info').innerHTML = `
+        <div class="thinking-loader">
+            <span class="thinking-dot"></span>
+            <span class="thinking-dot"></span>
+            <span class="thinking-dot"></span>
+            <span class="thinking-label">${t('thinking')}</span>
+        </div>
+    `;
     var aiRes = await getGemmaResponse(speech);
     addMessage(aiRes, "ai");
     const currentLocation = CITY_LOCATIONS[currentCityLocationKey];
@@ -3856,7 +3866,7 @@ async function processTherapySpeech(speech, source) {
         answer: speech,
         via: source === 'card' ? 'card' : 'mic'
     });
-    confetti({ particleCount: 50 });
+    celebrateCorrectAnswer();
     var vEl = document.getElementById('v');
     var pp = vEl.play();
     if (pp !== undefined) pp.catch(function() {});
@@ -4000,6 +4010,15 @@ async function rec() {
 
     function _startVolumeRings() {
         var rings = document.querySelectorAll('.mic-ring');
+        var canvas = document.getElementById('waveformCanvas');
+        var ctx = canvas ? canvas.getContext('2d') : null;
+        const container = document.querySelector('.waveform-container');
+        if (container) container.style.display = 'flex';
+        if (canvas && ctx) {
+            canvas.width = canvas.clientWidth * (window.devicePixelRatio || 1);
+            canvas.height = canvas.clientHeight * (window.devicePixelRatio || 1);
+        }
+
         navigator.mediaDevices.getUserMedia({ audio: true, video: false }).then(function(stream) {
             _volStream = stream;
             _volCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -4011,12 +4030,49 @@ async function rec() {
 
             function tick() {
                 analyser.getByteFrequencyData(data);
-                var sum = 0;
-                for (var i = 0; i < data.length; i++) sum += data[i];
-                var vol = sum / data.length; // 0–128 arası tipik
+                
+                // Siri-style waveform
+                if (canvas && ctx) {
+                    var w = canvas.width;
+                    var h = canvas.height;
+                    ctx.clearRect(0, 0, w, h);
+                    
+                    var sum = 0;
+                    for (var i = 0; i < data.length; i++) sum += data[i];
+                    var vol = sum / data.length; // volume
+                    
+                    var colors = [
+                        'rgba(34, 197, 94, 0.45)', // Green
+                        'rgba(168, 85, 247, 0.45)', // Purple
+                        'rgba(59, 130, 246, 0.6)'    // Blue
+                    ];
+                    
+                    for (var wIdx = 0; wIdx < 3; wIdx++) {
+                        ctx.beginPath();
+                        ctx.lineWidth = wIdx === 2 ? 4 : 2;
+                        ctx.strokeStyle = colors[wIdx];
+                        
+                        var frequency = 0.012 + wIdx * 0.006;
+                        var phase = (Date.now() * 0.005 * (wIdx + 1)) % (Math.PI * 2);
+                        var amplitude = (vol / 128) * (h * 0.4) + 4;
+                        
+                        ctx.moveTo(0, h / 2);
+                        for (var x = 0; x < w; x++) {
+                            var normalizedX = x / w;
+                            var envelope = Math.sin(normalizedX * Math.PI);
+                            var y = h / 2 + Math.sin(x * frequency + phase) * amplitude * envelope;
+                            ctx.lineTo(x, y);
+                        }
+                        ctx.stroke();
+                    }
+                }
+
+                var sumRings = 0;
+                for (var i = 0; i < data.length; i++) sumRings += data[i];
+                var volRings = sumRings / data.length;
                 rings.forEach(function(ring, i) {
-                    var scale = 1 + (vol / 128) * (0.55 + i * 0.35);
-                    var opacity = Math.min(vol / 60, 1) * (1 - i * 0.28);
+                    var scale = 1 + (volRings / 128) * (0.55 + i * 0.35);
+                    var opacity = Math.min(volRings / 60, 1) * (1 - i * 0.28);
                     ring.style.transform = 'scale(' + scale + ')';
                     ring.style.opacity = opacity;
                 });
@@ -4034,6 +4090,8 @@ async function rec() {
             r.style.transform = 'scale(1)';
             r.style.opacity = 0;
         });
+        const container = document.querySelector('.waveform-container');
+        if (container) container.style.display = 'none';
     }
 
     var _noSpeechTimeout = null;
@@ -5239,6 +5297,7 @@ const OBJECT_RECOGNITION_ITEMS = [
 let _objThree = null, _objGLTFLoader = null;
 let _objScene = null, _objCamera = null, _objRenderer = null, _objControls = null, _objMesh = null;
 let _objItems = [], _objIndex = 0, _objErrors = 0, _objAnimating = false, _objBusy = false;
+let _objAnimState = null, _objAnimTimer = 0;
 
 async function goToObjectRecognition() {
     showOnly('object-screen');
@@ -5305,6 +5364,18 @@ async function _objInitThree() {
 
         function animate() {
             requestAnimationFrame(animate);
+            if (_objMesh) {
+                if (_objAnimState === 'correct') {
+                    _objAnimTimer += 0.15;
+                    _objMesh.position.y = Math.sin(_objAnimTimer) * 0.45;
+                    _objMesh.rotation.y += 0.15;
+                    var scale = 1.0 + Math.abs(Math.sin(_objAnimTimer)) * 0.25;
+                    _objMesh.scale.set(scale, scale, scale);
+                } else {
+                    _objMesh.position.y = 0;
+                    _objMesh.scale.set(1, 1, 1);
+                }
+            }
             controls.update();
             renderer.render(scene, camera);
         }
@@ -5417,11 +5488,13 @@ function _objCheckAnswer(raw) {
 
     if (correct) {
         _objBusy = true;
+        _objAnimState = 'correct';
+        _objAnimTimer = 0;
         _objFeedbackShow(true, t('object_correct'));
         speakFallback(t('object_correct'));
-        if (typeof confetti === 'function') confetti({ particleCount: 60, spread: 60, origin: { y: 0.5 } });
+        if (typeof confetti === 'function') confetti({ particleCount: 100, spread: 80, origin: { y: 0.5 } });
         incrementDailyTask('object');
-        setTimeout(() => { _objBusy = false; _objNext(); }, 1300);
+        setTimeout(() => { _objAnimState = null; _objBusy = false; _objNext(); }, 1400);
     } else {
         _objErrors++;
         _objFeedbackShow(false, t('object_wrong'));

@@ -4,6 +4,9 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 let mouth = null;
 let eyesMesh = null;
 let blinkTimer = null;
+let model3d = null;
+let animTimer = 0;
+let currentAnim = null;
 
 function frameObject(object, camera, fitOffset = 1.3) {
     const box    = new THREE.Box3().setFromObject(object);
@@ -66,6 +69,7 @@ function init() {
     const loader = new GLTFLoader();
     loader.load('/bear_avatar.glb', (gltf) => {
         const model = gltf.scene;
+        model3d = model;
 
         // Hiç rotasyon verme — model zaten +Z'ye bakıyor
         model.rotation.set(0, 0, 0);
@@ -100,6 +104,22 @@ function init() {
 
     (function renderLoop() {
         requestAnimationFrame(renderLoop);
+        if (model3d) {
+            if (currentAnim === 'excited') {
+                animTimer += 0.15;
+                model3d.position.y = Math.sin(animTimer) * 0.2;
+                model3d.rotation.z = Math.sin(animTimer * 1.5) * 0.1;
+            } else if (currentAnim === 'spin') {
+                model3d.rotation.y += 0.2;
+                if (model3d.rotation.y >= Math.PI * 2) {
+                    model3d.rotation.y = 0;
+                    currentAnim = null;
+                }
+            } else {
+                model3d.position.y = 0;
+                model3d.rotation.z = 0;
+            }
+        }
         if (canvasVisible) renderer.render(scene, camera);
     })();
 }
@@ -126,6 +146,16 @@ function clearVisemes() {
     mouth.morphTargetInfluences[mouth.morphTargetDictionary[mouth._mouthKey]] = 0;
 }
 
-window.avatar3d = { setViseme, clearVisemes };
+function triggerCelebration() {
+    currentAnim = 'excited';
+    animTimer = 0;
+    setTimeout(() => {
+        if (currentAnim === 'excited') {
+            currentAnim = 'spin';
+        }
+    }, 1500);
+}
+
+window.avatar3d = { setViseme, clearVisemes, triggerCelebration };
 
 document.addEventListener('DOMContentLoaded', init);
