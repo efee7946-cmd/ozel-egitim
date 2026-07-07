@@ -1,5 +1,6 @@
 import crypto from 'crypto';
 import { query } from './_db.js';
+import { checkRateLimit } from './_rateLimit.js';
 
 function safeCompare(a, b) {
     const bufA = Buffer.from(String(a || ''));
@@ -23,6 +24,22 @@ async function ensureTable() {
     _tableEnsured = true;
 }
 
+function clientIp(req) {
+    const fwd = req.headers['x-forwarded-for'];
+    if (fwd) return String(fwd).split(',')[0].trim();
+    return req.socket?.remoteAddress || 'unknown';
+}
+
+function redactSecrets(value, maxLen) {
+    let text = String(value || '');
+    text = text
+        .replace(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi, '[redacted-email]')
+        .replace(/\b(?:demo_)?[a-f0-9]{32,128}\b/gi, '[redacted-token]')
+        .replace(/(authorization["'\s:=]+bearer\s+)[^\s"'`]+/gi, '$1[redacted-token]')
+        .replace(/(["']?(?:password|token|reset[_-]?code|verify[_-]?code)["']?\s*[:=]\s*["'])[^"']+/gi, '$1[redacted]');
+    return text.slice(0, maxLen);
+}
+
 export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Origin', process.env.ALLOWED_ORIGIN || '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
@@ -33,6 +50,9 @@ export default async function handler(req, res) {
         await ensureTable();
 
         if (req.method === 'POST') {
+            if (!(await checkRateLimit('client_log:' + clientIp(req), 30))) {
+                return res.json({ ok: true });
+            }
             const { message, stack, screen, lang } = req.body || {};
             if (!message) return res.status(400).json({ error: 'message gerekli' });
             // Taşma koruması: uç kimliksiz olduğu için saatlik tavan var
@@ -43,11 +63,11 @@ export default async function handler(req, res) {
             await query(
                 'INSERT INTO client_errors (message, stack, screen, user_agent, app_lang) VALUES ($1, $2, $3, $4, $5)',
                 [
-                    String(message).slice(0, 500),
-                    String(stack || '').slice(0, 3000),
-                    String(screen || '').slice(0, 100),
-                    String(req.headers['user-agent'] || '').slice(0, 300),
-                    String(lang || '').slice(0, 10)
+                    redactSecrets(message, 500),
+                    redactSecrets(stack, 3000),
+                    redactSecrets(screen, 100),
+                    redactSecrets(req.headers['user-agent'] || '', 300),
+                    redactSecrets(lang || '', 10)
                 ]
             );
             return res.json({ ok: true });

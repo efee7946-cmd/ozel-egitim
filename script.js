@@ -886,6 +886,7 @@ const STRINGS = {
     auth_code_sent_info: 'Kod {email} adresine gönderildi. 📁 Gelen kutunuzda yoksa SPAM/Gereksiz klasörüne bakın!',
     auth_code_sent_generic: 'Bilgileriniz kayıtlıysa e-posta adresinize kod gönderildi. 📁 SPAM/Gereksiz klasörünü de kontrol edin!',
     auth_code_sent_toast: 'Sıfırlama kodu gönderildi! 📧',
+    auth_reset_requested_generic: 'Bilgileriniz kayıtlıysa e-postanıza bir sıfırlama kodu gönderildi.',
     auth_email_not_verified_register: 'Bu hesabın e-postası henüz doğrulanmamış. Kod gelmediyse Kayıt Ol sekmesinden tekrar deneyin.',
     auth_use_recovery_code: 'Kurtarma kodum var',
     auth_use_email_code: 'E-posta ile sıfırla',
@@ -1780,6 +1781,7 @@ const STRINGS = {
     auth_code_sent_info: 'Code sent to {email}. 📁 Not in your inbox? Check your SPAM/Junk folder!',
     auth_code_sent_generic: 'If your details are registered, a code was sent to your email. 📁 Check your SPAM/Junk folder too!',
     auth_code_sent_toast: 'Reset code sent! 📧',
+    auth_reset_requested_generic: 'If your details are registered, a reset code was sent to your email.',
     auth_email_not_verified_register: 'This account email is not verified yet. If no code arrives, try again from the Register tab.',
     auth_use_recovery_code: 'I have a recovery code',
     auth_use_email_code: 'Reset via email',
@@ -5915,7 +5917,7 @@ async function requestResetCode() {
     document.getElementById('resetCodeFields').style.display = '';
     document.getElementById('resetInfoText').textContent = res.emailMasked
         ? t('auth_code_sent_info').replace('{email}', res.emailMasked)
-        : t('auth_code_sent_generic');
+        : t('auth_reset_requested_generic');
     document.getElementById('authError').textContent = '';
     showToast(t('auth_code_sent_toast'));
 }

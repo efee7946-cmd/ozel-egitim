@@ -64,6 +64,14 @@ function maskEmail(e) {
     return local[0] + '***@' + domain[0] + '***' + domain.slice(domain.lastIndexOf('.'));
 }
 
+function genericResetResponse() {
+    return {
+        ok: true,
+        emailMasked: null,
+        generic: true
+    };
+}
+
 // Kullanıcı adı VEYA e-posta ile kullanıcı bul
 async function findUserByIdentifier(identifier) {
     const id = String(identifier || '').trim().toLowerCase();
@@ -237,16 +245,12 @@ export default async function handler(req, res) {
             if (!ident) return res.status(400).json({ error: 'AUTH_FIELDS_REQUIRED' });
             await ensureAuthColumns();
             const user = await findUserByIdentifier(ident);
-            // Kayıtlı olmayan kimlik de 'ok' alır — kullanıcı adı/e-posta
-            // varlığı dışarıdan test edilemesin
-            if (!user)
-                return res.json({ ok: true, emailMasked: null });
-            if (!user.email)
-                return res.status(400).json({ error: 'AUTH_NO_EMAIL' });
+            // Hesabın varlığı / e-posta durumu dışarıdan anlaşılamasın.
+            if (!user || !user.email) return res.json(genericResetResponse());
 
             // 60 sn içinde tekrar istenmesin
             if (user.reset_expires && new Date(user.reset_expires).getTime() - Date.now() > 14 * 60 * 1000)
-                return res.status(429).json({ error: 'AUTH_RESET_TOO_SOON' });
+                return res.json(genericResetResponse());
 
             const code = generateSixDigitCode();
             const codeHash = await bcrypt.hash(code, 8);
@@ -255,7 +259,7 @@ export default async function handler(req, res) {
                 [codeHash, user.username]
             );
             await sendMail(user.email, 'YıldızCan şifre sıfırlama kodu', resetCodeEmailHtml(code));
-            return res.json({ ok: true, emailMasked: maskEmail(user.email) });
+            return res.json(genericResetResponse());
         }
 
         /* ---- ŞİFRE SIFIRLA (e-posta koduyla) ---- */
