@@ -206,7 +206,7 @@ const DB = (function () {
     }
 
     // Cihaza özel anahtarlar — buluta asla gönderilmez (oturum güvenliği)
-    const LOCAL_ONLY = ['auth_token', 'auth_user', 'auth_data_key'];
+    const LOCAL_ONLY = ['auth_token', 'auth_user', 'auth_data_key', 'auth_email_verified'];
     function isLocalOnly(key) { return LOCAL_ONLY.includes(key); }
 
     function _apiToken() {
