@@ -598,8 +598,22 @@ document.addEventListener('DOMContentLoaded', function(){
             <div class="a11y-account-section" id="a11yAccountSection" style="display:none">
                 <div class="a11y-section-title" data-i18n="a11y_account">Hesap</div>
                 <div class="a11y-account-user" id="a11yAccountUser"></div>
+                <div class="a11y-email-card">
+                    <div class="a11y-email-copy">
+                        <span class="a11y-email-label" data-i18n="a11y_email_label">E-posta</span>
+                        <strong class="a11y-email-value" id="a11yEmailValue">-</strong>
+                        <span class="a11y-email-status" id="a11yEmailStatus">-</span>
+                    </div>
+                    <button type="button" class="a11y-email-edit-btn" onclick="openEmailEditor()" data-i18n="a11y_email_edit">Düzenle</button>
+                </div>
+                <div class="a11y-email-editor" id="a11yEmailEditor" style="display:none">
+                    <input type="email" id="a11yEmailInput" class="a11y-email-input" placeholder="ornek@gmail.com" autocomplete="email">
+                    <div class="a11y-email-editor-actions">
+                        <button type="button" class="a11y-email-save-btn" onclick="saveEmailInline()" data-i18n="save">Kaydet</button>
+                        <button type="button" class="a11y-email-cancel-btn" onclick="closeEmailEditor()" data-i18n="cancel">İptal</button>
+                    </div>
+                </div>
                 <div class="a11y-account-actions">
-                    <button type="button" class="a11y-account-btn" onclick="promptSetEmail()"><span data-i18n="a11y_set_email">📧 E-posta Ekle/Güncelle</span></button>
                     <button type="button" class="a11y-account-btn" onclick="exportMyData()"><span data-i18n="a11y_export">📥 Verilerimi İndir</span></button>
                     <button type="button" class="a11y-account-btn a11y-danger-btn" onclick="deleteAccount()"><span data-i18n="a11y_delete">🗑️ Hesabı Sil</span></button>
                 </div>

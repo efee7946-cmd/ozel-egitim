@@ -901,6 +901,8 @@ const STRINGS = {
     AUTH_RESET_CODE_INVALID: 'Kod hatalı veya süresi dolmuş',
     AUTH_RESET_TOO_SOON: 'Az önce kod gönderildi, lütfen e-postanızı kontrol edin',
     a11y_set_email: '📧 E-posta Ekle/Güncelle',
+    a11y_email_label: 'E-posta',
+    a11y_email_edit: 'Düzenle',
     set_email_prompt: 'Şifre sıfırlama için e-posta adresiniz:',
     set_email_success: 'E-posta kaydedildi: {email}',
   },
@@ -1802,6 +1804,8 @@ const STRINGS = {
     AUTH_RESET_CODE_INVALID: 'Code is incorrect or expired',
     AUTH_RESET_TOO_SOON: 'A code was just sent, please check your email',
     a11y_set_email: '📧 Add/Update Email',
+    a11y_email_label: 'Email',
+    a11y_email_edit: 'Edit',
     set_email_prompt: 'Your email address for password reset:',
     set_email_success: 'Email saved: {email}',
   }
@@ -6358,14 +6362,35 @@ async function deleteAccount() {
 
 async function promptSetEmail() {
     if (!_authToken || _authToken.startsWith('demo_')) return;
-    const email = prompt(t('set_email_prompt'));
-    if (!email) return;
-    const res = await authApi('set_email', { token: _authToken, email: email.trim() });
+    openEmailEditor();
+}
+
+function openEmailEditor() {
+    const editor = document.getElementById('a11yEmailEditor');
+    const input = document.getElementById('a11yEmailInput');
+    if (!editor || !input) return;
+    editor.style.display = 'flex';
+    input.value = _authUser?.email || '';
+    input.focus();
+}
+
+function closeEmailEditor() {
+    const editor = document.getElementById('a11yEmailEditor');
+    if (editor) editor.style.display = 'none';
+}
+
+async function saveEmailInline() {
+    if (!_authToken || _authToken.startsWith('demo_')) return;
+    const input = document.getElementById('a11yEmailInput');
+    const email = input ? input.value.trim() : '';
+    if (!email) return showToast(t('AUTH_EMAIL_INVALID'));
+    const res = await authApi('set_email', { token: _authToken, email });
     if (res && res.ok) {
         if (_authUser) {
-            _authUser.email = email.trim().toLowerCase();
+            _authUser.email = email.toLowerCase();
             _authUser.emailVerified = false;
         }
+        closeEmailEditor();
         showToast(t('set_email_success').replace('{email}', res.emailMasked || ''));
         updateA11yAccountSection();
         if (res.verificationSent) showEmailVerifyModal(res.emailMasked);
@@ -6395,6 +6420,8 @@ function updateA11yAccountSection() {
 updateA11yAccountSection = function updateA11yAccountSection() {
     const section = document.getElementById('a11yAccountSection');
     const userEl = document.getElementById('a11yAccountUser');
+    const emailValueEl = document.getElementById('a11yEmailValue');
+    const emailStatusEl = document.getElementById('a11yEmailStatus');
     if (!section) return;
     if (_authUser) {
         section.style.display = 'block';
@@ -6412,6 +6439,10 @@ updateA11yAccountSection = function updateA11yAccountSection() {
                 <div class="a11y-account-meta">${escapeHtml(emailText)}${verifyText ? ` • ${escapeHtml(verifyText)}` : ''}</div>
             `;
         }
+        if (emailValueEl) emailValueEl.textContent = _authUser.email || t('email_missing_label');
+        if (emailStatusEl) emailStatusEl.textContent = _authUser.email
+            ? (_authUser.emailVerified ? t('email_verified_label') : t('email_unverified_label'))
+            : t('email_missing_label');
     } else {
         section.style.display = 'none';
     }
@@ -6419,6 +6450,9 @@ updateA11yAccountSection = function updateA11yAccountSection() {
 
 window.openKvkkModal = openKvkkModal;
 window.closeKvkkModal = closeKvkkModal;
+window.openEmailEditor = openEmailEditor;
+window.closeEmailEditor = closeEmailEditor;
+window.saveEmailInline = saveEmailInline;
 window.exportMyData = exportMyData;
 window.deleteAccount = deleteAccount;
 

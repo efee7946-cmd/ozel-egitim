@@ -5084,6 +5084,88 @@ body.a11y-reduce-motion * { transition: none !important; animation: none !import
     font-size: 0.84rem;
     font-weight: 500;
 }
+.a11y-email-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 14px 16px;
+    margin-bottom: 12px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, #f8fbff 0%, #eef5ff 100%);
+    border: 1px solid #dce8f4;
+}
+.a11y-email-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+.a11y-email-label {
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #8a99b2;
+}
+.a11y-email-value {
+    font-size: 0.96rem;
+    color: #223a58;
+    overflow-wrap: anywhere;
+}
+.a11y-email-status {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #5a73d8;
+}
+.a11y-email-edit-btn,
+.a11y-email-save-btn,
+.a11y-email-cancel-btn {
+    min-height: 40px;
+    border: none;
+    border-radius: 999px;
+    padding: 0 14px;
+    font-size: 0.86rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+.a11y-email-edit-btn,
+.a11y-email-save-btn {
+    background: linear-gradient(135deg, #667eea, #7b5fe8);
+    color: #fff;
+}
+.a11y-email-cancel-btn {
+    background: #eef2ff;
+    color: #5e6e9f;
+}
+.a11y-email-editor {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 12px;
+    padding: 14px 16px;
+    border-radius: 16px;
+    background: #fbfcff;
+    border: 1px solid #e2eaf5;
+}
+.a11y-email-input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px 14px;
+    border: 2px solid #dfe7f2;
+    border-radius: 12px;
+    font-size: 0.96rem;
+    color: #223a58;
+    background: #fff;
+}
+.a11y-email-input:focus {
+    outline: none;
+    border-color: #667eea;
+}
+.a11y-email-editor-actions {
+    display: flex;
+    gap: 10px;
+}
 .a11y-account-actions { display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; }
 .a11y-account-btn {
     min-height: 44px;
