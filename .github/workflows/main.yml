@@ -20,6 +20,11 @@ jobs:
     - name: Paketleri yükle
       run: npm install
 
+    - name: Depoları temizle
+      run: |
+        sudo rm -f /etc/apt/sources.list.d/azure-cli.list /etc/apt/sources.list.d/microsoft-prod.list || true
+        sudo apt-get update || true
+
     - name: Playwright kur
       run: npx playwright install --with-deps
 
