@@ -2066,7 +2066,32 @@ function celebrateCorrectAnswer() {
 // =============================================
 let _restoringScreen = false;
 
+function isTherapyInProgress() {
+    const container = document.getElementById('game-container');
+    const mainCard = document.getElementById('therapyMainCard');
+    const completeBox = document.getElementById('therapyCompleteBox');
+    const topicOverlay = document.getElementById('topicOverlay');
+    
+    return container && container.style.display !== 'none' && 
+           mainCard && mainCard.style.display !== 'none' && 
+           !completeBox && 
+           topicOverlay && topicOverlay.style.display === 'none';
+}
+
 function showOnly(id) {
+    if (isTherapyInProgress() && id !== 'game-container') {
+        const msg = _lang === 'en'
+            ? "Are you sure you want to leave the speech practice session? Your progress will be lost."
+            : "Konuşma pratiği seansını yarıda bırakmak istediğine emin misin? İlerlemen kaybolacak.";
+        if (!confirm(msg)) {
+            _updateBottomNav('game-container');
+            return;
+        }
+        currentTopic = '';
+        therapySessionCompleted = false;
+        try { window.speechSynthesis.cancel(); } catch(_){}
+    }
+
     const screens = ['start-screen','student-setup-screen','menu-screen','game-container',
                       'schedule-screen','aac-screen','store-screen','object-screen',
                       'login-screen','iep-screen','skills-screen','behavior-screen','auth-screen','analysis-screen'];
@@ -2239,9 +2264,20 @@ function setTherapySelectionMode(isSelecting) {
 }
 
 function goToMenu() {
+    if (isTherapyInProgress()) {
+        const msg = _lang === 'en'
+            ? "Are you sure you want to leave the speech practice session? Your progress will be lost."
+            : "Konuşma pratiği seansını yarıda bırakmak istediğine emin misin? İlerlemen kaybolacak.";
+        if (!confirm(msg)) {
+            return;
+        }
+        currentTopic = '';
+        therapySessionCompleted = false;
+    }
     try { window.speechSynthesis.cancel(); } catch(_){}
     clearTimeout(idleTimer);
-    const hadTherapy = sessionData.micUsedInTherapy > 0 || sessionData.therapyTurns.length > 0;
+    const shouldAwardStars = therapySessionCompleted;
+    therapySessionCompleted = false;
     persistSessionSnapshot();
     setTherapySelectionMode(false);
     syncCityEntryPlacement(false);
@@ -2250,11 +2286,12 @@ function goToMenu() {
     showOnly('menu-screen');
     renderCityScene();
     maybeGreetChild();
-    if (hadTherapy) _showStarReward();
+    if (shouldAwardStars) _showStarReward();
 }
 
 let currentTopic = '';
 let sessionTotalQuestions = 0;
+let therapySessionCompleted = false;
 
 function goToTherapy() {
     showOnly('game-container');
@@ -2302,6 +2339,7 @@ async function startTherapyWithTopic() {
         unaskedQuestions = [{ q: t('therapy_fallback_q').replace('{topic}', currentTopic), query: currentTopic, goal: currentTopic }];
     }
     sessionTotalQuestions = unaskedQuestions.length;
+    therapySessionCompleted = false;
 
     chatHistory = [];
     turnCount = 0;
@@ -3400,7 +3438,7 @@ let turnCount = 0;
 // İLERLEME & YARDIMCI FONKSIYONLAR
 // =============================================
 function updateProgressBar() {
-    const total = (currentTopic && sessionTotalQuestions) ? sessionTotalQuestions : getActiveTherapyQuestions().length;
+    const total = sessionTotalQuestions || 6;
     const answered = total - unaskedQuestions.length;
     const pct = total > 0 ? Math.round((answered / total) * 100) : 0;
 
@@ -3554,7 +3592,9 @@ function getActiveTherapyQuestions() {
 }
 
 function resetTherapyQuestionPool() {
-    unaskedQuestions = [...getActiveTherapyQuestions()];
+    const all = [...getActiveTherapyQuestions()];
+    unaskedQuestions = all.sort(() => 0.5 - Math.random()).slice(0, 6);
+    sessionTotalQuestions = unaskedQuestions.length;
 }
 
 function showTherapySessionComplete() {
@@ -3565,6 +3605,7 @@ function showTherapySessionComplete() {
     incrementDailyTask('therapy');
     confetti({ particleCount: 120, spread: 90 });
     speakFallback(t('therapy_complete_msg'), () => {});
+    therapySessionCompleted = true;
     const card = document.getElementById('therapyMainCard');
     const box = document.createElement('div');
     box.className = 'sort-complete therapy-session-ui';
@@ -3633,6 +3674,7 @@ function setTherapyCategory(categoryKey, shouldReload = true) {
     turnCount = 0;
     currentObj = null;
     chatHistory = [];
+    therapySessionCompleted = false;
     resetTherapyQuestionPool();
     renderTherapyCategories();
 
@@ -3659,6 +3701,7 @@ function startFocusedCityLocation() {
     setTherapyCategory(location.category, false);
     setTherapySelectionMode(false);
     renderTherapyCategories();
+    therapySessionCompleted = false;
     resetTherapyQuestionPool();
     turnCount = 0;
     const bubbles = document.getElementById('chat-bubbles');
@@ -3707,8 +3750,7 @@ async function loadNext() {
     document.getElementById('info').innerText = t('video_loading');
 
     if (unaskedQuestions.length === 0) {
-        if (currentTopic) return showTherapySessionComplete();
-        resetTherapyQuestionPool();
+        return showTherapySessionComplete();
     }
     const rIndex = Math.floor(Math.random() * unaskedQuestions.length);
     currentObj = unaskedQuestions[rIndex];
