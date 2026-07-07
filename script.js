@@ -860,6 +860,9 @@ const STRINGS = {
     verify_resend: 'Kodu tekrar gönder',
     verify_later: 'Daha sonra',
     verify_success: 'E-postanız doğrulandı! ✓',
+    email_verified_label: 'Doğrulandı',
+    email_unverified_label: 'Doğrulanmadı',
+    email_missing_label: 'E-posta eklenmedi',
     AUTH_VERIFY_CODE_INVALID: 'Kod hatalı veya süresi dolmuş',
     AUTH_EMAIL_TAKEN: 'Bu e-posta başka bir hesapta kayıtlı',
     sync_last: 'Son senkron: {time}',
@@ -1755,6 +1758,9 @@ const STRINGS = {
     verify_resend: 'Resend code',
     verify_later: 'Later',
     verify_success: 'Your email is verified! ✓',
+    email_verified_label: 'Verified',
+    email_unverified_label: 'Not verified',
+    email_missing_label: 'No email added',
     AUTH_VERIFY_CODE_INVALID: 'Code is incorrect or expired',
     AUTH_EMAIL_TAKEN: 'This email is registered to another account',
     sync_last: 'Last sync: {time}',
@@ -5690,7 +5696,12 @@ async function checkAuthSession() {
                 return;
             }
             if (res && res.valid) {
-                _authUser = { username: res.username, displayName: res.displayName };
+                _authUser = {
+                    username: res.username,
+                    displayName: res.displayName,
+                    email: res.email || '',
+                    emailVerified: !!res.emailVerified
+                };
                 DB.set(authEmailVerifiedStorageKey(), !!res.emailVerified);
                 if (res.dataKey) {
                     DB.set(authDataKeyStorageKey(), res.dataKey);
@@ -5979,6 +5990,10 @@ async function submitEmailVerification() {
         _verifyModalMandatory = false;
         _verifyModalExitMode = 'close';
         DB.set(authEmailVerifiedStorageKey(), true);
+        if (_authUser) {
+            if (res.email) _authUser.email = res.email;
+            _authUser.emailVerified = true;
+        }
         closeVerifyModal();
         if (typeof postVerifyAction === 'function') await postVerifyAction();
         showToast(t('verify_success'));
@@ -6077,7 +6092,12 @@ async function handleLogin(e) {
     }
     if (!res.ok) return showAuthError(t(res.error) || t('auth_fill_all'));
     _authToken = res.token;
-    _authUser  = { username: username.toLowerCase(), displayName: res.displayName };
+    _authUser  = {
+        username: username.toLowerCase(),
+        displayName: res.displayName,
+        email: res.email || '',
+        emailVerified: !!res.emailVerified
+    };
     await DB.initEncryption(res.dataKey || res.token);
     DB.set(authStorageKey(), _authToken);
     DB.set(authUserStorageKey(), _authUser);
@@ -6250,7 +6270,12 @@ async function promptSetEmail() {
     if (!email) return;
     const res = await authApi('set_email', { token: _authToken, email: email.trim() });
     if (res && res.ok) {
+        if (_authUser) {
+            _authUser.email = email.trim().toLowerCase();
+            _authUser.emailVerified = false;
+        }
         showToast(t('set_email_success').replace('{email}', res.emailMasked || ''));
+        updateA11yAccountSection();
         if (res.verificationSent) showEmailVerifyModal(res.emailMasked);
     } else {
         showToast(t(res && res.error) || t('AUTH_EMAIL_INVALID'));
@@ -6274,6 +6299,31 @@ function updateA11yAccountSection() {
         section.style.display = 'none';
     }
 }
+
+updateA11yAccountSection = function updateA11yAccountSection() {
+    const section = document.getElementById('a11yAccountSection');
+    const userEl = document.getElementById('a11yAccountUser');
+    if (!section) return;
+    if (_authUser) {
+        section.style.display = 'block';
+        if (userEl) {
+            const syncAt = DB.lastSyncAt ? DB.lastSyncAt() : null;
+            const syncText = syncAt
+                ? t('sync_last').replace('{time}', new Date(syncAt).toLocaleTimeString(_lang === 'en' ? 'en-US' : 'tr-TR', { hour: '2-digit', minute: '2-digit' }))
+                : t('sync_never');
+            const emailText = _authUser.email || t('email_missing_label');
+            const verifyText = _authUser.email
+                ? (_authUser.emailVerified ? t('email_verified_label') : t('email_unverified_label'))
+                : '';
+            userEl.innerHTML = `
+                <div>@${escapeHtml(_authUser.username)} • ${escapeHtml(syncText)}</div>
+                <div class="a11y-account-meta">${escapeHtml(emailText)}${verifyText ? ` • ${escapeHtml(verifyText)}` : ''}</div>
+            `;
+        }
+    } else {
+        section.style.display = 'none';
+    }
+};
 
 window.openKvkkModal = openKvkkModal;
 window.closeKvkkModal = closeKvkkModal;

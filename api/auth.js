@@ -231,7 +231,8 @@ export default async function handler(req, res) {
             );
             return res.json({
                 ok: true, token: tok, displayName: user.display_name, dataKey,
-                hasEmail: !!user.email, emailVerified: !!user.email_verified
+                hasEmail: !!user.email, email: user.email || '',
+                emailVerified: !!user.email_verified
             });
         }
 
@@ -367,7 +368,7 @@ export default async function handler(req, res) {
                 'UPDATE users SET email_verified = true, verify_hash = NULL, verify_expires = NULL, verify_attempts = 0 WHERE username = $1',
                 [user.username]
             );
-            return res.json({ ok: true });
+            return res.json({ ok: true, email: user.email || '' });
         }
 
         /* ---- OTURUM DOĞRULA ---- */
@@ -388,6 +389,7 @@ export default async function handler(req, res) {
                 displayName: rows[0].display_name,
                 dataKey,
                 hasEmail: !!rows[0].email,
+                email: rows[0].email || '',
                 emailVerified: !!rows[0].email_verified
             });
         }

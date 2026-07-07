@@ -5066,6 +5066,12 @@ body.a11y-reduce-motion * { transition: none !important; animation: none !import
 .a11y-account-user {
     font-size: 0.9rem; color: #3b7dd8; font-weight: 600; margin-bottom: 14px;
 }
+.a11y-account-meta {
+    margin-top: 4px;
+    color: #6d7f99;
+    font-size: 0.84rem;
+    font-weight: 500;
+}
 .a11y-account-actions { display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; }
 .a11y-account-btn {
     min-height: 44px;
