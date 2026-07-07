@@ -5609,6 +5609,7 @@ window.switchAuthTab = switchAuthTab;
 window.handleLogin = handleLogin;
 window.handleRegister = handleRegister;
 window.authLogout = authLogout;
+window.exitVerifyModal = exitVerifyModal;
 window.selectRegisterEmoji = selectRegisterEmoji;
 
 // =============================================
@@ -5619,6 +5620,7 @@ let _authUser     = null; // { username, displayName }
 let _authMode     = 'login'; // 'login' | 'register'
 let _verifyModalMandatory = false;
 let _pendingPostVerifyAction = null;
+let _verifyModalExitMode = 'close';
 
 function authStorageKey()  { return 'auth_token'; }
 function authUserStorageKey() { return 'auth_user'; }
@@ -5668,7 +5670,7 @@ async function checkAuthSession() {
                 hideSplash();
                 showOnly('auth-screen');
                 _pendingPostVerifyAction = () => continueAuthenticatedEntry();
-                showEmailVerifyModal(null, false, true);
+                showEmailVerifyModal(null, false, true, 'logout');
                 return;
             }
             const res = await authApi('verify', { token: savedToken });
@@ -5697,7 +5699,7 @@ async function checkAuthSession() {
                 if (res.hasEmail && !res.emailVerified) {
                     showOnly('auth-screen');
                     _pendingPostVerifyAction = () => continueAuthenticatedEntry();
-                    showEmailVerifyModal(null, false, true);
+                    showEmailVerifyModal(null, false, true, 'logout');
                     return;
                 }
             }
@@ -5881,10 +5883,11 @@ async function requestResetCode() {
 }
 
 /* ---- E-posta doğrulama modalı ---- */
-function showEmailVerifyModal(emailMasked, codeAlreadySent = true, mandatory = false) {
+function showEmailVerifyModal(emailMasked, codeAlreadySent = true, mandatory = false, exitMode = 'close') {
     const modal = document.getElementById('emailVerifyModal');
     if (!modal) return;
     _verifyModalMandatory = mandatory;
+    _verifyModalExitMode = exitMode;
     document.getElementById('verifyModalText').textContent = codeAlreadySent
         ? t('verify_modal_sub').replace('{email}', emailMasked || '')
         : t('verify_modal_nudge');
@@ -5897,6 +5900,45 @@ function showEmailVerifyModal(emailMasked, codeAlreadySent = true, mandatory = f
 function closeVerifyModal() {
     if (_verifyModalMandatory) return;
     document.getElementById('emailVerifyModal').style.display = 'none';
+    _verifyModalExitMode = 'close';
+}
+
+async function clearAuthSessionLocal() {
+    DB.del(authStorageKey());
+    DB.del(authUserStorageKey());
+    DB.del(authDataKeyStorageKey());
+    DB.del(authEmailVerifiedStorageKey());
+    _authToken = null;
+    _authUser  = null;
+    _pendingPostVerifyAction = null;
+    _verifyModalMandatory = false;
+    _verifyModalExitMode = 'close';
+    document.getElementById('emailVerifyModal').style.display = 'none';
+}
+
+async function exitVerifyModal() {
+    if (!_verifyModalMandatory) {
+        closeVerifyModal();
+        return;
+    }
+
+    const exitMode = _verifyModalExitMode;
+    if (exitMode === 'delete_signup' && _authToken && !_authToken.startsWith('demo_')) {
+        await authApi('delete', { token: _authToken });
+        await clearAuthSessionLocal();
+        showOnly('auth-screen');
+        document.getElementById('authError').textContent = '';
+        switchAuthTab('register');
+        return;
+    }
+
+    if (_authToken && !_authToken.startsWith('demo_')) {
+        await authApi('logout', { token: _authToken });
+    }
+    await clearAuthSessionLocal();
+    showOnly('auth-screen');
+    document.getElementById('authError').textContent = '';
+    switchAuthTab('login');
 }
 
 async function submitEmailVerification() {
@@ -5907,6 +5949,7 @@ async function submitEmailVerification() {
         const postVerifyAction = _pendingPostVerifyAction;
         _pendingPostVerifyAction = null;
         _verifyModalMandatory = false;
+        _verifyModalExitMode = 'close';
         DB.set(authEmailVerifiedStorageKey(), true);
         closeVerifyModal();
         if (typeof postVerifyAction === 'function') await postVerifyAction();
@@ -6017,7 +6060,7 @@ async function handleLogin(e) {
     if (res.hasEmail && !res.emailVerified) {
         _pendingPostVerifyAction = () => continueAuthenticatedEntry();
         showOnly('auth-screen');
-        showEmailVerifyModal(null, false, true);
+        showEmailVerifyModal(null, false, true, 'logout');
         return;
     }
 
@@ -6065,19 +6108,14 @@ async function handleRegister(e) {
     localStorage.setItem('lms_last_user', _authUser.username);
     _pendingPostVerifyAction = () => continueAuthenticatedEntry(student);
     showOnly('auth-screen');
-    showEmailVerifyModal(res.emailMasked, !!res.emailVerificationPending, true);
+    showEmailVerifyModal(res.emailMasked, !!res.emailVerificationPending, true, 'delete_signup');
 }
 
 async function authLogout() {
     if (_authToken && !_authToken.startsWith('demo_')) {
         authApi('logout', { token: _authToken });
     }
-    DB.del(authStorageKey());
-    DB.del(authUserStorageKey());
-    DB.del(authDataKeyStorageKey());
-    DB.del(authEmailVerifiedStorageKey());
-    _authToken = null;
-    _authUser  = null;
+    await clearAuthSessionLocal();
     showOnly('auth-screen');
     document.getElementById('authError').textContent = '';
     switchAuthTab('login');

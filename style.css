@@ -4828,10 +4828,31 @@ body.a11y-reduce-motion * { transition: none !important; animation: none !import
     padding: 20px;
 }
 .recovery-modal-card {
+    position: relative;
     background: #fff; border-radius: 24px;
     padding: 28px 24px; max-width: 380px; width: 100%;
     text-align: center;
     box-shadow: 0 24px 70px rgba(0,0,0,0.3);
+}
+.recovery-modal-dismiss {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 999px;
+    background: #eef2ff;
+    color: #5060a8;
+    font-size: 1.1rem;
+    font-weight: 800;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.recovery-modal-dismiss:hover {
+    background: #dde5ff;
 }
 .recovery-modal-icon { font-size: 2.4rem; margin-bottom: 8px; }
 .recovery-modal-card h3 { margin: 0 0 8px; color: #1d2746; }
