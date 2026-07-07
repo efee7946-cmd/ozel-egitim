@@ -27,7 +27,10 @@ async function authUsername(req) {
     const token = header.startsWith('Bearer ') ? header.slice(7) : null;
     if (!token) return null;
     const rows = await query(
-        'SELECT username FROM sessions WHERE token = $1 AND expires_at > now()',
+        `SELECT s.username
+         FROM sessions s
+         JOIN users u ON u.username = s.username
+         WHERE s.token = $1 AND s.expires_at > now() AND u.email_verified = true`,
         [token]
     );
     return rows.length ? rows[0].username : null;

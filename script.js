@@ -2819,12 +2819,15 @@ function updateAdaptiveState() {
         catStats[c].noResponse += n;
     });
 
-    DB.set(key, {
-        categoryStats: catStats,
-        simplifyTotal: (existing.simplifyTotal || 0) + (sessionData.simplifyUsed || 0),
-        totalTurns: (existing.totalTurns || 0) + sessionData.therapyTurns.length,
-        totalSessions: (existing.totalSessions || 0) + 1,
-        updatedAt: new Date().toISOString(),
+    DB.update(key, current => {
+        const snapshot = current || existing || {};
+        return {
+            categoryStats: catStats,
+            simplifyTotal: (snapshot.simplifyTotal || 0) + (sessionData.simplifyUsed || 0),
+            totalTurns: (snapshot.totalTurns || 0) + sessionData.therapyTurns.length,
+            totalSessions: (snapshot.totalSessions || 0) + 1,
+            updatedAt: new Date().toISOString(),
+        };
     });
 }
 
@@ -2842,12 +2845,14 @@ async function persistSessionSnapshot() {
     const snapshot = buildSessionSnapshot(userId, durationMin, totalMic, '-', totalTurns);
 
     const key = 'session_history_' + userId;
-    const history = await DB.get(key) || [];
-    const idx = history.findIndex(h => h.id === snapshot.id);
-    if (idx >= 0) history[idx] = snapshot;
-    else history.unshift(snapshot);
-    if (history.length > 180) history.splice(180);
-    await DB.set(key, history);
+    await DB.update(key, history => {
+        const next = Array.isArray(history) ? history : [];
+        const idx = next.findIndex(h => h.id === snapshot.id);
+        if (idx >= 0) next[idx] = snapshot;
+        else next.unshift(snapshot);
+        if (next.length > 180) next.splice(180);
+        return next;
+    });
 
     sessionData.reportEntryId = snapshot.id;
     return loadReportHistory();
@@ -4870,7 +4875,7 @@ function addStars(n) {
     if (!n) return;
     const s = getStarState();
     s.total += n;
-    DB.set(_starsKey(), s);
+    DB.update(_starsKey(), () => s);
     showToast(t('stars_earned').replace('{n}', n));
     updateStarBadge();
 }
@@ -4974,7 +4979,7 @@ function buyStoreItem(id) {
     s.spent += item.cost;
     s.owned.push(id);
     s.equipped = id;
-    DB.set(_starsKey(), s);
+    DB.update(_starsKey(), () => s);
     showToast(t('store_bought_toast').replace('{item}', item.emoji + ' ' + item.label));
     if (typeof confetti === 'function') confetti({ particleCount: 90, spread: 75 });
     _renderStoreMannequin();
@@ -4986,7 +4991,7 @@ function equipStoreItem(id) {
     const s = getStarState();
     if (!s.owned.includes(id)) return;
     s.equipped = id;
-    DB.set(_starsKey(), s);
+    DB.update(_starsKey(), () => s);
     _renderStoreMannequin();
     _renderStoreGrid();
     updateStarBadge();
@@ -4995,7 +5000,7 @@ function equipStoreItem(id) {
 function unequipStoreItem() {
     const s = getStarState();
     s.equipped = null;
-    DB.set(_starsKey(), s);
+    DB.update(_starsKey(), () => s);
     _renderStoreMannequin();
     _renderStoreGrid();
     updateStarBadge();
@@ -5404,14 +5409,17 @@ function _objComplete() {
 async function _saveObjResult() {
     const sid = activeStudentId || 'default';
     const key = 'obj_results_' + sid;
-    const list = await DB.get(key) || [];
-    list.unshift({
-        date: new Date().toISOString(),
-        items: _objItems.length,
-        errors: _objErrors,
+    await DB.update(key, list => {
+        const next = Array.isArray(list) ? list : [];
+        next.unshift({
+            id: 'obj_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
+            date: new Date().toISOString(),
+            items: _objItems.length,
+            errors: _objErrors,
+        });
+        if (next.length > 100) next.splice(100);
+        return next;
     });
-    if (list.length > 100) list.splice(100);
-    await DB.set(key, list);
 }
 
 async function renderObjResultsSummary() {
@@ -6984,7 +6992,7 @@ async function saveIepGoal() {
         targetDate: document.getElementById('iepTargetDate').value,
     };
     goals.push(goal);
-    DB.set(iepGoalsKey(), goals);
+    await DB.update(iepGoalsKey(), () => goals);
     document.getElementById('iepGoalText').value = '';
     hideIepGoalForm();
     renderIepGoals();
@@ -6992,7 +7000,7 @@ async function saveIepGoal() {
 
 async function deleteIepGoal(id) {
     const goals = (await loadIepGoals()).filter(g => g.id !== id);
-    DB.set(iepGoalsKey(), goals);
+    await DB.update(iepGoalsKey(), () => goals);
     DB.del(iepTrialsKey(id));
     renderIepGoals();
 }
@@ -7051,6 +7059,7 @@ async function submitTrialSession() {
         return;
     }
     const session = {
+        id: 'trial_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
         goalId: _iepCurrentGoalId,
         date: new Date().toISOString().slice(0, 10),
         trials: [..._iepCurrentTrials],
@@ -7058,7 +7067,7 @@ async function submitTrialSession() {
     };
     const trials = await loadTrials(_iepCurrentGoalId);
     trials.push(session);
-    DB.set(iepTrialsKey(_iepCurrentGoalId), trials);
+    await DB.update(iepTrialsKey(_iepCurrentGoalId), () => trials);
 
     // Durumu güncelle (mastery check)
     const goals = await loadIepGoals();
@@ -7068,7 +7077,7 @@ async function submitTrialSession() {
         const target = goals[goalIdx].targetPct;
         if (goals[goalIdx].status === 'not_started') goals[goalIdx].status = 'learning';
         if (pct >= target && trials.length >= 3) goals[goalIdx].status = 'mastered';
-        DB.set(iepGoalsKey(), goals);
+        await DB.update(iepGoalsKey(), () => goals);
         if (goals[goalIdx].status === 'mastered' && typeof confetti === 'function') {
             confetti({ particleCount: 80, spread: 60, origin: { y: 0.6 } });
             speakFallback(t('iep_goal_won'));
@@ -7168,14 +7177,14 @@ function renderSkillsGrid() {
     }).join('');
 }
 
-function cycleSkill(key) {
+async function cycleSkill(key) {
     const map = loadSkillsSync();
     const current = map[key] || 'not_started';
     const next = current === 'not_started' ? 'learning'
                : current === 'learning'    ? 'mastered'
                :                             'not_started';
     map[key] = next;
-    DB.set(skillsKey(), map);
+    await DB.update(skillsKey(), () => map);
     renderSkillsGrid();
     const label = next === 'mastered' ? t('skill_mastered') : next === 'learning' ? t('skill_learning_status') : t('skill_reset');
     speakFallback(label);
@@ -7270,6 +7279,35 @@ function deleteBehaviorEntry(id) {
 // =============================================
 // WINDOW EXPORTS (YENİ)
 // =============================================
+saveBehaviorEntry = async function saveBehaviorEntry() {
+    const text = document.getElementById('behaviorText').value.trim();
+    if (!text) { document.getElementById('behaviorText').focus(); return; }
+    const log = loadBehaviorSync();
+    log.unshift({
+        id: 'b_' + Date.now(),
+        date: new Date().toISOString(),
+        behavior: text,
+        antecedent: document.getElementById('behaviorAntecedent').value.trim(),
+        consequence: document.getElementById('behaviorConsequence').value.trim(),
+        frequency: _behaviorCount,
+        duration: parseInt(document.getElementById('behaviorDuration').value) || 0,
+    });
+    await DB.update(behaviorKey(), () => log.slice(0, 100));
+    ['behaviorText','behaviorAntecedent','behaviorConsequence','behaviorDuration'].forEach(id => {
+        document.getElementById(id).value = '';
+    });
+    _behaviorCount = 1;
+    document.getElementById('behaviorCount').textContent = '1';
+    renderBehaviorLog();
+    speakFallback(t('behavior_added'));
+};
+
+deleteBehaviorEntry = async function deleteBehaviorEntry(id) {
+    const log = loadBehaviorSync().filter(e => e.id !== id);
+    await DB.update(behaviorKey(), () => log);
+    renderBehaviorLog();
+};
+
 window.goToLogin = goToLogin;
 window.selectLoginEmoji = selectLoginEmoji;
 window.createStudentFromLogin = createStudentFromLogin;

@@ -43,6 +43,168 @@ const DB = (function () {
     const SENSITIVE = ['students', 'bep_profile_', 'iep_', 'skills_', 'behavior_', 'adaptive_', 'trials_'];
     function isSensitive(key) { return SENSITIVE.some(p => key.startsWith(p)); }
 
+    function deepClone(val) {
+        if (val === undefined) return undefined;
+        try { return JSON.parse(JSON.stringify(val)); }
+        catch { return val; }
+    }
+
+    function deepEqual(a, b) {
+        try { return JSON.stringify(a) === JSON.stringify(b); }
+        catch { return a === b; }
+    }
+
+    function uniqueList(values) {
+        return Array.from(new Set((Array.isArray(values) ? values : []).filter(v => v !== undefined && v !== null)));
+    }
+
+    function mergeByIdentity(remote, local, identify, limit) {
+        const order = [];
+        const map = new Map();
+        const add = (items, preferLocal) => {
+            (Array.isArray(items) ? items : []).forEach(item => {
+                const id = identify(item);
+                if (!id) return;
+                if (!map.has(id)) order.push(id);
+                if (preferLocal || !map.has(id)) map.set(id, deepClone(item));
+            });
+        };
+        add(remote, false);
+        add(local, true);
+        const merged = order.map(id => map.get(id)).filter(item => item !== undefined);
+        return typeof limit === 'number' ? merged.slice(0, limit) : merged;
+    }
+
+    function sortByNewest(items, field) {
+        return (Array.isArray(items) ? items : []).slice().sort((a, b) => {
+            const aTs = Date.parse(a?.[field] || '') || 0;
+            const bTs = Date.parse(b?.[field] || '') || 0;
+            return bTs - aTs;
+        });
+    }
+
+    function mergeFlatObject(base, remote, local) {
+        const baseObj = base && typeof base === 'object' && !Array.isArray(base) ? base : {};
+        const remoteObj = remote && typeof remote === 'object' && !Array.isArray(remote) ? remote : {};
+        const localObj = local && typeof local === 'object' && !Array.isArray(local) ? local : {};
+        const merged = { ...remoteObj };
+        Object.keys(localObj).forEach(k => {
+            const baseVal = baseObj[k];
+            const remoteVal = remoteObj[k];
+            const localVal = localObj[k];
+            if (deepEqual(localVal, baseVal)) return;
+            if (deepEqual(remoteVal, baseVal) || !deepEqual(remoteVal, localVal)) merged[k] = deepClone(localVal);
+        });
+        return merged;
+    }
+
+    function mergeStars(base, remote, local) {
+        const baseState = base || {};
+        const remoteState = remote || {};
+        const localState = local || {};
+        const totalDelta = Math.max(0, (localState.total || 0) - (baseState.total || 0));
+        const spentDelta = Math.max(0, (localState.spent || 0) - (baseState.spent || 0));
+        const addedOwned = (Array.isArray(localState.owned) ? localState.owned : [])
+            .filter(id => !(Array.isArray(baseState.owned) ? baseState.owned : []).includes(id));
+        const merged = {
+            total: Math.max(0, (remoteState.total || 0) + totalDelta),
+            spent: Math.max(0, (remoteState.spent || 0) + spentDelta),
+            owned: uniqueList([...(remoteState.owned || []), ...addedOwned]),
+            equipped: remoteState.equipped || null,
+        };
+        if (!merged.owned.includes(merged.equipped) && merged.equipped) merged.owned.push(merged.equipped);
+        if (!deepEqual(localState.equipped || null, baseState.equipped || null)) merged.equipped = localState.equipped || null;
+        if (merged.equipped && !merged.owned.includes(merged.equipped)) merged.owned.push(merged.equipped);
+        return merged;
+    }
+
+    function mergeAdaptive(base, remote, local) {
+        const baseState = base || {};
+        const remoteState = remote || {};
+        const localState = local || {};
+        const mergedStats = deepClone(remoteState.categoryStats || {});
+        const categories = uniqueList([
+            ...Object.keys(localState.categoryStats || {}),
+            ...Object.keys(baseState.categoryStats || {}),
+            ...Object.keys(remoteState.categoryStats || {}),
+        ]);
+        categories.forEach(cat => {
+            const baseCat = (baseState.categoryStats || {})[cat] || {};
+            const remoteCat = (remoteState.categoryStats || {})[cat] || { turns: 0, simplify: 0, noResponse: 0 };
+            const localCat = (localState.categoryStats || {})[cat] || {};
+            const turnsDelta = Math.max(0, (localCat.turns || 0) - (baseCat.turns || 0));
+            const simplifyDelta = Math.max(0, (localCat.simplify || 0) - (baseCat.simplify || 0));
+            const noResponseDelta = Math.max(0, (localCat.noResponse || 0) - (baseCat.noResponse || 0));
+            mergedStats[cat] = {
+                turns: Math.max(0, (remoteCat.turns || 0) + turnsDelta),
+                simplify: Math.max(0, (remoteCat.simplify || 0) + simplifyDelta),
+                noResponse: Math.max(0, (remoteCat.noResponse || 0) + noResponseDelta),
+            };
+        });
+        return {
+            categoryStats: mergedStats,
+            simplifyTotal: Math.max(0, (remoteState.simplifyTotal || 0) + Math.max(0, (localState.simplifyTotal || 0) - (baseState.simplifyTotal || 0))),
+            totalTurns: Math.max(0, (remoteState.totalTurns || 0) + Math.max(0, (localState.totalTurns || 0) - (baseState.totalTurns || 0))),
+            totalSessions: Math.max(0, (remoteState.totalSessions || 0) + Math.max(0, (localState.totalSessions || 0) - (baseState.totalSessions || 0))),
+            updatedAt: localState.updatedAt || remoteState.updatedAt || new Date().toISOString(),
+        };
+    }
+
+    function mergeKeyData(key, base, remote, local) {
+        if (key.startsWith('session_history_')) {
+            return sortByNewest(mergeByIdentity(remote, local, item => item && item.id), 'created_at').slice(0, 180);
+        }
+        if (key.startsWith('obj_results_')) {
+            return sortByNewest(
+                mergeByIdentity(remote, local, item => item && (item.id || `${item.date}|${item.items}|${item.errors || 0}`)),
+                'date'
+            ).slice(0, 100);
+        }
+        if (key.startsWith('behavior_')) {
+            return sortByNewest(mergeByIdentity(remote, local, item => item && item.id), 'date').slice(0, 100);
+        }
+        if (key.startsWith('trials_')) {
+            return sortByNewest(
+                mergeByIdentity(remote, local, item => item && (item.id || `${item.goalId}|${item.date}|${(item.trials || []).length}|${item.notes || ''}`)),
+                'date'
+            );
+        }
+        if (key.startsWith('iep_')) {
+            return mergeByIdentity(remote, local, item => item && item.id);
+        }
+        if (key.startsWith('skills_')) {
+            return mergeFlatObject(base, remote, local);
+        }
+        if (key.startsWith('stars_')) {
+            return mergeStars(base, remote, local);
+        }
+        if (key.startsWith('adaptive_')) {
+            return mergeAdaptive(base, remote, local);
+        }
+        return deepClone(local);
+    }
+
+    function getLocalValue(key) {
+        if (isSensitive(key)) return ssGet(key);
+        try {
+            const raw = localStorage.getItem(PFX + key);
+            return raw ? JSON.parse(raw) : null;
+        } catch {
+            return null;
+        }
+    }
+
+    async function persistValue(key, val) {
+        if (isSensitive(key)) {
+            ssPut(key, val);
+            await lsPut(key, val);
+        } else {
+            try { localStorage.setItem(PFX + key, JSON.stringify(val)); } catch {}
+        }
+        _tsSet(key, Date.now());
+        await cloudPut(key, val);
+    }
+
     // Cihaza özel anahtarlar — buluta asla gönderilmez (oturum güvenliği)
     const LOCAL_ONLY = ['auth_token', 'auth_user', 'auth_data_key'];
     function isLocalOnly(key) { return LOCAL_ONLY.includes(key); }
@@ -295,14 +457,16 @@ const DB = (function () {
 
         /** Yazar: anında (ss+ls), cloud'a arka planda */
         async set(key, val) {
-            if (isSensitive(key)) {
-                ssPut(key, val);
-                await lsPut(key, val);
-            } else {
-                try { localStorage.setItem(PFX + key, JSON.stringify(val)); } catch {}
-            }
-            _tsSet(key, Date.now());
-            await cloudPut(key, val);
+            await persistValue(key, val);
+        },
+
+        async update(key, updater) {
+            const base = deepClone(getLocalValue(key));
+            const next = await updater(deepClone(base));
+            const remote = await cloudFetch(key);
+            const merged = remote ? mergeKeyData(key, base, remote.value, next) : next;
+            await persistValue(key, merged);
+            return merged;
         },
 
         del(key) {
@@ -379,9 +543,7 @@ const DB = (function () {
                     if (!remote.value && remote.value !== null) continue;
 
                     const localTs = _tsGet(key);
-                    const localVal = isSensitive(key) ? ssGet(key) : (() => {
-                        try { const r = localStorage.getItem(PFX + key); return r ? JSON.parse(r) : null; } catch { return null; }
-                    })();
+                    const localVal = getLocalValue(key);
 
                     if (remote.value === null) {
                         if (localVal !== null) writes.push({ key, value: localVal });
