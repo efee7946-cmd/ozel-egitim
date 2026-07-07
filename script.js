@@ -6183,9 +6183,26 @@ async function exportMyData() {
         ogrenciler: await DB.get(studentsKey()) || [],
         verme_tarihi: new Date().toISOString(),
     };
+
+    const excludedKeys = new Set([
+        authStorageKey(),
+        authUserStorageKey(),
+        authDataKeyStorageKey(),
+        authEmailVerifiedStorageKey(),
+        '_key_ts',
+    ]);
+
     const keys = Object.keys(localStorage).filter(k => k.startsWith('lms_'));
-    for (const k of keys) {
-        try { data[k] = JSON.parse(localStorage.getItem(k)); } catch { data[k] = localStorage.getItem(k); }
+    for (const fullKey of keys) {
+        const logicalKey = fullKey.slice(4);
+        if (!logicalKey || excludedKeys.has(logicalKey)) continue;
+
+        let value = await DB.get(logicalKey);
+        if (value === null) {
+            try { value = JSON.parse(localStorage.getItem(fullKey)); }
+            catch { value = localStorage.getItem(fullKey); }
+        }
+        data[fullKey] = value;
     }
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
