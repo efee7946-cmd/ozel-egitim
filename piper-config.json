@@ -1,0 +1,14 @@
+{
+  "voices": {
+    "tr": {
+      "id": "tr_TR-dfki-medium",
+      "onnxUrl": "https://huggingface.co/rhasspy/piper-voices/resolve/main/tr/tr_TR/dfki/medium/tr_TR-dfki-medium.onnx",
+      "jsonUrl": "https://huggingface.co/rhasspy/piper-voices/resolve/main/tr/tr_TR/dfki/medium/tr_TR-dfki-medium.onnx.json"
+    },
+    "en": {
+      "id": "en_US-ljspeech-medium",
+      "onnxUrl": "https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/ljspeech/medium/en_US-ljspeech-medium.onnx",
+      "jsonUrl": "https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/ljspeech/medium/en_US-ljspeech-medium.onnx.json"
+    }
+  }
+}

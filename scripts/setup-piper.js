@@ -15,17 +15,7 @@ const PIPER_VERSION = '2023.11.14-2';
 
 const URLS = {
     windows: `https://github.com/rhasspy/piper/releases/download/${PIPER_VERSION}/piper_windows_amd64.zip`,
-    linux: `https://github.com/rhasspy/piper/releases/download/${PIPER_VERSION}/piper_linux_x86_64.tar.gz`,
-    models: {
-        tr: {
-            onnx: 'https://huggingface.co/rhasspy/piper-voices/resolve/main/tr/tr_TR/dfki/medium/tr_TR-dfki-medium.onnx',
-            json: 'https://huggingface.co/rhasspy/piper-voices/resolve/main/tr/tr_TR/dfki/medium/tr_TR-dfki-medium.onnx.json'
-        },
-        en: {
-            onnx: 'https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/ljspeech/medium/en_US-ljspeech-medium.onnx',
-            json: 'https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/ljspeech/medium/en_US-ljspeech-medium.onnx.json'
-        }
-    }
+    linux: `https://github.com/rhasspy/piper/releases/download/${PIPER_VERSION}/piper_linux_x86_64.tar.gz`
 };
 
 async function downloadFile(url, destPath) {
@@ -81,6 +71,13 @@ async function setup() {
         if (!fs.existsSync(binDir)) fs.mkdirSync(binDir, { recursive: true });
         if (!fs.existsSync(modelsDir)) fs.mkdirSync(modelsDir, { recursive: true });
 
+        // Load config
+        const configPath = path.join(rootDir, 'piper-config.json');
+        if (!fs.existsSync(configPath)) {
+            throw new Error('piper-config.json missing in root directory!');
+        }
+        const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+
         const isWin = process.platform === 'win32';
         const piperExecName = isWin ? 'piper.exe' : 'piper';
         const piperExecPath = path.join(piperDir, piperExecName);
@@ -110,13 +107,23 @@ async function setup() {
             console.log('Piper binary already exists. Skipping download.');
         }
 
-        // 2. Setup Voice Models
+        // 2. Setup Voice Models from config
         const modelFiles = [
-            { name: 'tr_TR-dfki-medium.onnx', url: URLS.models.tr.onnx },
-            { name: 'tr_TR-dfki-medium.onnx.json', url: URLS.models.tr.json },
-            { name: 'en_US-ljspeech-medium.onnx', url: URLS.models.en.onnx },
-            { name: 'en_US-ljspeech-medium.onnx.json', url: URLS.models.en.json }
+            { name: `${config.voices.tr.id}.onnx`, url: config.voices.tr.onnxUrl },
+            { name: `${config.voices.tr.id}.onnx.json`, url: config.voices.tr.jsonUrl },
+            { name: `${config.voices.en.id}.onnx`, url: config.voices.en.onnxUrl },
+            { name: `${config.voices.en.id}.onnx.json`, url: config.voices.en.jsonUrl }
         ];
+
+        // Clean up old model files that are no longer configured to save space
+        const allowedFiles = new Set(modelFiles.map(f => f.name));
+        const currentFiles = fs.readdirSync(modelsDir);
+        for (const file of currentFiles) {
+            if (!allowedFiles.has(file)) {
+                console.log(`Cleaning up old model file: ${file}`);
+                fs.unlinkSync(path.join(modelsDir, file));
+            }
+        }
 
         for (const file of modelFiles) {
             const destPath = path.join(modelsDir, file.name);

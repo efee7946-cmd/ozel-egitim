@@ -27,12 +27,22 @@ export default async function handler(req, res) {
     if (String(text).length > 800) return res.status(400).json({ error: 'text çok uzun' });
 
     const rootDir = process.cwd();
+
+    // Read config to find the active model ID
+    const configPath = path.join(rootDir, 'piper-config.json');
+    if (!fs.existsSync(configPath)) {
+        console.error('piper-config.json not found!');
+        return res.status(500).json({ error: 'CONFIG_MISSING' });
+    }
+    const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+
     const isWin = process.platform === 'win32';
     const piperExecName = isWin ? 'piper.exe' : 'piper';
     const piperExecPath = path.join(rootDir, 'bin', 'piper', piperExecName);
     
-    // Choose model based on language selection
-    const modelName = lang === 'en' ? 'en_US-ljspeech-medium.onnx' : 'tr_TR-dfki-medium.onnx';
+    // Select model from config
+    const voiceConfig = lang === 'en' ? config.voices.en : config.voices.tr;
+    const modelName = `${voiceConfig.id}.onnx`;
     const modelPath = path.join(rootDir, 'bin', 'models', modelName);
 
     console.log(`Piper TTS Synthesizing text "${text}" with lang="${lang}" using model="${modelName}"`);

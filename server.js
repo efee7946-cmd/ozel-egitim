@@ -21,14 +21,22 @@ app.post('/api/tts', async (req, res) => {
     const { text, lang } = req.body;
     if (!text) return res.status(400).json({ error: 'text zorunlu.' });
 
+    // Read config
+    const configPath = path.join(__dirname, 'piper-config.json');
+    if (!fs.existsSync(configPath)) {
+        return res.status(500).json({ error: 'CONFIG_MISSING', detail: 'piper-config.json is missing.' });
+    }
+    const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+
     const isWin = process.platform === 'win32';
     const piperExecName = isWin ? 'piper.exe' : 'piper';
     const piperExecPath = path.join(__dirname, 'bin', 'piper', piperExecName);
     
-    const modelName = lang === 'en' ? 'en_US-ljspeech-medium.onnx' : 'tr_TR-dfki-medium.onnx';
+    const voiceConfig = lang === 'en' ? config.voices.en : config.voices.tr;
+    const modelName = `${voiceConfig.id}.onnx`;
     const modelPath = path.join(__dirname, 'bin', 'models', modelName);
 
-    console.log(`[Local API] Piper TTS Synthesizing: "${text}" [${lang}]`);
+    console.log(`[Local API] Piper TTS Synthesizing: "${text}" [${lang}] using model="${modelName}"`);
 
     if (fs.existsSync(piperExecPath) && fs.existsSync(modelPath)) {
         try {
