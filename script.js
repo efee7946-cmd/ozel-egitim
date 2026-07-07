@@ -2081,12 +2081,45 @@ function isTherapyInProgress() {
            topicOverlay && topicOverlay.style.display === 'none';
 }
 
-function showOnly(id) {
+function showCustomConfirm(message) {
+    return new Promise((resolve) => {
+        const overlay = document.getElementById('confirmModal');
+        const textEl = document.getElementById('confirmModalText');
+        const titleEl = document.getElementById('confirmModalTitle');
+        const cancelBtn = document.getElementById('confirmBtnCancel');
+        const okBtn = document.getElementById('confirmBtnOk');
+        if (!overlay || !textEl) {
+            resolve(confirm(message));
+            return;
+        }
+        titleEl.textContent = _lang === 'en' ? 'Are you sure?' : 'Emin misiniz?';
+        textEl.textContent = message;
+        cancelBtn.textContent = t('cancel');
+        okBtn.textContent = t('yes');
+        overlay.style.display = 'flex';
+        const cleanUp = () => {
+            overlay.style.display = 'none';
+            cancelBtn.onclick = null;
+            okBtn.onclick = null;
+        };
+        cancelBtn.onclick = () => {
+            cleanUp();
+            resolve(false);
+        };
+        okBtn.onclick = () => {
+            cleanUp();
+            resolve(true);
+        };
+    });
+}
+
+async function showOnly(id) {
     if (isTherapyInProgress() && id !== 'game-container') {
         const msg = _lang === 'en'
             ? "Are you sure you want to leave the speech practice session? Your progress will be lost."
             : "Konuşma pratiği seansını yarıda bırakmak istediğine emin misin? İlerlemen kaybolacak.";
-        if (!confirm(msg)) {
+        const confirmed = await showCustomConfirm(msg);
+        if (!confirmed) {
             _updateBottomNav('game-container');
             return;
         }
@@ -2266,12 +2299,13 @@ function setTherapySelectionMode(isSelecting) {
     }
 }
 
-function goToMenu() {
+async function goToMenu() {
     if (isTherapyInProgress()) {
         const msg = _lang === 'en'
             ? "Are you sure you want to leave the speech practice session? Your progress will be lost."
             : "Konuşma pratiği seansını yarıda bırakmak istediğine emin misin? İlerlemen kaybolacak.";
-        if (!confirm(msg)) {
+        const confirmed = await showCustomConfirm(msg);
+        if (!confirmed) {
             return;
         }
         currentTopic = '';
@@ -2286,7 +2320,7 @@ function goToMenu() {
     syncCityEntryPlacement(false);
     const cityShell = document.getElementById('cityEntryShell');
     if (cityShell) cityShell.style.display = '';
-    showOnly('menu-screen');
+    await showOnly('menu-screen');
     renderCityScene();
     maybeGreetChild();
     if (shouldAwardStars) _showStarReward();
