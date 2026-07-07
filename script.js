@@ -5617,10 +5617,13 @@ window.selectRegisterEmoji = selectRegisterEmoji;
 let _authToken    = null;
 let _authUser     = null; // { username, displayName }
 let _authMode     = 'login'; // 'login' | 'register'
+let _verifyModalMandatory = false;
+let _pendingPostVerifyAction = null;
 
 function authStorageKey()  { return 'auth_token'; }
 function authUserStorageKey() { return 'auth_user'; }
 function authDataKeyStorageKey() { return 'auth_data_key'; }
+function authEmailVerifiedStorageKey() { return 'auth_email_verified'; }
 
 async function authApi(action, body = {}) {
     try {
@@ -5655,35 +5658,50 @@ async function checkAuthSession() {
         const savedToken = DB.getSync(authStorageKey());
         const savedUser  = DB.getSync(authUserStorageKey());
         const savedDataKey = DB.getSync(authDataKeyStorageKey());
+        const savedEmailVerified = DB.getSync(authEmailVerifiedStorageKey());
 
         if (savedToken && savedUser) {
             _authToken = savedToken;
             _authUser  = savedUser;
             await DB.initEncryption(savedDataKey || savedToken).catch(() => {});
+            if (savedEmailVerified === false) {
+                hideSplash();
+                showOnly('auth-screen');
+                _pendingPostVerifyAction = () => continueAuthenticatedEntry();
+                showEmailVerifyModal(null, false, true);
+                return;
+            }
+            const res = await authApi('verify', { token: savedToken });
             hideSplash();
-            onAuthSuccess();
-
-            // Arka planda token geçerliliğini kontrol et
-            authApi('verify', { token: savedToken }).then(res => {
-                if (res && !res.valid && !res.fallback) {
-                    DB.del(authStorageKey());
-                    DB.del(authUserStorageKey());
-                    DB.del(authDataKeyStorageKey());
-                    _authToken = null;
-                    _authUser  = null;
-                    showOnly('auth-screen');
-                } else if (res && res.valid) {
-                    _authUser = { username: res.username, displayName: res.displayName };
-                    if (res.dataKey) {
-                        DB.set(authDataKeyStorageKey(), res.dataKey);
-                        if (res.dataKey !== savedDataKey) {
-                            DB.initEncryption(res.dataKey)
-                                .then(() => { try { DB.pushAll(); } catch(_) {} })
-                                .catch(() => {});
-                        }
+            if (res && !res.valid && !res.fallback) {
+                DB.del(authStorageKey());
+                DB.del(authUserStorageKey());
+                DB.del(authDataKeyStorageKey());
+                DB.del(authEmailVerifiedStorageKey());
+                _authToken = null;
+                _authUser  = null;
+                showOnly('auth-screen');
+                return;
+            }
+            if (res && res.valid) {
+                _authUser = { username: res.username, displayName: res.displayName };
+                DB.set(authEmailVerifiedStorageKey(), !!res.emailVerified);
+                if (res.dataKey) {
+                    DB.set(authDataKeyStorageKey(), res.dataKey);
+                    if (res.dataKey !== savedDataKey) {
+                        DB.initEncryption(res.dataKey)
+                            .then(() => { try { DB.pushAll(); } catch(_) {} })
+                            .catch(() => {});
                     }
                 }
-            }).catch(() => {});
+                if (res.hasEmail && !res.emailVerified) {
+                    showOnly('auth-screen');
+                    _pendingPostVerifyAction = () => continueAuthenticatedEntry();
+                    showEmailVerifyModal(null, false, true);
+                    return;
+                }
+            }
+            onAuthSuccess();
             return;
         }
     } catch (e) {}
@@ -5780,6 +5798,26 @@ function onAuthSuccessWithStudent(student) {
     syncUserDataFromCloud();
 }
 
+async function continueAuthenticatedEntry(preferredStudent = null) {
+    if (preferredStudent) {
+        activeStudentId = preferredStudent.id;
+        activeStudentName = preferredStudent.name;
+        localStorage.setItem('lms_last_user', _authUser.username);
+        onAuthSuccessWithStudent(preferredStudent);
+        return;
+    }
+
+    const students = await loadStudents();
+    if (students.length > 0) {
+        const student = students[0];
+        activeStudentId = student.id;
+        activeStudentName = student.name;
+        onAuthSuccessWithStudent(student);
+    } else {
+        onAuthSuccess();
+    }
+}
+
 function renderRegisterEmojiPicker() {
     const wrap = document.getElementById('regEmojiPicker');
     if (!wrap) return;
@@ -5843,17 +5881,21 @@ async function requestResetCode() {
 }
 
 /* ---- E-posta doğrulama modalı ---- */
-function showEmailVerifyModal(emailMasked, codeAlreadySent = true) {
+function showEmailVerifyModal(emailMasked, codeAlreadySent = true, mandatory = false) {
     const modal = document.getElementById('emailVerifyModal');
     if (!modal) return;
+    _verifyModalMandatory = mandatory;
     document.getElementById('verifyModalText').textContent = codeAlreadySent
         ? t('verify_modal_sub').replace('{email}', emailMasked || '')
         : t('verify_modal_nudge');
     document.getElementById('verifyCodeInput').value = '';
+    const laterBtn = document.getElementById('verifyLaterBtn');
+    if (laterBtn) laterBtn.style.display = mandatory ? 'none' : '';
     modal.style.display = 'flex';
 }
 
 function closeVerifyModal() {
+    if (_verifyModalMandatory) return;
     document.getElementById('emailVerifyModal').style.display = 'none';
 }
 
@@ -5862,7 +5904,12 @@ async function submitEmailVerification() {
     if (!code) return;
     const res = await authApi('verify_email', { token: _authToken, code });
     if (res && res.ok) {
+        const postVerifyAction = _pendingPostVerifyAction;
+        _pendingPostVerifyAction = null;
+        _verifyModalMandatory = false;
+        DB.set(authEmailVerifiedStorageKey(), true);
         closeVerifyModal();
+        if (typeof postVerifyAction === 'function') await postVerifyAction();
         showToast(t('verify_success'));
     } else {
         showToast(t(res && res.error) || t('AUTH_VERIFY_CODE_INVALID'));
@@ -5964,20 +6011,17 @@ async function handleLogin(e) {
     DB.set(authStorageKey(), _authToken);
     DB.set(authUserStorageKey(), _authUser);
     if (res.dataKey) DB.set(authDataKeyStorageKey(), res.dataKey);
+    DB.set(authEmailVerifiedStorageKey(), !!res.emailVerified);
     localStorage.setItem('lms_last_user', _authUser.username);
 
-    // Öğrenci varsa direkt menüye, yoksa öğrenci seçim ekranına
-    const students = await loadStudents();
-    if (students.length > 0) {
-        const student = students[0];
-        activeStudentId   = student.id;
-        activeStudentName = student.name;
-        onAuthSuccessWithStudent(student);
-    } else {
-        onAuthSuccess();
+    if (res.hasEmail && !res.emailVerified) {
+        _pendingPostVerifyAction = () => continueAuthenticatedEntry();
+        showOnly('auth-screen');
+        showEmailVerifyModal(null, false, true);
+        return;
     }
-    // E-posta var ama doğrulanmamışsa hatırlat
-    if (res.hasEmail && !res.emailVerified) showEmailVerifyModal(null, false);
+
+    await continueAuthenticatedEntry();
     showToast(t('auth_login_success'));
 }
 
@@ -5992,7 +6036,7 @@ async function handleRegister(e) {
     if (!document.getElementById('kvkkConsent').checked) return showAuthError(t('auth_kvkk_required'));
     if (!username || !password || !studentName || !regEmail) return showAuthError(t('auth_fill_all'));
     if (password !== password2) return showAuthError(t('auth_passwords_mismatch'));
-    if (password.length < 6) return showAuthError(t('auth_password_short'));
+    if (password.length < 8) return showAuthError(t('auth_password_short'));
     setAuthLoading(true);
 
     const res = await authApi('register', { username, password, email: regEmail });
@@ -6008,21 +6052,20 @@ async function handleRegister(e) {
     DB.set(authStorageKey(), _authToken);
     DB.set(authUserStorageKey(), _authUser);
     if (res.dataKey) DB.set(authDataKeyStorageKey(), res.dataKey);
+    DB.set(authEmailVerifiedStorageKey(), false);
 
     // BEP profilini kaydet
     const level = document.querySelector('input[name="regLevel"]:checked')?.value || 'egit';
     const conditions = [...document.querySelectorAll('.reg-cond:checked')].map(c => c.value);
     await DB.set('bep_profile_' + username.toLowerCase(), { category: level, conditions });
 
-    // Öğrenciyi hemen oluştur ve menüye git
+    // Öğrenci verisini kaydet; uygulamaya giriş e-posta doğrulamasından sonra açılacak
     const student = { id: 'st_' + Date.now(), name: studentName, emoji, createdAt: new Date().toISOString() };
     await saveStudents([student]);
-    activeStudentId   = student.id;
-    activeStudentName = student.name;
     localStorage.setItem('lms_last_user', _authUser.username);
-    onAuthSuccessWithStudent(student);
-    if (res.emailVerificationPending) showEmailVerifyModal(res.emailMasked);
-    showToast(t('auth_register_success'));
+    _pendingPostVerifyAction = () => continueAuthenticatedEntry(student);
+    showOnly('auth-screen');
+    showEmailVerifyModal(res.emailMasked, !!res.emailVerificationPending, true);
 }
 
 async function authLogout() {
@@ -6032,6 +6075,7 @@ async function authLogout() {
     DB.del(authStorageKey());
     DB.del(authUserStorageKey());
     DB.del(authDataKeyStorageKey());
+    DB.del(authEmailVerifiedStorageKey());
     _authToken = null;
     _authUser  = null;
     showOnly('auth-screen');
@@ -7149,4 +7193,3 @@ window.behaviorBack = behaviorBack;
 window.behaviorCountChange = behaviorCountChange;
 window.saveBehaviorEntry = saveBehaviorEntry;
 window.deleteBehaviorEntry = deleteBehaviorEntry;
-

@@ -370,12 +370,22 @@ export default async function handler(req, res) {
         if (action === 'verify') {
             if (!token) return res.json({ valid: false });
             const rows = await query(
-                'SELECT username, display_name FROM sessions WHERE token = $1 AND expires_at > now()',
+                `SELECT s.username, s.display_name, u.email, u.email_verified
+                 FROM sessions s
+                 JOIN users u ON u.username = s.username
+                 WHERE s.token = $1 AND s.expires_at > now()`,
                 [token]
             );
             if (!rows.length) return res.json({ valid: false });
             const dataKey = await ensureDataKey(rows[0].username);
-            return res.json({ valid: true, username: rows[0].username, displayName: rows[0].display_name, dataKey });
+            return res.json({
+                valid: true,
+                username: rows[0].username,
+                displayName: rows[0].display_name,
+                dataKey,
+                hasEmail: !!rows[0].email,
+                emailVerified: !!rows[0].email_verified
+            });
         }
 
         /* ---- ÇIKIŞ ---- */
