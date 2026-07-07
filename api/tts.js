@@ -56,7 +56,11 @@ export default async function handler(req, res) {
     try {
 
         const audioBuffer = await new Promise((resolve, reject) => {
-            const child = spawn(piperExecPath, ['-m', modelPath, '--output_file', '-']);
+            const args = ['-m', modelPath, '--output_file', '-'];
+            if (voiceConfig.length_scale) {
+                args.push('--length_scale', String(voiceConfig.length_scale));
+            }
+            const child = spawn(piperExecPath, args);
             const chunks = [];
             let errorOutput = '';
 
