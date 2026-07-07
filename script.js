@@ -5820,6 +5820,28 @@ async function continueAuthenticatedEntry(preferredStudent = null) {
     }
 }
 
+function currentBepProfileKey() {
+    const user = getActiveAuthUser();
+    return user ? 'bep_profile_' + user.username : '';
+}
+
+async function loadCurrentBepProfile() {
+    const key = currentBepProfileKey();
+    if (!key) return null;
+    return DB.getSync(key) || await DB.get(key) || null;
+}
+
+function renderLoginEmojiPicker(selectedEmoji = '🌟') {
+    const picker = document.getElementById('loginEmojiPicker');
+    const hidden = document.getElementById('loginStudentEmoji');
+    if (!picker || !hidden) return;
+    hidden.value = selectedEmoji;
+    picker.innerHTML = STUDENT_EMOJIS.map(e => `
+        <button type="button" class="emoji-pick-btn ${e === selectedEmoji ? 'selected' : ''}"
+            onclick="selectLoginEmoji('${e}', this)">${e}</button>
+    `).join('');
+}
+
 function renderRegisterEmojiPicker() {
     const wrap = document.getElementById('regEmojiPicker');
     if (!wrap) return;
@@ -6074,10 +6096,8 @@ async function handleRegister(e) {
     const password    = document.getElementById('regPassword').value;
     const password2   = document.getElementById('regPassword2').value;
     const regEmail    = document.getElementById('regEmail').value.trim();
-    const studentName = document.getElementById('regStudentName').value.trim();
-    const emoji       = document.getElementById('regStudentEmoji').value || '🌟';
     if (!document.getElementById('kvkkConsent').checked) return showAuthError(t('auth_kvkk_required'));
-    if (!username || !password || !studentName || !regEmail) return showAuthError(t('auth_fill_all'));
+    if (!username || !password || !regEmail) return showAuthError(t('auth_fill_all'));
     if (password !== password2) return showAuthError(t('auth_passwords_mismatch'));
     if (password.length < 8) return showAuthError(t('auth_password_short'));
     setAuthLoading(true);
@@ -6096,17 +6116,8 @@ async function handleRegister(e) {
     DB.set(authUserStorageKey(), _authUser);
     if (res.dataKey) DB.set(authDataKeyStorageKey(), res.dataKey);
     DB.set(authEmailVerifiedStorageKey(), false);
-
-    // BEP profilini kaydet
-    const level = document.querySelector('input[name="regLevel"]:checked')?.value || 'egit';
-    const conditions = [...document.querySelectorAll('.reg-cond:checked')].map(c => c.value);
-    await DB.set('bep_profile_' + username.toLowerCase(), { category: level, conditions });
-
-    // Öğrenci verisini kaydet; uygulamaya giriş e-posta doğrulamasından sonra açılacak
-    const student = { id: 'st_' + Date.now(), name: studentName, emoji, createdAt: new Date().toISOString() };
-    await saveStudents([student]);
     localStorage.setItem('lms_last_user', _authUser.username);
-    _pendingPostVerifyAction = () => continueAuthenticatedEntry(student);
+    _pendingPostVerifyAction = () => continueAuthenticatedEntry();
     showOnly('auth-screen');
     showEmailVerifyModal(res.emailMasked, !!res.emailVerificationPending, true, 'delete_signup');
 }
@@ -6282,6 +6293,16 @@ function legacyStudentsKey() {
     return user ? 'teacher_students_' + user.username : 'teacher_students';
 }
 
+function normalizeStudentRecord(student, index = 0) {
+    if (!student || typeof student !== 'object') return null;
+    return {
+        id: student.id || `st_${Date.now()}_${index}`,
+        name: String(student.name || student.full_name || '').trim(),
+        emoji: student.emoji || '🌟',
+        createdAt: student.createdAt || student.created_at || new Date().toISOString(),
+    };
+}
+
 async function loadStudents() {
     const key = studentsKey();
     const legacyKey = legacyStudentsKey();
@@ -6302,7 +6323,7 @@ async function loadStudents() {
 
     if (list && list.length) {
         try {
-            await saveStudents(list);
+            list = await saveStudents(list);
         } catch (_) {}
     }
 
@@ -6310,7 +6331,10 @@ async function loadStudents() {
 }
 
 async function saveStudents(list) {
-    const normalized = Array.isArray(list) ? list : [];
+    const normalized = (Array.isArray(list) ? list : [])
+        .map((student, index) => normalizeStudentRecord(student, index))
+        .filter(Boolean)
+        .slice(0, 1);
     await DB.set(studentsKey(), normalized);
     await DB.set(legacyStudentsKey(), normalized);
     return normalized;
@@ -6318,87 +6342,114 @@ async function saveStudents(list) {
 
 let _cachedLoginStudents = [];
 
-function renderLoginStudents(students) {
-    _cachedLoginStudents = students;
+async function renderLoginStudents(students) {
+    _cachedLoginStudents = Array.isArray(students) ? students.slice(0, 1) : [];
     const wrap = document.getElementById('loginStudents');
     if (!wrap) return;
-    if (!students.length) {
+    const subtitleEl = document.getElementById('loginSubtitle');
+    const saveBtn = document.getElementById('loginSaveBtn');
+    const backBtn = document.getElementById('loginBackBtn');
+    const statusEl = document.getElementById('loginProfileStatus');
+    const nameInput = document.getElementById('loginNameInput');
+    const consentEl = document.getElementById('loginVeliConsent');
+    const student = _cachedLoginStudents[0] || null;
+    const profile = await loadCurrentBepProfile();
+
+    if (!student) {
         wrap.innerHTML = `<div class="login-empty">
             <p>${t('login_no_students')}</p>
-            <p>${t('login_add_first')}</p>
+            <p>${t('no_students_yet')}</p>
         </div>`;
-        return;
+    } else {
+        wrap.innerHTML = `
+            <div class="login-student-card">
+                <span class="login-student-emoji">${escapeHtml(student.emoji || '🌟')}</span>
+                <span class="login-student-name">${escapeHtml(student.name)}</span>
+            </div>
+        `;
     }
-    wrap.innerHTML = students.map(s => `
-        <button type="button" class="login-student-card" onclick="selectStudentLogin('${escapeHtml(s.id)}')">
-            <span class="login-student-emoji">${escapeHtml(s.emoji || '🌟')}</span>
-            <span class="login-student-name">${escapeHtml(s.name)}</span>
-        </button>
-    `).join('');
-}
 
-function showLoginAddForm() {
-    document.getElementById('loginAddForm').style.display = '';
-    const picker = document.getElementById('loginEmojiPicker');
-    picker.innerHTML = STUDENT_EMOJIS.map((e, i) => `
-        <button type="button" class="emoji-pick-btn ${i === 0 ? 'selected' : ''}"
-            onclick="selectLoginEmoji('${e}', this)">${e}</button>
-    `).join('');
-    document.getElementById('loginNameInput').focus();
-}
-
-function hideLoginAddForm() {
-    document.getElementById('loginAddForm').style.display = 'none';
-    document.getElementById('loginNameInput').value = '';
+    if (subtitleEl) subtitleEl.textContent = student
+        ? (_lang === 'en' ? 'Update your student information' : 'Öğrenci bilgilerini güncelle')
+        : (_lang === 'en' ? 'Create your student profile to continue' : 'Devam etmek için öğrenci profilini oluştur');
+    if (saveBtn) saveBtn.textContent = student ? t('save') : t('setup_create_btn');
+    if (backBtn) backBtn.style.display = student ? '' : 'none';
+    if (statusEl) statusEl.textContent = '';
+    if (nameInput) nameInput.value = student?.name || '';
+    if (consentEl) consentEl.checked = false;
+    renderLoginEmojiPicker(student?.emoji || '🌟');
+    document.querySelectorAll('input[name="loginLevel"]').forEach(input => {
+        input.checked = input.value === (profile?.category || 'egit');
+    });
+    document.querySelectorAll('.login-cond').forEach(input => {
+        input.checked = Array.isArray(profile?.conditions) && profile.conditions.includes(input.value);
+    });
 }
 
 function selectLoginEmoji(emoji, btn) {
-    document.querySelectorAll('.emoji-pick-btn').forEach(b => b.classList.remove('selected'));
+    const hidden = document.getElementById('loginStudentEmoji');
+    if (hidden) hidden.value = emoji;
+    document.querySelectorAll('#loginEmojiPicker .emoji-pick-btn').forEach(b => b.classList.remove('selected'));
     btn.classList.add('selected');
 }
 
 async function createStudentFromLogin() {
-    const name = document.getElementById('loginNameInput').value.trim();
-    if (!name) { document.getElementById('loginNameInput').focus(); return; }
-    const veliConsent = document.getElementById('loginVeliConsent');
-    if (veliConsent && !veliConsent.checked) {
-        alert(t('kvkk_confirm_required'));
+    const nameEl = document.getElementById('loginNameInput');
+    const statusEl = document.getElementById('loginProfileStatus');
+    const saveBtn = document.getElementById('loginSaveBtn');
+    const name = nameEl.value.trim();
+    if (!name) {
+        if (statusEl) statusEl.textContent = t('student_name_required');
+        nameEl.focus();
         return;
     }
-    const selectedBtn = document.querySelector('.emoji-pick-btn.selected');
-    const emoji = selectedBtn ? selectedBtn.textContent : '🌟';
-    const students = await loadStudents();
-    const student = { id: 'st_' + Date.now(), name, emoji, createdAt: new Date().toISOString() };
-    students.push(student);
-    await saveStudents(students);
-    hideLoginAddForm();
-    renderLoginStudents(students);
-}
-
-async function selectStudentLogin(id) {
-    try {
-        const students = _cachedLoginStudents.length ? _cachedLoginStudents : await loadStudents();
-        const student = students.find(s => s.id === id);
-        if (!student) { showOnly('menu-screen'); return; }
-        activeStudentId = student.id;
-        activeStudentName = student.name;
-        childName = student.name;
-        const nameEl = document.getElementById('active-student-name');
-        if (nameEl) nameEl.textContent = student.name;
-        const greetEl = document.getElementById('menu-greeting');
-        if (greetEl) greetEl.textContent = t('menu_greeting_named').replace('{name}', student.name);
-        try { speakFallback(_lang === 'en' ? `Hello ${student.name}!` : `Merhaba ${student.name}!`); } catch(_){}
-        showOnly('menu-screen');
-        try { renderCityScene(); } catch(_){}
-    } catch(e) {
-        showOnly('menu-screen');
+    const veliConsent = document.getElementById('loginVeliConsent');
+    if (veliConsent && !veliConsent.checked) {
+        if (statusEl) statusEl.textContent = t('kvkk_confirm_required');
+        return;
     }
+    const emoji = document.getElementById('loginStudentEmoji')?.value || '🌟';
+    const students = await loadStudents();
+    const existing = students[0] || null;
+    const student = {
+        id: existing?.id || ('st_' + Date.now()),
+        name,
+        emoji,
+        createdAt: existing?.createdAt || new Date().toISOString(),
+    };
+    if (saveBtn) saveBtn.disabled = true;
+    if (statusEl) statusEl.textContent = existing ? t('updating_student') : t('creating_student');
+    await saveStudents([student]);
+    const bepKey = currentBepProfileKey();
+    if (bepKey) {
+        await DB.set(bepKey, {
+            category: document.querySelector('input[name="loginLevel"]:checked')?.value || 'egit',
+            conditions: [...document.querySelectorAll('.login-cond:checked')].map(c => c.value),
+        });
+    }
+    if (saveBtn) saveBtn.disabled = false;
+    if (statusEl) statusEl.textContent = '';
+    activeStudentId = student.id;
+    activeStudentName = student.name;
+    childName = student.name;
+    onAuthSuccessWithStudent(student);
 }
 
 function goToLogin() {
     try { window.speechSynthesis.cancel(); } catch(_){}
     showOnly('login-screen');
     loadStudents().then(renderLoginStudents);
+}
+
+async function backFromStudentProfile() {
+    const students = await loadStudents();
+    const student = students[0];
+    if (student) {
+        activeStudentId = student.id;
+        activeStudentName = student.name;
+        childName = student.name;
+        onAuthSuccessWithStudent(student);
+    }
 }
 
 // =============================================
@@ -7203,11 +7254,9 @@ function deleteBehaviorEntry(id) {
 // WINDOW EXPORTS (YENİ)
 // =============================================
 window.goToLogin = goToLogin;
-window.showLoginAddForm = showLoginAddForm;
-window.hideLoginAddForm = hideLoginAddForm;
 window.selectLoginEmoji = selectLoginEmoji;
 window.createStudentFromLogin = createStudentFromLogin;
-window.selectStudentLogin = selectStudentLogin;
+window.backFromStudentProfile = backFromStudentProfile;
 window.goToAnalysis = goToAnalysis;
 window.generateBepReport = generateBepReport;
 window.copyBepReport = copyBepReport;

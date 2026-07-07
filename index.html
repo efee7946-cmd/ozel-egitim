@@ -124,45 +124,6 @@
                 <input type="email" id="regEmail" autocomplete="email"
                     placeholder="ornek@gmail.com" required>
             </div>
-            <div class="auth-field">
-                <label data-i18n="auth_student_name">Öğrencinin Adı</label>
-                <input type="text" id="regStudentName" placeholder="örn: Ali" data-i18n-placeholder="reg_student_placeholder" required>
-            </div>
-            <div class="auth-field">
-                <label data-i18n="auth_student_emoji">Öğrenci Emojisi</label>
-                <div class="auth-emoji-picker" id="regEmojiPicker"></div>
-                <input type="hidden" id="regStudentEmoji" value="🌟">
-            </div>
-            <div class="auth-field">
-                <label data-i18n="auth_edu_level">Eğitim Kademesi</label>
-                <div class="reg-level-group">
-                    <label class="reg-level-opt">
-                        <input type="radio" name="regLevel" value="ogreti">
-                        <span data-i18n="auth_level_mild">Hafif – Öğretilebilir</span>
-                    </label>
-                    <label class="reg-level-opt">
-                        <input type="radio" name="regLevel" value="egit" checked>
-                        <span data-i18n="auth_level_moderate">Orta – Eğitilebilir</span>
-                    </label>
-                    <label class="reg-level-opt">
-                        <input type="radio" name="regLevel" value="destekli">
-                        <span data-i18n="auth_level_severe">Ağır/İleri – Desteklenen</span>
-                    </label>
-                </div>
-            </div>
-            <div class="auth-field">
-                <label data-i18n="auth_diagnosis">Tanı / Eşlik Eden Durumlar</label>
-                <div class="reg-condition-chips">
-                    <label class="reg-chip"><input type="checkbox" class="reg-cond" value="osb"> <span data-i18n="auth_cond_osb">OSB</span></label>
-                    <label class="reg-chip"><input type="checkbox" class="reg-cond" value="dehb"> <span data-i18n="auth_cond_dehb">DEHB</span></label>
-                    <label class="reg-chip"><input type="checkbox" class="reg-cond" value="dil"> <span data-i18n="auth_cond_dil">Dil / Konuşma</span></label>
-                    <label class="reg-chip"><input type="checkbox" class="reg-cond" value="down"> <span data-i18n="auth_cond_down">Down Sendromu</span></label>
-                    <label class="reg-chip"><input type="checkbox" class="reg-cond" value="cp"> <span data-i18n="auth_cond_cp">Serebral Palsi</span></label>
-                    <label class="reg-chip"><input type="checkbox" class="reg-cond" value="oog"> <span data-i18n="auth_cond_oog">Öz. Öğrenme Güçlüğü</span></label>
-                    <label class="reg-chip"><input type="checkbox" class="reg-cond" value="ekolali"> <span data-i18n="auth_cond_ekolali">Ekolali</span></label>
-                    <label class="reg-chip"><input type="checkbox" class="reg-cond" value="stereotipik"> <span data-i18n="auth_cond_stereotipik">Stereotipik Hareket</span></label>
-                </div>
-            </div>
             <div class="kvkk-consent-row">
                 <label class="kvkk-consent-label">
                     <input type="checkbox" id="kvkkConsent" required>
@@ -227,26 +188,60 @@
         <div class="login-header">
             <img src="avatar.png" class="login-logo" alt="">
             <h1 class="login-title" data-i18n="app_name">YıldızCan</h1>
-            <p class="login-subtitle" data-i18n="login_pick_who">Kim olduğunu seç!</p>
+            <p class="login-subtitle" id="loginSubtitle" data-i18n="login_pick_who">Kim olduğunu seç!</p>
         </div>
         <div class="login-students" id="loginStudents">
             <div class="login-loading" data-i18n="loading">Yükleniyor...</div>
         </div>
-        <button type="button" class="login-add-btn" onclick="showLoginAddForm()" data-i18n="login_add_student">
-            + Yeni Öğrenci Ekle
-        </button>
-        <!-- Yeni öğrenci formu (gizli) -->
-        <div class="login-add-form" id="loginAddForm" style="display:none">
-            <div class="login-emoji-picker" id="loginEmojiPicker"></div>
-            <input type="text" id="loginNameInput" class="login-name-input"
-                data-i18n-placeholder="student_placeholder" placeholder="Öğrenci adı" maxlength="30">
+        <div class="login-add-form" id="loginAddForm">
+            <div class="auth-field">
+                <label data-i18n="auth_student_name">Öğrencinin Adı</label>
+                <input type="text" id="loginNameInput" class="login-name-input"
+                    data-i18n-placeholder="student_placeholder" placeholder="Öğrenci adı" maxlength="30">
+            </div>
+            <div class="auth-field">
+                <label data-i18n="auth_student_emoji">Öğrenci Emojisi</label>
+                <div class="login-emoji-picker" id="loginEmojiPicker"></div>
+                <input type="hidden" id="loginStudentEmoji" value="🌟">
+            </div>
+            <div class="auth-field">
+                <label data-i18n="auth_edu_level">Eğitim Kademesi</label>
+                <div class="reg-level-group">
+                    <label class="reg-level-opt">
+                        <input type="radio" name="loginLevel" value="ogreti">
+                        <span data-i18n="auth_level_mild">Hafif – Öğretilebilir</span>
+                    </label>
+                    <label class="reg-level-opt">
+                        <input type="radio" name="loginLevel" value="egit" checked>
+                        <span data-i18n="auth_level_moderate">Orta – Eğitilebilir</span>
+                    </label>
+                    <label class="reg-level-opt">
+                        <input type="radio" name="loginLevel" value="destekli">
+                        <span data-i18n="auth_level_severe">Ağır/İleri – Desteklenen</span>
+                    </label>
+                </div>
+            </div>
+            <div class="auth-field">
+                <label data-i18n="auth_diagnosis">Tanı / Eşlik Eden Durumlar</label>
+                <div class="reg-condition-chips">
+                    <label class="reg-chip"><input type="checkbox" class="login-cond" value="osb"> <span data-i18n="auth_cond_osb">OSB</span></label>
+                    <label class="reg-chip"><input type="checkbox" class="login-cond" value="dehb"> <span data-i18n="auth_cond_dehb">DEHB</span></label>
+                    <label class="reg-chip"><input type="checkbox" class="login-cond" value="dil"> <span data-i18n="auth_cond_dil">Dil / Konuşma</span></label>
+                    <label class="reg-chip"><input type="checkbox" class="login-cond" value="down"> <span data-i18n="auth_cond_down">Down Sendromu</span></label>
+                    <label class="reg-chip"><input type="checkbox" class="login-cond" value="cp"> <span data-i18n="auth_cond_cp">Serebral Palsi</span></label>
+                    <label class="reg-chip"><input type="checkbox" class="login-cond" value="oog"> <span data-i18n="auth_cond_oog">Öz. Öğrenme Güçlüğü</span></label>
+                    <label class="reg-chip"><input type="checkbox" class="login-cond" value="ekolali"> <span data-i18n="auth_cond_ekolali">Ekolali</span></label>
+                    <label class="reg-chip"><input type="checkbox" class="login-cond" value="stereotipik"> <span data-i18n="auth_cond_stereotipik">Stereotipik Hareket</span></label>
+                </div>
+            </div>
             <label class="veli-consent-label">
                 <input type="checkbox" id="loginVeliConsent">
                 <span data-i18n="veli_consent_label">Bu öğrencinin velisi KVKK kapsamında bilgilendirildi ve rıza verdi.</span>
             </label>
+            <div class="auth-error login-profile-status" id="loginProfileStatus"></div>
             <div class="login-form-btns">
-                <button type="button" class="login-save-btn" onclick="createStudentFromLogin()" data-i18n="save">Kaydet</button>
-                <button type="button" class="login-cancel-btn" onclick="hideLoginAddForm()" data-i18n="cancel">İptal</button>
+                <button type="button" class="login-save-btn" id="loginSaveBtn" onclick="createStudentFromLogin()" data-i18n="save">Kaydet</button>
+                <button type="button" class="login-cancel-btn" id="loginBackBtn" onclick="backFromStudentProfile()" style="display:none" data-i18n="back_menu">← Menü</button>
             </div>
         </div>
     </div>
