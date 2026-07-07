@@ -54,14 +54,6 @@ export default async function handler(req, res) {
     }
 
     try {
-        // Apply execute permission for Linux if not already set (safety measure)
-        if (!isWin) {
-            try {
-                fs.chmodSync(piperExecPath, 0o755);
-            } catch (e) {
-                console.warn('chmodSync error:', e.message);
-            }
-        }
 
         const audioBuffer = await new Promise((resolve, reject) => {
             const child = spawn(piperExecPath, ['-m', modelPath, '--output_file', '-']);
