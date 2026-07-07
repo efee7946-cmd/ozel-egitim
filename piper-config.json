@@ -1,9 +1,9 @@
 {
   "voices": {
     "tr": {
-      "id": "tr_TR-fahrettin-medium",
-      "onnxUrl": "https://huggingface.co/rhasspy/piper-voices/resolve/v1.0.0/tr/tr_TR/fahrettin/medium/tr_TR-fahrettin-medium.onnx",
-      "jsonUrl": "https://huggingface.co/rhasspy/piper-voices/resolve/v1.0.0/tr/tr_TR/fahrettin/medium/tr_TR-fahrettin-medium.onnx.json",
+      "id": "tr_TR-fettah-medium",
+      "onnxUrl": "https://huggingface.co/rhasspy/piper-voices/resolve/v1.0.0/tr/tr_TR/fettah/medium/tr_TR-fettah-medium.onnx",
+      "jsonUrl": "https://huggingface.co/rhasspy/piper-voices/resolve/v1.0.0/tr/tr_TR/fettah/medium/tr_TR-fettah-medium.onnx.json",
       "length_scale": 1.0
     },
     "en": {
