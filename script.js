@@ -5672,23 +5672,11 @@ async function checkAuthSession() {
         const savedToken = DB.getSync(authStorageKey());
         const savedUser  = DB.getSync(authUserStorageKey());
         const savedDataKey = DB.getSync(authDataKeyStorageKey());
-        const savedEmailVerified = DB.getSync(authEmailVerifiedStorageKey());
 
         if (savedToken && savedUser) {
             _authToken = savedToken;
             _authUser  = savedUser;
             await DB.initEncryption(savedDataKey || savedToken).catch(() => {});
-            if (savedEmailVerified === false) {
-                if (savedToken && !String(savedToken).startsWith('demo_')) {
-                    authApi('logout', { token: savedToken }).catch(() => {});
-                }
-                await clearAuthSessionLocal();
-                hideSplash();
-                showOnly('auth-screen');
-                switchAuthTab('register');
-                showAuthError(t('auth_email_not_verified_register'));
-                return;
-            }
             const res = await authApi('verify', { token: savedToken });
             hideSplash();
             if (res && !res.valid && !res.fallback) {
@@ -5713,11 +5701,11 @@ async function checkAuthSession() {
                     }
                 }
                 if (res.hasEmail && !res.emailVerified) {
-                    authApi('logout', { token: savedToken }).catch(() => {});
-                    await clearAuthSessionLocal();
                     showOnly('auth-screen');
-                    switchAuthTab('register');
-                    showAuthError(t('auth_email_not_verified_register'));
+                    _pendingPostVerifyAction = () => continueAuthenticatedEntry();
+                    document.getElementById('authError').textContent = '';
+                    switchAuthTab('login');
+                    showEmailVerifyModal(null, false, true, 'logout');
                     return;
                 }
             }
@@ -6098,13 +6086,11 @@ async function handleLogin(e) {
     localStorage.setItem('lms_last_user', _authUser.username);
 
     if (res.hasEmail && !res.emailVerified) {
-        await authApi('logout', { token: _authToken }).catch(() => {});
-        const attemptedUsername = _authUser.username;
-        await clearAuthSessionLocal();
+        _pendingPostVerifyAction = () => continueAuthenticatedEntry();
         showOnly('auth-screen');
-        switchAuthTab('register');
-        document.getElementById('regUsername').value = attemptedUsername || '';
-        showAuthError(t('auth_email_not_verified_register'));
+        document.getElementById('authError').textContent = '';
+        switchAuthTab('login');
+        showEmailVerifyModal(null, false, true, 'logout');
         return;
     }
 
