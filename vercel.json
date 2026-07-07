@@ -1,6 +1,11 @@
 {
   "buildCommand": null,
   "outputDirectory": ".",
+  "functions": {
+    "api/tts.js": {
+      "includeFiles": "bin/**"
+    }
+  },
   "headers": [
     {
       "source": "/(.*)",

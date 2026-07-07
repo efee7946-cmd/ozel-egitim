@@ -5,7 +5,7 @@
   "main": "script.js",
   "scripts": {
     "test": "playwright test",
-    "build": "node build-web.js",
+    "build": "node scripts/setup-piper.js && node build-web.js",
     "cap:sync": "npm run build && npx cap sync",
     "cap:open:ios": "npx cap open ios",
     "cap:open:android": "npx cap open android"
