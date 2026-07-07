@@ -20,7 +20,7 @@ export default async function handler(req, res) {
     if (!query) return res.status(400).json({ error: 'query gerekli' });
 
     try {
-        const response = await fetch(`https://api.pexels.com/videos/search?query=${encodeURIComponent(query)}&per_page=5`, {
+        const response = await fetch(`https://api.pexels.com/videos/search?query=${encodeURIComponent(query)}&per_page=15&orientation=landscape`, {
             headers: { Authorization: PEXELS_KEY }
         });
         const data = await response.json();

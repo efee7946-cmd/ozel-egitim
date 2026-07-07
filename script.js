@@ -2318,8 +2318,8 @@ async function startTherapyWithTopic() {
 
     try {
         const prompt = _lang === 'en'
-            ? `Generate 6 short questions about "${currentTopic}" for a child (age 8-12, special education, intermediate level). Each question should relate to daily life and social skills. One question per line, maximum 10 words each. Write only the questions.`
-            : `Özel eğitim öğrencisi (8-12 yaş, orta düzey) için "${currentTopic}" konusunda 6 kısa soru üret. Her soru günlük yaşam ve sosyal beceriye yönelik olsun. Her soru yeni satırda, maksimum 10 kelime. Sadece soruları yaz.`;
+            ? `Generate 6 short questions about "${currentTopic}" for a child (age 8-12, special education, intermediate level). Each question should relate to daily life and social skills. One question per line. On each line, write the question, then a vertical bar "|" followed by a short English search term (3-5 words) for Pexels that is highly relevant to the question (e.g. "child playing football", "family eating dinner"). Write only the questions and search terms. No other text.`
+            : `Özel eğitim öğrencisi (8-12 yaş, orta düzey) için "${currentTopic}" konusunda 6 kısa soru üret. Her soru günlük yaşam ve sosyal beceriye yönelik olsun. Her soru yeni satırda olsun ve sorunun yanına dik çizgi "|" koyarak Pexels'te aratmak için soruyla doğrudan alakalı İngilizce kısa bir arama terimi (3-5 kelime) yaz. Arama terimi çocuklarla, aileyle veya sosyal ortamla ilgili olsun (örneğin: "child playing football", "family eating dinner"). Sadece soruları ve arama terimlerini yaz. Başka açıklama yazma.`;
         const res = await fetch(API_BASE + '/api/chat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', ...apiAuthHeaders() },
@@ -2328,11 +2328,18 @@ async function startTherapyWithTopic() {
         });
         const data = await res.json();
         const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-        const questions = text.split('\n')
-            .map(q => q.replace(/^[\d\-\.\*]+\s*/, '').trim())
-            .filter(q => q.length > 5)
-            .slice(0, 6)
-            .map(q => ({ q, query: currentTopic, goal: currentTopic }));
+        const lines = text.split('\n');
+        const questions = [];
+        for (const line of lines) {
+            const cleanLine = line.replace(/^[\d\-\.\*]+\s*/, '').trim();
+            if (!cleanLine) continue;
+            const parts = cleanLine.split('|');
+            const qText = parts[0].trim();
+            const engQuery = parts[1] ? parts[1].trim() : currentTopic;
+            if (qText.length > 5) {
+                questions.push({ q: qText, query: engQuery, goal: currentTopic });
+            }
+        }
 
         unaskedQuestions = questions.length ? questions : [{ q: t('therapy_fallback_q').replace('{topic}', currentTopic), query: currentTopic, goal: currentTopic }];
     } catch {
@@ -3591,9 +3598,18 @@ function getActiveTherapyQuestions() {
     return getCurrentTherapyCategory().questions;
 }
 
+function shuffleArray(array) {
+    const arr = [...array];
+    for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+}
+
 function resetTherapyQuestionPool() {
     const all = [...getActiveTherapyQuestions()];
-    unaskedQuestions = all.sort(() => 0.5 - Math.random()).slice(0, 6);
+    unaskedQuestions = shuffleArray(all).slice(0, 6);
     sessionTotalQuestions = unaskedQuestions.length;
 }
 
