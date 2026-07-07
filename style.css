@@ -4879,6 +4879,18 @@ body.a11y-reduce-motion * { transition: none !important; animation: none !import
     text-align: center; color: #3a4a8c;
 }
 .verify-code-input:focus { border-color: #667eea; outline: none; }
+.recovery-text-input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 14px 16px;
+    margin-bottom: 12px;
+    border: 2px solid #d8ddf0;
+    border-radius: 12px;
+    font-size: 1rem;
+    color: #2d3a5c;
+    background: #f9fafd;
+}
+.recovery-text-input:focus { border-color: #667eea; outline: none; background: #fff; }
 .recovery-modal-card .recovery-close-btn { margin-bottom: 8px; }
 .recovery-close-btn {
     width: 100%; padding: 13px;

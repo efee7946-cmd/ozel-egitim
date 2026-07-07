@@ -859,6 +859,9 @@ const STRINGS = {
     verify_btn: 'Doğrula ✓',
     verify_resend: 'Kodu tekrar gönder',
     verify_later: 'Daha sonra',
+    set_email_modal_title: 'E-posta Ekleyin',
+    set_email_modal_sub: 'Devam etmek için hesabınıza geçerli bir e-posta adresi eklemelisiniz.',
+    set_email_modal_btn: 'E-postayı Kaydet',
     verify_success: 'E-postanız doğrulandı! ✓',
     email_verified_label: 'Doğrulandı',
     email_unverified_label: 'Doğrulanmadı',
@@ -1757,6 +1760,9 @@ const STRINGS = {
     verify_btn: 'Verify ✓',
     verify_resend: 'Resend code',
     verify_later: 'Later',
+    set_email_modal_title: 'Add Email',
+    set_email_modal_sub: 'To continue, you must add a valid email address to your account.',
+    set_email_modal_btn: 'Save Email',
     verify_success: 'Your email is verified! ✓',
     email_verified_label: 'Verified',
     email_unverified_label: 'Not verified',
@@ -5639,6 +5645,8 @@ let _authMode     = 'login'; // 'login' | 'register'
 let _verifyModalMandatory = false;
 let _pendingPostVerifyAction = null;
 let _verifyModalExitMode = 'close';
+let _setEmailModalMandatory = false;
+let _setEmailModalExitMode = 'close';
 
 function authStorageKey()  { return 'auth_token'; }
 function authUserStorageKey() { return 'auth_user'; }
@@ -5717,6 +5725,14 @@ async function checkAuthSession() {
                     document.getElementById('authError').textContent = '';
                     switchAuthTab('login');
                     showEmailVerifyModal(null, false, true, 'logout');
+                    return;
+                }
+                if (!res.hasEmail) {
+                    showOnly('auth-screen');
+                    _pendingPostVerifyAction = () => continueAuthenticatedEntry();
+                    document.getElementById('authError').textContent = '';
+                    switchAuthTab('login');
+                    showSetEmailModal(true, 'logout');
                     return;
                 }
             }
@@ -5925,6 +5941,8 @@ async function requestResetCode() {
 function showEmailVerifyModal(emailMasked, codeAlreadySent = true, mandatory = false, exitMode = 'close') {
     const modal = document.getElementById('emailVerifyModal');
     if (!modal) return;
+    const setEmailModal = document.getElementById('setEmailModal');
+    if (setEmailModal) setEmailModal.style.display = 'none';
     _verifyModalMandatory = mandatory;
     _verifyModalExitMode = exitMode;
     document.getElementById('verifyModalText').textContent = codeAlreadySent
@@ -5942,6 +5960,26 @@ function closeVerifyModal() {
     _verifyModalExitMode = 'close';
 }
 
+function showSetEmailModal(mandatory = false, exitMode = 'close') {
+    const modal = document.getElementById('setEmailModal');
+    if (!modal) return;
+    _setEmailModalMandatory = mandatory;
+    _setEmailModalExitMode = exitMode;
+    const input = document.getElementById('setEmailInput');
+    if (input) {
+        input.value = _authUser?.email || '';
+        setTimeout(() => input.focus(), 0);
+    }
+    modal.style.display = 'flex';
+}
+
+function closeSetEmailModal() {
+    if (_setEmailModalMandatory) return;
+    const modal = document.getElementById('setEmailModal');
+    if (modal) modal.style.display = 'none';
+    _setEmailModalExitMode = 'close';
+}
+
 async function clearAuthSessionLocal() {
     DB.del(authStorageKey());
     DB.del(authUserStorageKey());
@@ -5952,7 +5990,11 @@ async function clearAuthSessionLocal() {
     _pendingPostVerifyAction = null;
     _verifyModalMandatory = false;
     _verifyModalExitMode = 'close';
+    _setEmailModalMandatory = false;
+    _setEmailModalExitMode = 'close';
     document.getElementById('emailVerifyModal').style.display = 'none';
+    const setEmailModal = document.getElementById('setEmailModal');
+    if (setEmailModal) setEmailModal.style.display = 'none';
 }
 
 async function exitVerifyModal() {
@@ -5978,6 +6020,48 @@ async function exitVerifyModal() {
     showOnly('auth-screen');
     document.getElementById('authError').textContent = '';
     switchAuthTab('login');
+}
+
+async function exitSetEmailModal() {
+    if (!_setEmailModalMandatory) {
+        closeSetEmailModal();
+        return;
+    }
+
+    if (_setEmailModalExitMode === 'delete_signup' && _authToken && !_authToken.startsWith('demo_')) {
+        await authApi('delete', { token: _authToken });
+        await clearAuthSessionLocal();
+        showOnly('auth-screen');
+        document.getElementById('authError').textContent = '';
+        switchAuthTab('register');
+        return;
+    }
+
+    if (_authToken && !_authToken.startsWith('demo_')) {
+        await authApi('logout', { token: _authToken });
+    }
+    await clearAuthSessionLocal();
+    showOnly('auth-screen');
+    document.getElementById('authError').textContent = '';
+    switchAuthTab('login');
+}
+
+async function submitSetEmailModal() {
+    const input = document.getElementById('setEmailInput');
+    const email = input ? input.value.trim() : '';
+    if (!email) return;
+    const res = await authApi('set_email', { token: _authToken, email });
+    if (res && res.ok) {
+        if (_authUser) {
+            _authUser.email = email.toLowerCase();
+            _authUser.emailVerified = false;
+        }
+        const modal = document.getElementById('setEmailModal');
+        if (modal) modal.style.display = 'none';
+        showEmailVerifyModal(res.emailMasked, !!res.verificationSent, true, _setEmailModalExitMode);
+        return;
+    }
+    showToast(t(res && res.error) || t('AUTH_EMAIL_INVALID'));
 }
 
 async function submitEmailVerification() {
@@ -6111,6 +6195,14 @@ async function handleLogin(e) {
         document.getElementById('authError').textContent = '';
         switchAuthTab('login');
         showEmailVerifyModal(null, false, true, 'logout');
+        return;
+    }
+    if (!res.hasEmail) {
+        _pendingPostVerifyAction = () => continueAuthenticatedEntry();
+        showOnly('auth-screen');
+        document.getElementById('authError').textContent = '';
+        switchAuthTab('login');
+        showSetEmailModal(true, 'logout');
         return;
     }
 
@@ -7359,6 +7451,8 @@ deleteBehaviorEntry = async function deleteBehaviorEntry(id) {
 };
 
 window.goToLogin = goToLogin;
+window.exitSetEmailModal = exitSetEmailModal;
+window.submitSetEmailModal = submitSetEmailModal;
 window.selectLoginEmoji = selectLoginEmoji;
 window.createStudentFromLogin = createStudentFromLogin;
 window.backFromStudentProfile = backFromStudentProfile;
