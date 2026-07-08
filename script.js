@@ -1904,6 +1904,118 @@ window.addEventListener('unhandledrejection', (e) => {
     );
 });
 
+function _isTherapyDebugEnabled() {
+    try {
+        const search = window.location && window.location.search ? new URLSearchParams(window.location.search) : null;
+        const host = window.location && window.location.hostname ? window.location.hostname : '';
+        return host === 'localhost' || host === '127.0.0.1' || (search && search.get('debug') === '1');
+    } catch (_) {
+        return false;
+    }
+}
+
+function _installDebugTherapyGuards() {
+    if (!_isTherapyDebugEnabled()) return;
+    window.__debugTherapyGuards = async function __debugTherapyGuards() {
+        const results = [];
+        const originalCurrentObj = currentObj;
+        const originalIsWaiting = isWaiting;
+        const originalTurnCount = turnCount;
+        const infoEl = document.getElementById('info');
+        const micBtn = document.getElementById('micBtn');
+        const originalInfo = infoEl ? infoEl.innerText : '';
+        const originalMicDisabled = micBtn ? micBtn.disabled : null;
+        const originalDBGet = DB.get;
+        const originalGetCurrentUserId = getCurrentUserId;
+        const originalWarn = console.warn;
+        const warnCalls = [];
+
+        console.warn = function() {
+            warnCalls.push(Array.from(arguments));
+            return originalWarn.apply(console, arguments);
+        };
+
+        async function runCase(name, fn) {
+            try {
+                const detail = await fn();
+                results.push({ test: name, status: 'pass', detail: detail || '' });
+            } catch (error) {
+                results.push({
+                    test: name,
+                    status: 'fail',
+                    detail: error && error.message ? error.message : String(error)
+                });
+            }
+        }
+
+        try {
+            await runCase('startQuestion currentObj null guard', async function() {
+                currentObj = null;
+                isWaiting = true;
+                startQuestion();
+                if (isWaiting !== false) throw new Error('isWaiting should reset to false');
+                if (!warnCalls.some(call => String(call[0]).indexOf('startQuestion: missing currentObj') === 0)) {
+                    throw new Error('missing startQuestion warning');
+                }
+                return 'guard returned without crash';
+            });
+
+            await runCase('processTherapySpeech safe exit', async function() {
+                currentObj = null;
+                isWaiting = true;
+                if (micBtn) micBtn.disabled = true;
+                await processTherapySpeech('debug answer', 'mic');
+                if (isWaiting !== false) throw new Error('isWaiting should reset to false');
+                if (micBtn && micBtn.disabled) throw new Error('mic button should be re-enabled');
+                if (!warnCalls.some(call => String(call[0]).indexOf('processTherapySpeech: missing currentObj') === 0)) {
+                    throw new Error('missing processTherapySpeech warning');
+                }
+                return 'speech aborted safely';
+            });
+
+            await runCase('loadReportHistory payload normalization', async function() {
+                const payloads = [
+                    { label: 'array', value: [] },
+                    { label: 'wrapped', value: { data: [] } },
+                    { label: 'null', value: null },
+                    { label: 'error-object', value: { error: 'debug' } }
+                ];
+                getCurrentUserId = async function() { return 'debug-user'; };
+                for (const payload of payloads) {
+                    DB.get = async function(key) {
+                        if (String(key).indexOf('session_history_') === 0) return payload.value;
+                        return null;
+                    };
+                    const history = await loadReportHistory();
+                    if (!Array.isArray(history)) {
+                        throw new Error(payload.label + ' did not return an array');
+                    }
+                }
+                const sawWrapped = warnCalls.some(call => String(call[0]).indexOf('loadReportHistory: normalized wrapped history payload') === 0);
+                const sawUnexpected = warnCalls.some(call => String(call[0]).indexOf('loadReportHistory: unexpected history payload') === 0);
+                if (!sawWrapped || !sawUnexpected) {
+                    throw new Error('expected normalization warnings were not emitted');
+                }
+                return 'array, wrapped, null and error object handled';
+            });
+        } finally {
+            console.warn = originalWarn;
+            DB.get = originalDBGet;
+            getCurrentUserId = originalGetCurrentUserId;
+            currentObj = originalCurrentObj;
+            isWaiting = originalIsWaiting;
+            turnCount = originalTurnCount;
+            if (infoEl) infoEl.innerText = originalInfo;
+            if (micBtn && originalMicDisabled !== null) micBtn.disabled = originalMicDisabled;
+        }
+
+        console.table(results);
+        return results;
+    };
+}
+
+_installDebugTherapyGuards();
+
 // =============================================
 // GENEL DEĞİŞKENLER
 // =============================================
@@ -2896,7 +3008,19 @@ function hasSessionActivity() {
 async function loadReportHistory() {
     const userId = await getCurrentUserId();
     if (!userId) return [];
-    const all = await DB.get('session_history_' + userId) || [];
+    const raw = await DB.get('session_history_' + userId);
+    let all = [];
+    if (Array.isArray(raw)) {
+        all = raw;
+    } else if (raw && Array.isArray(raw.data)) {
+        all = raw.data;
+        console.warn('loadReportHistory: normalized wrapped history payload', { userId });
+    } else if (raw != null) {
+        console.warn('loadReportHistory: unexpected history payload, using empty list', {
+            userId,
+            payloadType: typeof raw
+        });
+    }
     const data = activeStudentId ? all.filter(h => h.student_id === activeStudentId) : all;
     return data.slice(0, 180).map(mapHistoryRow);
 }
@@ -3852,6 +3976,15 @@ async function loadNext() {
 }
 
 function startQuestion() {
+    if (!currentObj || typeof currentObj.q !== 'string' || !currentObj.q.trim()) {
+        console.warn('startQuestion: missing currentObj, skipping question render', {
+            hasCurrentObj: Boolean(currentObj),
+            turnCount
+        });
+        document.getElementById('info').innerText = t('info_next_question');
+        isWaiting = false;
+        return;
+    }
     var vEl = document.getElementById('v');
     vEl.pause();
     isWaiting = true;
@@ -3869,6 +4002,20 @@ function startQuestion() {
 
 async function processTherapySpeech(speech, source) {
     if (!speech) return;
+    const questionText = currentObj && typeof currentObj.q === 'string' ? currentObj.q : '';
+    if (!questionText) {
+        console.warn('processTherapySpeech: missing currentObj, aborting speech processing safely', {
+            source: source || 'mic',
+            speechLength: speech.length,
+            turnCount
+        });
+        document.getElementById('micBtn').disabled = false;
+        document.getElementById('info').innerText = t('info_next_question');
+        isWaiting = false;
+        return;
+    }
+    const category = getCurrentTherapyCategory();
+    const categoryLabel = category && category.label ? category.label : t('report_other');
     if (source === 'card') sessionData.cardUsedInTherapy++;
     else sessionData.micUsedInTherapy++;
     addMessage(speech, "user");
@@ -3895,8 +4042,8 @@ async function processTherapySpeech(speech, source) {
     const currentLocation = CITY_LOCATIONS[currentCityLocationKey];
     sessionData.therapyTurns.push({
         location: currentLocation ? currentLocation.label : '',
-        category: getCurrentTherapyCategory().label,
-        question: currentObj.q,
+        category: categoryLabel,
+        question: questionText,
         answer: speech,
         via: source === 'card' ? 'card' : 'mic'
     });
