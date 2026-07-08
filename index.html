@@ -444,6 +444,23 @@ document.addEventListener('DOMContentLoaded', function(){
                 data-i18n-placeholder="therapy_topic_placeholder"
                 placeholder="örn: alışveriş, futbol, okul..." maxlength="60"
                 onkeydown="if(event.key==='Enter') startTherapyWithTopic()">
+            <div class="topic-levels">
+                <p class="topic-level-title" data-i18n="therapy_level_title">Hangi düzeyde başlamak istersin?</p>
+                <div class="topic-level-options">
+                    <button type="button" class="topic-level-btn" data-level="word" onclick="setTherapyLevel('word')">
+                        <strong data-i18n="therapy_level_word">Tek Kelime</strong>
+                        <span data-i18n="therapy_level_word_example">Örn: su, anne, top</span>
+                    </button>
+                    <button type="button" class="topic-level-btn" data-level="sentence" onclick="setTherapyLevel('sentence')">
+                        <strong data-i18n="therapy_level_sentence">Kısa Cümle</strong>
+                        <span data-i18n="therapy_level_sentence_example">Örn: Okula annemle giderim</span>
+                    </button>
+                    <button type="button" class="topic-level-btn" data-level="tell" onclick="setTherapyLevel('tell')">
+                        <strong data-i18n="therapy_level_tell">Anlat Bakalım</strong>
+                        <span data-i18n="therapy_level_tell_example">Örn: Bugün neler yaptığını anlat</span>
+                    </button>
+                </div>
+            </div>
             <div class="topic-suggestions">
                 <button type="button" class="topic-chip" onclick="setTopicChip(t('topic_shopping'))">🛒 <span data-i18n="topic_shopping">Alışveriş</span></button>
                 <button type="button" class="topic-chip" onclick="setTopicChip(t('topic_school'))">🏫 <span data-i18n="topic_school">Okul</span></button>

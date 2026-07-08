@@ -662,6 +662,13 @@ const STRINGS = {
     therapy_topic_title: 'Hangi konuyu çalışalım?',
     therapy_topic_sub: 'Bir konu yaz, Yıldız Can o konuyla ilgili sorular soracak.',
     therapy_topic_placeholder: 'örn: alışveriş, futbol, okul...',
+    therapy_level_title: 'Hangi düzeyde başlamak istersin?',
+    therapy_level_word: 'Tek Kelime',
+    therapy_level_word_example: 'Örn: su, anne, top',
+    therapy_level_sentence: 'Kısa Cümle',
+    therapy_level_sentence_example: 'Örn: Okula annemle giderim',
+    therapy_level_tell: 'Anlat Bakalım',
+    therapy_level_tell_example: 'Örn: Bugün neler yaptığını anlat',
     therapy_start_btn: 'Başla →',
     therapy_loading: 'Sorular hazırlanıyor...',
     therapy_progress: 'Soru {a} / {t}',
@@ -1565,6 +1572,13 @@ const STRINGS = {
     therapy_topic_title: 'What topic shall we work on?',
     therapy_topic_sub: 'Type a topic and Yıldız Can will ask questions about it.',
     therapy_topic_placeholder: 'e.g. shopping, sports, school...',
+    therapy_level_title: 'How would you like to start?',
+    therapy_level_word: 'One Word',
+    therapy_level_word_example: 'e.g. water, mom, ball',
+    therapy_level_sentence: 'Short Sentence',
+    therapy_level_sentence_example: 'e.g. I go with my mom',
+    therapy_level_tell: 'Tell Me More',
+    therapy_level_tell_example: 'e.g. Tell me what you did today',
     therapy_start_btn: 'Start →',
     therapy_loading: 'Getting questions ready...',
     therapy_progress: 'Question {a} / {t}',
@@ -2449,6 +2463,7 @@ function goToTherapy() {
     document.getElementById('topicInput').value = '';
     document.getElementById('topicLoading').style.display = 'none';
     document.getElementById('topicStartBtn').style.display = '';
+    renderTherapyLevelOptions();
     setTimeout(() => document.getElementById('topicInput').focus(), 100);
 }
 
@@ -2461,18 +2476,22 @@ async function startTherapyWithTopic() {
     const input = document.getElementById('topicInput').value.trim();
     if (!input) return;
     currentTopic = input;
+    const level = getCurrentTherapyLevel();
 
     document.getElementById('topicLoading').style.display = 'flex';
     document.getElementById('topicStartBtn').style.display = 'none';
 
     try {
         const prompt = _lang === 'en'
-            ? `Generate 6 short questions about "${currentTopic}" for a child (age 8-12, special education, intermediate level). Each question should relate to daily life and social skills. One question per line. On each line, write the question, then a vertical bar "|" followed by a short English search term (3-5 words) for Pexels that is highly relevant to the question (e.g. "child playing football", "family eating dinner"). Write only the questions and search terms. No other text.`
+            ? `Generate 6 short questions about "${currentTopic}" for a child (age 8-12, special education support). Each question should relate to daily life and social communication. ${level.promptHintEn} One question per line. On each line, write the question, then a vertical bar "|" followed by a short English search term (3-5 words) for Pexels that is highly relevant to the question (for example: "child playing football", "family eating dinner"). Write only the questions and search terms. No other text.`
             : `Özel eğitim öğrencisi (8-12 yaş, orta düzey) için "${currentTopic}" konusunda 6 kısa soru üret. Her soru günlük yaşam ve sosyal beceriye yönelik olsun. Her soru yeni satırda olsun ve sorunun yanına dik çizgi "|" koyarak Pexels'te aratmak için soruyla doğrudan alakalı İngilizce kısa bir arama terimi (3-5 kelime) yaz. Arama terimi çocuklarla, aileyle veya sosyal ortamla ilgili olsun (örneğin: "child playing football", "family eating dinner"). Sadece soruları ve arama terimlerini yaz. Başka açıklama yazma.`;
+        const therapyPrompt = _lang === 'en'
+            ? prompt
+            : `Özel eğitim desteği alan bir çocuk (8-12 yaş) için "${currentTopic}" konusunda 6 kısa soru üret. Her soru günlük yaşam ve sosyal iletişimle ilgili olsun. ${level.promptHintTr} Her soru yeni satırda olsun ve sorunun yanına dik çizgi "|" koyarak Pexels'te aratmak için soruyla doğrudan alakalı İngilizce kısa bir arama terimi (3-5 kelime) yaz. Arama terimi çocuklarla, aileyle veya sosyal ortamla ilgili olsun (örneğin: "child playing football", "family eating dinner"). Sadece soruları ve arama terimlerini yaz. Başka açıklama yazma.`;
         const res = await fetch(API_BASE + '/api/chat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', ...apiAuthHeaders() },
-            body: JSON.stringify({ contents: [{ role: 'user', parts: [{ text: prompt }] }] }),
+            body: JSON.stringify({ contents: [{ role: 'user', parts: [{ text: therapyPrompt }] }] }),
             signal: AbortSignal.timeout(15000)
         });
         const data = await res.json();
@@ -2504,6 +2523,7 @@ async function startTherapyWithTopic() {
     const badge = document.getElementById('therapyTopicBadge');
     if (badge) badge.textContent = `🎯 ${currentTopic}`;
 
+    updateTherapyTopicBadge();
     document.getElementById('topicOverlay').style.display = 'none';
     document.getElementById('therapyMainCard').style.display = '';
     document.getElementById('chat-bubbles').innerHTML = '';
@@ -3442,6 +3462,31 @@ function _loadFallbackVideo(vEl) {
     };
     vEl.onerror = function() { clearTimeout(t); startQuestion(); };
 }
+
+const THERAPY_LEVELS = {
+    word: {
+        labelKey: 'therapy_level_word',
+        promptHintEn: 'Questions must be very concrete and answerable with one word or a very short 2-word phrase. Avoid why/how questions.',
+        promptHintTr: 'Sorular çok somut olmalı ve tek kelime ya da en fazla 2 kelimelik çok kısa ifadeyle cevaplanabilmeli. Neden/nasıl soruları sorma.',
+        replyRuleEn: 'ONE-WORD MODE: Every reply must be MAXIMUM 4 short words before the emoji.',
+        replyRuleTr: 'TEK KELİME MODU: Her cevabın emojiden önce EN FAZLA 4 kısa kelime olsun.'
+    },
+    sentence: {
+        labelKey: 'therapy_level_sentence',
+        promptHintEn: 'Questions should stay concrete and be answerable with one short sentence.',
+        promptHintTr: 'Sorular somut kalmalı ve tek kısa cümleyle cevaplanabilmeli.',
+        replyRuleEn: 'SHORT-SENTENCE MODE: Every reply must be MAXIMUM 7 short words before the emoji.',
+        replyRuleTr: 'KISA CÜMLE MODU: Her cevabın emojiden önce EN FAZLA 7 kısa kelime olsun.'
+    },
+    tell: {
+        labelKey: 'therapy_level_tell',
+        promptHintEn: 'Questions can be a little more open-ended, but still child-friendly and grounded in daily life.',
+        promptHintTr: 'Sorular biraz daha açık uçlu olabilir ama yine çocuk dostu ve günlük yaşamla bağlantılı kalmalı.',
+        replyRuleEn: 'TELL-ME-MORE MODE: Every reply must be MAXIMUM 10 simple words before the emoji.',
+        replyRuleTr: 'ANLAT BAKALIM MODU: Her cevabın emojiden önce EN FAZLA 10 basit kelime olsun.'
+    }
+};
+
 const THERAPY_CATEGORIES = {
     daily_life: {
         emoji: '🏠',
@@ -3510,6 +3555,58 @@ const THERAPY_CATEGORIES = {
             { get q() { return t('therapy_play_sports_q9'); }, query: "children passing ball teamwork", get goal() { return t('therapy_play_sports_goal9'); } },
             { get q() { return t('therapy_play_sports_q10'); }, query: "child trying sports outdoors", get goal() { return t('therapy_play_sports_goal10'); } }
         ]
+    }
+};
+
+const THERAPY_LEVEL_BUCKETS = {
+    category: {
+        daily_life: {
+            word: [0, 1, 2, 3, 6, 7],
+            sentence: [4, 5, 8, 9, 1, 3],
+            tell: [0, 4, 5, 8, 9, 6]
+        },
+        emotions: {
+            word: [0, 1, 2, 4, 5, 7],
+            sentence: [1, 2, 5, 6, 8, 9],
+            tell: [3, 4, 6, 7, 8, 9]
+        },
+        social_communication: {
+            word: [0, 1, 2, 5, 6, 8],
+            sentence: [3, 4, 7, 8, 9, 0],
+            tell: [1, 2, 3, 4, 7, 9]
+        },
+        play_sports: {
+            word: [0, 1, 2, 3, 8, 9],
+            sentence: [4, 5, 6, 7, 8, 0],
+            tell: [1, 4, 5, 6, 7, 9]
+        }
+    },
+    location: {
+        home: {
+            word: [0, 1, 2, 4, 6, 9],
+            sentence: [3, 4, 5, 7, 8, 1],
+            tell: [0, 3, 5, 8, 9, 2]
+        },
+        school: {
+            word: [0, 1, 2, 5, 7, 9],
+            sentence: [3, 4, 6, 8, 9, 1],
+            tell: [1, 2, 3, 4, 6, 8]
+        },
+        market: {
+            word: [0, 1, 2, 5, 6, 7],
+            sentence: [3, 4, 7, 8, 9, 1],
+            tell: [2, 3, 4, 8, 9, 6]
+        },
+        park: {
+            word: [0, 1, 2, 4, 5, 9],
+            sentence: [2, 3, 5, 6, 9, 0],
+            tell: [3, 6, 7, 8, 9, 4]
+        },
+        hospital: {
+            word: [0, 1, 2, 4, 7, 9],
+            sentence: [3, 4, 5, 7, 8, 9],
+            tell: [1, 2, 3, 5, 6, 8]
+        }
     }
 };
 
@@ -3613,6 +3710,7 @@ const CITY_LOCATIONS = {
 
 let currentTherapyCategoryKey = 'daily_life';
 let currentCityLocationKey = 'school';
+let currentTherapyLevelKey = 'sentence';
 let _useLocationQuestions = true;
 let unaskedQuestions = [...CITY_LOCATIONS[currentCityLocationKey].questions];
 let currentObj = null;
@@ -3768,14 +3866,60 @@ function getCurrentCityLocation() {
     return CITY_LOCATIONS[currentCityLocationKey] || CITY_LOCATIONS.school;
 }
 
+function getCurrentTherapyLevel() {
+    return THERAPY_LEVELS[currentTherapyLevelKey] || THERAPY_LEVELS.sentence;
+}
+
+function renderTherapyLevelOptions() {
+    document.querySelectorAll('.topic-level-btn').forEach((btn) => {
+        btn.classList.toggle('active', btn.dataset.level === currentTherapyLevelKey);
+    });
+}
+
+function setTherapyLevel(levelKey) {
+    if (!THERAPY_LEVELS[levelKey]) return;
+    currentTherapyLevelKey = levelKey;
+    renderTherapyLevelOptions();
+    updateTherapyTopicBadge();
+}
+
+function updateTherapyTopicBadge() {
+    const badge = document.getElementById('therapyTopicBadge');
+    if (!badge) return;
+    const levelLabel = t(getCurrentTherapyLevel().labelKey);
+    if (currentTopic) {
+        badge.textContent = `🎯 ${currentTopic} • ${levelLabel}`;
+        return;
+    }
+    const location = _useLocationQuestions ? getCurrentCityLocation() : null;
+    const label = location ? location.label : getCurrentTherapyCategory().label;
+    badge.textContent = label ? `🗣️ ${label} • ${levelLabel}` : '';
+}
+
+function getQuestionsForCurrentLevel(questions, sourceType, sourceKey) {
+    if (!Array.isArray(questions) || !questions.length) return [];
+    const sourceBuckets = THERAPY_LEVEL_BUCKETS[sourceType] && THERAPY_LEVEL_BUCKETS[sourceType][sourceKey];
+    const indexes = sourceBuckets && Array.isArray(sourceBuckets[currentTherapyLevelKey]) ? sourceBuckets[currentTherapyLevelKey] : null;
+    if (!indexes || !indexes.length) return questions;
+    const selected = indexes.map(index => questions[index]).filter(Boolean);
+    const seen = new Set(selected);
+    for (const question of questions) {
+        if (selected.length >= 6) break;
+        if (seen.has(question)) continue;
+        selected.push(question);
+        seen.add(question);
+    }
+    return selected;
+}
+
 function getActiveTherapyQuestions() {
     if (_useLocationQuestions) {
         const location = getCurrentCityLocation();
         if (location && Array.isArray(location.questions) && location.questions.length) {
-            return location.questions;
+            return getQuestionsForCurrentLevel(location.questions, 'location', currentCityLocationKey);
         }
     }
-    return getCurrentTherapyCategory().questions;
+    return getQuestionsForCurrentLevel(getCurrentTherapyCategory().questions, 'category', currentTherapyCategoryKey);
 }
 
 function shuffleArray(array) {
@@ -3791,6 +3935,7 @@ function resetTherapyQuestionPool() {
     const all = [...getActiveTherapyQuestions()];
     unaskedQuestions = shuffleArray(all).slice(0, 6);
     sessionTotalQuestions = unaskedQuestions.length;
+    updateTherapyTopicBadge();
 }
 
 function showTherapySessionComplete() {
@@ -3869,6 +4014,7 @@ function renderCityScene() {
 function setTherapyCategory(categoryKey, shouldReload = true) {
     if (!THERAPY_CATEGORIES[categoryKey]) return;
     currentTherapyCategoryKey = categoryKey;
+    currentTopic = '';
     _useLocationQuestions = false;
     turnCount = 0;
     currentObj = null;
@@ -3889,6 +4035,7 @@ function focusCityLocation(locationKey) {
     const location = CITY_LOCATIONS[locationKey];
     if (!location) return;
     currentCityLocationKey = locationKey;
+    currentTopic = '';
     currentTherapyCategoryKey = location.category;
     _useLocationQuestions = true;
     resetTherapyQuestionPool();
@@ -3897,6 +4044,7 @@ function focusCityLocation(locationKey) {
 
 function startFocusedCityLocation() {
     const location = getCurrentCityLocation();
+    currentTopic = '';
     setTherapyCategory(location.category, false);
     setTherapySelectionMode(false);
     renderTherapyCategories();
@@ -4381,13 +4529,14 @@ async function getGemmaResponse(text) {
     var url = "/api/chat";
     chatHistory.push({ role: "user", parts: [{ text: text }] });
     const currentCategory = getCurrentTherapyCategory();
+    const currentLevel = getCurrentTherapyLevel();
     const currentGoal = currentObj && currentObj.goal ? currentObj.goal : (_lang === 'en' ? 'clear and concise communication' : 'kısa ve anlaşılır konuşma');
     const currentLocation = CITY_LOCATIONS[currentCityLocationKey];
     var instructions = _lang === 'en'
         ? `You are a friendly AAC (Augmentative and Alternative Communication) companion bot working with special-education students on social skills, daily routines, and community life. Your name is Yıldız Can. Current topic: ${currentTopic || currentCategory.label}. Goal for this question: ${currentGoal}. Always remember the student's limited attention and verbal comprehension.
 
 STRICT INTERACTION RULES:
-1. ONE-SENTENCE RULE: Every reply must be MAXIMUM 1 short sentence (6-7 words max). No long paragraphs, lectures, or conditional advice.
+1. ${currentLevel.replyRuleEn} No long paragraphs, lectures, or conditional advice.
 2. EMOJI SUPPORT: Add one appropriate emoji at the end of your sentence to support comprehension (e.g. ⚽ 🟥 🤫 👋).
 3. INAPPROPRIATE LANGUAGE: If the student uses swearing or rude words, NEVER repeat, criticize, or comment on them. Ignore the behavior entirely and redirect.
 4. NO ANSWERING FOR THE CHILD: Never generate confirmations or statements on the child's behalf. Always keep control with the student.
@@ -4400,6 +4549,17 @@ KATI ETKİLEŞİM VE DİL KURALLARI:
 3. ARGO VE REAKSİYONEL DİRENÇ SÖNÜMLENDİRME: Öğrenci küfür veya argo kullanırsa bu kelimeleri ASLA tekrarlama, eleştirme veya "küfür etme" deme. Hatalı davranışı tamamen görmezden gel.
 4. ÇOCUĞUN ADINA CEVAP VERME YASAĞI: Öğrenci yerine onun söylemediği onaylama cümleleri üretme. Kontrolü her zaman öğrenciye bırak.
 5. AKRAN DİLİYLE ALTERNATİF SUNMA: Öğrenci olumsuz davranışta ısrar ederse duyguyu çok kısa onayla, kabul edilebilir akran modelini sun ve sahneyi değiştir. (Örn: "Maçta öfkelenmek normal! ⚽ Ama hakeme sadece 'Hocam bence fauldü' diyebiliriz.")`;
+
+    if (_lang !== 'en') {
+        instructions = `Sen özel eğitim öğrencileriyle sosyal uyum, kurallar ve günlük yaşam rutinleri çalışan, çok kısa ve somut konuşan bir AAC (Alternatif İletişim) oyun arkadaşı botsun. Adın Yıldız Can. Çalışılan konu: ${currentTopic || currentCategory.label}. Bu sorunun hedefi: ${currentGoal}. Öğrencinin dikkat ve sözel anlama sınırlılıklarını asla unutma.
+
+KATI ETKİLEŞİM VE DİL KURALLARI:
+1. ${currentLevel.replyRuleTr} Asla uzun paragraflar, didaktik açıklamalar veya şartlı nasihatler yapma.
+2. SOYUT DÜŞÜNME VE EMOJİ DESTEĞİ: Soyut kavramları somutlaştırmak için cümlenin sonuna tek bir uygun emoji koy (Örn: ⚽ 🟥 🤫 👋).
+3. ARGO VE REAKSİYONEL DİRENÇ SÖNÜMLENDİRME: Öğrenci küfür veya argo kullanırsa bu kelimeleri ASLA tekrarlama, eleştirme veya "küfür etme" deme. Hatalı davranışı tamamen görmezden gel.
+4. ÇOCUĞUN ADINA CEVAP VERME YASAĞI: Öğrenci yerine onun söylemediği onaylama cümleleri üretme. Kontrolü her zaman öğrenciye bırak.
+5. AKRAN DİLİYLE ALTERNATİF SUNMA: Öğrenci olumsuz davranışta ısrar ederse duyguyu çok kısa onayla, kabul edilebilir akran modelini sun ve sahneyi değiştir. (Örn: "Maçta öfkelenmek normal! ⚽ Ama hakeme sadece 'Hocam bence fauldü' diyebiliriz.")`;
+    }
 
     var payload = {
         contents: [
@@ -5936,6 +6096,7 @@ window.continueAsGuest = continueAsGuest;
 window.goToMenu = goToMenu;
 window.goToTherapy = goToTherapy;
 window.setTopicChip = setTopicChip;
+window.setTherapyLevel = setTherapyLevel;
 window.startTherapyWithTopic = startTherapyWithTopic;
 window.setTherapyCategory = setTherapyCategory;
 window.focusCityLocation = focusCityLocation;
