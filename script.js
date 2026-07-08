@@ -2543,24 +2543,24 @@ function createSessionHistoryId() {
 function mapHistoryRow(row) {
     return {
         id: row.id,
-        createdAt: row.created_at,
-        dateKey: row.session_date,
+        createdAt: getHistoryTimestamp(row),
+        dateKey: row.session_date || row.dateKey || getDateKey(new Date()),
         childName: row.child_name || '',
-        durationMin: row.duration_min || 0,
-        totalMic: row.total_mic || 0,
-        storyPct: row.story_pct || '-',
-        totalTurns: row.total_turns || 0,
-        storyCompleted: !!row.story_completed,
-        storyName: row.story_name || '',
-        totalScenesReached: row.total_scenes_reached || 0,
-        totalScenes: row.total_scenes || 0,
-        micUsedInStory: row.mic_used_in_story || 0,
-        micUsedInTherapy: row.mic_used_in_therapy || 0,
-        cardUsedInTherapy: row.card_used_in_therapy || 0,
-        repeatUsed: row.repeat_used || 0,
-        simplifyUsed: row.simplify_used || 0,
-        therapyTurns: Array.isArray(row.therapy_turns) ? row.therapy_turns : [],
-        storyChoices: Array.isArray(row.story_choices) ? row.story_choices : [],
+        durationMin: row.duration_min || row.durationMin || 0,
+        totalMic: row.total_mic || row.totalMic || 0,
+        storyPct: row.story_pct || row.storyPct || '-',
+        totalTurns: row.total_turns || row.totalTurns || 0,
+        storyCompleted: typeof row.story_completed !== 'undefined' ? !!row.story_completed : !!row.storyCompleted,
+        storyName: row.story_name || row.storyName || '',
+        totalScenesReached: row.total_scenes_reached || row.totalScenesReached || 0,
+        totalScenes: row.total_scenes || row.totalScenes || 0,
+        micUsedInStory: row.mic_used_in_story || row.micUsedInStory || 0,
+        micUsedInTherapy: row.mic_used_in_therapy || row.micUsedInTherapy || 0,
+        cardUsedInTherapy: row.card_used_in_therapy || row.cardUsedInTherapy || 0,
+        repeatUsed: row.repeat_used || row.repeatUsed || 0,
+        simplifyUsed: row.simplify_used || row.simplifyUsed || 0,
+        therapyTurns: Array.isArray(row.therapy_turns) ? row.therapy_turns : (Array.isArray(row.therapyTurns) ? row.therapyTurns : []),
+        storyChoices: Array.isArray(row.story_choices) ? row.story_choices : (Array.isArray(row.storyChoices) ? row.storyChoices : []),
     };
 }
 
@@ -2793,7 +2793,7 @@ async function renderStudentDetailPanel() {
     }
 
     if (metrics.latestSession) {
-        const sessionDate = new Date(metrics.latestSession.created_at).toLocaleDateString(_lang === 'en' ? 'en-US' : 'tr-TR');
+        const sessionDate = new Date(getHistoryTimestamp(metrics.latestSession)).toLocaleDateString(_lang === 'en' ? 'en-US' : 'tr-TR');
         sessionEl.textContent = t('sd_session_line')
             .replace('{date}', sessionDate)
             .replace('{min}', metrics.latestSession.duration_min || 0)
@@ -2969,10 +2969,13 @@ async function updateStudent() {
 }
 
 function buildSessionSnapshot(userId, durationMin, totalMic, storyPct, totalTurns) {
+    const createdAt = new Date().toISOString();
     return {
         id: sessionData.reportEntryId || createSessionHistoryId(),
         user_id: userId,
         created_by: userId,
+        created_at: createdAt,
+        updated_at: createdAt,
         student_id: activeStudentId || null,
         session_date: getDateKey(new Date()),
         child_name: activeStudentName || childName,
@@ -3003,6 +3006,19 @@ function hasSessionActivity() {
         sessionData.micUsedInTherapy ||
         sessionData.cardUsedInTherapy
     );
+}
+
+function getHistoryTimestamp(row) {
+    const direct = row && (row.createdAt || row.created_at || row.updatedAt || row.updated_at);
+    if (direct) {
+        const parsed = new Date(direct);
+        if (!Number.isNaN(parsed.getTime())) return direct;
+    }
+    const dateKey = row && (row.dateKey || row.session_date);
+    if (typeof dateKey === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(dateKey)) {
+        return `${dateKey}T12:00:00`;
+    }
+    return '';
 }
 
 async function loadReportHistory() {
@@ -3230,7 +3246,10 @@ async function _populateReportTab() {
 
     // İstatistikler son 7 günü anlatır — rapor ne zaman açılırsa açılsın dolu
     const weekAgo = Date.now() - 7 * 86400000;
-    const week = history.filter(h => new Date(h.createdAt).getTime() >= weekAgo);
+    const week = history.filter(h => {
+        const ts = getHistoryTimestamp(h);
+        return ts ? new Date(ts).getTime() >= weekAgo : false;
+    });
     const weekMinutes = week.reduce((s, h) => s + (h.durationMin || 0), 0);
     const weekTurns = week.reduce((s, h) => s + (h.totalTurns || 0), 0);
     const weekMic = week.reduce((s, h) => s + (h.micUsedInTherapy || 0), 0);
