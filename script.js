@@ -2477,41 +2477,47 @@ async function startTherapyWithTopic() {
     if (!input) return;
     currentTopic = input;
     const level = getCurrentTherapyLevel();
+    const presetQuestions = getPresetTherapyQuestionsForTopic(currentTopic, currentTherapyLevelKey);
 
     document.getElementById('topicLoading').style.display = 'flex';
     document.getElementById('topicStartBtn').style.display = 'none';
 
     try {
-        const prompt = _lang === 'en'
-            ? `Generate 6 short questions about "${currentTopic}" for a child (age 8-12, special education support). Each question should relate to daily life and social communication. ${level.promptHintEn} One question per line. On each line, write the question, then a vertical bar "|" followed by a short English search term (3-5 words) for Pexels that is highly relevant to the question (for example: "child playing football", "family eating dinner"). Write only the questions and search terms. No other text.`
-            : `Özel eğitim öğrencisi (8-12 yaş, orta düzey) için "${currentTopic}" konusunda 6 kısa soru üret. Her soru günlük yaşam ve sosyal beceriye yönelik olsun. Her soru yeni satırda olsun ve sorunun yanına dik çizgi "|" koyarak Pexels'te aratmak için soruyla doğrudan alakalı İngilizce kısa bir arama terimi (3-5 kelime) yaz. Arama terimi çocuklarla, aileyle veya sosyal ortamla ilgili olsun (örneğin: "child playing football", "family eating dinner"). Sadece soruları ve arama terimlerini yaz. Başka açıklama yazma.`;
-        const therapyPrompt = _lang === 'en'
-            ? prompt
-            : `Özel eğitim desteği alan bir çocuk (8-12 yaş) için "${currentTopic}" konusunda 6 kısa soru üret. Her soru günlük yaşam ve sosyal iletişimle ilgili olsun. ${level.promptHintTr} Her soru yeni satırda olsun ve sorunun yanına dik çizgi "|" koyarak Pexels'te aratmak için soruyla doğrudan alakalı İngilizce kısa bir arama terimi (3-5 kelime) yaz. Arama terimi çocuklarla, aileyle veya sosyal ortamla ilgili olsun (örneğin: "child playing football", "family eating dinner"). Sadece soruları ve arama terimlerini yaz. Başka açıklama yazma.`;
-        const res = await fetch(API_BASE + '/api/chat', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', ...apiAuthHeaders() },
-            body: JSON.stringify({ contents: [{ role: 'user', parts: [{ text: therapyPrompt }] }] }),
-            signal: AbortSignal.timeout(15000)
-        });
-        const data = await res.json();
-        const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-        const lines = text.split('\n');
-        const questions = [];
-        for (const line of lines) {
-            const cleanLine = line.replace(/^[\d\-\.\*]+\s*/, '').trim();
-            if (!cleanLine) continue;
-            const parts = cleanLine.split('|');
-            const qText = parts[0].trim();
-            const engQuery = parts[1] ? parts[1].trim() : currentTopic;
-            if (qText.length > 5) {
-                questions.push({ q: qText, query: engQuery, goal: currentTopic });
+        if (presetQuestions && presetQuestions.length) {
+            unaskedQuestions = presetQuestions;
+        } else {
+            const prompt = _lang === 'en'
+                ? `Generate 6 short questions about "${currentTopic}" for a child (age 8-12, special education support). Each question should relate to daily life and social communication. ${level.promptHintEn} One question per line. On each line, write the question, then a vertical bar "|" followed by a short English search term (3-5 words) for Pexels that is highly relevant to the question (for example: "child playing football", "family eating dinner"). Write only the questions and search terms. No other text.`
+                : `Özel eğitim öğrencisi (8-12 yaş, orta düzey) için "${currentTopic}" konusunda 6 kısa soru üret. Her soru günlük yaşam ve sosyal beceriye yönelik olsun. Her soru yeni satırda olsun ve sorunun yanına dik çizgi "|" koyarak Pexels'te aratmak için soruyla doğrudan alakalı İngilizce kısa bir arama terimi (3-5 kelime) yaz. Arama terimi çocuklarla, aileyle veya sosyal ortamla ilgili olsun (örneğin: "child playing football", "family eating dinner"). Sadece soruları ve arama terimlerini yaz. Başka açıklama yazma.`;
+            const therapyPrompt = _lang === 'en'
+                ? prompt
+                : `Özel eğitim desteği alan bir çocuk (8-12 yaş) için "${currentTopic}" konusunda 6 kısa soru üret. Her soru günlük yaşam ve sosyal iletişimle ilgili olsun. ${level.promptHintTr} Her soru yeni satırda olsun ve sorunun yanına dik çizgi "|" koyarak Pexels'te aratmak için soruyla doğrudan alakalı İngilizce kısa bir arama terimi (3-5 kelime) yaz. Arama terimi çocuklarla, aileyle veya sosyal ortamla ilgili olsun (örneğin: "child playing football", "family eating dinner"). Sadece soruları ve arama terimlerini yaz. Başka açıklama yazma.`;
+            const res = await fetch(API_BASE + '/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', ...apiAuthHeaders() },
+                body: JSON.stringify({ contents: [{ role: 'user', parts: [{ text: therapyPrompt }] }] }),
+                signal: AbortSignal.timeout(15000)
+            });
+            const data = await res.json();
+            const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+            const lines = text.split('\n');
+            const questions = [];
+            for (const line of lines) {
+                const cleanLine = line.replace(/^[\d\-\.\*]+\s*/, '').trim();
+                if (!cleanLine) continue;
+                const parts = cleanLine.split('|');
+                const qText = parts[0].trim();
+                const engQuery = parts[1] ? parts[1].trim() : currentTopic;
+                if (qText.length > 5 && isQuestionSuitableForTherapyLevel(qText, currentTherapyLevelKey)) {
+                    questions.push({ q: qText, query: engQuery, goal: currentTopic });
+                }
             }
+            unaskedQuestions = questions.length ? questions : [{ q: t('therapy_fallback_q').replace('{topic}', currentTopic), query: currentTopic, goal: currentTopic }];
         }
-
-        unaskedQuestions = questions.length ? questions : [{ q: t('therapy_fallback_q').replace('{topic}', currentTopic), query: currentTopic, goal: currentTopic }];
     } catch {
-        unaskedQuestions = [{ q: t('therapy_fallback_q').replace('{topic}', currentTopic), query: currentTopic, goal: currentTopic }];
+        unaskedQuestions = (presetQuestions && presetQuestions.length)
+            ? presetQuestions
+            : [{ q: t('therapy_fallback_q').replace('{topic}', currentTopic), query: currentTopic, goal: currentTopic }];
     }
     sessionTotalQuestions = unaskedQuestions.length;
     therapySessionCompleted = false;
@@ -2519,9 +2525,6 @@ async function startTherapyWithTopic() {
     chatHistory = [];
     turnCount = 0;
     currentObj = null;
-
-    const badge = document.getElementById('therapyTopicBadge');
-    if (badge) badge.textContent = `🎯 ${currentTopic}`;
 
     updateTherapyTopicBadge();
     document.getElementById('topicOverlay').style.display = 'none';
@@ -3466,8 +3469,8 @@ function _loadFallbackVideo(vEl) {
 const THERAPY_LEVELS = {
     word: {
         labelKey: 'therapy_level_word',
-        promptHintEn: 'Questions must be very concrete and answerable with one word or a very short 2-word phrase. Avoid why/how questions.',
-        promptHintTr: 'Sorular çok somut olmalı ve tek kelime ya da en fazla 2 kelimelik çok kısa ifadeyle cevaplanabilmeli. Neden/nasıl soruları sorma.',
+        promptHintEn: 'Questions must be very concrete and answerable with one word or a very short 2-word phrase. Use only naming, choosing, or identifying prompts. Start with what, which, who, or where whenever possible. Do not ask about numbers, prices, totals, time, reasons, sequences, or comparisons. Keep each question short.',
+        promptHintTr: 'Sorular çok somut olmalı ve tek kelime ya da en fazla 2 kelimelik çok kısa ifadeyle cevaplanabilmeli. Sadece ad söyleme, seçim yapma veya nesne/kişi tanıma soruları sor. Mümkünse hangi, ne, kim veya nerede ile başla. Sayı, fiyat, toplam, zaman, neden, sıralama veya karşılaştırma sorma. Soruları kısa tut.',
         replyRuleEn: 'ONE-WORD MODE: Every reply must be MAXIMUM 4 short words before the emoji.',
         replyRuleTr: 'TEK KELİME MODU: Her cevabın emojiden önce EN FAZLA 4 kısa kelime olsun.'
     },
@@ -3609,6 +3612,141 @@ const THERAPY_LEVEL_BUCKETS = {
         }
     }
 };
+
+function detectTherapyTopicPreset(topic) {
+    const normalized = String(topic || '').toLocaleLowerCase('tr-TR').trim();
+    if (!normalized) return null;
+    if (/(alışveriş|alisveris|shopping|market)/.test(normalized)) return 'shopping';
+    if (/(okul|school|class)/.test(normalized)) return 'school';
+    if (/(futbol|football|soccer)/.test(normalized)) return 'football';
+    if (/(arkadaş|arkadas|friend)/.test(normalized)) return 'friendship';
+    if (/(yemek|food|meal|eat)/.test(normalized)) return 'food';
+    if (/(duygu|emotion|feeling)/.test(normalized)) return 'emotions';
+    return null;
+}
+
+function getPresetTherapyQuestionsForTopic(topic, levelKey) {
+    if (levelKey !== 'word') return null;
+    const presetKey = detectTherapyTopicPreset(topic);
+    if (!presetKey) return null;
+    const banks = _lang === 'en'
+        ? {
+            shopping: [
+                { q: 'Which fruit?', query: 'child choosing fruit in market' },
+                { q: 'Which drink?', query: 'child choosing drink in market' },
+                { q: 'What goes in the basket?', query: 'child putting groceries in basket' },
+                { q: 'Which snack?', query: 'child choosing snack in market' },
+                { q: 'Who is at the checkout?', query: 'cashier at grocery store' },
+                { q: 'Which vegetable?', query: 'child choosing vegetable in market' }
+            ],
+            school: [
+                { q: 'What is in your bag?', query: 'child school bag classroom' },
+                { q: 'Who is in class?', query: 'teacher in classroom with child' },
+                { q: 'What is on the desk?', query: 'child desk classroom pencil' },
+                { q: 'Who do you ask?', query: 'child asking teacher for help' },
+                { q: 'Which lesson?', query: 'child in classroom lesson board' },
+                { q: 'What do you write with?', query: 'child writing with pencil in class' }
+            ],
+            football: [
+                { q: 'What do you play with?', query: 'child football ball playground' },
+                { q: 'Who is in the goal?', query: 'goalkeeper child football field' },
+                { q: 'Which jersey?', query: 'child football jersey color' },
+                { q: 'Where is the ball?', query: 'football ball on field near child' },
+                { q: 'Who gets the pass?', query: 'children passing football' },
+                { q: 'What do you wear?', query: 'child football shoes field' }
+            ],
+            friendship: [
+                { q: 'Who do you play with?', query: 'child playing with friend' },
+                { q: 'What do you share?', query: 'children sharing toy' },
+                { q: 'What do you say first?', query: 'children greeting each other' },
+                { q: 'Which game?', query: 'children playing together' },
+                { q: 'Who helps you?', query: 'child comforting friend' },
+                { q: 'Who is your friend?', query: 'two children smiling together' }
+            ],
+            food: [
+                { q: 'What do you eat?', query: 'child eating meal at table' },
+                { q: 'What do you drink?', query: 'child drinking water juice' },
+                { q: 'Which fruit?', query: 'child choosing fruit at table' },
+                { q: 'What is for breakfast?', query: 'child breakfast table food' },
+                { q: 'What is on the plate?', query: 'plate with food on family table' },
+                { q: 'What is on the table?', query: 'family table plate spoon' }
+            ],
+            emotions: [
+                { q: 'How do you feel?', query: 'child face expression emotion' },
+                { q: 'Which feeling?', query: 'child emotion flashcard face' },
+                { q: 'Who helps you?', query: 'child seeking comfort parent' },
+                { q: 'Who do you call?', query: 'child seeking comfort parent' },
+                { q: 'How is your face?', query: 'child facial expression close up' },
+                { q: 'What calms you?', query: 'child calming down quiet activity' }
+            ]
+        }
+        : {
+            shopping: [
+                { q: 'Hangi meyve?', query: 'child choosing fruit in market' },
+                { q: 'Hangi içecek?', query: 'child choosing drink in market' },
+                { q: 'Sepete ne koyalım?', query: 'child putting groceries in basket' },
+                { q: 'Hangi atıştırmalık?', query: 'child choosing snack in market' },
+                { q: 'Kasada kim var?', query: 'cashier at grocery store' },
+                { q: 'Hangi sebze?', query: 'child choosing vegetable in market' }
+            ],
+            school: [
+                { q: 'Çantanda ne var?', query: 'child school bag classroom' },
+                { q: 'Sınıfta kim var?', query: 'teacher in classroom with child' },
+                { q: 'Masada ne var?', query: 'child desk classroom pencil' },
+                { q: 'Kime sorarsın?', query: 'child asking teacher for help' },
+                { q: 'Hangi ders?', query: 'child in classroom lesson board' },
+                { q: 'Ne ile yazarsın?', query: 'child writing with pencil in class' }
+            ],
+            football: [
+                { q: 'Ne ile oynarsın?', query: 'child football ball playground' },
+                { q: 'Kalede kim var?', query: 'goalkeeper child football field' },
+                { q: 'Hangi forma?', query: 'child football jersey color' },
+                { q: 'Top nerede?', query: 'football ball on field near child' },
+                { q: 'Kime pas?', query: 'children passing football' },
+                { q: 'Ayağında ne var?', query: 'child football shoes field' }
+            ],
+            friendship: [
+                { q: 'Kiminle oynarsın?', query: 'child playing with friend' },
+                { q: 'Neyi paylaşırsın?', query: 'children sharing toy' },
+                { q: 'İlk ne dersin?', query: 'children greeting each other' },
+                { q: 'Hangi oyun?', query: 'children playing together' },
+                { q: 'Kim yardım eder?', query: 'child comforting friend' },
+                { q: 'Arkadaşın kim?', query: 'two children smiling together' }
+            ],
+            food: [
+                { q: 'Ne yersin?', query: 'child eating meal at table' },
+                { q: 'Ne içersin?', query: 'child drinking water juice' },
+                { q: 'Hangi meyve?', query: 'child choosing fruit at table' },
+                { q: 'Kahvaltıda ne var?', query: 'child breakfast table food' },
+                { q: 'Tabakta ne var?', query: 'plate with food on family table' },
+                { q: 'Masada ne var?', query: 'family table plate spoon' }
+            ],
+            emotions: [
+                { q: 'Nasıl hissediyorsun?', query: 'child face expression emotion' },
+                { q: 'Hangi duygu?', query: 'child emotion flashcard face' },
+                { q: 'Kim yardım eder?', query: 'child seeking comfort parent' },
+                { q: 'Kimi çağırırsın?', query: 'child seeking comfort parent' },
+                { q: 'Yüzün nasıl?', query: 'child facial expression close up' },
+                { q: 'Ne rahatlatır?', query: 'child calming down quiet activity' }
+            ]
+    };
+    return (banks[presetKey] || []).map((item) => ({ ...item, goal: topic }));
+}
+
+function isQuestionSuitableForTherapyLevel(questionText, levelKey) {
+    const text = String(questionText || '').trim();
+    if (!text) return false;
+    if (levelKey !== 'word') return true;
+    const lowered = text.toLocaleLowerCase('tr-TR');
+    const wordCount = lowered.split(/\s+/).filter(Boolean).length;
+    if (wordCount > 6) return false;
+    if (/\d/.test(lowered)) return false;
+    if (!/(hangi|ne|kim|nerede|what|which|who|where)/.test(lowered)) return false;
+    if (/(kaç|fiyat|para|lira|öde|ödeyelim|neden|nasıl|niye|sence|kaçta|kaç tane|toplam|more fun|how much|price|money|why|how|compare|first|then)/.test(lowered)) {
+        return false;
+    }
+    return true;
+}
 
 const CITY_LOCATIONS = {
     home: {
@@ -4559,6 +4697,12 @@ KATI ETKİLEŞİM VE DİL KURALLARI:
 3. ARGO VE REAKSİYONEL DİRENÇ SÖNÜMLENDİRME: Öğrenci küfür veya argo kullanırsa bu kelimeleri ASLA tekrarlama, eleştirme veya "küfür etme" deme. Hatalı davranışı tamamen görmezden gel.
 4. ÇOCUĞUN ADINA CEVAP VERME YASAĞI: Öğrenci yerine onun söylemediği onaylama cümleleri üretme. Kontrolü her zaman öğrenciye bırak.
 5. AKRAN DİLİYLE ALTERNATİF SUNMA: Öğrenci olumsuz davranışta ısrar ederse duyguyu çok kısa onayla, kabul edilebilir akran modelini sun ve sahneyi değiştir. (Örn: "Maçta öfkelenmek normal! ⚽ Ama hakeme sadece 'Hocam bence fauldü' diyebiliriz.")`;
+    }
+
+    if (currentTherapyLevelKey === 'word') {
+        instructions += _lang === 'en'
+            ? `\n6. WORD-MODE FEEDBACK: If the answer is unclear or off-topic, do not talk about numbers, prices, or mistakes. Give one simple model word or very short phrase related to the question and move on.`
+            : `\n6. TEK KELIME GERI BILDIRIMI: Cevap belirsiz veya konu disiysa sayi, fiyat ya da hata tartismasi yapma. Soruya uygun tek kelimelik ya da cok kisa bir model verip devam et.`;
     }
 
     var payload = {
