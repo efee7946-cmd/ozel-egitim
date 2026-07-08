@@ -3428,7 +3428,7 @@ Kesinlikle emoji kullanma. Sıcak, profesyonel ve umut verici bir dil kullan.`;
             })
         });
         const data = await res.json();
-        const text = data.candidates[0].content.parts[0].text;
+        const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
         document.getElementById('aiEvalLoading').style.display = 'none';
         const evalEl = document.getElementById('aiEvalText');
         evalEl.textContent = text;
@@ -3851,8 +3851,8 @@ let currentCityLocationKey = 'school';
 let currentTherapyLevelKey = 'sentence';
 let _useLocationQuestions = true;
 let unaskedQuestions = [...CITY_LOCATIONS[currentCityLocationKey].questions];
-let currentObj = null;
 let isWaiting = false;
+let isProcessingTherapySpeech = false;
 let chatHistory = [];
 let idleTimer;
 let turnCount = 0;
@@ -3873,7 +3873,7 @@ function updateProgressBar() {
 
 function rereadQuestion() {
     if (currentObj) {
-        speakFallback(currentObj.q, () => {});
+        speak(currentObj.q, () => {});
     }
 }
 
@@ -3882,7 +3882,7 @@ async function askAIMode(mode) {
     if (mode === 'repeat') {
         sessionData.repeatUsed++;
         addMessage(_lang === 'en' ? 'Reading the question again...' : 'Soruyu tekrar okuyorum...', 'ai');
-        speakFallback(currentObj.q, () => {});
+        speak(currentObj.q, () => {});
     } else if (mode === 'simplify') {
         sessionData.simplifyUsed++;
         const _sCat = getCurrentTherapyCategory().label;
@@ -3892,7 +3892,7 @@ async function askAIMode(mode) {
             : `Şu soruyu, 4-8 yaş arası özel eğitim desteği alan bir çocuk için çok basit 1-2 kelimeyle açıkla: "${currentObj.q}". Maksimum 1 kısa cümle.`;
         const res = await getGemmaResponse(simplePrompt);
         addMessage(res, 'ai');
-        speakFallback(res, () => {});
+        speak(res, () => {});
     }
 }
 
@@ -4310,6 +4310,7 @@ function startQuestion() {
 
 async function processTherapySpeech(speech, source) {
     if (!speech) return;
+    isProcessingTherapySpeech = true;
     const questionText = currentObj && typeof currentObj.q === 'string' ? currentObj.q : '';
     if (!questionText) {
         console.warn('processTherapySpeech: missing currentObj, aborting speech processing safely', {
@@ -4320,6 +4321,7 @@ async function processTherapySpeech(speech, source) {
         document.getElementById('micBtn').disabled = false;
         document.getElementById('info').innerText = t('info_next_question');
         isWaiting = false;
+        isProcessingTherapySpeech = false;
         return;
     }
     const category = getCurrentTherapyCategory();
@@ -4333,6 +4335,7 @@ async function processTherapySpeech(speech, source) {
         speak(final, function() {
             document.getElementById('nextBtn').classList.add('pulse-anim');
             document.getElementById('info').innerText = t('info_press_next');
+            isProcessingTherapySpeech = false;
         });
         isWaiting = false;
         return;
@@ -4364,6 +4367,7 @@ async function processTherapySpeech(speech, source) {
         isWaiting = false;
         resetIdleTimer();
         document.getElementById('info').innerText = t('mic_prompt');
+        isProcessingTherapySpeech = false;
     });
 }
 
@@ -4651,7 +4655,7 @@ async function rec() {
         document.getElementById('micBtn').classList.remove('listening');
         if (_speechBuffer.trim() && _recognized) {
             _finalizeSpeech();
-        } else if (document.getElementById('micBtn').disabled && isWaiting) {
+        } else if (document.getElementById('micBtn').disabled && isWaiting && !isProcessingTherapySpeech) {
             document.getElementById('micBtn').disabled = false;
             document.getElementById('info').innerText = t('mic_prompt');
         }
@@ -4848,7 +4852,13 @@ async function speakWithLipsync(text, onEnd, emotion = CharacterEmotion.NEUTRAL)
 // =============================================
 // GÜNLÜK GÖREVLER (daily quest sistemi)
 // =============================================
-function _dailyDateKey() { return new Date().toISOString().slice(0, 10); }
+function _dailyDateKey() {
+    const d = new Date();
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const r = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${r}`;
+}
 function _dailyProgressKey() {
     return `daily_${activeStudentId || 'default'}_${_dailyDateKey()}`;
 }
@@ -4949,6 +4959,7 @@ function renderDailyTasks() {
 let _aacBoards = [];
 let _aacCurrentBoardId = null;
 let _aacSentence = []; // [{ label, spoken }]
+let _aacAudioObj = null; // Track current playing audio
 
 let _aacEditMode = false;
 let _aacJustEnteredEdit = false;
@@ -5289,6 +5300,10 @@ async function speakAacSentence() {
     if (!_aacSentence.length) return;
     const text = sanitizeForSpeech(_aacSentence.map(w => w.spoken).join(' '));
     try {
+        if (_aacAudioObj) {
+            try { _aacAudioObj.pause(); } catch(e) {}
+            _aacAudioObj = null;
+        }
         const ctrl = new AbortController();
         const timer = setTimeout(() => ctrl.abort(), 8000);
         const res = await fetch(API_BASE + '/api/tts', {
@@ -5302,7 +5317,11 @@ async function speakAacSentence() {
         const blob = await res.blob();
         const url = URL.createObjectURL(blob);
         const audio = new Audio(url);
-        audio.onended = () => URL.revokeObjectURL(url);
+        _aacAudioObj = audio;
+        audio.onended = () => {
+            URL.revokeObjectURL(url);
+            if (_aacAudioObj === audio) _aacAudioObj = null;
+        };
         await audio.play();
     } catch {
         speakFallback(text, null, _aacTtsRate);
@@ -5318,11 +5337,11 @@ function filterAacCards(q) {
     const term = q.toLowerCase().trim();
     document.querySelectorAll('#aacGrid .aac-card').forEach(card => {
         if (card.classList.contains('empty')) {
-            card.style.visibility = term ? 'hidden' : '';
+            card.style.display = term ? 'none' : '';
             return;
         }
         const label = (card.dataset.label || '').toLowerCase();
-        card.style.visibility = (!term || label.includes(term)) ? '' : 'hidden';
+        card.style.display = (!term || label.includes(term)) ? '' : 'none';
     });
 }
 
@@ -5822,10 +5841,17 @@ async function goToObjectRecognition() {
     _objErrors = 0;
 
     const ok = await _objInitThree();
+    const canvas = document.getElementById('objectCanvas');
+    const fallback = document.getElementById('objFallback');
+    const hint = document.querySelector('.object-hint');
     if (!ok) {
-        // WebGL yok — 3D olmadan devam: emoji + metinle
-        const card = document.querySelector('.object-canvas-card');
-        if (card) card.innerHTML = `<div class="object-fallback" id="objFallback" style="display:flex;align-items:center;justify-content:center;height:100%;font-size:4rem;"></div>`;
+        if (canvas) canvas.style.display = 'none';
+        if (fallback) fallback.style.display = 'flex';
+        if (hint) hint.style.display = 'none';
+    } else {
+        if (canvas) canvas.style.display = 'block';
+        if (fallback) fallback.style.display = 'none';
+        if (hint) hint.style.display = 'block';
     }
     _objShowCurrent();
 }
@@ -5951,7 +5977,22 @@ async function _objShowCurrent() {
     }
     if (!_objRenderer) return;
 
-    if (_objMesh) { _objScene.remove(_objMesh); _objMesh = null; }
+    if (_objMesh) {
+        _objScene.remove(_objMesh);
+        _objMesh.traverse((node) => {
+            if (node.isMesh) {
+                if (node.geometry) node.geometry.dispose();
+                if (node.material) {
+                    if (Array.isArray(node.material)) {
+                        node.material.forEach(m => m.dispose());
+                    } else {
+                        node.material.dispose();
+                    }
+                }
+            }
+        });
+        _objMesh = null;
+    }
     const THREE = _objThree;
 
     if (item.type === 'glb' && item.model) {
@@ -7357,7 +7398,7 @@ function _renderAzTrend(history) {
 
     const points = [...history].reverse()
         .map(h => {
-            const total = (h.micUsedInTherapy || 0) + (h.cardUsedInTherapy || 0) + (h.repeatUsed || 0) + (h.simplifyUsed || 0);
+            const total = (h.micUsedInTherapy || 0) + (h.cardUsedInTherapy || 0);
             if (total === 0) return null;
             return {
                 dateKey: h.dateKey,
