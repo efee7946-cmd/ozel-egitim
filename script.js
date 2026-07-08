@@ -2487,11 +2487,11 @@ async function startTherapyWithTopic() {
             unaskedQuestions = presetQuestions;
         } else {
             const prompt = _lang === 'en'
-                ? `Generate 6 short questions about "${currentTopic}" for a child (age 8-12, special education support). Each question should relate to daily life and social communication. ${level.promptHintEn} One question per line. On each line, write the question, then a vertical bar "|" followed by a short English search term (3-5 words) for Pexels that is highly relevant to the question (for example: "child playing football", "family eating dinner"). Write only the questions and search terms. No other text.`
-                : `Özel eğitim öğrencisi (8-12 yaş, orta düzey) için "${currentTopic}" konusunda 6 kısa soru üret. Her soru günlük yaşam ve sosyal beceriye yönelik olsun. Her soru yeni satırda olsun ve sorunun yanına dik çizgi "|" koyarak Pexels'te aratmak için soruyla doğrudan alakalı İngilizce kısa bir arama terimi (3-5 kelime) yaz. Arama terimi çocuklarla, aileyle veya sosyal ortamla ilgili olsun (örneğin: "child playing football", "family eating dinner"). Sadece soruları ve arama terimlerini yaz. Başka açıklama yazma.`;
+                ? `Generate 6 friendly, grammatically complete, and natural-sounding questions about "${currentTopic}" for a child (special education support). Each question must be a complete sentence and relate to daily life or social communication. ${level.promptHintEn} One question per line. On each line, write the question, then a vertical bar "|" followed by a short English search term (3-5 words) for Pexels that is highly relevant to the question (for example: "child playing football", "family eating dinner"). Write only the questions and search terms. No other text.`
+                : `Özel eğitim desteği alan bir çocuk için "${currentTopic}" konusunda 6 adet samimi, dil bilgisi açısından tam, kurallı ve doğal soru üret. Her soru günlük yaşam ve sosyal beceriye yönelik olsun. Kesinlikle yarım, kesik veya telgraf diliyle soru yazma (Örn: "Kime pas?", "Hangi renk?" gibi yarım sorular ASLA üretilmeyecektir). Her soru yeni satırda olsun ve sorunun yanına dik çizgi "|" koyarak Pexels'te aratmak için soruyla doğrudan alakalı İngilizce kısa bir arama terimi (3-5 kelime) yaz. Arama terimi çocuklarla, aileyle veya sosyal ortamla ilgili olsun (örneğin: "child playing football", "family eating dinner"). Sadece soruları ve arama terimlerini yaz. Başka açıklama yazma.`;
             const therapyPrompt = _lang === 'en'
                 ? prompt
-                : `Özel eğitim desteği alan bir çocuk (8-12 yaş) için "${currentTopic}" konusunda 6 kısa soru üret. Her soru günlük yaşam ve sosyal iletişimle ilgili olsun. ${level.promptHintTr} Her soru yeni satırda olsun ve sorunun yanına dik çizgi "|" koyarak Pexels'te aratmak için soruyla doğrudan alakalı İngilizce kısa bir arama terimi (3-5 kelime) yaz. Arama terimi çocuklarla, aileyle veya sosyal ortamla ilgili olsun (örneğin: "child playing football", "family eating dinner"). Sadece soruları ve arama terimlerini yaz. Başka açıklama yazma.`;
+                : `Özel eğitim desteği alan bir çocuk için "${currentTopic}" konusunda 6 adet samimi, dil bilgisi açısından tam, kurallı ve doğal soru üret. Her soru günlük yaşam ve sosyal iletişimle ilgili olsun. Kesinlikle yarım, kesik veya telgraf diliyle soru yazma (Örn: "Kime pas?", "Hangi renk?" gibi yarım sorular ASLA üretilmeyecektir). ${level.promptHintTr} Her soru yeni satırda olsun ve sorunun yanına dik çizgi "|" koyarak Pexels'te aratmak için soruyla doğrudan alakalı İngilizce kısa bir arama terimi (3-5 kelime) yaz. Arama terimi çocuklarla, aileyle veya sosyal ortamla ilgili olsun (örneğin: "child playing football", "family eating dinner"). Sadece soruları ve arama terimlerini yaz. Başka açıklama yazma.`;
             const res = await fetch(API_BASE + '/api/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', ...apiAuthHeaders() },
@@ -3469,22 +3469,22 @@ function _loadFallbackVideo(vEl) {
 const THERAPY_LEVELS = {
     word: {
         labelKey: 'therapy_level_word',
-        promptHintEn: 'Questions must be very concrete and answerable with one word or a very short 2-word phrase. Use only naming, choosing, or identifying prompts. Start with what, which, who, or where whenever possible. Do not ask about numbers, prices, totals, time, reasons, sequences, or comparisons. Keep each question short.',
-        promptHintTr: 'Sorular çok somut olmalı ve tek kelime ya da en fazla 2 kelimelik çok kısa ifadeyle cevaplanabilmeli. Sadece ad söyleme, seçim yapma veya nesne/kişi tanıma soruları sor. Mümkünse hangi, ne, kim veya nerede ile başla. Sayı, fiyat, toplam, zaman, neden, sıralama veya karşılaştırma sorma. Soruları kısa tut.',
+        promptHintEn: 'Every question generated must be a grammatically complete, natural, and friendly sentence. Avoid telegraphic, clipped, or fragmented questions (e.g. NEVER ask "Pass to whom?" or "Which color?". Instead, ask complete questions like "Who do you want to pass the ball to when playing soccer?" or "What is the color of your favorite pen?"). The question should be structured so the child can answer with a single word or a very short 2-word phrase.',
+        promptHintTr: 'Soruların kendisi kesinlikle dil bilgisi açısından tam, kurallı, doğal, anlaşılır ve akıcı cümlelerden oluşmalıdır. Asla yarım, kesik veya telgraf diliyle soru sorma (Örn: "Kime pas?", "Hangi renk?", "Nerede gitmek?" gibi yetersiz sorular ASLA yazma. Bunun yerine "Futbol oynarken topu kime pas atmak istersin?", "En sevdiğin kalemin rengi nedir?" gibi tam cümleler kur). Soru, çocuğun tek kelime ya da en fazla 2 kelimelik çok kısa bir ifadeyle cevaplayabileceği şekilde (seçim yapma, nesne/kişi adlandırma, yer sorma) tasarlanmalıdır.',
         replyRuleEn: 'ONE-WORD MODE: Every reply must be MAXIMUM 4 short words before the emoji.',
         replyRuleTr: 'TEK KELİME MODU: Her cevabın emojiden önce EN FAZLA 4 kısa kelime olsun.'
     },
     sentence: {
         labelKey: 'therapy_level_sentence',
-        promptHintEn: 'Questions should stay concrete and be answerable with one short sentence.',
-        promptHintTr: 'Sorular somut kalmalı ve tek kısa cümleyle cevaplanabilmeli.',
+        promptHintEn: 'Every question generated must be a grammatically complete, natural, and friendly sentence. Frame the question to invite a simple, structured single-sentence response from the child about concrete daily events. Avoid fragmented language.',
+        promptHintTr: 'Soruların kendisi kesinlikle dil bilgisi açısından tam, kurallı, doğal, anlaşılır ve akıcı cümlelerden oluşmalıdır. Çocuğu kısa ve basit bir cümle kurmaya teşvik edecek, günlük yaşamdan somut konuları sor. Asla yarım, kesik veya telgraf diliyle soru yazma.',
         replyRuleEn: 'SHORT-SENTENCE MODE: Every reply must be MAXIMUM 7 short words before the emoji.',
         replyRuleTr: 'KISA CÜMLE MODU: Her cevabın emojiden önce EN FAZLA 7 kısa kelime olsun.'
     },
     tell: {
         labelKey: 'therapy_level_tell',
-        promptHintEn: 'Questions can be a little more open-ended, but still child-friendly and grounded in daily life.',
-        promptHintTr: 'Sorular biraz daha açık uçlu olabilir ama yine çocuk dostu ve günlük yaşamla bağlantılı kalmalı.',
+        promptHintEn: 'Every question generated must be a grammatically complete, natural, and friendly sentence. Frame open-ended, child-friendly questions that encourage the child to describe events or tell short stories.',
+        promptHintTr: 'Soruların kendisi kesinlikle dil bilgisi açısından tam, kurallı, doğal, anlaşılır ve akıcı cümlelerden oluşmalıdır. Çocuğun daha uzun açıklamalar yapmasını, olayları anlatmasını teşvik edecek açık uçlu ama çocuk dostu sorular sor. Asla yarım, kesik veya telgraf diliyle soru yazma.',
         replyRuleEn: 'TELL-ME-MORE MODE: Every reply must be MAXIMUM 10 simple words before the emoji.',
         replyRuleTr: 'ANLAT BAKALIM MODU: Her cevabın emojiden önce EN FAZLA 10 basit kelime olsun.'
     }
