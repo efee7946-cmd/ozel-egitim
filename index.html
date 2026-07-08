@@ -436,39 +436,62 @@ document.addEventListener('DOMContentLoaded', function(){
     <!-- Konu Seçim Overlay -->
     <div id="topicOverlay" class="topic-overlay">
         <div class="topic-card">
-            <button class="btn-back topic-back-btn" onclick="goToMenu()"><span data-i18n="back_menu">← Menü</span></button>
-            <div class="topic-card-icon">🎤</div>
+            <button class="btn-back topic-back-btn" onclick="goToMenu()">
+                <span class="back-arrow">←</span>
+                <span data-i18n="back_menu">Menü</span>
+            </button>
+            <div class="topic-header-accent">
+                <div class="topic-icon-ring"></div>
+                <div class="topic-card-icon">🎙️</div>
+            </div>
             <h2 class="topic-card-title" data-i18n="therapy_topic_title">Hangi konuyu çalışalım?</h2>
             <p class="topic-card-sub" data-i18n="therapy_topic_sub">Bir konu yaz, Yıldız Can o konuyla ilgili sorular soracak.</p>
-            <input type="text" id="topicInput" class="topic-input"
-                data-i18n-placeholder="therapy_topic_placeholder"
-                placeholder="örn: alışveriş, futbol, okul..." maxlength="60"
-                onkeydown="if(event.key==='Enter') startTherapyWithTopic()">
+            
+            <div class="topic-input-wrapper">
+                <span class="topic-input-icon">🔍</span>
+                <input type="text" id="topicInput" class="topic-input"
+                    data-i18n-placeholder="therapy_topic_placeholder"
+                    placeholder="örn: alışveriş, futbol, okul..." maxlength="60"
+                    onkeydown="if(event.key==='Enter') startTherapyWithTopic()">
+                <button type="button" class="topic-input-clear" onclick="document.getElementById('topicInput').value = ''; document.getElementById('topicInput').focus();" title="Temizle">✕</button>
+            </div>
+
+            <div class="topic-suggestions">
+                <button type="button" class="topic-chip chip-shopping" onclick="setTopicChip(t('topic_shopping'))">🛒 <span data-i18n="topic_shopping">Alışveriş</span></button>
+                <button type="button" class="topic-chip chip-school" onclick="setTopicChip(t('topic_school'))">🏫 <span data-i18n="topic_school">Okul</span></button>
+                <button type="button" class="topic-chip chip-football" onclick="setTopicChip(t('topic_football'))">⚽ <span data-i18n="topic_football">Futbol</span></button>
+                <button type="button" class="topic-chip chip-friendship" onclick="setTopicChip(t('topic_friendship'))">🤝 <span data-i18n="topic_friendship">Arkadaşlık</span></button>
+                <button type="button" class="topic-chip chip-food" onclick="setTopicChip(t('topic_food'))">🍽️ <span data-i18n="topic_food">Yemek</span></button>
+                <button type="button" class="topic-chip chip-emotions" onclick="setTopicChip(t('topic_emotions'))">😊 <span data-i18n="topic_emotions">Duygular</span></button>
+            </div>
+
             <div class="topic-levels">
                 <p class="topic-level-title" data-i18n="therapy_level_title">Hangi düzeyde başlamak istersin?</p>
                 <div class="topic-level-options">
                     <button type="button" class="topic-level-btn" data-level="word" onclick="setTherapyLevel('word')">
-                        <strong data-i18n="therapy_level_word">Tek Kelime</strong>
-                        <span data-i18n="therapy_level_word_example">Örn: su, anne, top</span>
+                        <div class="level-icon-wrapper word-icon">💬</div>
+                        <div class="level-btn-content">
+                            <strong data-i18n="therapy_level_word">Tek Kelime</strong>
+                            <span data-i18n="therapy_level_word_example">Örn: su, anne, top</span>
+                        </div>
                     </button>
                     <button type="button" class="topic-level-btn" data-level="sentence" onclick="setTherapyLevel('sentence')">
-                        <strong data-i18n="therapy_level_sentence">Kısa Cümle</strong>
-                        <span data-i18n="therapy_level_sentence_example">Örn: Okula annemle giderim</span>
+                        <div class="level-icon-wrapper sentence-icon">🗣️</div>
+                        <div class="level-btn-content">
+                            <strong data-i18n="therapy_level_sentence">Kısa Cümle</strong>
+                            <span data-i18n="therapy_level_sentence_example">Örn: Okula annemle giderim</span>
+                        </div>
                     </button>
                     <button type="button" class="topic-level-btn" data-level="tell" onclick="setTherapyLevel('tell')">
-                        <strong data-i18n="therapy_level_tell">Anlat Bakalım</strong>
-                        <span data-i18n="therapy_level_tell_example">Örn: Bugün neler yaptığını anlat</span>
+                        <div class="level-icon-wrapper tell-icon">🎙️</div>
+                        <div class="level-btn-content">
+                            <strong data-i18n="therapy_level_tell">Anlat Bakalım</strong>
+                            <span data-i18n="therapy_level_tell_example">Örn: Bugün neler yaptığını anlat</span>
+                        </div>
                     </button>
                 </div>
             </div>
-            <div class="topic-suggestions">
-                <button type="button" class="topic-chip" onclick="setTopicChip(t('topic_shopping'))">🛒 <span data-i18n="topic_shopping">Alışveriş</span></button>
-                <button type="button" class="topic-chip" onclick="setTopicChip(t('topic_school'))">🏫 <span data-i18n="topic_school">Okul</span></button>
-                <button type="button" class="topic-chip" onclick="setTopicChip(t('topic_football'))">⚽ <span data-i18n="topic_football">Futbol</span></button>
-                <button type="button" class="topic-chip" onclick="setTopicChip(t('topic_friendship'))">🤝 <span data-i18n="topic_friendship">Arkadaşlık</span></button>
-                <button type="button" class="topic-chip" onclick="setTopicChip(t('topic_food'))">🍽️ <span data-i18n="topic_food">Yemek</span></button>
-                <button type="button" class="topic-chip" onclick="setTopicChip(t('topic_emotions'))">😊 <span data-i18n="topic_emotions">Duygular</span></button>
-            </div>
+
             <button class="topic-start-btn" id="topicStartBtn" onclick="startTherapyWithTopic()">
                 <span data-i18n="therapy_start_btn">Başla →</span>
             </button>
