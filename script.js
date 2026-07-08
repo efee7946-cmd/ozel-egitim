@@ -2225,8 +2225,8 @@ function showCustomConfirm(message) {
     });
 }
 
-async function showOnly(id) {
-    if (isTherapyInProgress() && id !== 'game-container') {
+async function showOnly(id, options = {}) {
+    if (!options.skipTherapyConfirm && isTherapyInProgress() && id !== 'game-container') {
         const msg = _lang === 'en'
             ? "Are you sure you want to leave the speech practice session? Your progress will be lost."
             : "Konuşma pratiği seansını yarıda bırakmak istediğine emin misin? İlerlemen kaybolacak.";
@@ -2432,7 +2432,7 @@ async function goToMenu() {
     syncCityEntryPlacement(false);
     const cityShell = document.getElementById('cityEntryShell');
     if (cityShell) cityShell.style.display = '';
-    await showOnly('menu-screen');
+    await showOnly('menu-screen', { skipTherapyConfirm: true });
     renderCityScene();
     maybeGreetChild();
     if (shouldAwardStars) _showStarReward();
@@ -3785,15 +3785,18 @@ function showTherapySessionComplete() {
     therapySessionCompleted = true;
     const card = document.getElementById('therapyMainCard');
     const box = document.createElement('div');
-    box.className = 'sort-complete therapy-session-ui';
+    box.className = 'therapy-complete therapy-session-ui';
     box.id = 'therapyCompleteBox';
     box.innerHTML = `
-        <div class="sort-complete-icon">🏆</div>
-        <h2>${t('therapy_complete_title')}</h2>
-        <p>${t('therapy_complete_msg')}</p>
-        <div class="sort-complete-btns">
-            <button type="button" class="btn-primary-gradient" onclick="document.getElementById('therapyCompleteBox').remove(); currentTopic=''; goToTherapy();">${t('therapy_complete_new_topic')}</button>
-            <button type="button" class="menu-ghost-btn" onclick="currentTopic=''; goToMenu();">${t('therapy_complete_menu')}</button>
+        <div class="therapy-complete-glow" aria-hidden="true"></div>
+        <div class="therapy-complete-badge">🏆</div>
+        <div class="therapy-complete-copy">
+            <h2>${t('therapy_complete_title')}</h2>
+            <p>${t('therapy_complete_msg')}</p>
+        </div>
+        <div class="therapy-complete-actions">
+            <button type="button" class="btn-primary-gradient therapy-complete-btn" onclick="document.getElementById('therapyCompleteBox').remove(); currentTopic=''; goToTherapy();">${t('therapy_complete_new_topic')}</button>
+            <button type="button" class="menu-ghost-btn therapy-complete-btn" onclick="currentTopic=''; goToMenu();">${t('therapy_complete_menu')}</button>
         </div>
     `;
     card.appendChild(box);
