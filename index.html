@@ -138,10 +138,14 @@
 
         <div class="auth-error" id="authError"></div>
 
-        <div class="auth-guest-row">
-            <button type="button" class="auth-guest-btn" onclick="continueAsGuest()" data-i18n="auth_guest_try">👀 Kayıt olmadan dene</button>
-            <p class="auth-guest-hint" data-i18n="auth_guest_hint">1 konuşma pratiği + 1 nesne tanıma denemesi ücretsiz</p>
-        </div>
+        <button type="button" class="auth-guest-btn" onclick="continueAsGuest()">
+            <span class="auth-guest-icon">👀</span>
+            <span class="auth-guest-text">
+                <strong data-i18n="auth_guest_try">Uygulamayı Keşfet</strong>
+                <small data-i18n="auth_guest_hint">Kayıt olmadan dene</small>
+            </span>
+            <span class="auth-guest-chevron">›</span>
+        </button>
 
         <p class="footer">© 2026 Efe Erman · <a href="mailto:efee7946@gmail.com">efee7946@gmail.com</a></p>
     </div>
@@ -476,7 +480,7 @@ document.addEventListener('DOMContentLoaded', function(){
         <div class="topic-card">
             <button class="btn-back topic-back-btn" onclick="goToMenu()">
                 <span class="back-arrow">←</span>
-                <span data-i18n="back_menu">Menü</span>
+                <span data-i18n="back_menu_plain">Menü</span>
             </button>
             <div class="topic-header-accent">
                 <div class="topic-icon-ring"></div>

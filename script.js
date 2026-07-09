@@ -4,6 +4,7 @@
 const STRINGS = {
   tr: {
     back_menu: '← Menü',
+    back_menu_plain: 'Menü',
     back: '← Geri',
     save: 'Kaydet',
     cancel: 'İptal',
@@ -934,8 +935,8 @@ const STRINGS = {
     routine_notif_denied: 'Bildirim izni verilmediği için hatırlatma kurulamadı.',
     routine_saved_toast: 'Hatırlatma kuruldu: her gün {time} ⏰',
     routine_removed_toast: 'Hatırlatma kapatıldı',
-    auth_guest_try: '👀 Kayıt olmadan dene',
-    auth_guest_hint: '1 konuşma pratiği + 1 nesne tanıma denemesi ücretsiz',
+    auth_guest_try: 'Uygulamayı Keşfet',
+    auth_guest_hint: 'Kayıt olmadan dene',
     guest_banner_text: '👀 Misafir modu: toplam 1 konuşma pratiği + 1 nesne tanıma hakkı',
     guest_banner_btn: 'Ücretsiz kayıt ol',
     guest_limit_title: 'Deneme hakkın doldu 🌟',
@@ -948,6 +949,7 @@ const STRINGS = {
   },
   en: {
     back_menu: '← Menu',
+    back_menu_plain: 'Menu',
     back: '← Back',
     save: 'Save',
     cancel: 'Cancel',
@@ -1877,8 +1879,8 @@ const STRINGS = {
     routine_notif_denied: 'Reminder could not be set because notification permission was denied.',
     routine_saved_toast: 'Reminder set: every day at {time} ⏰',
     routine_removed_toast: 'Reminder turned off',
-    auth_guest_try: '👀 Try without an account',
-    auth_guest_hint: '1 speech practice + 1 object recognition session free',
+    auth_guest_try: 'Explore the App',
+    auth_guest_hint: 'Try without signing up',
     guest_banner_text: '👀 Guest mode: 1 speech practice + 1 object recognition in total',
     guest_banner_btn: 'Sign up free',
     guest_limit_title: 'Your trial is used up 🌟',
