@@ -2340,7 +2340,8 @@ video { width: 100%; height: 100%; object-fit: cover; }
     #avatarCanvas { width: 96px; height: 96px; margin-bottom: 6px; }
     #chat-bubbles { max-height: 30vh; }
     .question-bar { font-size: 1.1rem; padding: 10px; }
-    .btn-mic { width: 70px; height: 70px; font-size: 2.2rem; }    .question-bar-wrap .question-bar { font-size: 1.05rem; }
+    .btn-mic { width: 70px; height: 70px; font-size: 2.2rem; }
+    .question-bar-wrap .question-bar { font-size: 1.05rem; }
     .ai-mode-btns { gap: 6px; }
     .btn-next { width: 55px; height: 55px; font-size: 1.5rem; }
     #info { font-size: 0.9rem; margin-top: 10px; }
@@ -5569,7 +5570,8 @@ button:active, .menu-tile:active {
     .tile-desc { font-size: 0.76rem; }
     .welcome-title { font-size: 1.8rem; }
     .welcome-sub { font-size: 1rem; }
-    .btn-mic { width: 80px; height: 80px; font-size: 2.5rem; }    .btn-next { width: 64px; height: 64px; font-size: 1.8rem; }
+    .btn-mic { width: 80px; height: 80px; font-size: 2.5rem; }
+    .btn-next { width: 64px; height: 64px; font-size: 1.8rem; }
     .ai-mode-btn { font-size: 0.95rem; padding: 10px 14px; }
     .topic-card-title { font-size: 1.4rem; }
     .topic-card-sub { font-size: 1rem; }
