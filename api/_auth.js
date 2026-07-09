@@ -20,9 +20,13 @@ export async function resolveToken(token) {
     return hashed;
 }
 
-export async function sessionUsername(req) {
+export function bearerToken(req) {
     const header = req.headers.authorization || '';
-    const token = header.startsWith('Bearer ') ? header.slice(7) : null;
+    return header.startsWith('Bearer ') ? header.slice(7) : null;
+}
+
+export async function sessionUsername(req) {
+    const token = bearerToken(req);
     const stored = await resolveToken(token);
     if (!stored) return null;
     const rows = await query(
@@ -33,4 +37,36 @@ export async function sessionUsername(req) {
         [stored]
     );
     return rows.length ? rows[0].username : null;
+}
+
+// Misafir cihaz kaydı: token guest_devices tablosunda hash'iyle durur.
+// Tablo guest_start sırasında oluşturulur; yoksa misafir token'ı da yoktur.
+export async function guestByToken(token) {
+    if (!token || !String(token).startsWith('guest_')) return null;
+    try {
+        const rows = await query(
+            'SELECT * FROM guest_devices WHERE token_hash = $1 AND token_expires > now()',
+            [hashToken(token)]
+        );
+        return rows[0] || null;
+    } catch {
+        return null;
+    }
+}
+
+const GUEST_CALL_COLUMNS = ['chat_calls', 'tts_calls', 'photo_calls', 'video_calls'];
+
+// Misafirin toplam (saatlik değil, ömürlük) çağrı tavanı — sayaç cihaz
+// kaydında tutulur, uygulama silinip yeniden kurulsa da sıfırlanmaz.
+export async function guestCallAllowed(req, column, cap) {
+    if (!GUEST_CALL_COLUMNS.includes(column)) return null;
+    const token = bearerToken(req);
+    const g = await guestByToken(token);
+    if (!g) return null;
+    if ((g[column] || 0) >= cap) return null;
+    await query(
+        `UPDATE guest_devices SET ${column} = ${column} + 1, last_seen = now() WHERE device_hash = $1`,
+        [g.device_hash]
+    );
+    return 'guest:' + g.device_hash.slice(0, 16);
 }

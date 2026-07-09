@@ -1,5 +1,7 @@
-import { sessionUsername } from './_auth.js';
+import { sessionUsername, guestCallAllowed } from './_auth.js';
 import { checkRateLimit } from './_rateLimit.js';
+
+const GUEST_VIDEO_CAP = 30;
 
 export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Origin', process.env.ALLOWED_ORIGIN || '*');
@@ -7,11 +9,12 @@ export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     if (req.method === 'OPTIONS') return res.status(200).end();
 
-    const username = await sessionUsername(req);
-    if (!username) {
+    let actor = await sessionUsername(req);
+    if (!actor) actor = await guestCallAllowed(req, 'video_calls', GUEST_VIDEO_CAP);
+    if (!actor) {
         return res.status(401).json({ error: 'AUTH_REQUIRED' });
     }
-    if (!(await checkRateLimit('video:' + username, 30))) {
+    if (!(await checkRateLimit('video:' + actor, 30))) {
         return res.status(429).json({ error: 'RATE_LIMITED' });
     }
 

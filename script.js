@@ -934,8 +934,14 @@ const STRINGS = {
     routine_notif_denied: 'Bildirim izni verilmediği için hatırlatma kurulamadı.',
     routine_saved_toast: 'Hatırlatma kuruldu: her gün {time} ⏰',
     routine_removed_toast: 'Hatırlatma kapatıldı',
-    verify_banner_text: '☁️ Verileriniz henüz buluta yedeklenmiyor',
-    verify_banner_btn: 'E-postayı doğrula',
+    auth_guest_try: '👀 Kayıt olmadan dene',
+    auth_guest_hint: '1 konuşma pratiği + 1 nesne tanıma denemesi ücretsiz',
+    guest_banner_text: '👀 Misafir modu: toplam 1 konuşma pratiği + 1 nesne tanıma hakkı',
+    guest_banner_btn: 'Ücretsiz kayıt ol',
+    guest_limit_title: 'Deneme hakkın doldu 🌟',
+    guest_limit_sub: 'Beğendiysen ücretsiz kayıt ol — tüm etkinlikler sınırsız olur, ilerlemen buluta yedeklenir ve verilerin kaybolmaz.',
+    guest_limit_btn: 'Ücretsiz Kayıt Ol',
+    guest_limit_later: 'Menüye dön',
     therapy_complete_stat: '{name} bugün {n} soruya cevap verdi! 👏',
     therapy_complete_show: 'Bu ekranı ailene göster 🌟',
     first_run_toast: 'Harika, hazırsınız! İlk pratik için bir konu seçin 🎤',
@@ -1871,8 +1877,14 @@ const STRINGS = {
     routine_notif_denied: 'Reminder could not be set because notification permission was denied.',
     routine_saved_toast: 'Reminder set: every day at {time} ⏰',
     routine_removed_toast: 'Reminder turned off',
-    verify_banner_text: '☁️ Your data is not backed up to the cloud yet',
-    verify_banner_btn: 'Verify email',
+    auth_guest_try: '👀 Try without an account',
+    auth_guest_hint: '1 speech practice + 1 object recognition session free',
+    guest_banner_text: '👀 Guest mode: 1 speech practice + 1 object recognition in total',
+    guest_banner_btn: 'Sign up free',
+    guest_limit_title: 'Your trial is used up 🌟',
+    guest_limit_sub: 'Liked it? Sign up for free — all activities become unlimited, your progress is backed up to the cloud and nothing gets lost.',
+    guest_limit_btn: 'Sign Up Free',
+    guest_limit_later: 'Back to menu',
     therapy_complete_stat: '{name} answered {n} questions today! 👏',
     therapy_complete_show: 'Show this screen to your family 🌟',
     first_run_toast: 'Great, you are all set! Pick a topic for the first practice 🎤',
@@ -2324,7 +2336,7 @@ async function showOnly(id, options = {}) {
         try {
             updateStarBadge();
             renderMenuNudge();
-            updateVerifyBanner();
+            updateGuestBanner();
         } catch (_) {}
     }
     currentScreenId = id;
@@ -2415,17 +2427,64 @@ function submitParentGate() {
 }
 
 // =============================================
-// YEDEKLENMİYOR ŞERİDİ (e-posta doğrulanana kadar sync kapalı)
+// MİSAFİR MODU — kayıt olmadan deneme: cihaz başına TOPLAM
+// 1 konuşma pratiği + 1 nesne tanıma hakkı. Hak, seans fiilen
+// başlarken düşülür; sayaç localStorage'da tutulur ve misafir
+// çıkış yapıp yeniden girse de sıfırlanmaz.
 // =============================================
-function updateVerifyBanner() {
-    const el = document.getElementById('verifyBanner');
-    if (!el) return;
-    const isDemo = !_authToken || String(_authToken).startsWith('demo_');
-    el.style.display = (!isDemo && _authUser && _authUser.email && !_authUser.emailVerified) ? '' : 'none';
+function isGuestUser() {
+    return !!(_authToken && (String(_authToken).startsWith('demo_') || String(_authToken).startsWith('guest_')));
 }
 
-function openVerifyFromBanner() {
-    showEmailVerifyModal(null, false, false, 'close');
+function _guestUsed() {
+    try { return JSON.parse(localStorage.getItem('lms_guest_used')) || {}; } catch { return {}; }
+}
+
+function guestTryConsume(kind) {
+    if (!isGuestUser()) return true;
+    const used = _guestUsed();
+    if (used[kind]) { showGuestLimitModal(); return false; }
+    used[kind] = Date.now();
+    try { localStorage.setItem('lms_guest_used', JSON.stringify(used)); } catch {}
+    if (String(_authToken).startsWith('guest_')) {
+        authApi('guest_use', { token: _authToken, kind }).catch(() => {});
+    }
+    return true;
+}
+
+const GUEST_PRAISE = {
+    tr: ['Harika söyledin! 👏', 'Çok güzel! Devam edelim 🌟', 'Bravo, seni duydum!', 'Süpersin! Sıradaki soruya geçelim ⭐', 'Ne güzel anlattın! 👏', 'Aferin sana! 🌟'],
+    en: ['Great job! 👏', 'Wonderful! Let\'s keep going 🌟', 'Bravo, I heard you!', 'Awesome! On to the next one ⭐', 'You said that so nicely! 👏', 'Well done! 🌟'],
+};
+let _guestPraiseIdx = -1;
+
+function guestPraise() {
+    const list = GUEST_PRAISE[_lang] || GUEST_PRAISE.tr;
+    _guestPraiseIdx = (_guestPraiseIdx + 1) % list.length;
+    return list[_guestPraiseIdx];
+}
+
+function updateGuestBanner() {
+    const el = document.getElementById('guestBanner');
+    if (el) el.style.display = isGuestUser() ? '' : 'none';
+}
+
+function showGuestLimitModal() {
+    const modal = document.getElementById('guestLimitModal');
+    if (modal) modal.style.display = 'flex';
+}
+
+function closeGuestLimitModal() {
+    const modal = document.getElementById('guestLimitModal');
+    if (modal) modal.style.display = 'none';
+}
+
+async function guestExitToRegister() {
+    closeGuestLimitModal();
+    await clearAuthSessionLocal();
+    showOnly('auth-screen');
+    document.getElementById('authError').textContent = '';
+    switchAuthTab('register');
 }
 
 // =============================================
@@ -2560,6 +2619,7 @@ async function renderWeeklySummaryCard(force = false) {
         let tip = '';
         let aiOk = false;
         try {
+            if (isGuestUser()) throw new Error('guest');
             const r = await fetch(API_BASE + '/api/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', ...apiAuthHeaders() },
@@ -2855,6 +2915,7 @@ function setTopicChip(topic) {
 async function startTherapyWithTopic() {
     const input = document.getElementById('topicInput').value.trim();
     if (!input) return;
+    if (!guestTryConsume('therapy')) return;
     currentTopic = input;
     const level = getCurrentTherapyLevel();
     const presetQuestions = getPresetTherapyQuestionsForTopic(currentTopic, currentTherapyLevelKey);
@@ -4569,6 +4630,7 @@ function focusCityLocation(locationKey) {
 }
 
 function startFocusedCityLocation() {
+    if (!guestTryConsume('therapy')) return;
     const location = getCurrentCityLocation();
     currentTopic = '';
     setTherapyCategory(location.category, false);
@@ -5112,12 +5174,14 @@ KATI ETKİLEŞİM VE DİL KURALLARI:
         var reply = data?.candidates?.[0]?.content?.parts?.[0]?.text;
         if (!reply) {
             console.error('Gemini yanıt boş:', JSON.stringify(data));
+            if (isGuestUser()) return guestPraise();
             return _lang === 'en' ? 'AI is not responding right now, please wait.' : 'Yapay zeka şu an yanıt veremiyor, biraz bekle.';
         }
         chatHistory.push({ role: "model", parts: [{ text: reply }] });
         return reply;
     } catch (e) {
         console.error('Gemini hata:', e);
+        if (isGuestUser()) return guestPraise();
         return _lang === 'en' ? 'AI is not responding right now, please wait.' : 'Yapay zeka şu an yanıt veremiyor, biraz bekle.';
     }
 }
@@ -6217,6 +6281,7 @@ let _objItems = [], _objIndex = 0, _objErrors = 0, _objAnimating = false, _objBu
 let _objAnimState = null, _objAnimTimer = 0;
 
 async function goToObjectRecognition() {
+    if (!guestTryConsume('obj')) return;
     showOnly('object-screen');
     document.getElementById('objComplete').style.display = 'none';
     document.querySelector('.object-canvas-card').style.display = '';
@@ -6695,8 +6760,9 @@ window.askAIMode = askAIMode;
 window.submitParentGate = submitParentGate;
 window.closeParentGate = closeParentGate;
 window.toggleRoutineReminder = toggleRoutineReminder;
-window.openVerifyFromBanner = openVerifyFromBanner;
 window.renderWeeklySummaryCard = renderWeeklySummaryCard;
+window.guestExitToRegister = guestExitToRegister;
+window.closeGuestLimitModal = closeGuestLimitModal;
 // Yeni özellikler
 window.goToSchedule = goToSchedule;
 window.goToAac = goToAac;
@@ -6806,7 +6872,7 @@ async function checkAuthSession() {
                     _pendingPostVerifyAction = () => continueAuthenticatedEntry();
                     document.getElementById('authError').textContent = '';
                     switchAuthTab('login');
-                    showEmailVerifyModal(null, false, false, 'continue');
+                    showEmailVerifyModal(null, false, true, 'logout');
                     return;
                 }
                 if (!res.hasEmail) {
@@ -6827,8 +6893,48 @@ async function checkAuthSession() {
     showOnly('auth-screen');
 }
 
+// Cihaz kimliği: Android'de ANDROID_ID (uygulama silinip yeniden kurulsa da
+// aynı kalır — deneme hakkı bu sayede sıfırlanmaz), web'de localStorage'da
+// saklanan rastgele kimlik.
+async function getGuestDeviceId() {
+    try {
+        if (typeof Capacitor !== 'undefined' && Capacitor.isNativePlatform()
+            && Capacitor.Plugins && Capacitor.Plugins.Device) {
+            const info = await Capacitor.Plugins.Device.getId();
+            const id = info && (info.identifier || info.uuid);
+            if (id) return 'and_' + id;
+        }
+    } catch (_) {}
+    let id = null;
+    try { id = localStorage.getItem('lms_device_id'); } catch (_) {}
+    if (!id) {
+        const rand = (crypto.randomUUID && crypto.randomUUID())
+            || (Date.now() + '_' + Math.random().toString(36).slice(2, 12));
+        id = 'web_' + rand;
+        try { localStorage.setItem('lms_device_id', id); } catch (_) {}
+    }
+    return id;
+}
+
 async function continueAsGuest() {
-    _authToken = 'demo_' + Date.now();
+    let started = null;
+    try {
+        const deviceId = await getGuestDeviceId();
+        const res = await authApi('guest_start', { deviceId });
+        if (res && res.ok && res.token) started = res;
+    } catch (_) {}
+
+    if (started) {
+        _authToken = started.token;
+        // Sunucudaki hak durumu yereldekini ezer — uygulama silinip yeniden
+        // kurulduğunda kota kaldığı yerden devam eder
+        const used = {};
+        if (started.used && started.used.therapy) used.therapy = Date.now();
+        if (started.used && started.used.obj) used.obj = Date.now();
+        try { localStorage.setItem('lms_guest_used', JSON.stringify(used)); } catch (_) {}
+    } else {
+        _authToken = 'demo_' + Date.now();
+    }
     _authUser = { username: 'guest', displayName: _lang === 'en' ? 'Guest' : 'Misafir' };
     await DB.initEncryption(_authToken).catch(() => {});
     await continueAuthenticatedEntry();
@@ -7039,15 +7145,7 @@ function showEmailVerifyModal(emailMasked, codeAlreadySent = true, mandatory = f
 function closeVerifyModal() {
     if (_verifyModalMandatory) return;
     document.getElementById('emailVerifyModal').style.display = 'none';
-    const mode = _verifyModalExitMode;
     _verifyModalExitMode = 'close';
-    // "Daha sonra" ile ertelendiğinde kullanıcı auth ekranında asılı kalmasın,
-    // doğrulama duvarı yerine uygulamaya devam edip menüdeki şeridi görsün
-    if (mode === 'continue') {
-        const go = _pendingPostVerifyAction;
-        _pendingPostVerifyAction = null;
-        if (typeof go === 'function') go();
-    }
 }
 
 function showSetEmailModal(mandatory = false, exitMode = 'close') {
@@ -7169,7 +7267,6 @@ async function submitEmailVerification() {
             _authUser.emailVerified = true;
         }
         closeVerifyModal();
-        updateVerifyBanner();
         if (typeof postVerifyAction === 'function') await postVerifyAction();
         showToast(t('verify_success'));
     } else {
@@ -7285,7 +7382,7 @@ async function handleLogin(e) {
         showOnly('auth-screen');
         document.getElementById('authError').textContent = '';
         switchAuthTab('login');
-        showEmailVerifyModal(null, false, false, 'continue');
+        showEmailVerifyModal(null, false, true, 'logout');
         return;
     }
     if (!res.hasEmail) {
@@ -7335,7 +7432,7 @@ async function handleRegister(e) {
     localStorage.setItem('lms_last_user', _authUser.username);
     _pendingPostVerifyAction = () => continueAuthenticatedEntry();
     showOnly('auth-screen');
-    showEmailVerifyModal(res.emailMasked, !!res.emailVerificationPending, false, 'continue');
+    showEmailVerifyModal(res.emailMasked, !!res.emailVerificationPending, true, 'delete_signup');
 }
 
 async function authLogout() {

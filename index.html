@@ -137,6 +137,12 @@
         </form>
 
         <div class="auth-error" id="authError"></div>
+
+        <div class="auth-guest-row">
+            <button type="button" class="auth-guest-btn" onclick="continueAsGuest()" data-i18n="auth_guest_try">👀 Kayıt olmadan dene</button>
+            <p class="auth-guest-hint" data-i18n="auth_guest_hint">1 konuşma pratiği + 1 nesne tanıma denemesi ücretsiz</p>
+        </div>
+
         <p class="footer">© 2026 Efe Erman · <a href="mailto:efee7946@gmail.com">efee7946@gmail.com</a></p>
     </div>
 </div>
@@ -331,10 +337,10 @@
         <div><h2 id="menu-greeting-hidden">x</h2><p class="menu-subtitle"></p></div>
     </div>
 
-    <!-- Doğrulanmamış hesap: bulut yedeği kapalı uyarısı -->
-    <button type="button" id="verifyBanner" class="verify-banner" style="display:none" onclick="openVerifyFromBanner()">
-        <span data-i18n="verify_banner_text">☁️ Verileriniz henüz buluta yedeklenmiyor</span>
-        <strong data-i18n="verify_banner_btn">E-postayı doğrula</strong>
+    <!-- Misafir modu şeridi -->
+    <button type="button" id="guestBanner" class="menu-banner" style="display:none" onclick="guestExitToRegister()">
+        <span data-i18n="guest_banner_text">👀 Misafir modu: toplam 1 konuşma pratiği + 1 nesne tanıma hakkı</span>
+        <strong data-i18n="guest_banner_btn">Ücretsiz kayıt ol</strong>
     </button>
 
     <!-- Karşılama alanı -->
@@ -436,6 +442,18 @@
         <input type="text" id="parentGateInput" class="verify-code-input" inputmode="numeric" maxlength="3" placeholder="?" autocomplete="off">
         <div class="auth-error" id="parentGateError"></div>
         <button type="button" class="recovery-close-btn" onclick="submitParentGate()" data-i18n="parent_gate_ok">Devam</button>
+    </div>
+</div>
+
+<!-- ===================== MİSAFİR LİMİT MODALI ===================== -->
+<div id="guestLimitModal" class="recovery-modal-overlay" style="display:none">
+    <div class="recovery-modal-card">
+        <button type="button" class="recovery-modal-dismiss" onclick="closeGuestLimitModal()" aria-label="Kapat">✕</button>
+        <div class="recovery-modal-icon">🌟</div>
+        <h3 data-i18n="guest_limit_title">Deneme hakkın doldu 🌟</h3>
+        <p data-i18n="guest_limit_sub">Beğendiysen ücretsiz kayıt ol — tüm etkinlikler sınırsız olur, ilerlemen buluta yedeklenir ve verilerin kaybolmaz.</p>
+        <button type="button" class="recovery-close-btn" onclick="guestExitToRegister()" data-i18n="guest_limit_btn">Ücretsiz Kayıt Ol</button>
+        <button type="button" class="auth-forgot-link" onclick="closeGuestLimitModal()" data-i18n="guest_limit_later">Menüye dön</button>
     </div>
 </div>
 

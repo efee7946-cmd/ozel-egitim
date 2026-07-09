@@ -6,7 +6,7 @@
 import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 import { query } from './_db.js';
-import { hashToken, resolveToken } from './_auth.js';
+import { hashToken, resolveToken, guestByToken } from './_auth.js';
 import { sendMail, resetCodeEmailHtml, verifyCodeEmailHtml } from './_mail.js';
 import { checkRateLimit } from './_rateLimit.js';
 import { isPasswordPwned } from './_pwned.js';
@@ -155,6 +155,33 @@ async function unwrapDataKey(username, stored) {
 async function ensureDataKey(username) {
     const rows = await query('SELECT data_key FROM users WHERE username = $1', [username]);
     return unwrapDataKey(username, rows[0]?.data_key);
+}
+
+// Misafir deneme hakları cihaz kimliğine bağlıdır: Android'de ANDROID_ID
+// uygulama silinip yeniden kurulsa da değişmez, bu yüzden hak sıfırlanmaz.
+// Ham kimlik saklanmaz, pepper'lı SHA-256 hash'i saklanır.
+let _guestTableEnsured = false;
+async function ensureGuestTable() {
+    if (_guestTableEnsured) return;
+    await query(`CREATE TABLE IF NOT EXISTS guest_devices (
+        device_hash   TEXT PRIMARY KEY,
+        token_hash    TEXT,
+        token_expires TIMESTAMPTZ,
+        therapy_used  BOOLEAN DEFAULT false,
+        obj_used      BOOLEAN DEFAULT false,
+        chat_calls    INT DEFAULT 0,
+        tts_calls     INT DEFAULT 0,
+        photo_calls   INT DEFAULT 0,
+        video_calls   INT DEFAULT 0,
+        created_at    TIMESTAMPTZ DEFAULT now(),
+        last_seen     TIMESTAMPTZ DEFAULT now()
+    )`);
+    _guestTableEnsured = true;
+}
+
+function hashDeviceId(rawId) {
+    const pepper = process.env.AUTH_PEPPER || 'yz2026';
+    return crypto.createHash('sha256').update('guest_device:' + pepper + ':' + rawId).digest('hex');
 }
 
 // Doğrulama kodu üretir, kaydeder ve e-postayla gönderir (best-effort)
@@ -455,6 +482,44 @@ export default async function handler(req, res) {
                 email: rows[0].email || '',
                 emailVerified: !!rows[0].email_verified
             });
+        }
+
+        /* ---- MİSAFİR BAŞLAT (cihaz başına kalıcı deneme hakkı) ---- */
+        if (action === 'guest_start') {
+            if (!(await checkRateLimit('guest_start_ip:' + getClientIp(req), 20)))
+                return res.status(429).json({ error: 'AUTH_RATE_LIMITED' });
+            const rawId = String(req.body?.deviceId || '').trim();
+            if (rawId.length < 8 || rawId.length > 128)
+                return res.status(400).json({ error: 'AUTH_FIELDS_REQUIRED' });
+            await ensureGuestTable();
+            const deviceHash = hashDeviceId(rawId);
+            const tok = 'guest_' + crypto.randomBytes(32).toString('hex');
+            const rows = await query(
+                `INSERT INTO guest_devices (device_hash, token_hash, token_expires)
+                 VALUES ($1, $2, now() + interval '7 days')
+                 ON CONFLICT (device_hash) DO UPDATE
+                 SET token_hash = $2, token_expires = now() + interval '7 days', last_seen = now()
+                 RETURNING therapy_used, obj_used`,
+                [deviceHash, hashToken(tok)]
+            );
+            return res.json({
+                ok: true, token: tok,
+                used: { therapy: !!rows[0].therapy_used, obj: !!rows[0].obj_used }
+            });
+        }
+
+        /* ---- MİSAFİR HAK KULLANIMI ---- */
+        if (action === 'guest_use') {
+            const g = await guestByToken(token);
+            if (!g) return res.status(401).json({ error: 'Geçersiz oturum' });
+            const { kind } = req.body || {};
+            const column = kind === 'therapy' ? 'therapy_used' : (kind === 'obj' ? 'obj_used' : null);
+            if (!column) return res.status(400).json({ error: 'Geçersiz istek' });
+            await query(
+                `UPDATE guest_devices SET ${column} = true, last_seen = now() WHERE device_hash = $1`,
+                [g.device_hash]
+            );
+            return res.json({ ok: true });
         }
 
         /* ---- ÇIKIŞ ---- */

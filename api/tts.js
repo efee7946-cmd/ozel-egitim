@@ -1,8 +1,10 @@
 import { spawn } from 'child_process';
 import path from 'path';
 import fs from 'fs';
-import { sessionUsername } from './_auth.js';
+import { sessionUsername, guestCallAllowed } from './_auth.js';
 import { checkRateLimit } from './_rateLimit.js';
+
+const GUEST_TTS_CAP = 80;
 
 export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Origin', process.env.ALLOWED_ORIGIN || '*');
@@ -14,11 +16,12 @@ export default async function handler(req, res) {
         return res.status(405).json({ error: 'Sadece POST isteği atılabilir.' });
     }
 
-    const username = await sessionUsername(req);
-    if (!username) {
+    let actor = await sessionUsername(req);
+    if (!actor) actor = await guestCallAllowed(req, 'tts_calls', GUEST_TTS_CAP);
+    if (!actor) {
         return res.status(401).json({ error: 'AUTH_REQUIRED' });
     }
-    if (!(await checkRateLimit('tts:' + username, 120))) {
+    if (!(await checkRateLimit('tts:' + actor, 120))) {
         return res.status(429).json({ error: 'RATE_LIMITED' });
     }
 

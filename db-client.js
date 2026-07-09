@@ -217,7 +217,7 @@ const DB = (function () {
         try {
             const raw = localStorage.getItem(PFX + 'auth_token');
             const token = raw ? JSON.parse(raw) : null;
-            if (!token || String(token).startsWith('demo_')) return null;
+            if (!token || String(token).startsWith('demo_') || String(token).startsWith('guest_')) return null;
             return token;
         } catch { return null; }
     }
