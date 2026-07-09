@@ -3,10 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Hesap Silme – YıldızCan</title>
+<title>Hesap ve Veri Silme – YıldızCan</title>
 <style>
   body { font-family: system-ui, sans-serif; max-width: 560px; margin: 40px auto; padding: 0 20px; color: #333; line-height: 1.7; }
   h1 { color: #0f9d8f; }
+  h2 { color: #1d2746; font-size: 1.05rem; margin-top: 32px; }
   .card { background: #f9f9f9; border: 1px solid #ddd; border-radius: 12px; padding: 24px; margin-top: 24px; }
   input { width: 100%; padding: 10px 14px; margin: 8px 0 16px; border: 1px solid #ccc; border-radius: 8px; font-size: 1rem; box-sizing: border-box; }
   button { background: #e53935; color: white; border: none; padding: 12px 24px; border-radius: 8px; font-size: 1rem; cursor: pointer; width: 100%; }
@@ -14,12 +15,15 @@
   .msg { margin-top: 16px; padding: 12px; border-radius: 8px; display: none; }
   .msg.success { background: #e8f5e9; color: #2e7d32; display: block; }
   .msg.error { background: #ffebee; color: #c62828; display: block; }
+  ul { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note { font-size: 0.9rem; color: #666; }
 </style>
 </head>
 <body>
-<h1>Hesap Silme</h1>
-<p>Hesabınızı ve ilişkili tüm verilerinizi kalıcı olarak silmek için aşağıdaki formu doldurun.</p>
-<p><strong>Uyarı:</strong> Bu işlem geri alınamaz. Tüm öğrenci verileri, seans kayıtları ve profil bilgileri silinecektir.</p>
+<h1>Hesap ve Veri Silme</h1>
+<p><strong>YıldızCan – Konuşma Pratiği</strong> (geliştirici: Efe Erman) hesabınızı ve ilişkili tüm verilerinizi kalıcı olarak silmek için aşağıdaki formu kullanın.</p>
+<p><strong>Uyarı:</strong> Bu işlem geri alınamaz.</p>
 
 <div class="card">
   <label>Kullanıcı adı</label>
@@ -30,8 +34,35 @@
   <div class="msg" id="msg"></div>
 </div>
 
-<p style="margin-top:32px;font-size:0.9rem;color:#666">
-  Sorun yaşıyorsanız: <a href="mailto:yildizsiniflari@gmail.com">yildizsiniflari@gmail.com</a>
+<h2>Silme talebinde bulunmanın adımları</h2>
+<ol>
+  <li>Yukarıdaki forma kullanıcı adınızı ve şifrenizi yazın, "Hesabımı Kalıcı Olarak Sil" düğmesine basın; silme işlemi anında gerçekleşir.</li>
+  <li>Alternatif olarak uygulama içinden: <em>Ana ekran → ⚙️ Ayarlar → Hesabı Sil</em>.</li>
+  <li>Şifrenize erişemiyorsanız veya hesabınızı silmeden <em>belirli verilerin</em> (örn. tek bir öğrenci kaydı ya da seans geçmişi) silinmesini istiyorsanız, kayıtlı e-posta adresinizden <a href="mailto:efee7946@gmail.com">efee7946@gmail.com</a> adresine yazın. Talepler en geç 30 gün içinde yerine getirilir.</li>
+</ol>
+
+<h2>Silinen veriler</h2>
+<p>Hesap silindiğinde aşağıdaki verilerin tamamı sunucularımızdan kalıcı olarak ve anında silinir; ek bir saklama süresi yoktur:</p>
+<ul>
+  <li>Hesap bilgileri (kullanıcı adı, e-posta adresi, şifre özeti)</li>
+  <li>Öğrenci profilleri ve gelişim notları</li>
+  <li>IEP hedefleri ve deneme kayıtları</li>
+  <li>Beceri ve davranış kayıtları</li>
+  <li>Konuşma pratiği seans geçmişi ve raporlar</li>
+  <li>AAC panoları ve kartları</li>
+  <li>Yıldız/ödül ilerlemesi</li>
+  <li>Tüm aktif oturumlar</li>
+</ul>
+
+<h2>Saklanan veriler ve süreleri</h2>
+<ul>
+  <li>Hesapla ilişkilendirilmeyen, kişisel bilgilerden arındırılmış teknik hata kayıtları en fazla <strong>30 gün</strong> saklanır ve otomatik silinir.</li>
+  <li>Misafir denemesinin kötüye kullanımını önlemek için tutulan kayıt, geri döndürülemez şekilde karma (hash) işleminden geçirilmiş bir cihaz kimliğidir; hesabınızla veya kimliğinizle ilişkilendirilmez.</li>
+  <li>Bunların dışında hesap silindikten sonra hiçbir kişisel veri saklanmaz.</li>
+</ul>
+
+<p class="note" style="margin-top:32px">
+  Sorularınız için: <a href="mailto:efee7946@gmail.com">efee7946@gmail.com</a>
 </p>
 
 <script>
