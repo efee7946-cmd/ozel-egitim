@@ -27,8 +27,7 @@ test.describe('Veli kapısı, ilk kullanım akışı ve rapor kartları', () => 
     await page.waitForSelector('#menu-screen', { state: 'visible' });
     const obSkip = page.locator('#onboardingModal .onboarding-skip');
     if (await obSkip.isVisible().catch(() => false)) await obSkip.click();
-    await expect(page.locator('.menu-section-label')).toBeVisible();
-    await expect(page.locator('.tile-iep')).toBeVisible();
+    await expect(page.locator('.tile-analysis')).toBeVisible();
 
     // Analiz girişi veli kapısıyla korunur: önce yanlış cevap
     await page.click('.tile-analysis');
@@ -53,11 +52,11 @@ test.describe('Veli kapısı, ilk kullanım akışı ve rapor kartları', () => 
     await expect(page.locator('#routineToggleBtn')).toBeDisabled();
     await expect(page.locator('#routineStatus')).toContainText('mobil uygulamada');
 
-    // Kilit açıkken diğer yetişkin ekranları kapısız açılmalı
+    // Kilit açıkken analize tekrar giriş kapısız olmalı
     await page.evaluate(() => window.goToMenu());
     await page.waitForSelector('#menu-screen', { state: 'visible' });
-    await page.click('.tile-iep');
+    await page.click('.tile-analysis');
     await expect(page.locator('#parentGateModal')).toBeHidden();
-    await page.waitForSelector('#iep-screen', { state: 'visible' });
+    await page.waitForSelector('#analysis-screen', { state: 'visible' });
   });
 });

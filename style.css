@@ -6134,16 +6134,7 @@ body.has-bottom-nav #behavior-screen {
     50% { transform: scale(1.1); }
 }
 
-/* ===================== VELİ KAPISI VE TAKİP BÖLÜMÜ ===================== */
-.menu-section-label {
-    max-width: 1080px;
-    margin: 26px auto 12px;
-    padding: 0 4px;
-    font-size: 1.02rem;
-    font-weight: 800;
-    color: var(--auth-ink);
-}
-
+/* ===================== VELİ KAPISI ===================== */
 .parent-gate-question {
     font-size: 1.25rem;
     font-weight: 800;
