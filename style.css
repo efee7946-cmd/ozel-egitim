@@ -5431,6 +5431,13 @@ body.a11y-reduce-motion * { transition: none !important; animation: none !import
     width: 15px; height: 15px;
     flex-shrink: 0; cursor: pointer;
 }
+.veli-consent-label a { color: #3b7dd8; text-decoration: underline; font-weight: 600; }
+
+.guest-name-hint {
+    font-size: 0.78rem;
+    color: #64748b;
+    margin-top: 4px;
+}
 
 .kvkk-modal-overlay {
     position: fixed; inset: 0; background: rgba(0,0,0,0.55);

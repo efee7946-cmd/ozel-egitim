@@ -298,7 +298,10 @@ const STRINGS = {
     setup_note_label: 'Not',
     setup_create_btn: 'Oluştur',
     setup_add_new_divider: 'Yeni öğrenci ekle',
-    veli_consent_label: 'Bu öğrencinin velisi KVKK kapsamında bilgilendirildi ve rıza verdi.',
+    veli_consent_pre: 'Bu öğrencinin velisi ',
+    veli_consent_link: 'KVKK Aydınlatma Metni',
+    veli_consent_post: ' kapsamında bilgilendirildi ve rıza verdi.',
+    guest_name_hint: 'Denemek için gerçek isim yerine takma ad yazabilirsiniz.',
     // Accessibility panel
     a11y_export_label: '📥 Verilerimi İndir',
     a11y_delete_label: '🗑️ Hesabı Sil',
@@ -1242,7 +1245,10 @@ const STRINGS = {
     setup_note_label: 'Note',
     setup_create_btn: 'Create',
     setup_add_new_divider: 'Add new student',
-    veli_consent_label: "I confirm that this student's parent/guardian has been informed and has given consent under KVKK.",
+    veli_consent_pre: "This student's parent/guardian has been informed via the ",
+    veli_consent_link: 'Privacy Notice (KVKK)',
+    veli_consent_post: ' and has given consent.',
+    guest_name_hint: 'You can use a nickname instead of a real name while trying the app.',
     // Accessibility panel
     a11y_export_label: '📥 Export My Data',
     a11y_delete_label: '🗑️ Delete Account',
@@ -3378,6 +3384,7 @@ async function createStudent() {
         support_notes: supportNotes,
         active: true,
         created_at: new Date().toISOString(),
+        consent_at: new Date().toISOString(),
     };
     const key = 'teacher_students_' + userId;
     const existing = await DB.get(key) || [];
@@ -7412,7 +7419,7 @@ async function handleRegister(e) {
     if (password.length < 8) return showAuthError(t('auth_password_short'));
     setAuthLoading(true);
 
-    const res = await authApi('register', { username, password, email: regEmail });
+    const res = await authApi('register', { username, password, email: regEmail, kvkkAccepted: true });
     setAuthLoading(false);
 
     if (res.fallback) {
@@ -7455,29 +7462,33 @@ function openKvkkModal(e) {
         : 'Privacy & Data Protection';
     document.getElementById('kvkkModalBody').innerHTML = isTr ? `
         <h4>Aydınlatma Metni</h4>
-        <p><strong>Veri Sorumlusu:</strong> Efe Erman — İstanbul, Tuzla — efee7946@gmail.com</p>
+        <p><strong>Veri Sorumlusu:</strong> Efe Erman — İstanbul, Tuzla — yildizsiniflari@gmail.com</p>
         <p><strong>Toplanan Veriler:</strong> Kullanıcı adı, e-posta adresi (şifre sıfırlama ve hesap doğrulama amaçlı), öğrenci adı, eğitim kademesi, destek ihtiyacı bilgileri, beceri ve davranış takip verileri, oturum bilgileri. Öğrenci verilerinin işlenmesi için veli/yasal temsilci onayı zorunludur.</p>
         <p><strong>İşleme Amacı:</strong> Özel eğitim süreçlerinin takibi, BEP hazırlama, beceri ve davranış değerlendirmesi, yapay zeka destekli geri bildirim oluşturulması.</p>
-        <p><strong>Saklama Süresi:</strong> Hesap silinene kadar. Hesap silme talebi üzerine tüm veriler 30 gün içinde kalıcı olarak silinir.</p>
-        <p><strong>Aktarılan Taraflar:</strong> Vercel (barındırma altyapısı), Aiven (veritabanı), Google Gemini ve Google Cloud (yapay zeka ve ses sentezi), Pexels (görsel içerik). Bu hizmetler yalnızca teknik işleme amacıyla kullanılmakta olup kişisel verileriniz pazarlama amaçlı üçüncü taraflarla paylaşılmamaktadır.</p>
+        <p><strong>Onay Kaydı:</strong> Veli onayı öğrenci kaydıyla, Aydınlatma Metni kabulü hesap kaydıyla birlikte tarih bilgisi olarak saklanır.</p>
+        <p><strong>Saklama Süresi:</strong> Hesap silinene kadar. Uygulama içi "Hesabı Sil" ile tüm veriler anında, e-posta ile iletilen silme talepleri en geç 30 gün içinde kalıcı olarak silinir. Kişisel bilgi içermeyen teknik hata kayıtları en fazla 30 gün saklanır.</p>
+        <p><strong>Aktarılan Taraflar:</strong> Vercel (barındırma altyapısı), Aiven (veritabanı), Google Gemini ve Google Cloud (yapay zeka, ses sentezi ve e-posta gönderimi), Pexels (görsel içerik). Bu hizmetler yalnızca teknik işleme amacıyla kullanılmakta olup kişisel verileriniz pazarlama amaçlı üçüncü taraflarla paylaşılmamaktadır.</p>
+        <p><strong>Misafir Modu:</strong> Kayıt olmadan deneme yapıldığında öğrenci bilgileri yalnızca cihazınızda saklanır, sunucuya gönderilmez. Deneme hakkının kötüye kullanılmasını önlemek için cihaz kimliğinin geri döndürülemez bir karma (hash) özeti sunucuda tutulur; bu özet kimliğinizle ilişkilendirilmez. Seans sırasında verilen yanıtların metni, geri bildirim üretmek için yapay zeka hizmetine iletilir.</p>
         <p><strong>Haklarınız (KVKK Md. 11):</strong> Verilerinize erişim, düzeltme, silme, işlemeyi kısıtlama ve taşıma haklarına sahipsiniz. Talepleriniz için uygulama içi "Hesabı Sil" veya "Verilerimi İndir" özelliklerini kullanabilirsiniz.</p>
         <h4>Gizlilik Politikası</h4>
         <p>YıldızCan, 6698 sayılı Kişisel Verilerin Korunması Kanunu (KVKK) kapsamında kişisel verilerinizi korumayı taahhüt eder. Çocuklara ait veriler yalnızca eğitim amacıyla işlenir, hiçbir koşulda satılmaz veya reklam amacıyla kullanılmaz.</p>
-        <p>Uygulama, tarayıcı yerel deposunu (localStorage) oturum ve tercih bilgilerini saklamak için kullanır. Bu veriler cihazınızda kalır ve sunucuya aktarılmaz.</p>
+        <p>Veriler önce cihazınızdaki yerel depoya (localStorage) kaydedilir; kayıtlı hesaplarda ayrıca hesabınıza özel olarak sunucu veritabanıyla eşitlenir. Misafir modunda öğrenci verileri yalnızca cihazda kalır.</p>
         <p>Sorularınız için: yildizsiniflari@gmail.com</p>
         <h4>Çerez / Yerel Depolama Politikası</h4>
         <p>Uygulama; oturum belirteci, kullanıcı tercihleri ve öğrenci verilerini cihazınızdaki localStorage'da saklar. Üçüncü taraf çerez kullanılmaz. Tarayıcı verilerini temizlediğinizde yerel veriler de silinir.</p>
     ` : `
         <h4>Privacy Notice</h4>
-        <p><strong>Data Controller:</strong> Efe Erman — Istanbul, Tuzla — efee7946@gmail.com</p>
+        <p><strong>Data Controller:</strong> Efe Erman — Istanbul, Tuzla — yildizsiniflari@gmail.com</p>
         <p><strong>Data Collected:</strong> Username, email address (for password reset and account verification), student name, education level, support needs, skill and behavior tracking data, session information. Parental/guardian consent is required to process student data.</p>
         <p><strong>Purpose:</strong> Tracking special education progress, IEP preparation, skill and behavior assessment, AI-assisted feedback generation.</p>
-        <p><strong>Retention:</strong> Until account deletion. Upon request, all data is permanently deleted within 30 days.</p>
-        <p><strong>Third Parties:</strong> Vercel (hosting), Aiven (database), Google Gemini and Google Cloud (AI and text-to-speech), Pexels (images). These services are used for technical processing only — your data is never shared with third parties for marketing purposes.</p>
+        <p><strong>Consent Records:</strong> Parental consent is stored with the student record and Privacy Notice acceptance with the account record, each with a timestamp.</p>
+        <p><strong>Retention:</strong> Until account deletion. In-app "Delete Account" removes all data immediately; deletion requests sent by email are fulfilled within 30 days. Technical error logs containing no personal information are kept for at most 30 days.</p>
+        <p><strong>Third Parties:</strong> Vercel (hosting), Aiven (database), Google Gemini and Google Cloud (AI, text-to-speech and email delivery), Pexels (images). These services are used for technical processing only — your data is never shared with third parties for marketing purposes.</p>
+        <p><strong>Guest Mode:</strong> When trying the app without an account, student data stays on your device only and is not sent to the server. To prevent abuse of the free trial, an irreversible hash of your device identifier is kept on the server; it is never linked to your identity. The text of answers given during a session is sent to the AI service to generate feedback.</p>
         <p><strong>Your Rights:</strong> You have the right to access, correct, delete, restrict processing, and port your data. Use the in-app "Delete Account" or "Export My Data" features to exercise these rights.</p>
         <h4>Privacy Policy</h4>
         <p>YıldızCan is committed to protecting your personal data. Student data is processed solely for educational purposes and will never be sold or used for advertising.</p>
-        <p>The app uses browser local storage (localStorage) to store session and preference data. This data stays on your device and is not transmitted to the server.</p>
+        <p>Data is saved to your device's local storage (localStorage) first; for registered accounts it is additionally synced to the server database, isolated per account. In guest mode student data stays on the device only.</p>
         <p>Questions: yildizsiniflari@gmail.com</p>
         <h4>Cookie / Local Storage Policy</h4>
         <p>The app stores session tokens, user preferences, and student data in your device's localStorage. No third-party cookies are used. Clearing your browser data will also remove local app data.</p>
@@ -7769,6 +7780,8 @@ async function renderLoginStudents(students) {
     if (statusEl) statusEl.textContent = '';
     if (nameInput) nameInput.value = student?.name || '';
     if (consentEl) consentEl.checked = false;
+    const guestHint = document.getElementById('guestNameHint');
+    if (guestHint) guestHint.style.display = isGuestUser() ? '' : 'none';
     renderLoginEmojiPicker(student?.emoji || '🌟');
     document.querySelectorAll('input[name="loginLevel"]').forEach(input => {
         input.checked = input.value === (profile?.category || 'egit');
@@ -7808,6 +7821,7 @@ async function createStudentFromLogin() {
         name,
         emoji,
         createdAt: existing?.createdAt || new Date().toISOString(),
+        consentAt: new Date().toISOString(),
     };
     if (saveBtn) saveBtn.disabled = true;
     if (statusEl) statusEl.textContent = existing ? t('updating_student') : t('creating_student');

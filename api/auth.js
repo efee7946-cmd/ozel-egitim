@@ -59,6 +59,7 @@ async function ensureAuthColumns() {
     await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS verify_attempts INT DEFAULT 0');
     await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS failed_logins INT DEFAULT 0');
     await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS lock_until TIMESTAMPTZ');
+    await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS kvkk_accepted_at TIMESTAMPTZ');
     _columnsEnsured = true;
 }
 
@@ -236,8 +237,8 @@ export default async function handler(req, res) {
             const displayName = username.trim();
             const dataKey = crypto.randomBytes(32).toString('hex');
             await query(
-                'INSERT INTO users (username, display_name, hash, salt, email, data_key) VALUES ($1, $2, $3, $4, $5, $6)',
-                [u, displayName, hash, '', userEmail, encryptDataKey(dataKey)]  // bcrypt hash'i salt içeriyor, ayrı sütun boş
+                'INSERT INTO users (username, display_name, hash, salt, email, data_key, kvkk_accepted_at) VALUES ($1, $2, $3, $4, $5, $6, $7)',
+                [u, displayName, hash, '', userEmail, encryptDataKey(dataKey), req.body?.kvkkAccepted ? new Date() : null]  // bcrypt hash'i salt içeriyor, ayrı sütun boş
             );
 
             // Doğrulama kodu gönder — mail hatası kaydı engellemesin
