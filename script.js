@@ -912,14 +912,10 @@ const STRINGS = {
     a11y_email_edit: 'Düzenle',
     set_email_prompt: 'Şifre sıfırlama için e-posta adresiniz:',
     set_email_success: 'E-posta kaydedildi: {email}',
-    mode_parent_btn: '🔒 Veli',
-    mode_child_btn: '🧒 Çocuk Modu',
-    mode_child_on_toast: 'Çocuk modu açık. Veli bölümüne dönmek için 🔒 Veli düğmesine dokunun.',
     parent_gate_title: 'Veli Kapısı',
-    parent_gate_sub: 'Bu bölüm yetişkinler içindir. Devam etmek için cevabı rakamla yazın:',
+    parent_gate_sub: 'Bu bölüm yetişkinler içindir. Devam etmek için sonucu yazın:',
     parent_gate_wrong: 'Cevap doğru değil, tekrar deneyin.',
     parent_gate_ok: 'Devam',
-    gate_question: '{a} artı {b} kaç eder?',
     menu_section_parent: '👨‍👩‍👧 Takip & Raporlar',
     menu_iep: 'IEP Hedefleri',
     menu_iep_desc: 'Hedef belirle, deneme kaydet',
@@ -1860,14 +1856,10 @@ const STRINGS = {
     a11y_email_edit: 'Edit',
     set_email_prompt: 'Your email address for password reset:',
     set_email_success: 'Email saved: {email}',
-    mode_parent_btn: '🔒 Parent',
-    mode_child_btn: '🧒 Child Mode',
-    mode_child_on_toast: 'Child mode is on. Tap 🔒 Parent to return to the adult area.',
     parent_gate_title: 'Parent Gate',
-    parent_gate_sub: 'This area is for adults. Type the answer in digits to continue:',
+    parent_gate_sub: 'This area is for adults. Type the result to continue:',
     parent_gate_wrong: 'Not quite, try again.',
     parent_gate_ok: 'Continue',
-    gate_question: 'How much is {a} plus {b}?',
     menu_section_parent: '👨‍👩‍👧 Tracking & Reports',
     menu_iep: 'IEP Goals',
     menu_iep_desc: 'Set goals, log trials',
@@ -1913,8 +1905,7 @@ function setLang(lang) {
   applyLang();
   // Menu ipucu banner'ı data-i18n değil, JS ile textContent yazıyor —
   // applyLang() bunu göremez, dil değişince manuel yeniden render gerekir.
-  applyUiMode();
-  if (currentScreenId === 'menu-screen') { renderMenuNudge(); renderRoutineCard(); renderWeeklySummaryCard(); }
+  if (currentScreenId === 'menu-screen') renderMenuNudge();
   if (activeStudentId && typeof AACData !== 'undefined') {
     AACData.resyncLanguage(activeStudentId).then(changed => {
       if (changed && currentScreenId === 'aac-screen') _aacRenderAll();
@@ -2347,10 +2338,7 @@ async function showOnly(id, options = {}) {
         try {
             updateStarBadge();
             renderMenuNudge();
-            applyUiMode();
             updateVerifyBanner();
-            renderRoutineCard();
-            renderWeeklySummaryCard();
         } catch (_) {}
     }
     currentScreenId = id;
@@ -2396,51 +2384,25 @@ function _updateBottomNav(screenId) {
 }
 
 // =============================================
-// ÇOCUK MODU / VELİ MODU
+// VELİ KAPISI — yetişkin ekranlarının (analiz, IEP, beceri, davranış)
+// girişini basit bir toplama sorusuyla korur
 // =============================================
-let _uiMode = localStorage.getItem('lms_ui_mode') || 'parent';
+const GATE_UNLOCK_MS = 10 * 60 * 1000;
 let _parentGateAnswer = null;
+let _gateNext = null;
+let _gateUnlockedUntil = 0;
 
-function applyUiMode() {
-    document.body.classList.toggle('mode-child', _uiMode === 'child');
-    const btn = document.getElementById('modeToggleBtn');
-    if (btn) btn.textContent = _uiMode === 'child' ? t('mode_parent_btn') : t('mode_child_btn');
-}
-
-function toggleUiMode() {
-    if (_uiMode === 'parent') {
-        _uiMode = 'child';
-        localStorage.setItem('lms_ui_mode', _uiMode);
-        applyUiMode();
-        showToast(t('mode_child_on_toast'));
-    } else {
-        openParentGate();
-    }
-}
-
-function _gateWords(n) {
-    if (_lang === 'en') {
-        const ones = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
-        const tens = ['', '', 'twenty', 'thirty', 'forty'];
-        const d = Math.floor(n / 10), o = n % 10;
-        if (d < 2) return ones[n];
-        return tens[d] + (o ? '-' + ones[o] : '');
-    }
-    const ones = ['', 'bir', 'iki', 'üç', 'dört', 'beş', 'altı', 'yedi', 'sekiz', 'dokuz'];
-    const tens = ['', 'on', 'yirmi', 'otuz', 'kırk'];
-    const d = Math.floor(n / 10), o = n % 10;
-    if (!d) return ones[o];
-    return tens[d] + (o ? ' ' + ones[o] : '');
+function requireAdultGate(next) {
+    if (Date.now() < _gateUnlockedUntil) { next(); return; }
+    _gateNext = next;
+    openParentGate();
 }
 
 function openParentGate() {
-    // Rakam yerine yazıyla sorulur — okuma bilmeyen çocuk geçemez.
-    // 21-49 arası + tek basamak: İngilizce'de düzensiz "teen" sayılarından kaçınır
-    const a = 21 + Math.floor(Math.random() * 29);
-    const b = 2 + Math.floor(Math.random() * 8);
+    const a = 2 + Math.floor(Math.random() * 8);
+    const b = 21 + Math.floor(Math.random() * 29);
     _parentGateAnswer = a + b;
-    document.getElementById('parentGateQuestion').textContent =
-        t('gate_question').replace('{a}', _gateWords(a)).replace('{b}', _gateWords(b));
+    document.getElementById('parentGateQuestion').textContent = `${a} + ${b} = ?`;
     document.getElementById('parentGateInput').value = '';
     document.getElementById('parentGateError').textContent = '';
     document.getElementById('parentGateModal').style.display = 'flex';
@@ -2450,6 +2412,7 @@ function openParentGate() {
 function closeParentGate() {
     document.getElementById('parentGateModal').style.display = 'none';
     _parentGateAnswer = null;
+    _gateNext = null;
 }
 
 function submitParentGate() {
@@ -2459,13 +2422,10 @@ function submitParentGate() {
         document.getElementById('parentGateInput').value = '';
         return;
     }
+    const next = _gateNext;
     closeParentGate();
-    _uiMode = 'parent';
-    localStorage.setItem('lms_ui_mode', 'parent');
-    applyUiMode();
-    updateVerifyBanner();
-    renderRoutineCard();
-    renderWeeklySummaryCard();
+    _gateUnlockedUntil = Date.now() + GATE_UNLOCK_MS;
+    if (typeof next === 'function') next();
 }
 
 // =============================================
@@ -2579,7 +2539,7 @@ let _weeklyBusy = false;
 async function renderWeeklySummaryCard(force = false) {
     const card = document.getElementById('weeklySummaryCard');
     if (!card) return;
-    if (!activeStudentId || _uiMode !== 'parent') { card.style.display = 'none'; return; }
+    if (!activeStudentId) { card.style.display = 'none'; return; }
     card.style.display = '';
 
     const stored = DB.getSync(weeklySummaryStorageKey());
@@ -3701,6 +3661,8 @@ async function _populateReportTab() {
     const history = await persistSessionSnapshot();
     renderReportHistory(history);
     renderObjResultsSummary();
+    renderWeeklySummaryCard();
+    renderRoutineCard();
 
     // İstatistikler son 7 günü anlatır — rapor ne zaman açılırsa açılsın dolu
     const weekAgo = Date.now() - 7 * 86400000;
@@ -6714,7 +6676,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const settings = loadA11ySettings();
     applyA11yClasses(settings);
     applyLang();
-    applyUiMode();
     const gateInput = document.getElementById('parentGateInput');
     if (gateInput) gateInput.addEventListener('keydown', e => { if (e.key === 'Enter') submitParentGate(); });
 });
@@ -6745,7 +6706,6 @@ window.selectStudent = selectStudent;
 window.changeHistoryMonth = changeHistoryMonth;
 window.rereadQuestion = rereadQuestion;
 window.askAIMode = askAIMode;
-window.toggleUiMode = toggleUiMode;
 window.submitParentGate = submitParentGate;
 window.closeParentGate = closeParentGate;
 window.toggleRoutineReminder = toggleRoutineReminder;
@@ -7819,9 +7779,11 @@ const BEP_CONDITION_LABELS = {
     get stereotipik() { return t('bep_cond_stereotipik'); },
 };
 
-async function goToAnalysis(tab) {
-    showOnly('analysis-screen');
-    await switchReportTab(tab || 'analysis');
+function goToAnalysis(tab) {
+    requireAdultGate(async () => {
+        showOnly('analysis-screen');
+        await switchReportTab(tab || 'analysis');
+    });
 }
 
 async function switchReportTab(tab) {
@@ -8182,12 +8144,13 @@ function iepBack() {
 }
 
 function goToIep() {
-
-    showOnly('iep-screen');
-    document.getElementById('iepStudentBadge').textContent = activeStudentName || '';
-    hideIepGoalForm();
-    closeSessionPanel();
-    renderIepGoals();
+    requireAdultGate(() => {
+        showOnly('iep-screen');
+        document.getElementById('iepStudentBadge').textContent = activeStudentName || '';
+        hideIepGoalForm();
+        closeSessionPanel();
+        renderIepGoals();
+    });
 }
 
 function iepGoalsKey() { return `iep_${activeStudentId || 'default'}`; }
@@ -8455,10 +8418,12 @@ function skillsBack() {
 }
 
 function goToSkills() {
-    showOnly('skills-screen');
-    document.getElementById('skillsStudentBadge').textContent = activeStudentName || '';
-    renderSkillsDomainTabs();
-    renderSkillsGrid();
+    requireAdultGate(() => {
+        showOnly('skills-screen');
+        document.getElementById('skillsStudentBadge').textContent = activeStudentName || '';
+        renderSkillsDomainTabs();
+        renderSkillsGrid();
+    });
 }
 
 function skillsKey() { return `skills_${activeStudentId || 'default'}`; }
@@ -8523,12 +8488,13 @@ function behaviorBack() {
 }
 
 function goToBehavior() {
-
-    showOnly('behavior-screen');
-    document.getElementById('behaviorStudentBadge').textContent = activeStudentName || '';
-    _behaviorCount = 1;
-    document.getElementById('behaviorCount').textContent = '1';
-    renderBehaviorLog();
+    requireAdultGate(() => {
+        showOnly('behavior-screen');
+        document.getElementById('behaviorStudentBadge').textContent = activeStudentName || '';
+        _behaviorCount = 1;
+        document.getElementById('behaviorCount').textContent = '1';
+        renderBehaviorLog();
+    });
 }
 
 function behaviorKey() { return `behavior_${activeStudentId || 'default'}`; }

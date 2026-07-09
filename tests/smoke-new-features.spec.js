@@ -1,15 +1,12 @@
 import { test, expect } from '@playwright/test';
 
-const TR_WORDS = { bir: 1, iki: 2, 'üç': 3, 'dört': 4, 'beş': 5, 'altı': 6, yedi: 7, sekiz: 8, dokuz: 9, on: 10, yirmi: 20, otuz: 30, 'kırk': 40 };
-
 function solveGate(question) {
-  const parts = question.replace('kaç eder?', '').split('artı');
-  const parse = s => s.trim().split(/\s+/).reduce((sum, w) => sum + (TR_WORDS[w] || 0), 0);
-  return parse(parts[0]) + parse(parts[1]);
+  const m = question.match(/(\d+)\s*\+\s*(\d+)/);
+  return Number(m[1]) + Number(m[2]);
 }
 
-test.describe('Çocuk/Veli modu, veli kapısı ve ilk kullanım akışı', () => {
-  test('misafir akışı: ilk öğrenci → doğrudan pratik, mod geçişleri ve kapı', async ({ page }) => {
+test.describe('Veli kapısı, ilk kullanım akışı ve rapor kartları', () => {
+  test('misafir akışı: ilk öğrenci → doğrudan pratik, kapılı analiz girişi', async ({ page }) => {
     await page.goto('/');
     await page.evaluate(() => { localStorage.clear(); localStorage.setItem('lms_lang', 'tr'); });
     await page.reload();
@@ -25,46 +22,42 @@ test.describe('Çocuk/Veli modu, veli kapısı ve ilk kullanım akışı', () =>
     // P2: ilk öğrenci sonrası menü yerine doğrudan konuşma pratiği açılmalı
     await page.waitForSelector('#topicOverlay', { state: 'visible', timeout: 8000 });
 
-    // Menüye dön — varsayılan veli modu: veli bölümü görünür olmalı
+    // Menüye dön — tüm karolar tek menüde görünür olmalı
     await page.evaluate(() => window.goToMenu());
     await page.waitForSelector('#menu-screen', { state: 'visible' });
     const obSkip = page.locator('#onboardingModal .onboarding-skip');
     if (await obSkip.isVisible().catch(() => false)) await obSkip.click();
     await expect(page.locator('.menu-section-label')).toBeVisible();
-    await expect(page.locator('#weeklySummaryCard')).toBeVisible();
     await expect(page.locator('.tile-iep')).toBeVisible();
-    await expect(page.locator('#routineCard')).toBeVisible();
 
-    // Haftalık kart: veri yokken boş durum + başlat butonu
-    await expect(page.locator('#weeklySummaryCard')).toContainText('Bu hafta henüz pratik yapılmadı');
-
-    // Rutin kartı webde devre dışı olmalı
-    await expect(page.locator('#routineToggleBtn')).toBeDisabled();
-    await expect(page.locator('#routineStatus')).toContainText('mobil uygulamada');
-
-    // Çocuk moduna geç: veli bölümü kaybolmalı
-    await page.click('#modeToggleBtn');
-    await expect(page.locator('.menu-section-label')).toBeHidden();
-    await expect(page.locator('#weeklySummaryCard')).toBeHidden();
-    await expect(page.locator('#bnAnalysis')).toBeHidden();
-    await expect(page.locator('#topbarStudentPill')).toBeHidden();
-
-    // Veli moduna dönüş kapıdan geçer: önce yanlış cevap
-    await page.click('#modeToggleBtn');
+    // Analiz girişi veli kapısıyla korunur: önce yanlış cevap
+    await page.click('.tile-analysis');
     await page.waitForSelector('#parentGateModal', { state: 'visible' });
     const question = await page.locator('#parentGateQuestion').textContent();
+    expect(question).toMatch(/\d+\s*\+\s*\d+/);
     await page.fill('#parentGateInput', '1');
     await page.click('#parentGateModal .recovery-close-btn');
     await expect(page.locator('#parentGateError')).toContainText('doğru değil');
 
-    // Doğru cevapla geç
+    // Doğru cevapla analiz ekranı açılır
     await page.fill('#parentGateInput', String(solveGate(question)));
     await page.click('#parentGateModal .recovery-close-btn');
     await expect(page.locator('#parentGateModal')).toBeHidden();
-    await expect(page.locator('.menu-section-label')).toBeVisible();
+    await page.waitForSelector('#analysis-screen', { state: 'visible' });
 
-    // Mod tercihi kalıcı olmalı
-    const mode = await page.evaluate(() => localStorage.getItem('lms_ui_mode'));
-    expect(mode).toBe('parent');
+    // Veli Özeti sekmesi: haftalık kart (boş durum) ve rutin kartı orada
+    await page.click('#repTabParent');
+    await expect(page.locator('#weeklySummaryCard')).toBeVisible();
+    await expect(page.locator('#weeklySummaryCard')).toContainText('Bu hafta henüz pratik yapılmadı');
+    await expect(page.locator('#routineCard')).toBeVisible();
+    await expect(page.locator('#routineToggleBtn')).toBeDisabled();
+    await expect(page.locator('#routineStatus')).toContainText('mobil uygulamada');
+
+    // Kilit açıkken diğer yetişkin ekranları kapısız açılmalı
+    await page.evaluate(() => window.goToMenu());
+    await page.waitForSelector('#menu-screen', { state: 'visible' });
+    await page.click('.tile-iep');
+    await expect(page.locator('#parentGateModal')).toBeHidden();
+    await page.waitForSelector('#iep-screen', { state: 'visible' });
   });
 });

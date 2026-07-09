@@ -6134,24 +6134,7 @@ body.has-bottom-nav #behavior-screen {
     50% { transform: scale(1.1); }
 }
 
-/* ===================== ÇOCUK / VELİ MODU ===================== */
-body.mode-child .parent-only { display: none !important; }
-
-.mode-toggle-btn {
-    border: 1.5px solid rgba(108, 99, 255, 0.35);
-    background: #fff;
-    color: var(--accent);
-    border-radius: 22px;
-    padding: 8px 14px;
-    font-size: 0.85rem;
-    font-weight: 700;
-    cursor: pointer;
-    min-height: 44px;
-    white-space: nowrap;
-    transition: background 0.15s ease;
-}
-.mode-toggle-btn:active { background: var(--soft-purple); }
-
+/* ===================== VELİ KAPISI VE TAKİP BÖLÜMÜ ===================== */
 .menu-section-label {
     max-width: 1080px;
     margin: 26px auto 12px;
