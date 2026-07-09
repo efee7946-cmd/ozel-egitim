@@ -6169,7 +6169,24 @@ body.has-bottom-nav #behavior-screen {
     cursor: pointer;
     min-height: 44px;
 }
-.menu-banner strong { color: var(--accent); white-space: nowrap; }
+.menu-banner-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+.menu-banner-text strong { font-weight: 700; }
+.menu-banner-text small { font-size: 0.8rem; color: #5b55a8; }
+.menu-banner-cta {
+    flex-shrink: 0;
+    background: var(--accent);
+    color: white;
+    font-weight: 700;
+    font-size: 0.85rem;
+    padding: 9px 16px;
+    border-radius: 999px;
+    white-space: nowrap;
+}
 
 .auth-guest-btn {
     width: 100%;

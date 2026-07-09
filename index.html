@@ -344,8 +344,11 @@
 
     <!-- Misafir modu şeridi -->
     <button type="button" id="guestBanner" class="menu-banner" style="display:none" onclick="guestExitToRegister()">
-        <span data-i18n="guest_banner_text">👀 Misafir modu: toplam 1 konuşma pratiği + 1 nesne tanıma hakkı</span>
-        <strong data-i18n="guest_banner_btn">Ücretsiz kayıt ol</strong>
+        <span class="menu-banner-text">
+            <strong data-i18n="guest_banner_title">👀 Misafir modundasın — deneme hakkın: 1 konuşma pratiği + 1 nesne tanıma</strong>
+            <small data-i18n="guest_banner_sub">Kayıt tamamen ücretsiz: tüm etkinliklere tam erişim kazanırsın, ilerlemen kaybolmaz.</small>
+        </span>
+        <span class="menu-banner-cta" data-i18n="guest_banner_btn">Ücretsiz Kayıt Ol</span>
     </button>
 
     <!-- Karşılama alanı -->
@@ -456,7 +459,7 @@
         <button type="button" class="recovery-modal-dismiss" onclick="closeGuestLimitModal()" aria-label="Kapat">✕</button>
         <div class="recovery-modal-icon">🌟</div>
         <h3 data-i18n="guest_limit_title">Deneme hakkın doldu 🌟</h3>
-        <p data-i18n="guest_limit_sub">Beğendiysen ücretsiz kayıt ol — tüm etkinlikler sınırsız olur, ilerlemen buluta yedeklenir ve verilerin kaybolmaz.</p>
+        <p data-i18n="guest_limit_sub">Beğendiysen ücretsiz kayıt ol — tüm etkinliklere tam erişim kazanırsın, ilerlemen buluta yedeklenir ve verilerin kaybolmaz.</p>
         <button type="button" class="recovery-close-btn" onclick="guestExitToRegister()" data-i18n="guest_limit_btn">Ücretsiz Kayıt Ol</button>
         <button type="button" class="auth-forgot-link" onclick="closeGuestLimitModal()" data-i18n="guest_limit_later">Menüye dön</button>
     </div>
