@@ -912,6 +912,44 @@ const STRINGS = {
     a11y_email_edit: 'Düzenle',
     set_email_prompt: 'Şifre sıfırlama için e-posta adresiniz:',
     set_email_success: 'E-posta kaydedildi: {email}',
+    mode_parent_btn: '🔒 Veli',
+    mode_child_btn: '🧒 Çocuk Modu',
+    mode_child_on_toast: 'Çocuk modu açık. Veli bölümüne dönmek için 🔒 Veli düğmesine dokunun.',
+    parent_gate_title: 'Veli Kapısı',
+    parent_gate_sub: 'Bu bölüm yetişkinler içindir. Devam etmek için cevabı rakamla yazın:',
+    parent_gate_wrong: 'Cevap doğru değil, tekrar deneyin.',
+    parent_gate_ok: 'Devam',
+    gate_question: '{a} artı {b} kaç eder?',
+    menu_section_parent: '👨‍👩‍👧 Takip & Raporlar',
+    menu_iep: 'IEP Hedefleri',
+    menu_iep_desc: 'Hedef belirle, deneme kaydet',
+    menu_skills: 'Beceri Takibi',
+    menu_skills_desc: 'Gelişim alanlarını işaretle',
+    menu_behavior: 'Davranış Kaydı',
+    menu_behavior_desc: 'Gözlemleri not et',
+    weekly_title: '📬 Bu Haftanın Özeti',
+    weekly_loading: 'Haftalık özet hazırlanıyor...',
+    weekly_refresh: '↻ Yenile',
+    weekly_empty: 'Bu hafta henüz pratik yapılmadı. Kısa bir seans her zaman iyi bir başlangıçtır.',
+    weekly_empty_btn: '🎤 Pratiği Başlat',
+    weekly_tip_label: '🏠 Evde deneyin',
+    routine_title: '⏰ Günlük Hatırlatma',
+    routine_sub: 'Pratik için en uygun saati seçin; o saatte tek ve nazik bir hatırlatma gönderelim. Kaçan gün dert değil.',
+    routine_enable: 'Hatırlatmayı Kur',
+    routine_disable: 'Kapat',
+    routine_active: 'Her gün {time} için kurulu ✓',
+    routine_off: 'Hatırlatma kapalı',
+    routine_native_only: 'Hatırlatma bildirimi mobil uygulamada çalışır.',
+    routine_notif_title: 'YıldızCan',
+    routine_notif_body: '{name} için yıldız vakti 🌟 Kısa bir pratiğe ne dersiniz?',
+    routine_notif_denied: 'Bildirim izni verilmediği için hatırlatma kurulamadı.',
+    routine_saved_toast: 'Hatırlatma kuruldu: her gün {time} ⏰',
+    routine_removed_toast: 'Hatırlatma kapatıldı',
+    verify_banner_text: '☁️ Verileriniz henüz buluta yedeklenmiyor',
+    verify_banner_btn: 'E-postayı doğrula',
+    therapy_complete_stat: '{name} bugün {n} soruya cevap verdi! 👏',
+    therapy_complete_show: 'Bu ekranı ailene göster 🌟',
+    first_run_toast: 'Harika, hazırsınız! İlk pratik için bir konu seçin 🎤',
   },
   en: {
     back_menu: '← Menu',
@@ -1822,6 +1860,44 @@ const STRINGS = {
     a11y_email_edit: 'Edit',
     set_email_prompt: 'Your email address for password reset:',
     set_email_success: 'Email saved: {email}',
+    mode_parent_btn: '🔒 Parent',
+    mode_child_btn: '🧒 Child Mode',
+    mode_child_on_toast: 'Child mode is on. Tap 🔒 Parent to return to the adult area.',
+    parent_gate_title: 'Parent Gate',
+    parent_gate_sub: 'This area is for adults. Type the answer in digits to continue:',
+    parent_gate_wrong: 'Not quite, try again.',
+    parent_gate_ok: 'Continue',
+    gate_question: 'How much is {a} plus {b}?',
+    menu_section_parent: '👨‍👩‍👧 Tracking & Reports',
+    menu_iep: 'IEP Goals',
+    menu_iep_desc: 'Set goals, log trials',
+    menu_skills: 'Skill Tracking',
+    menu_skills_desc: 'Mark developmental areas',
+    menu_behavior: 'Behavior Log',
+    menu_behavior_desc: 'Note observations',
+    weekly_title: '📬 This Week\'s Summary',
+    weekly_loading: 'Preparing the weekly summary...',
+    weekly_refresh: '↻ Refresh',
+    weekly_empty: 'No practice yet this week. A short session is always a good start.',
+    weekly_empty_btn: '🎤 Start Practice',
+    weekly_tip_label: '🏠 Try at home',
+    routine_title: '⏰ Daily Reminder',
+    routine_sub: 'Pick the best time for practice; we will send one gentle reminder at that time. Missed days are no problem.',
+    routine_enable: 'Set Reminder',
+    routine_disable: 'Turn Off',
+    routine_active: 'Set for {time} every day ✓',
+    routine_off: 'Reminder is off',
+    routine_native_only: 'Reminder notifications work in the mobile app.',
+    routine_notif_title: 'YıldızCan',
+    routine_notif_body: 'Star time for {name} 🌟 How about a short practice?',
+    routine_notif_denied: 'Reminder could not be set because notification permission was denied.',
+    routine_saved_toast: 'Reminder set: every day at {time} ⏰',
+    routine_removed_toast: 'Reminder turned off',
+    verify_banner_text: '☁️ Your data is not backed up to the cloud yet',
+    verify_banner_btn: 'Verify email',
+    therapy_complete_stat: '{name} answered {n} questions today! 👏',
+    therapy_complete_show: 'Show this screen to your family 🌟',
+    first_run_toast: 'Great, you are all set! Pick a topic for the first practice 🎤',
   }
 };
 
@@ -1837,7 +1913,8 @@ function setLang(lang) {
   applyLang();
   // Menu ipucu banner'ı data-i18n değil, JS ile textContent yazıyor —
   // applyLang() bunu göremez, dil değişince manuel yeniden render gerekir.
-  if (currentScreenId === 'menu-screen') renderMenuNudge();
+  applyUiMode();
+  if (currentScreenId === 'menu-screen') { renderMenuNudge(); renderRoutineCard(); renderWeeklySummaryCard(); }
   if (activeStudentId && typeof AACData !== 'undefined') {
     AACData.resyncLanguage(activeStudentId).then(changed => {
       if (changed && currentScreenId === 'aac-screen') _aacRenderAll();
@@ -2267,7 +2344,14 @@ async function showOnly(id, options = {}) {
     if (target) target.style.display = 'flex';
 
     if (id === 'menu-screen') {
-        try { updateStarBadge(); renderMenuNudge(); } catch (_) {}
+        try {
+            updateStarBadge();
+            renderMenuNudge();
+            applyUiMode();
+            updateVerifyBanner();
+            renderRoutineCard();
+            renderWeeklySummaryCard();
+        } catch (_) {}
     }
     currentScreenId = id;
     if (id === 'menu-screen') {
@@ -2309,6 +2393,356 @@ function _updateBottomNav(screenId) {
     nav.querySelectorAll('.bottom-nav-item').forEach(btn => btn.classList.remove('active'));
     const activeId = map[screenId];
     if (activeId) { const el = document.getElementById(activeId); if (el) el.classList.add('active'); }
+}
+
+// =============================================
+// ÇOCUK MODU / VELİ MODU
+// =============================================
+let _uiMode = localStorage.getItem('lms_ui_mode') || 'parent';
+let _parentGateAnswer = null;
+
+function applyUiMode() {
+    document.body.classList.toggle('mode-child', _uiMode === 'child');
+    const btn = document.getElementById('modeToggleBtn');
+    if (btn) btn.textContent = _uiMode === 'child' ? t('mode_parent_btn') : t('mode_child_btn');
+}
+
+function toggleUiMode() {
+    if (_uiMode === 'parent') {
+        _uiMode = 'child';
+        localStorage.setItem('lms_ui_mode', _uiMode);
+        applyUiMode();
+        showToast(t('mode_child_on_toast'));
+    } else {
+        openParentGate();
+    }
+}
+
+function _gateWords(n) {
+    if (_lang === 'en') {
+        const ones = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
+        const tens = ['', '', 'twenty', 'thirty', 'forty'];
+        const d = Math.floor(n / 10), o = n % 10;
+        if (d < 2) return ones[n];
+        return tens[d] + (o ? '-' + ones[o] : '');
+    }
+    const ones = ['', 'bir', 'iki', 'üç', 'dört', 'beş', 'altı', 'yedi', 'sekiz', 'dokuz'];
+    const tens = ['', 'on', 'yirmi', 'otuz', 'kırk'];
+    const d = Math.floor(n / 10), o = n % 10;
+    if (!d) return ones[o];
+    return tens[d] + (o ? ' ' + ones[o] : '');
+}
+
+function openParentGate() {
+    // Rakam yerine yazıyla sorulur — okuma bilmeyen çocuk geçemez.
+    // 21-49 arası + tek basamak: İngilizce'de düzensiz "teen" sayılarından kaçınır
+    const a = 21 + Math.floor(Math.random() * 29);
+    const b = 2 + Math.floor(Math.random() * 8);
+    _parentGateAnswer = a + b;
+    document.getElementById('parentGateQuestion').textContent =
+        t('gate_question').replace('{a}', _gateWords(a)).replace('{b}', _gateWords(b));
+    document.getElementById('parentGateInput').value = '';
+    document.getElementById('parentGateError').textContent = '';
+    document.getElementById('parentGateModal').style.display = 'flex';
+    setTimeout(() => document.getElementById('parentGateInput').focus(), 60);
+}
+
+function closeParentGate() {
+    document.getElementById('parentGateModal').style.display = 'none';
+    _parentGateAnswer = null;
+}
+
+function submitParentGate() {
+    const val = parseInt(document.getElementById('parentGateInput').value, 10);
+    if (_parentGateAnswer === null || val !== _parentGateAnswer) {
+        document.getElementById('parentGateError').textContent = t('parent_gate_wrong');
+        document.getElementById('parentGateInput').value = '';
+        return;
+    }
+    closeParentGate();
+    _uiMode = 'parent';
+    localStorage.setItem('lms_ui_mode', 'parent');
+    applyUiMode();
+    updateVerifyBanner();
+    renderRoutineCard();
+    renderWeeklySummaryCard();
+}
+
+// =============================================
+// YEDEKLENMİYOR ŞERİDİ (e-posta doğrulanana kadar sync kapalı)
+// =============================================
+function updateVerifyBanner() {
+    const el = document.getElementById('verifyBanner');
+    if (!el) return;
+    const isDemo = !_authToken || String(_authToken).startsWith('demo_');
+    el.style.display = (!isDemo && _authUser && _authUser.email && !_authUser.emailVerified) ? '' : 'none';
+}
+
+function openVerifyFromBanner() {
+    showEmailVerifyModal(null, false, false, 'close');
+}
+
+// =============================================
+// HAFTALIK VELİ ÖZETİ + EV ÖNERİSİ
+// =============================================
+function _weekKey() {
+    const d = new Date();
+    const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+    const dayNum = date.getUTCDay() || 7;
+    date.setUTCDate(date.getUTCDate() + 4 - dayNum);
+    const yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
+    const week = Math.ceil((((date - yearStart) / 86400000) + 1) / 7);
+    return `${date.getUTCFullYear()}-W${week}`;
+}
+
+function weeklySummaryStorageKey() { return `weekly_summary_${activeStudentId || 'default'}`; }
+
+async function _weeklyData() {
+    const weekAgo = Date.now() - 7 * 86400000;
+    const history = await loadReportHistory();
+    const sessions = history.filter(h => {
+        const ts = new Date(h.createdAt).getTime();
+        return ts && ts >= weekAgo;
+    });
+    const objAll = await DB.get('obj_results_' + activeStudentId) || [];
+    const obj = (Array.isArray(objAll) ? objAll : []).filter(r => new Date(r.date).getTime() >= weekAgo);
+    const topics = [];
+    sessions.forEach(s => (s.therapyTurns || []).forEach(turn => {
+        const label = turn.location || turn.category;
+        if (label && !topics.includes(label)) topics.push(label);
+    }));
+    return {
+        sessions: sessions.length,
+        minutes: sessions.reduce((a, s) => a + (s.durationMin || 0), 0),
+        turns: sessions.reduce((a, s) => a + (s.totalTurns || 0), 0),
+        mic: sessions.reduce((a, s) => a + (s.micUsedInTherapy || 0), 0),
+        topics: topics.slice(0, 5),
+        objPlays: obj.length,
+        objItems: obj.reduce((a, r) => a + (r.items || 0), 0),
+        objErrors: obj.reduce((a, r) => a + (r.errors || 0), 0),
+    };
+}
+
+function _weeklyLocalText(d) {
+    const name = activeStudentName || '';
+    return _lang === 'en'
+        ? `${name} completed ${d.sessions} session(s) and gave ${d.turns} answers this week.`
+        : `${name} bu hafta ${d.sessions} seans tamamladı ve ${d.turns} yanıt verdi.`;
+}
+
+function _weeklyPrompt(d) {
+    const name = activeStudentName || (_lang === 'en' ? 'the child' : 'çocuk');
+    const acc = (d.objItems + d.objErrors) > 0 ? Math.round((d.objItems / (d.objItems + d.objErrors)) * 100) : null;
+    const objLine = d.objPlays ? `${d.objPlays}${_lang === 'en' ? ' plays, ' : ' kez, '}${acc !== null ? '%' + acc : '-'}` : '-';
+    if (_lang === 'en') {
+        return `You are an assistant for special education teachers and parents. Summarize the weekly usage data below, addressing the parent directly.
+Rules: no diagnosis, no medical claims. Be encouraging and concrete. Refer to the child by first name only. Produce exactly these two lines:
+SUMMARY: at most two sentences
+TIP: one short, concrete activity suggestion the family can try at home this week
+Data -> Child: ${name}. Speech sessions: ${d.sessions}. Total answers: ${d.turns}. Answers by microphone: ${d.mic}. Practice minutes: ${d.minutes}. Topics: ${d.topics.join(', ') || '-'}. Object recognition game: ${objLine}.`;
+    }
+    return `Özel eğitim öğretmenlerine ve velilere yardımcı olan bir asistansın. Aşağıdaki haftalık kullanım verilerini veliye hitaben özetle.
+Kurallar: Tanı veya tıbbi yorum yapma. Cesaretlendirici ve somut ol. Çocuktan yalnızca adıyla bahset. Tam olarak şu iki satırı üret:
+ÖZET: en fazla iki cümlelik özet
+ÖNERİ: ailenin bu hafta evde deneyebileceği tek, kısa ve somut etkinlik önerisi
+Veriler -> Çocuk: ${name}. Konuşma seansı: ${d.sessions}. Toplam yanıt: ${d.turns}. Mikrofonla yanıt: ${d.mic}. Pratik dakikası: ${d.minutes}. Çalışılan konular: ${d.topics.join(', ') || '-'}. Nesne tanıma oyunu: ${objLine}.`;
+}
+
+function _parseWeekly(text) {
+    const sumRe = _lang === 'en' ? /SUMMARY:\s*([\s\S]*?)(?:TIP:|$)/i : /ÖZET:\s*([\s\S]*?)(?:ÖNERİ:|$)/i;
+    const tipRe = _lang === 'en' ? /TIP:\s*([\s\S]*)/i : /ÖNERİ:\s*([\s\S]*)/i;
+    const summary = (text.match(sumRe)?.[1] || '').trim();
+    const tip = (text.match(tipRe)?.[1] || '').trim();
+    if (summary) return { summary, tip };
+    return { summary: text.trim().slice(0, 400), tip: '' };
+}
+
+function _weeklyShell(bodyEl) {
+    const card = document.getElementById('weeklySummaryCard');
+    card.innerHTML = '';
+    const head = document.createElement('div');
+    head.className = 'weekly-card-head';
+    const title = document.createElement('strong');
+    title.textContent = t('weekly_title');
+    const refresh = document.createElement('button');
+    refresh.type = 'button';
+    refresh.className = 'weekly-refresh-btn';
+    refresh.textContent = t('weekly_refresh');
+    refresh.onclick = () => renderWeeklySummaryCard(true);
+    head.appendChild(title);
+    head.appendChild(refresh);
+    card.appendChild(head);
+    card.appendChild(bodyEl);
+}
+
+let _weeklyBusy = false;
+async function renderWeeklySummaryCard(force = false) {
+    const card = document.getElementById('weeklySummaryCard');
+    if (!card) return;
+    if (!activeStudentId || _uiMode !== 'parent') { card.style.display = 'none'; return; }
+    card.style.display = '';
+
+    const stored = DB.getSync(weeklySummaryStorageKey());
+    if (!force && stored && stored.week === _weekKey() && stored.summary) {
+        _paintWeekly(stored.summary, stored.tip);
+        return;
+    }
+    if (_weeklyBusy) return;
+    _weeklyBusy = true;
+    const loading = document.createElement('p');
+    loading.className = 'weekly-text weekly-muted';
+    loading.textContent = t('weekly_loading');
+    _weeklyShell(loading);
+    try {
+        const d = await _weeklyData();
+        if (!d.sessions && !d.objPlays) {
+            const wrap = document.createElement('div');
+            const p = document.createElement('p');
+            p.className = 'weekly-text';
+            p.textContent = t('weekly_empty');
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'weekly-start-btn';
+            btn.textContent = t('weekly_empty_btn');
+            btn.onclick = () => goToTherapy();
+            wrap.appendChild(p);
+            wrap.appendChild(btn);
+            _weeklyShell(wrap);
+            return;
+        }
+        let summary = _weeklyLocalText(d);
+        let tip = '';
+        let aiOk = false;
+        try {
+            const r = await fetch(API_BASE + '/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', ...apiAuthHeaders() },
+                body: JSON.stringify({ contents: [{ role: 'user', parts: [{ text: _weeklyPrompt(d) }] }] }),
+                signal: AbortSignal.timeout(20000)
+            });
+            const data = await r.json();
+            const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+            if (text) {
+                const parsed = _parseWeekly(text);
+                if (parsed.summary) { summary = parsed.summary; tip = parsed.tip; aiOk = true; }
+            }
+        } catch (_) {}
+        if (aiOk) DB.set(weeklySummaryStorageKey(), { week: _weekKey(), summary, tip, createdAt: new Date().toISOString() });
+        _paintWeekly(summary, tip);
+    } finally {
+        _weeklyBusy = false;
+    }
+}
+
+function _paintWeekly(summary, tip) {
+    const wrap = document.createElement('div');
+    const p = document.createElement('p');
+    p.className = 'weekly-text';
+    p.textContent = summary;
+    wrap.appendChild(p);
+    if (tip) {
+        const tipBox = document.createElement('div');
+        tipBox.className = 'weekly-tip';
+        const label = document.createElement('strong');
+        label.textContent = t('weekly_tip_label');
+        const tipText = document.createElement('p');
+        tipText.textContent = tip;
+        tipBox.appendChild(label);
+        tipBox.appendChild(tipText);
+        wrap.appendChild(tipBox);
+    }
+    _weeklyShell(wrap);
+}
+
+// =============================================
+// GÜNLÜK RUTİN HATIRLATMASI (yerel bildirim)
+// =============================================
+const ROUTINE_NOTIF_ID = 7001;
+
+function _routineStore() {
+    try { return JSON.parse(localStorage.getItem('lms_routine')) || null; } catch { return null; }
+}
+
+function _routineSave(v) {
+    try { localStorage.setItem('lms_routine', JSON.stringify(v)); } catch {}
+}
+
+function _localNotifPlugin() {
+    try {
+        if (typeof Capacitor !== 'undefined' && Capacitor.isNativePlatform()
+            && Capacitor.Plugins && Capacitor.Plugins.LocalNotifications) {
+            return Capacitor.Plugins.LocalNotifications;
+        }
+    } catch (_) {}
+    return null;
+}
+
+function renderRoutineCard() {
+    const statusEl = document.getElementById('routineStatus');
+    const btn = document.getElementById('routineToggleBtn');
+    const timeInput = document.getElementById('routineTime');
+    if (!statusEl || !btn || !timeInput) return;
+    const cfg = _routineStore();
+    const plugin = _localNotifPlugin();
+    if (cfg && cfg.enabled) {
+        if (cfg.time) timeInput.value = cfg.time;
+        statusEl.textContent = t('routine_active').replace('{time}', cfg.time);
+        btn.textContent = t('routine_disable');
+        btn.disabled = false;
+    } else {
+        statusEl.textContent = plugin ? t('routine_off') : t('routine_native_only');
+        btn.textContent = t('routine_enable');
+        btn.disabled = !plugin;
+    }
+}
+
+async function toggleRoutineReminder() {
+    const cfg = _routineStore();
+    const plugin = _localNotifPlugin();
+    if (cfg && cfg.enabled) {
+        if (plugin) {
+            try { await plugin.cancel({ notifications: [{ id: ROUTINE_NOTIF_ID }] }); } catch (_) {}
+        }
+        _routineSave({ enabled: false, time: cfg.time });
+        showToast(t('routine_removed_toast'));
+        renderRoutineCard();
+        return;
+    }
+    if (!plugin) { showToast(t('routine_native_only')); return; }
+    const time = document.getElementById('routineTime')?.value || '18:30';
+    try {
+        const perm = await plugin.requestPermissions();
+        if (perm && perm.display && perm.display !== 'granted') {
+            showToast(t('routine_notif_denied'));
+            renderRoutineCard();
+            return;
+        }
+        try { await plugin.cancel({ notifications: [{ id: ROUTINE_NOTIF_ID }] }); } catch (_) {}
+        const [h, m] = time.split(':').map(Number);
+        await plugin.schedule({
+            notifications: [{
+                id: ROUTINE_NOTIF_ID,
+                title: t('routine_notif_title'),
+                body: t('routine_notif_body').replace('{name}', activeStudentName || ''),
+                schedule: { on: { hour: h, minute: m }, allowWhileIdle: true },
+            }]
+        });
+        _routineSave({ enabled: true, time });
+        showToast(t('routine_saved_toast').replace('{time}', time));
+    } catch (_) {
+        showToast(t('routine_notif_denied'));
+    }
+    renderRoutineCard();
+}
+
+// İlk öğrenci oluşturulduğunda menü yerine doğrudan ilk pratiğe götür
+async function maybeStartFirstPractice() {
+    try {
+        const history = await loadReportHistory();
+        if (history.length) return;
+        showToast(t('first_run_toast'));
+        goToTherapy();
+    } catch (_) {}
 }
 
 function updateMenuIdentity() {
@@ -2947,6 +3381,7 @@ async function createStudent() {
     createBtn.disabled = false;
     await ensureActiveStudent();
     await selectStudent(newStudent.id);
+    if (existing.length === 1) maybeStartFirstPractice();
 }
 
 async function openStudentSetup() {
@@ -4089,12 +4524,17 @@ function showTherapySessionComplete() {
     const box = document.createElement('div');
     box.className = 'therapy-complete therapy-session-ui';
     box.id = 'therapyCompleteBox';
+    const answered = sessionTotalQuestions || turnCount || 0;
+    const achName = escapeHtml(activeStudentName || childName || '');
+    const achDate = new Date().toLocaleDateString(_lang === 'en' ? 'en-US' : 'tr-TR', { day: 'numeric', month: 'long' });
     box.innerHTML = `
         <div class="therapy-complete-glow" aria-hidden="true"></div>
         <div class="therapy-complete-badge">🏆</div>
         <div class="therapy-complete-copy">
             <h2>${t('therapy_complete_title')}</h2>
-            <p>${t('therapy_complete_msg')}</p>
+            <p class="therapy-complete-stat">${t('therapy_complete_stat').replace('{name}', achName).replace('{n}', answered)}</p>
+            <p class="therapy-complete-date">${escapeHtml(achDate)}</p>
+            <p class="therapy-complete-show">${t('therapy_complete_show')}</p>
         </div>
         <div class="therapy-complete-actions">
             <button type="button" class="btn-primary-gradient therapy-complete-btn" onclick="document.getElementById('therapyCompleteBox').remove(); currentTopic=''; goToTherapy();">${t('therapy_complete_new_topic')}</button>
@@ -6274,6 +6714,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const settings = loadA11ySettings();
     applyA11yClasses(settings);
     applyLang();
+    applyUiMode();
+    const gateInput = document.getElementById('parentGateInput');
+    if (gateInput) gateInput.addEventListener('keydown', e => { if (e.key === 'Enter') submitParentGate(); });
 });
 
 // =============================================
@@ -6302,6 +6745,12 @@ window.selectStudent = selectStudent;
 window.changeHistoryMonth = changeHistoryMonth;
 window.rereadQuestion = rereadQuestion;
 window.askAIMode = askAIMode;
+window.toggleUiMode = toggleUiMode;
+window.submitParentGate = submitParentGate;
+window.closeParentGate = closeParentGate;
+window.toggleRoutineReminder = toggleRoutineReminder;
+window.openVerifyFromBanner = openVerifyFromBanner;
+window.renderWeeklySummaryCard = renderWeeklySummaryCard;
 // Yeni özellikler
 window.goToSchedule = goToSchedule;
 window.goToAac = goToAac;
@@ -6411,7 +6860,7 @@ async function checkAuthSession() {
                     _pendingPostVerifyAction = () => continueAuthenticatedEntry();
                     document.getElementById('authError').textContent = '';
                     switchAuthTab('login');
-                    showEmailVerifyModal(null, false, true, 'logout');
+                    showEmailVerifyModal(null, false, false, 'continue');
                     return;
                 }
                 if (!res.hasEmail) {
@@ -6644,7 +7093,15 @@ function showEmailVerifyModal(emailMasked, codeAlreadySent = true, mandatory = f
 function closeVerifyModal() {
     if (_verifyModalMandatory) return;
     document.getElementById('emailVerifyModal').style.display = 'none';
+    const mode = _verifyModalExitMode;
     _verifyModalExitMode = 'close';
+    // "Daha sonra" ile ertelendiğinde kullanıcı auth ekranında asılı kalmasın,
+    // doğrulama duvarı yerine uygulamaya devam edip menüdeki şeridi görsün
+    if (mode === 'continue') {
+        const go = _pendingPostVerifyAction;
+        _pendingPostVerifyAction = null;
+        if (typeof go === 'function') go();
+    }
 }
 
 function showSetEmailModal(mandatory = false, exitMode = 'close') {
@@ -6766,6 +7223,7 @@ async function submitEmailVerification() {
             _authUser.emailVerified = true;
         }
         closeVerifyModal();
+        updateVerifyBanner();
         if (typeof postVerifyAction === 'function') await postVerifyAction();
         showToast(t('verify_success'));
     } else {
@@ -6881,7 +7339,7 @@ async function handleLogin(e) {
         showOnly('auth-screen');
         document.getElementById('authError').textContent = '';
         switchAuthTab('login');
-        showEmailVerifyModal(null, false, true, 'logout');
+        showEmailVerifyModal(null, false, false, 'continue');
         return;
     }
     if (!res.hasEmail) {
@@ -6917,7 +7375,12 @@ async function handleRegister(e) {
     }
     if (!res.ok) return showAuthError(t(res.error) || t('auth_fill_all'));
     _authToken = res.token;
-    _authUser  = { username: username.toLowerCase(), displayName: res.displayName };
+    _authUser  = {
+        username: username.toLowerCase(),
+        displayName: res.displayName,
+        email: regEmail.toLowerCase(),
+        emailVerified: false
+    };
     await DB.initEncryption(res.dataKey || res.token);
     DB.set(authStorageKey(), _authToken);
     DB.set(authUserStorageKey(), _authUser);
@@ -6926,7 +7389,7 @@ async function handleRegister(e) {
     localStorage.setItem('lms_last_user', _authUser.username);
     _pendingPostVerifyAction = () => continueAuthenticatedEntry();
     showOnly('auth-screen');
-    showEmailVerifyModal(res.emailMasked, !!res.emailVerificationPending, true, 'delete_signup');
+    showEmailVerifyModal(res.emailMasked, !!res.emailVerificationPending, false, 'continue');
 }
 
 async function authLogout() {
@@ -7317,6 +7780,7 @@ async function createStudentFromLogin() {
     activeStudentName = student.name;
     childName = student.name;
     onAuthSuccessWithStudent(student);
+    if (!existing) maybeStartFirstPractice();
 }
 
 function goToLogin() {

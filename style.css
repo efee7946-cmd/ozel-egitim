@@ -6133,3 +6133,176 @@ body.has-bottom-nav #behavior-screen {
     0%, 100% { transform: scale(1); }
     50% { transform: scale(1.1); }
 }
+
+/* ===================== ÇOCUK / VELİ MODU ===================== */
+body.mode-child .parent-only { display: none !important; }
+
+.mode-toggle-btn {
+    border: 1.5px solid rgba(108, 99, 255, 0.35);
+    background: #fff;
+    color: var(--accent);
+    border-radius: 22px;
+    padding: 8px 14px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    min-height: 44px;
+    white-space: nowrap;
+    transition: background 0.15s ease;
+}
+.mode-toggle-btn:active { background: var(--soft-purple); }
+
+.menu-section-label {
+    max-width: 1080px;
+    margin: 26px auto 12px;
+    padding: 0 4px;
+    font-size: 1.02rem;
+    font-weight: 800;
+    color: var(--auth-ink);
+}
+
+.parent-gate-question {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--auth-ink);
+    margin: 10px 0 4px;
+}
+
+/* ===================== YEDEKLENMİYOR ŞERİDİ ===================== */
+.verify-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    width: 100%;
+    max-width: 1080px;
+    margin: 0 auto 14px;
+    padding: 12px 16px;
+    border: 1.5px solid #f5c26b;
+    background: #fff8e8;
+    color: #7a5b17;
+    border-radius: 14px;
+    font-size: 0.92rem;
+    text-align: left;
+    cursor: pointer;
+    min-height: 44px;
+}
+.verify-banner strong { color: #b07908; white-space: nowrap; }
+
+/* ===================== HAFTALIK ÖZET KARTI ===================== */
+.weekly-card {
+    max-width: 1080px;
+    margin: 0 auto 16px;
+    padding: 18px 20px;
+    background: #fff;
+    border: 1.5px solid #e2e6f5;
+    border-radius: 18px;
+    box-shadow: 0 10px 30px rgba(29, 39, 70, 0.06);
+}
+.weekly-card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+.weekly-card-head strong { font-size: 1.02rem; color: var(--auth-ink); }
+.weekly-refresh-btn {
+    border: 1px solid #dfe4f2;
+    background: #f7f8fd;
+    color: var(--auth-muted);
+    border-radius: 18px;
+    padding: 6px 12px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    min-height: 36px;
+}
+.weekly-text { margin: 0; color: #37415f; font-size: 0.95rem; line-height: 1.55; }
+.weekly-muted { color: var(--auth-muted); }
+.weekly-tip {
+    margin-top: 12px;
+    padding: 12px 14px;
+    background: #f1fbf5;
+    border: 1.5px solid #bfe8cd;
+    border-radius: 12px;
+}
+.weekly-tip strong { display: block; font-size: 0.82rem; color: #1d7a43; margin-bottom: 4px; }
+.weekly-tip p { margin: 0; color: #245c3c; font-size: 0.93rem; line-height: 1.5; }
+.weekly-start-btn {
+    margin-top: 12px;
+    border: none;
+    background: var(--accent);
+    color: #fff;
+    border-radius: 14px;
+    padding: 12px 18px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    min-height: 44px;
+}
+
+/* ===================== RUTİN HATIRLATMA KARTI ===================== */
+.routine-card {
+    max-width: 1080px;
+    margin: 14px auto 0;
+    padding: 18px 20px;
+    background: #fff;
+    border: 1.5px solid #e2e6f5;
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+.routine-info { flex: 1 1 260px; }
+.routine-info strong { display: block; font-size: 1rem; color: var(--auth-ink); margin-bottom: 4px; }
+.routine-info p { margin: 0 0 6px; color: var(--auth-muted); font-size: 0.88rem; line-height: 1.5; }
+.routine-status { font-size: 0.85rem; font-weight: 700; color: #1d7a43; }
+.routine-controls { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.routine-controls input[type="time"] {
+    border: 1.5px solid #dfe4f2;
+    border-radius: 12px;
+    padding: 10px 12px;
+    font-size: 1rem;
+    min-height: 44px;
+    background: #f7f8fd;
+    color: var(--auth-ink);
+}
+.routine-btn {
+    border: none;
+    background: var(--accent);
+    color: #fff;
+    border-radius: 14px;
+    padding: 12px 18px;
+    font-size: 0.92rem;
+    font-weight: 700;
+    cursor: pointer;
+    min-height: 44px;
+}
+.routine-btn:disabled { background: #c3c7d9; cursor: not-allowed; }
+
+/* ===================== SEANS SONU BAŞARI KARTI ===================== */
+.therapy-complete-stat {
+    font-size: 1.15rem !important;
+    font-weight: 800;
+    color: var(--auth-ink);
+}
+.therapy-complete-date {
+    font-size: 0.85rem !important;
+    color: var(--auth-muted);
+    margin-top: 2px;
+}
+.therapy-complete-show {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 8px 16px;
+    background: #fff4d6;
+    border: 1.5px solid #f2ce74;
+    border-radius: 20px;
+    color: #8a6410;
+    font-weight: 700;
+    font-size: 0.92rem;
+}

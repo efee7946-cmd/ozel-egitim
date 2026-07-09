@@ -307,14 +307,15 @@
             <strong>YıldızCan</strong>
         </div>
         <div class="topbar-right">
-            <button class="student-pill" type="button" id="topbarStudentPill" onclick="goToLogin()">
+            <button class="student-pill parent-only" type="button" id="topbarStudentPill" onclick="goToLogin()">
                 <span class="pill-dot"></span>
                 <span id="active-student-name" data-i18n="student_pill">Öğrenci seç</span>
                 <span class="pill-chevron">›</span>
             </button>
-            <button id="langToggleBtn" class="lang-toggle-btn" type="button" onclick="setLang(document.documentElement.lang==='en'?'tr':'en')">EN</button>
-            <button class="icon-btn-a11y" type="button" onclick="toggleHelpPanel()" title="Yardım">❓</button>
-            <button class="icon-btn-a11y" type="button" onclick="toggleA11yPanel()" title="Erişilebilirlik Ayarları">⚙️</button>
+            <button id="langToggleBtn" class="lang-toggle-btn parent-only" type="button" onclick="setLang(document.documentElement.lang==='en'?'tr':'en')">EN</button>
+            <button class="icon-btn-a11y parent-only" type="button" onclick="toggleHelpPanel()" title="Yardım">❓</button>
+            <button class="icon-btn-a11y parent-only" type="button" onclick="toggleA11yPanel()" title="Erişilebilirlik Ayarları">⚙️</button>
+            <button id="modeToggleBtn" class="mode-toggle-btn" type="button" onclick="toggleUiMode()">🧒 Çocuk Modu</button>
         </div>
         <!-- JS uyumluluğu için gizli elementler -->
         <div class="account-chip" style="display:none"><span class="account-chip-label">Hesap</span><strong id="account-email">-</strong></div>
@@ -330,6 +331,12 @@
         <div></div>
         <div><h2 id="menu-greeting-hidden">x</h2><p class="menu-subtitle"></p></div>
     </div>
+
+    <!-- Doğrulanmamış hesap: bulut yedeği kapalı uyarısı -->
+    <button type="button" id="verifyBanner" class="verify-banner parent-only" style="display:none" onclick="openVerifyFromBanner()">
+        <span data-i18n="verify_banner_text">☁️ Verileriniz henüz buluta yedeklenmiyor</span>
+        <strong data-i18n="verify_banner_btn">E-postayı doğrula</strong>
+    </button>
 
     <!-- Karşılama alanı -->
     <div class="menu-welcome">
@@ -366,16 +373,52 @@
             <span class="tile-label" data-i18n="menu_schedule">Günlük Görevler</span>
             <span class="tile-desc" data-i18n="menu_schedule_desc">Bugünün görevlerini tamamla</span>
         </button>
-        <button class="menu-tile tile-analysis" type="button" onclick="goToAnalysis()">
-            <span class="tile-icon">📊</span>
-            <span class="tile-label" data-i18n="menu_analysis_report">Analiz & Rapor</span>
-            <span class="tile-desc" data-i18n="menu_analysis_report_desc">Gelişimi takip et</span>
-        </button>
         <button class="menu-tile tile-store" type="button" onclick="goToStore()">
             <span class="tile-icon">🏪</span>
             <span class="tile-label" data-i18n="menu_store">Giyim Mağazası</span>
             <span class="tile-desc" data-i18n="menu_store_desc">Yıldızlarını harca, giydir</span>
         </button>
+    </div>
+
+    <!-- Veli bölümü: takip araçları ve haftalık özet -->
+    <div class="menu-section-label parent-only" data-i18n="menu_section_parent">👨‍👩‍👧 Takip &amp; Raporlar</div>
+
+    <div id="weeklySummaryCard" class="weekly-card parent-only" style="display:none"></div>
+
+    <div class="menu-tiles parent-only">
+        <button class="menu-tile tile-analysis" type="button" onclick="goToAnalysis()">
+            <span class="tile-icon">📊</span>
+            <span class="tile-label" data-i18n="menu_analysis_report">Analiz & Rapor</span>
+            <span class="tile-desc" data-i18n="menu_analysis_report_desc">Gelişimi takip et</span>
+        </button>
+        <button class="menu-tile tile-iep" type="button" onclick="goToIep()">
+            <span class="tile-icon">📋</span>
+            <span class="tile-label" data-i18n="menu_iep">IEP Hedefleri</span>
+            <span class="tile-desc" data-i18n="menu_iep_desc">Hedef belirle, deneme kaydet</span>
+        </button>
+        <button class="menu-tile tile-skills" type="button" onclick="goToSkills()">
+            <span class="tile-icon">🧩</span>
+            <span class="tile-label" data-i18n="menu_skills">Beceri Takibi</span>
+            <span class="tile-desc" data-i18n="menu_skills_desc">Gelişim alanlarını işaretle</span>
+        </button>
+        <button class="menu-tile tile-behavior" type="button" onclick="goToBehavior()">
+            <span class="tile-icon">📝</span>
+            <span class="tile-label" data-i18n="menu_behavior">Davranış Kaydı</span>
+            <span class="tile-desc" data-i18n="menu_behavior_desc">Gözlemleri not et</span>
+        </button>
+    </div>
+
+    <!-- Günlük rutin hatırlatması -->
+    <div class="routine-card parent-only" id="routineCard">
+        <div class="routine-info">
+            <strong data-i18n="routine_title">⏰ Günlük Hatırlatma</strong>
+            <p data-i18n="routine_sub">Pratik için en uygun saati seçin; o saatte tek ve nazik bir hatırlatma gönderelim. Kaçan gün dert değil.</p>
+            <span class="routine-status" id="routineStatus"></span>
+        </div>
+        <div class="routine-controls">
+            <input type="time" id="routineTime" value="18:30">
+            <button type="button" class="routine-btn" id="routineToggleBtn" onclick="toggleRoutineReminder()" data-i18n="routine_enable">Hatırlatmayı Kur</button>
+        </div>
     </div>
 
     <!-- Alt çubuk -->
@@ -413,11 +456,25 @@
         <span class="bottom-nav-icon">🎯</span>
         <span class="bottom-nav-label" data-i18n="bottom_nav_schedule">Görevler</span>
     </button>
-    <button class="bottom-nav-item" id="bnAnalysis" onclick="goToAnalysis()">
+    <button class="bottom-nav-item parent-only" id="bnAnalysis" onclick="goToAnalysis()">
         <span class="bottom-nav-icon">📊</span>
         <span class="bottom-nav-label" data-i18n="bottom_nav_analysis">Analiz</span>
     </button>
 </nav>
+
+<!-- ===================== VELİ KAPISI ===================== -->
+<div id="parentGateModal" class="recovery-modal-overlay" style="display:none">
+    <div class="recovery-modal-card">
+        <button type="button" class="recovery-modal-dismiss" onclick="closeParentGate()" aria-label="Kapat">✕</button>
+        <div class="recovery-modal-icon">🔒</div>
+        <h3 data-i18n="parent_gate_title">Veli Kapısı</h3>
+        <p data-i18n="parent_gate_sub">Bu bölüm yetişkinler içindir. Devam etmek için cevabı rakamla yazın:</p>
+        <p class="parent-gate-question" id="parentGateQuestion"></p>
+        <input type="text" id="parentGateInput" class="verify-code-input" inputmode="numeric" maxlength="3" placeholder="?" autocomplete="off">
+        <div class="auth-error" id="parentGateError"></div>
+        <button type="button" class="recovery-close-btn" onclick="submitParentGate()" data-i18n="parent_gate_ok">Devam</button>
+    </div>
+</div>
 
 <!-- Auto-skip auth: show menu directly on page load -->
 <script>
