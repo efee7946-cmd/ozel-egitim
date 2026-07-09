@@ -568,15 +568,8 @@ document.addEventListener('DOMContentLoaded', function(){
             <div class="question-bar" id="qBar"></div>
             <button onclick="rereadQuestion()" class="btn-reread" title="Tekrar Dinle">🔊</button>
         </div>
-        <!-- Modern Siri-style Waveform -->
-        <div class="waveform-container therapy-session-ui" style="display:none; justify-content:center; align-items:center;">
-            <canvas id="waveformCanvas" style="width:100%; max-width:400px; height:60px;"></canvas>
-        </div>
         <div class="btns therapy-session-ui">
             <div class="mic-wrapper">
-                <div class="mic-ring"></div>
-                <div class="mic-ring"></div>
-                <div class="mic-ring"></div>
                 <button onclick="rec()" id="micBtn" class="btn-mic" disabled>🎙️</button>
             </div>
             <button onclick="loadNext()" id="nextBtn" class="btn-next">➡️</button>

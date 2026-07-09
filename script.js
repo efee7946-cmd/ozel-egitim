@@ -4656,250 +4656,35 @@ function _getNativeSpeech() {
     return null;
 }
 
-async function recNative(SR) {
-    const micBtn = document.getElementById('micBtn');
-    const infoEl = document.getElementById('info');
-    micBtn.disabled = true;
-    infoEl.innerText = _lang === 'en' ? 'Getting ready to listen...' : 'Dinlemeye hazırlanıyorum...';
-    try {
-        const avail = await SR.available();
-        if (!avail || !avail.available) {
-            infoEl.innerText = t('info_no_speech_native');
-            micBtn.disabled = false;
-            return;
-        }
-        try {
-            const perm = await SR.requestPermissions();
-            if (perm && perm.speechRecognition === 'denied') {
-                infoEl.innerText = t('info_mic_permission');
-                micBtn.disabled = false;
-                return;
-            }
-        } catch(_) {}
-
-        micBtn.classList.add('listening');
-        infoEl.innerText = t('info_listening');
-        const res = await SR.start({
-            language: _lang === 'en' ? 'en-US' : 'tr-TR',
-            maxResults: 1,
-            partialResults: false,
-            popup: false
-        });
-        micBtn.classList.remove('listening');
-        const speech = res && Array.isArray(res.matches) && res.matches[0] ? res.matches[0].trim() : '';
-        if (!speech) {
-            const _nrCat = getCurrentTherapyCategory().label;
-            sessionData.noResponseByCategory[_nrCat] = (sessionData.noResponseByCategory[_nrCat] || 0) + 1;
-            infoEl.innerText = t('info_no_sound');
-            micBtn.disabled = false;
-            return;
-        }
-        infoEl.innerText = '🎙️ ' + speech;
-        await processTherapySpeech(speech);
-    } catch (e) {
-        micBtn.classList.remove('listening');
-        micBtn.disabled = false;
-        infoEl.innerText = t('info_repeat_please');
-    }
-}
-
 async function rec() {
     clearTimeout(idleTimer);
-    const _nativeSR = _getNativeSpeech();
-    if (_nativeSR) return recNative(_nativeSR);
-    var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-        document.getElementById('info').innerText = t('info_no_speech_support');
-        document.getElementById('micBtn').disabled = true;
+    if (isProcessingTherapySpeech) return;
+    const micBtn = document.getElementById('micBtn');
+    const infoEl = document.getElementById('info');
+    if (micBtn.disabled) return;
+    if (!_getNativeSpeech() && !(window.SpeechRecognition || window.webkitSpeechRecognition)) {
+        infoEl.innerText = t('info_no_speech_support');
+        micBtn.disabled = true;
         return;
     }
-    var _isSafari = !window.SpeechRecognition && !!window.webkitSpeechRecognition;
-    document.getElementById('micBtn').disabled = true;
-    document.getElementById('info').innerText = _lang === 'en' ? 'Getting ready to listen...' : 'Dinlemeye hazırlanıyorum...';
-    var recognition = new SpeechRecognition();
-    recognition.lang = _lang === 'en' ? 'en-US' : 'tr-TR';
-    recognition.interimResults = !_isSafari;
-    recognition.maxAlternatives = 1;
-    recognition.continuous = !_isSafari;
-    var _speechBuffer = '';
-    var _silenceTimer = null;
-    var _recognized = false;
-    var _safariActive = false;
-
-    async function _finalizeSpeech() {
-        recognition.stop();
-        const speech = _speechBuffer.trim();
-        if (!speech) return;
-        _speechBuffer = '';
-        await processTherapySpeech(speech);
+    micBtn.disabled = true;
+    micBtn.classList.add('listening');
+    infoEl.innerText = t('info_listening');
+    let speech = '';
+    try {
+        speech = await recognizeSpeechOnce();
+    } finally {
+        micBtn.classList.remove('listening');
     }
-
-    var _volStream = null, _volCtx = null, _volFrame = null;
-
-    function _startVolumeRings() {
-        var rings = document.querySelectorAll('.mic-ring');
-        var canvas = document.getElementById('waveformCanvas');
-        var ctx = canvas ? canvas.getContext('2d') : null;
-        const container = document.querySelector('.waveform-container');
-        if (container) container.style.display = 'flex';
-        if (canvas && ctx) {
-            canvas.width = canvas.clientWidth * (window.devicePixelRatio || 1);
-            canvas.height = canvas.clientHeight * (window.devicePixelRatio || 1);
-        }
-
-        navigator.mediaDevices.getUserMedia({ audio: true, video: false }).then(function(stream) {
-            _volStream = stream;
-            _volCtx = new (window.AudioContext || window.webkitAudioContext)();
-            var source = _volCtx.createMediaStreamSource(stream);
-            var analyser = _volCtx.createAnalyser();
-            analyser.fftSize = 256;
-            source.connect(analyser);
-            var data = new Uint8Array(analyser.frequencyBinCount);
-
-            function tick() {
-                analyser.getByteFrequencyData(data);
-                
-                // Siri-style waveform
-                if (canvas && ctx) {
-                    var w = canvas.width;
-                    var h = canvas.height;
-                    ctx.clearRect(0, 0, w, h);
-                    
-                    var sum = 0;
-                    for (var i = 0; i < data.length; i++) sum += data[i];
-                    var vol = sum / data.length; // volume
-                    
-                    var colors = [
-                        'rgba(34, 197, 94, 0.45)', // Green
-                        'rgba(168, 85, 247, 0.45)', // Purple
-                        'rgba(59, 130, 246, 0.6)'    // Blue
-                    ];
-                    
-                    for (var wIdx = 0; wIdx < 3; wIdx++) {
-                        ctx.beginPath();
-                        ctx.lineWidth = wIdx === 2 ? 4 : 2;
-                        ctx.strokeStyle = colors[wIdx];
-                        
-                        var frequency = 0.012 + wIdx * 0.006;
-                        var phase = (Date.now() * 0.005 * (wIdx + 1)) % (Math.PI * 2);
-                        var amplitude = (vol / 128) * (h * 0.4) + 4;
-                        
-                        ctx.moveTo(0, h / 2);
-                        for (var x = 0; x < w; x++) {
-                            var normalizedX = x / w;
-                            var envelope = Math.sin(normalizedX * Math.PI);
-                            var y = h / 2 + Math.sin(x * frequency + phase) * amplitude * envelope;
-                            ctx.lineTo(x, y);
-                        }
-                        ctx.stroke();
-                    }
-                }
-
-                var sumRings = 0;
-                for (var i = 0; i < data.length; i++) sumRings += data[i];
-                var volRings = sumRings / data.length;
-                rings.forEach(function(ring, i) {
-                    var scale = 1 + (volRings / 128) * (0.55 + i * 0.35);
-                    var opacity = Math.min(volRings / 60, 1) * (1 - i * 0.28);
-                    ring.style.transform = 'scale(' + scale + ')';
-                    ring.style.opacity = opacity;
-                });
-                _volFrame = requestAnimationFrame(tick);
-            }
-            tick();
-        }).catch(function() { /* izin reddedildi veya zaten kullanımda — sessizce geç */ });
+    if (!speech) {
+        const cat = getCurrentTherapyCategory().label;
+        sessionData.noResponseByCategory[cat] = (sessionData.noResponseByCategory[cat] || 0) + 1;
+        infoEl.innerText = t('info_no_sound');
+        micBtn.disabled = false;
+        return;
     }
-
-    function _stopVolumeRings() {
-        if (_volFrame) { cancelAnimationFrame(_volFrame); _volFrame = null; }
-        if (_volStream) { _volStream.getTracks().forEach(function(t) { t.stop(); }); _volStream = null; }
-        if (_volCtx) { _volCtx.close(); _volCtx = null; }
-        document.querySelectorAll('.mic-ring').forEach(function(r) {
-            r.style.transform = 'scale(1)';
-            r.style.opacity = 0;
-        });
-        const container = document.querySelector('.waveform-container');
-        if (container) container.style.display = 'none';
-    }
-
-    var _noSpeechTimeout = null;
-    recognition.onstart = function() {
-        _safariActive = true;
-        document.getElementById('micBtn').classList.add('listening');
-        document.getElementById('info').innerText = t('info_listening');
-        _startVolumeRings();
-        _noSpeechTimeout = setTimeout(function() {
-            _safariActive = false;
-            _recognized = true;
-            try { recognition.stop(); } catch(_) {}
-            document.getElementById('micBtn').disabled = false;
-            document.getElementById('micBtn').classList.remove('listening');
-            _stopVolumeRings();
-            document.getElementById('info').innerText = t('mic_prompt');
-        }, 10000);
-    };
-
-    recognition.onresult = function(e) {
-        clearTimeout(_silenceTimer);
-        clearTimeout(_noSpeechTimeout);
-        var interim = '';
-        for (var i = e.resultIndex; i < e.results.length; i++) {
-            if (e.results[i].isFinal) {
-                _speechBuffer += e.results[i][0].transcript + ' ';
-                _recognized = true;
-            } else {
-                interim = e.results[i][0].transcript;
-            }
-        }
-        var display = (_speechBuffer + interim).trim();
-        if (display) document.getElementById('info').innerText = '🎙️ ' + display;
-
-        if (_isSafari && _recognized) {
-            _safariActive = false;
-            _finalizeSpeech();
-        } else {
-            _silenceTimer = setTimeout(_finalizeSpeech, 2500);
-        }
-    };
-
-    recognition.onerror = function(err) {
-        clearTimeout(_silenceTimer);
-        clearTimeout(_noSpeechTimeout);
-        _stopVolumeRings();
-        document.getElementById('micBtn').disabled = false;
-        document.getElementById('micBtn').classList.remove('listening');
-        if (err.error === 'not-allowed') document.getElementById('info').innerText = t('info_mic_permission');
-        else if (err.error === 'no-speech') {
-            // Ses gelmedi ama buffer'da bir şey varsa gönder
-            if (_speechBuffer.trim()) { _finalizeSpeech(); return; }
-            const _nrCat = getCurrentTherapyCategory().label;
-            sessionData.noResponseByCategory[_nrCat] = (sessionData.noResponseByCategory[_nrCat] || 0) + 1;
-            document.getElementById('info').innerText = t('info_no_sound');
-        } else document.getElementById('info').innerText = t('info_repeat_please');
-    };
-
-    recognition.onend = function() {
-        clearTimeout(_silenceTimer);
-        // Safari: continuous=false olduğu için her utterance sonrası onend gelir;
-        // konuşma bitmemişse yeniden başlat
-        if (_isSafari && _safariActive && !_recognized) {
-            try { recognition.start(); return; } catch(e) {}
-        }
-        _safariActive = false;
-        _stopVolumeRings();
-        document.getElementById('micBtn').classList.remove('listening');
-        if (_speechBuffer.trim() && _recognized) {
-            _finalizeSpeech();
-        } else if (document.getElementById('micBtn').disabled && isWaiting && !isProcessingTherapySpeech) {
-            document.getElementById('micBtn').disabled = false;
-            document.getElementById('info').innerText = t('mic_prompt');
-        }
-    };
-
-    try { recognition.start(); } catch(e) {
-        document.getElementById('micBtn').disabled = false;
-        document.getElementById('info').innerText = "Tekrar dene!";
-    }
+    infoEl.innerText = '🎙️ ' + speech;
+    await processTherapySpeech(speech);
 }
 
 async function getGemmaResponse(text) {
@@ -6157,6 +5942,7 @@ async function _objInitThree() {
         return true;
     } catch (e) {
         console.error('Nesne Tanıma: WebGL başlatılamadı', e);
+        reportClientError('object3d init failed: ' + (e && e.message ? e.message : String(e)), e && e.stack);
         return false;
     }
 }
@@ -6240,6 +6026,7 @@ async function _objShowCurrent() {
             _objMesh = gltf.scene;
         } catch (e) {
             console.error('Nesne Tanıma: model yüklenemedi', item.model, e);
+            reportClientError('object3d model load failed: ' + item.model, e && e.stack);
             _objMesh = new THREE.Mesh(
                 new THREE.BoxGeometry(1, 1, 1),
                 new THREE.MeshStandardMaterial({ color: 0xcccccc })
