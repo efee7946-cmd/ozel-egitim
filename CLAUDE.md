@@ -26,7 +26,7 @@ Framework yok — global değişkenler (`childName`, `activeStudentId`, `current
 Tek tip hesap: bir yetişkin (öğretmen/terapist/veli ayrımı yok) kayıt olur, altına öğrenciler ekler. Rol/PIN mekanizması yoktur. Kimlik: kullanıcı adı + şifre + zorunlu e-posta (şifre sıfırlama ve doğrulama 6 haneli e-posta koduyla, Gmail SMTP). `/api/data` oturum token'ı ister; veriler sunucuda `kullanıcıadı:anahtar` olarak izole edilir.
 
 ## Veri Anahtarları
-Tüm anahtarlar `lms_` öneki ile başlar: `lms_students`, `lms_iep_<studentId>`, `lms_skills_<studentId>`, `lms_behavior_<studentId>`, vb.
+Tüm anahtarlar `lms_` öneki ile başlar: `lms_students`, `lms_obj_results_<studentId>`, `lms_adaptive_<studentId>`, vb. (Eski sürümlerden kalan `lms_iep_`/`lms_skills_`/`lms_behavior_` anahtarları hesap silmede hâlâ temizlenir.)
 
 ## Dış API'ler
 - `GEMINI_KEY` — Google Gemini (konuşma pratiği geri bildirimi, veli raporu)

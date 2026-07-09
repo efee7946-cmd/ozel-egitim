@@ -75,9 +75,6 @@ const STRINGS = {
     menu_therapy_desc: 'Sorulara sesli cevap ver',
     menu_schedule: 'Günlük Görevler',
     menu_schedule_desc: 'Bugünün görevlerini tamamla',
-    menu_skills: 'Beceri Takibi',
-    menu_behavior: 'Davranış',
-    menu_bep: 'BEP',
     menu_report: 'Rapor',
     menu_aac: 'AAC',
     menu_aac_desc: 'Görsellerle iletişim kur',
@@ -141,8 +138,6 @@ const STRINGS = {
     bep_generate: 'BEP Taslağı Oluştur',
     bep_disclaimer: '⚠️ Bu taslak yalnızca rehberlik amaçlıdır. Lisanslı özel eğitim uzmanı tarafından gözden geçirilmelidir.',
     aac_title: 'AAC Panosu',
-    skills_title: 'Beceri Takibi',
-    behavior_title: 'Davranış Takibi',
     a11y_title: '⚙️ Erişilebilirlik',
     a11y_large_text: 'Büyük Metin',
     a11y_large_text_desc: 'Yazı boyutunu artırır',
@@ -180,37 +175,11 @@ const STRINGS = {
     bep_generate_btn: 'BEP Taslağı Oluştur',
     bep_copy: 'Kopyala',
     bep_copied: 'Kopyalandı!',
-    add_skill: '+ Beceri Ekle',
-    skill_name_ph: 'Beceri adı',
-    skill_goal_ph: 'Hedef',
-    skill_save: 'Kaydet',
-    skill_trial: 'Deneme Ekle',
-    add_behavior: '+ Davranış Ekle',
-    behavior_name_ph: 'Davranış adı',
-    behavior_freq: 'Sıklık',
     confirm_delete: 'Silmek istediğinizden emin misiniz?',
     data_saved: 'Kaydedildi',
     copy_success: 'Kopyalandı',
     no_student: 'Öğrenci seçilmedi',
-    // Skills ekranı
-    skill_mastered: 'Kazanıldı!',
-    skill_learning_status: 'Öğreniliyor',
-    skill_reset: 'Sıfırlandı',
-    skill_legend_not_started: '⬜ Başlanmadı',
-    skill_legend_learning: '🔄 Öğreniliyor',
-    skill_legend_mastered: '✅ Kazanıldı',
-    // Behavior ekranı
-    behavior_empty: 'Henüz kayıt yok.',
-    behavior_added: 'Kayıt eklendi!',
-    behavior_duration_unit: '{duration} dk',
-    behavior_delete: 'Sil',
-    behavior_label: 'Davranış',
-    behavior_what_happened_ph: 'Ne oldu?',
-    behavior_antecedent_label: 'Öncesi (A)',
-    behavior_consequence_label: 'Sonrası (C)',
-    behavior_frequency_label: 'Sıklık',
-    behavior_duration_label: 'Süre (dk)',
-    // BEP/IEP ekranı
+    // BEP ekranı
     bep_preparing: '⏳ Taslak hazırlanıyor...',
     bep_draft_failed: 'Taslak oluşturulamadı. Gemini API yanıt vermedi.',
     bep_error_prefix: 'Hata: ',
@@ -574,63 +543,6 @@ const STRINGS = {
     bep_cond_ekolali: 'Ekolali',
     bep_cond_stereotipik: 'Stereotipik Hareket',
 
-    iep_domain_communication: 'İletişim',
-    iep_domain_academic: 'Akademik',
-    iep_domain_selfcare: 'Öz Bakım',
-    iep_domain_social: 'Sosyal',
-    iep_domain_motor: 'Motor',
-
-    skill_domain_communication: 'İletişim',
-    skill_domain_academic: 'Akademik',
-    skill_domain_selfcare: 'Öz Bakım',
-    skill_domain_social: 'Sosyal',
-    skill_domain_motor: 'Motor',
-
-    skill_comm_0: 'Adını söyleme',
-    skill_comm_1: 'İstek ifade etme',
-    skill_comm_2: 'Hayır diyebilme',
-    skill_comm_3: 'İki kelime cümle',
-    skill_comm_4: 'Soru sorma',
-    skill_comm_5: 'Selamlama',
-    skill_comm_6: 'Sıra bekleme',
-    skill_comm_7: 'Görsel destek kullanma',
-
-    skill_acad_0: 'Rakam tanıma (1-10)',
-    skill_acad_1: 'Harf tanıma',
-    skill_acad_2: 'Renk tanıma',
-    skill_acad_3: 'Şekil tanıma',
-    skill_acad_4: 'Boyut kavramı',
-    skill_acad_5: 'Nesne eşleştirme',
-    skill_acad_6: 'Kategorilere ayırma',
-    skill_acad_7: 'Basit toplama',
-
-    skill_selfcare_0: 'El yıkama',
-    skill_selfcare_1: 'Diş fırçalama',
-    skill_selfcare_2: 'Tuvalet terbiyesi',
-    skill_selfcare_3: 'Giyinme/soyunma',
-    skill_selfcare_4: 'Yemek yeme',
-    skill_selfcare_5: 'Çanta hazırlama',
-    skill_selfcare_6: 'Uyku rutini',
-    skill_selfcare_7: 'Saç tarama',
-
-    skill_social_0: 'Göz teması',
-    skill_social_1: 'Sıra bekleme',
-    skill_social_2: 'Paylaşma',
-    skill_social_3: 'Empati',
-    skill_social_4: 'Grup etkinliğine katılma',
-    skill_social_5: 'Uygun davranış',
-    skill_social_6: 'Kurallara uyma',
-    skill_social_7: 'Duygularını ifade etme',
-
-    skill_motor_0: 'Kalem tutma',
-    skill_motor_1: 'Makas kullanma',
-    skill_motor_2: 'Top yakalama/atma',
-    skill_motor_3: 'Bağcık bağlama',
-    skill_motor_4: 'Düğme ilikleme',
-    skill_motor_5: 'Boyama',
-    skill_motor_6: 'Çizgi takibi',
-    skill_motor_7: 'Denge',
-
     object_title: '🔍 Nesne Tanıma',
     object_rotate_hint: '👆 Döndürmek için sürükle',
     object_prompt: 'Bu ne? Mikrofona söyle ya da yaz',
@@ -801,21 +713,6 @@ const STRINGS = {
     report_no_story: 'Henüz hikâye oturumu yapılmadı.',
     report_no_session: 'Henüz oturum yapılmadı.',
     report_print: '🖨️ Yazdır',
-    iep_goal_won: 'Tebrikler! Hedef kazanıldı!',
-    iep_session_saved: 'Seans kaydedildi!',
-    iep_screen_title: '📋 IEP Hedefleri',
-    iep_target_behavior: 'Hedef Davranış',
-    iep_behavior_ph: 'Örn: 10 farklı nesneyi doğru isimle tanımlayacak',
-    iep_target_pct: 'Hedef Başarı %',
-    iep_trial_count: 'Deneme Sayısı',
-    iep_start_date: 'Başlangıç',
-    iep_save: '✓ Kaydet',
-    iep_session_hint: 'Her deneme için butona bas:',
-    iep_correct: 'Doğru',
-    iep_prompted: 'İpucu',
-    iep_wrong: 'Yanlış',
-    iep_session_note_ph: 'Seans notu (isteğe bağlı)',
-    iep_save_session: '✓ Seansı Kaydet',
     login_pick_who: 'Kim olduğunu seç!',
     login_add_student: '+ Yeni Öğrenci Ekle',
     login_no_students: 'Henüz öğrenci eklenmedi.',
@@ -832,10 +729,6 @@ const STRINGS = {
     task_all_done_toast: '🏆 Bugünün tüm görevlerini bitirdin! +10 ⭐ bonus',
     task_all_done_title: 'Bugünü Tamamladın!',
     task_all_done_sub: 'Yarın yeni görevler seni bekliyor. Harikasın!',
-    behavior_new_entry: 'Yeni Kayıt',
-    behavior_history: 'Geçmiş Kayıtlar',
-    behavior_consequence_ph: 'Ne yapıldı?',
-    behavior_save: '✓ Kaydet',
     aac_add_card: '➕ Kart Ekle',
     aac_mode_emoji: '😊 Emoji',
     aac_mode_photo: '📷 Fotoğraf',
@@ -843,13 +736,6 @@ const STRINGS = {
     aac_photo_hint: 'Türkçe veya İngilizce kelime yaz, fotoğraflar gelsin.',
     aac_card_name_ph: 'Kart adı yaz...',
     a11y_account: 'Hesap',
-    iep_new_goal: 'Yeni Hedef Ekle',
-    iep_domain: 'Alan',
-    iep_target_date: 'Hedef Tarih',
-    iep_add_goal: '+ Hedef Ekle',
-    skills_screen_title: '🗺️ Beceri Haritası',
-    behavior_screen_title: '📊 Davranış Kaydı',
-    behavior_antecedent_ph: 'Ne tetikledi?',
     search_btn: 'Ara',
     add_btn: 'Ekle',
     student_pill: 'Öğrenci seç',
@@ -1023,9 +909,6 @@ const STRINGS = {
     menu_therapy_desc: 'Answer questions out loud',
     menu_schedule: 'Daily Tasks',
     menu_schedule_desc: "Finish today's tasks",
-    menu_skills: 'Skill Tracking',
-    menu_behavior: 'Behavior',
-    menu_bep: 'IEP',
     menu_report: 'Report',
     menu_aac: 'AAC',
     menu_aac_desc: 'Communicate with pictures',
@@ -1089,8 +972,6 @@ const STRINGS = {
     bep_generate: 'Generate IEP Draft',
     bep_disclaimer: '⚠️ This draft is for guidance only. It must be reviewed by a licensed special education specialist.',
     aac_title: 'AAC Board',
-    skills_title: 'Skill Tracking',
-    behavior_title: 'Behavior Tracking',
     a11y_title: '⚙️ Accessibility',
     a11y_large_text: 'Large Text',
     a11y_large_text_desc: 'Increases font size',
@@ -1128,37 +1009,11 @@ const STRINGS = {
     bep_generate_btn: 'Generate IEP Draft',
     bep_copy: 'Copy',
     bep_copied: 'Copied!',
-    add_skill: '+ Add Skill',
-    skill_name_ph: 'Skill name',
-    skill_goal_ph: 'Goal',
-    skill_save: 'Save',
-    skill_trial: 'Add Trial',
-    add_behavior: '+ Add Behavior',
-    behavior_name_ph: 'Behavior name',
-    behavior_freq: 'Frequency',
     confirm_delete: 'Are you sure you want to delete?',
     data_saved: 'Saved',
     copy_success: 'Copied',
     no_student: 'No student selected',
-    // Skills screen
-    skill_mastered: 'Mastered!',
-    skill_learning_status: 'Learning',
-    skill_reset: 'Reset',
-    skill_legend_not_started: '⬜ Not started',
-    skill_legend_learning: '🔄 Learning',
-    skill_legend_mastered: '✅ Mastered',
-    // Behavior screen
-    behavior_empty: 'No records yet.',
-    behavior_added: 'Record added!',
-    behavior_duration_unit: '{duration} min',
-    behavior_delete: 'Delete',
-    behavior_label: 'Behavior',
-    behavior_what_happened_ph: 'What happened?',
-    behavior_antecedent_label: 'Antecedent (A)',
-    behavior_consequence_label: 'Consequence (C)',
-    behavior_frequency_label: 'Frequency',
-    behavior_duration_label: 'Duration (min)',
-    // BEP/IEP screen
+    // BEP screen
     bep_preparing: '⏳ Preparing draft...',
     bep_draft_failed: 'Could not generate draft. The Gemini API did not respond.',
     bep_error_prefix: 'Error: ',
@@ -1522,63 +1377,6 @@ const STRINGS = {
     bep_cond_ekolali: 'Echolalia',
     bep_cond_stereotipik: 'Stereotypic Movement',
 
-    iep_domain_communication: 'Communication',
-    iep_domain_academic: 'Academic',
-    iep_domain_selfcare: 'Self-Care',
-    iep_domain_social: 'Social',
-    iep_domain_motor: 'Motor',
-
-    skill_domain_communication: 'Communication',
-    skill_domain_academic: 'Academic',
-    skill_domain_selfcare: 'Self-Care',
-    skill_domain_social: 'Social',
-    skill_domain_motor: 'Motor',
-
-    skill_comm_0: 'Saying their name',
-    skill_comm_1: 'Expressing a request',
-    skill_comm_2: 'Saying no',
-    skill_comm_3: 'Two-word sentences',
-    skill_comm_4: 'Asking questions',
-    skill_comm_5: 'Greeting',
-    skill_comm_6: 'Taking turns',
-    skill_comm_7: 'Using visual supports',
-
-    skill_acad_0: 'Number recognition (1-10)',
-    skill_acad_1: 'Letter recognition',
-    skill_acad_2: 'Color recognition',
-    skill_acad_3: 'Shape recognition',
-    skill_acad_4: 'Size concept',
-    skill_acad_5: 'Object matching',
-    skill_acad_6: 'Sorting into categories',
-    skill_acad_7: 'Simple addition',
-
-    skill_selfcare_0: 'Handwashing',
-    skill_selfcare_1: 'Toothbrushing',
-    skill_selfcare_2: 'Toilet training',
-    skill_selfcare_3: 'Dressing/undressing',
-    skill_selfcare_4: 'Eating',
-    skill_selfcare_5: 'Packing a bag',
-    skill_selfcare_6: 'Sleep routine',
-    skill_selfcare_7: 'Hair brushing',
-
-    skill_social_0: 'Eye contact',
-    skill_social_1: 'Taking turns',
-    skill_social_2: 'Sharing',
-    skill_social_3: 'Empathy',
-    skill_social_4: 'Joining group activities',
-    skill_social_5: 'Appropriate behavior',
-    skill_social_6: 'Following rules',
-    skill_social_7: 'Expressing emotions',
-
-    skill_motor_0: 'Holding a pencil',
-    skill_motor_1: 'Using scissors',
-    skill_motor_2: 'Catching/throwing a ball',
-    skill_motor_3: 'Tying shoelaces',
-    skill_motor_4: 'Buttoning',
-    skill_motor_5: 'Coloring',
-    skill_motor_6: 'Line tracing',
-    skill_motor_7: 'Balance',
-
     object_title: '🔍 Object Recognition',
     object_rotate_hint: '👆 Drag to rotate',
     object_prompt: 'What is this? Say it or type it',
@@ -1749,21 +1547,6 @@ const STRINGS = {
     report_no_story: 'No story session yet.',
     report_no_session: 'No session yet.',
     report_print: '🖨️ Print',
-    iep_goal_won: 'Congratulations! Goal achieved!',
-    iep_session_saved: 'Session saved!',
-    iep_screen_title: '📋 IEP Goals',
-    iep_target_behavior: 'Target Behavior',
-    iep_behavior_ph: 'E.g.: Will name 10 different objects correctly',
-    iep_target_pct: 'Target Success %',
-    iep_trial_count: 'Trial Count',
-    iep_start_date: 'Start',
-    iep_save: '✓ Save',
-    iep_session_hint: 'Press a button for each trial:',
-    iep_correct: 'Correct',
-    iep_prompted: 'Prompt',
-    iep_wrong: 'Wrong',
-    iep_session_note_ph: 'Session note (optional)',
-    iep_save_session: '✓ Save Session',
     login_pick_who: 'Pick who you are!',
     login_add_student: '+ Add New Student',
     login_no_students: 'No students added yet.',
@@ -1780,10 +1563,6 @@ const STRINGS = {
     task_all_done_toast: '🏆 You finished all of today\'s tasks! +10 ⭐ bonus',
     task_all_done_title: 'You Completed Today!',
     task_all_done_sub: 'New tasks await tomorrow. You\'re amazing!',
-    behavior_new_entry: 'New Entry',
-    behavior_history: 'Past Entries',
-    behavior_consequence_ph: 'What was done?',
-    behavior_save: '✓ Save',
     aac_add_card: '➕ Add Card',
     aac_mode_emoji: '😊 Emoji',
     aac_mode_photo: '📷 Photo',
@@ -1791,13 +1570,6 @@ const STRINGS = {
     aac_photo_hint: 'Type a Turkish or English word to get photos.',
     aac_card_name_ph: 'Type a card name...',
     a11y_account: 'Account',
-    iep_new_goal: 'Add New Goal',
-    iep_domain: 'Domain',
-    iep_target_date: 'Target Date',
-    iep_add_goal: '+ Add Goal',
-    skills_screen_title: '🗺️ Skill Map',
-    behavior_screen_title: '📊 Behavior Log',
-    behavior_antecedent_ph: 'What triggered it?',
     search_btn: 'Search',
     add_btn: 'Add',
     student_pill: 'Select student',
@@ -2332,7 +2104,7 @@ async function showOnly(id, options = {}) {
 
     const screens = ['start-screen','student-setup-screen','menu-screen','game-container',
                       'schedule-screen','aac-screen','store-screen','object-screen',
-                      'login-screen','iep-screen','skills-screen','behavior-screen','auth-screen','analysis-screen'];
+                      'login-screen','auth-screen','analysis-screen'];
     const isNewScreen = currentScreenId !== id;
     const prevScreen = currentScreenId;
     screens.forEach(s => {
@@ -2392,8 +2164,7 @@ function _updateBottomNav(screenId) {
 }
 
 // =============================================
-// VELİ KAPISI — yetişkin ekranlarının (analiz, IEP, beceri, davranış)
-// girişini basit bir toplama sorusuyla korur
+// VELİ KAPISI — analiz ekranının girişini basit bir toplama sorusuyla korur
 // =============================================
 const GATE_UNLOCK_MS = 10 * 60 * 1000;
 let _parentGateAnswer = null;
@@ -3791,31 +3562,6 @@ function _buildAdaptiveContextText() {
     }).join('\n');
 }
 
-function _buildIEPContextText() {
-    if (!activeStudentId) return null;
-    const goals = DB.getSync('iep_' + activeStudentId) || [];
-    if (!goals.length) return null;
-    return goals.slice(0, 6).map(g => {
-        const trials = DB.getSync('trials_' + g.id) || [];
-        const pct = calcGoalPct(trials);
-        const domain = IEP_DOMAINS.find(d => d.id === g.domain);
-        return `- ${domain ? domain.label : 'Alan'}: "${g.goalText}" → %${pct} (hedef: %${g.targetPct})`;
-    }).join('\n');
-}
-
-function _buildSkillsContextText() {
-    if (!activeStudentId) return null;
-    const map = DB.getSync('skills_' + activeStudentId) || {};
-    if (!Object.keys(map).length) return null;
-    const lines = Object.entries(SKILL_MAP).map(([domainId, domain]) => {
-        const mastered = domain.skills.filter((_, i) => map[`${domainId}:${i}`] === 'mastered').length;
-        const learning = domain.skills.filter((_, i) => map[`${domainId}:${i}`] === 'learning').length;
-        if (mastered + learning === 0) return null;
-        return `- ${domain.label}: ${mastered} kazanıldı, ${learning} öğreniliyor (${domain.skills.length} beceriden)`;
-    }).filter(Boolean);
-    return lines.length ? lines.join('\n') : null;
-}
-
 async function generateAIEvaluation(weekSessions, weekMinutes, weekMic, weekTurns) {
     const objResults = (DB.getSync('obj_results_' + (activeStudentId || 'default')) || []).slice(0, 6);
     const sortText = objResults.map(r => {
@@ -3828,13 +3574,9 @@ async function generateAIEvaluation(weekSessions, weekMinutes, weekMic, weekTurn
         `Soru: "${t.question}" → Cevap: "${t.answer}"`).join('\n') || 'Terapi oturumu yok.';
 
     const _adaptiveText = _buildAdaptiveContextText();
-    const _iepText      = _buildIEPContextText();
-    const _skillsText   = _buildSkillsContextText();
 
     let _contextBlock = '';
     if (_adaptiveText) _contextBlock += `\nKATEGORİ PERFORMANSI (geçmiş seans toplamı):\n${_adaptiveText}\n`;
-    if (_iepText)      _contextBlock += `\nIEP/BEP HEDEFLERİ:\n${_iepText}\n`;
-    if (_skillsText)   _contextBlock += `\nBECERİ HARİTASI:\n${_skillsText}\n`;
 
     const prompt = _lang === 'en'
         ? `You are an empathetic assistant specialized in special education and speech therapy.
@@ -3852,7 +3594,7 @@ Please write a warm, professional evaluation in English addressed to the parent,
 1. The child's overall engagement and motivation over the last week
 2. Cognitive/academic cues observed from the game results
 3. Notable points regarding speech and communication
-4. ${_adaptiveText || _iepText ? 'Concrete category-level suggestions for the family referencing the category/goal data (e.g. which themes to reinforce at home) and an encouraging closing' : 'Concrete suggestions for the family and an encouraging closing'}
+4. ${_adaptiveText ? 'Concrete category-level suggestions for the family referencing the category data (e.g. which themes to reinforce at home) and an encouraging closing' : 'Concrete suggestions for the family and an encouraging closing'}
 
 Do not use any emoji. Use warm, professional and hopeful language.`
         : `Sen özel eğitim ve konuşma terapisi alanında uzman, empati dolu bir asistansın.
@@ -3870,7 +3612,7 @@ Lütfen veliye hitap ederek, 3-4 paragraf halinde şunları içeren sevecen ve p
 1. Çocuğun son bir haftadaki genel katılımı ve motivasyonu
 2. Oyun sonuçlarından gözlemlenen bilişsel/akademik ipuçları
 3. Konuşma ve iletişim açısından dikkat çeken noktalar
-4. ${_adaptiveText || _iepText ? 'Kategori/hedef verilerini referans alarak aileye kategori düzeyinde somut öneriler (ör. hangi temalar evde pekiştirilmeli) ve teşvik edici bir kapanış' : 'Aileye somut öneriler ve teşvik edici bir kapanış'}
+4. ${_adaptiveText ? 'Kategori verilerini referans alarak aileye kategori düzeyinde somut öneriler (ör. hangi temalar evde pekiştirilmeli) ve teşvik edici bir kapanış' : 'Aileye somut öneriler ve teşvik edici bir kapanış'}
 
 Kesinlikle emoji kullanma. Sıcak, profesyonel ve umut verici bir dil kullan.`;
 
@@ -7465,8 +7207,8 @@ function openKvkkModal(e) {
     document.getElementById('kvkkModalBody').innerHTML = isTr ? `
         <h4>Aydınlatma Metni</h4>
         <p><strong>Veri Sorumlusu:</strong> Efe Erman — İstanbul, Tuzla — yildizsiniflari@gmail.com</p>
-        <p><strong>Toplanan Veriler:</strong> Kullanıcı adı, e-posta adresi (şifre sıfırlama ve hesap doğrulama amaçlı), öğrenci adı, eğitim kademesi, destek ihtiyacı bilgileri, beceri ve davranış takip verileri, oturum bilgileri. Öğrenci verilerinin işlenmesi için veli/yasal temsilci onayı zorunludur.</p>
-        <p><strong>İşleme Amacı:</strong> Özel eğitim süreçlerinin takibi, BEP hazırlama, beceri ve davranış değerlendirmesi, yapay zeka destekli geri bildirim oluşturulması.</p>
+        <p><strong>Toplanan Veriler:</strong> Kullanıcı adı, e-posta adresi (şifre sıfırlama ve hesap doğrulama amaçlı), öğrenci adı, eğitim kademesi, destek ihtiyacı bilgileri, seans kayıtları, oturum bilgileri. Öğrenci verilerinin işlenmesi için veli/yasal temsilci onayı zorunludur.</p>
+        <p><strong>İşleme Amacı:</strong> Özel eğitim süreçlerinin takibi, BEP taslağı hazırlama, yapay zeka destekli geri bildirim oluşturulması.</p>
         <p><strong>Onay Kaydı:</strong> Veli onayı öğrenci kaydıyla, Aydınlatma Metni kabulü hesap kaydıyla birlikte tarih bilgisi olarak saklanır.</p>
         <p><strong>Saklama Süresi:</strong> Hesap silinene kadar. Uygulama içi "Hesabı Sil" ile tüm veriler anında, e-posta ile iletilen silme talepleri en geç 30 gün içinde kalıcı olarak silinir. Kişisel bilgi içermeyen teknik hata kayıtları en fazla 30 gün saklanır.</p>
         <p><strong>Aktarılan Taraflar:</strong> Vercel (barındırma altyapısı), Aiven (veritabanı), Google Gemini ve Google Cloud (yapay zeka, ses sentezi ve e-posta gönderimi), Pexels (görsel içerik). Bu hizmetler yalnızca teknik işleme amacıyla kullanılmakta olup kişisel verileriniz pazarlama amaçlı üçüncü taraflarla paylaşılmamaktadır.</p>
@@ -7481,8 +7223,8 @@ function openKvkkModal(e) {
     ` : `
         <h4>Privacy Notice</h4>
         <p><strong>Data Controller:</strong> Efe Erman — Istanbul, Tuzla — yildizsiniflari@gmail.com</p>
-        <p><strong>Data Collected:</strong> Username, email address (for password reset and account verification), student name, education level, support needs, skill and behavior tracking data, session information. Parental/guardian consent is required to process student data.</p>
-        <p><strong>Purpose:</strong> Tracking special education progress, IEP preparation, skill and behavior assessment, AI-assisted feedback generation.</p>
+        <p><strong>Data Collected:</strong> Username, email address (for password reset and account verification), student name, education level, support needs, practice session records, login session information. Parental/guardian consent is required to process student data.</p>
+        <p><strong>Purpose:</strong> Tracking special education progress, IEP draft preparation, AI-assisted feedback generation.</p>
         <p><strong>Consent Records:</strong> Parental consent is stored with the student record and Privacy Notice acceptance with the account record, each with a timestamp.</p>
         <p><strong>Retention:</strong> Until account deletion. In-app "Delete Account" removes all data immediately; deletion requests sent by email are fulfilled within 30 days. Technical error logs containing no personal information are kept for at most 30 days.</p>
         <p><strong>Third Parties:</strong> Vercel (hosting), Aiven (database), Google Gemini and Google Cloud (AI, text-to-speech and email delivery), Pexels (images). These services are used for technical processing only — your data is never shared with third parties for marketing purposes.</p>
@@ -8226,478 +7968,8 @@ function copyBepReport() {
 }
 
 // =============================================
-// IEP HEDEFLERİ
-// =============================================
-const IEP_DOMAINS = [
-    { id: 'communication', get label() { return t('iep_domain_communication'); }, emoji: '🗣️', color: '#48dbfb' },
-    { id: 'academic',      get label() { return t('iep_domain_academic'); },      emoji: '📚', color: '#ff9f43' },
-    { id: 'selfcare',      get label() { return t('iep_domain_selfcare'); },      emoji: '🧼', color: '#1dd1a1' },
-    { id: 'social',        get label() { return t('iep_domain_social'); },        emoji: '🤝', color: '#a29bfe' },
-    { id: 'motor',         get label() { return t('iep_domain_motor'); },         emoji: '🏃', color: '#fd79a8' },
-];
-
-let _iepCurrentGoalId = null;
-let _iepCurrentTrials = [];
-let _iepSelectedDomain = 'communication';
-
-function iepBack() {
-    showOnly('analysis-screen');
-}
-
-function goToIep() {
-    requireAdultGate(() => {
-        showOnly('iep-screen');
-        document.getElementById('iepStudentBadge').textContent = activeStudentName || '';
-        hideIepGoalForm();
-        closeSessionPanel();
-        renderIepGoals();
-    });
-}
-
-function iepGoalsKey() { return `iep_${activeStudentId || 'default'}`; }
-function iepTrialsKey(goalId) { return `trials_${goalId}`; }
-
-async function loadIepGoals() {
-    let goals = DB.getSync(iepGoalsKey());
-    if (!goals) goals = await DB.get(iepGoalsKey());
-    return goals || [];
-}
-
-async function renderIepGoals() {
-    const goals = await loadIepGoals();
-    const el = document.getElementById('iepGoalList');
-    if (!goals.length) {
-        el.innerHTML = `<div class="iep-empty">
-            <p>📋 Henüz hedef eklenmedi.</p>
-            <p>Aşağıdaki <strong>"+ Hedef Ekle"</strong> butonuyla başlayın.</p>
-        </div>`;
-        return;
-    }
-    const items = await Promise.all(goals.map(async g => {
-        const trials = await loadTrials(g.id);
-        const pct = calcGoalPct(trials);
-        const domain = IEP_DOMAINS.find(d => d.id === g.domain) || IEP_DOMAINS[0];
-        const statusClass = g.status === 'mastered' ? 'status-mastered'
-                          : g.status === 'not_started' ? 'status-not-started'
-                          : 'status-learning';
-        const statusLabel = g.status === 'mastered' ? '✅ Kazanıldı'
-                          : g.status === 'not_started' ? '⬜ Başlanmadı'
-                          : '🔄 Öğreniliyor';
-        return `
-        <div class="iep-goal-card">
-            <div class="iep-goal-top">
-                <span class="iep-domain-badge" style="background:${domain.color}20;color:${domain.color}">
-                    ${domain.emoji} ${domain.label}
-                </span>
-                <span class="iep-status-badge ${statusClass}">${statusLabel}</span>
-                <button class="iep-delete-btn" onclick="deleteIepGoal('${escapeHtml(g.id)}')" aria-label="Sil">✕</button>
-            </div>
-            <p class="iep-goal-text">${escapeHtml(g.goalText)}</p>
-            <div class="iep-progress-row">
-                <div class="iep-progress-track">
-                    <div class="iep-progress-fill" style="width:${pct}%;background:${domain.color}"></div>
-                    <div class="iep-target-line" style="left:${g.targetPct}%"></div>
-                </div>
-                <span class="iep-pct-label">%${pct} / %${g.targetPct} hedef</span>
-            </div>
-            <div class="iep-goal-meta">
-                <span>${trials.length} seans · ${countTotalTrials(trials)} deneme</span>
-                ${g.targetDate ? `<span>Hedef: ${g.targetDate}</span>` : ''}
-            </div>
-            <button type="button" class="iep-session-btn" onclick="openSessionPanel('${escapeHtml(g.id)}')">
-                ▶ Seans Başlat
-            </button>
-        </div>`;
-    }));
-    el.innerHTML = items.join('');
-}
-
-function calcGoalPct(trials) {
-    if (!trials.length) return 0;
-    // Son 3 seansın ortalaması
-    const recent = trials.slice(-3);
-    let correct = 0, total = 0;
-    recent.forEach(s => {
-        s.trials.forEach(t => {
-            total++;
-            if (t.result === 'correct') correct++;
-        });
-    });
-    return total ? Math.round((correct / total) * 100) : 0;
-}
-
-function countTotalTrials(trials) {
-    return trials.reduce((acc, s) => acc + s.trials.length, 0);
-}
-
-async function loadTrials(goalId) {
-    let t = DB.getSync(iepTrialsKey(goalId));
-    if (!t) t = await DB.get(iepTrialsKey(goalId));
-    return t || [];
-}
-
-function showIepGoalForm() {
-    document.getElementById('iepGoalForm').style.display = '';
-    document.getElementById('iepSessionPanel').style.display = 'none';
-    // Domain chip'leri render et
-    const chips = document.getElementById('iepDomainChips');
-    chips.innerHTML = IEP_DOMAINS.map(d => `
-        <button type="button" class="iep-domain-chip ${d.id === _iepSelectedDomain ? 'selected' : ''}"
-            style="--dc:${d.color}" onclick="selectIepDomain('${d.id}', this)">
-            ${d.emoji} ${d.label}
-        </button>
-    `).join('');
-    // Varsayılan tarihler
-    const today = new Date().toISOString().slice(0, 10);
-    const sixMonths = new Date(Date.now() + 180 * 86400000).toISOString().slice(0, 10);
-    document.getElementById('iepStartDate').value = today;
-    document.getElementById('iepTargetDate').value = sixMonths;
-}
-
-function hideIepGoalForm() {
-    document.getElementById('iepGoalForm').style.display = 'none';
-}
-
-function selectIepDomain(id, btn) {
-    _iepSelectedDomain = id;
-    document.querySelectorAll('.iep-domain-chip').forEach(b => b.classList.remove('selected'));
-    btn.classList.add('selected');
-}
-
-async function saveIepGoal() {
-    const goalText = document.getElementById('iepGoalText').value.trim();
-    if (!goalText) { document.getElementById('iepGoalText').focus(); return; }
-    const goals = await loadIepGoals();
-    const goal = {
-        id: 'goal_' + Date.now(),
-        domain: _iepSelectedDomain,
-        goalText,
-        targetPct: parseInt(document.getElementById('iepTargetPct').value) || 80,
-        targetTrials: parseInt(document.getElementById('iepTargetTrials').value) || 10,
-        status: 'not_started',
-        startDate: document.getElementById('iepStartDate').value,
-        targetDate: document.getElementById('iepTargetDate').value,
-    };
-    goals.push(goal);
-    await DB.update(iepGoalsKey(), () => goals);
-    document.getElementById('iepGoalText').value = '';
-    hideIepGoalForm();
-    renderIepGoals();
-}
-
-async function deleteIepGoal(id) {
-    const goals = (await loadIepGoals()).filter(g => g.id !== id);
-    await DB.update(iepGoalsKey(), () => goals);
-    DB.del(iepTrialsKey(id));
-    renderIepGoals();
-}
-
-function openSessionPanel(goalId) {
-    _iepCurrentGoalId = goalId;
-    _iepCurrentTrials = [];
-    document.getElementById('iepSessionPanel').style.display = '';
-    document.getElementById('iepGoalForm').style.display = 'none';
-    document.getElementById('iepSessionNotes').value = '';
-    loadIepGoals().then(goals => {
-        const g = goals.find(x => x.id === goalId);
-        if (g) {
-            const d = IEP_DOMAINS.find(x => x.id === g.domain) || IEP_DOMAINS[0];
-            document.getElementById('iepSessionGoalInfo').innerHTML = `
-                <span class="iep-domain-badge" style="background:${d.color}20;color:${d.color}">${d.emoji} ${d.label}</span>
-                <p>${escapeHtml(g.goalText)}</p>
-                <small>Hedef: %${g.targetPct} · ${g.targetTrials} deneme</small>
-            `;
-        }
-    });
-    updateTrialTally();
-}
-
-function closeSessionPanel() {
-    document.getElementById('iepSessionPanel').style.display = 'none';
-    _iepCurrentGoalId = null;
-    _iepCurrentTrials = [];
-}
-
-function recordTrial(result) {
-    _iepCurrentTrials.push({ result });
-    updateTrialTally();
-    // Görsel geri bildirim
-    const btn = document.querySelector(`.trial-${result}`);
-    if (btn) { btn.classList.add('trial-flash'); setTimeout(() => btn.classList.remove('trial-flash'), 300); }
-}
-
-function updateTrialTally() {
-    const c = _iepCurrentTrials.filter(t => t.result === 'correct').length;
-    const p = _iepCurrentTrials.filter(t => t.result === 'prompted').length;
-    const w = _iepCurrentTrials.filter(t => t.result === 'incorrect').length;
-    const total = _iepCurrentTrials.length;
-    const pct = total ? Math.round((c / total) * 100) : 0;
-    document.getElementById('iepTrialTally').innerHTML = `
-        <span class="tally-correct">✓ ${c}</span>
-        <span class="tally-prompted">P ${p}</span>
-        <span class="tally-incorrect">✗ ${w}</span>
-        <span class="tally-pct">${total} deneme · %${pct}</span>
-    `;
-}
-
-async function submitTrialSession() {
-    if (!_iepCurrentGoalId || !_iepCurrentTrials.length) {
-        closeSessionPanel();
-        return;
-    }
-    const session = {
-        id: 'trial_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
-        goalId: _iepCurrentGoalId,
-        date: new Date().toISOString().slice(0, 10),
-        trials: [..._iepCurrentTrials],
-        notes: document.getElementById('iepSessionNotes').value.trim(),
-    };
-    const trials = await loadTrials(_iepCurrentGoalId);
-    trials.push(session);
-    await DB.update(iepTrialsKey(_iepCurrentGoalId), () => trials);
-
-    // Durumu güncelle (mastery check)
-    const goals = await loadIepGoals();
-    const goalIdx = goals.findIndex(g => g.id === _iepCurrentGoalId);
-    if (goalIdx >= 0) {
-        const pct = calcGoalPct(trials);
-        const target = goals[goalIdx].targetPct;
-        if (goals[goalIdx].status === 'not_started') goals[goalIdx].status = 'learning';
-        if (pct >= target && trials.length >= 3) goals[goalIdx].status = 'mastered';
-        await DB.update(iepGoalsKey(), () => goals);
-        if (goals[goalIdx].status === 'mastered' && typeof confetti === 'function') {
-            confetti({ particleCount: 80, spread: 60, origin: { y: 0.6 } });
-            speakFallback(t('iep_goal_won'));
-        } else {
-            speakFallback(t('iep_session_saved'));
-        }
-    }
-    closeSessionPanel();
-    renderIepGoals();
-}
-
-// =============================================
-// BECERİ HARİTASI
-// =============================================
-const SKILL_MAP = {
-    communication: {
-        get label() { return t('skill_domain_communication'); }, emoji: '🗣️', color: '#48dbfb',
-        skills: ['skill_comm_0','skill_comm_1','skill_comm_2',
-                 'skill_comm_3','skill_comm_4','skill_comm_5',
-                 'skill_comm_6','skill_comm_7'],
-    },
-    academic: {
-        get label() { return t('skill_domain_academic'); }, emoji: '📚', color: '#ff9f43',
-        skills: ['skill_acad_0','skill_acad_1','skill_acad_2',
-                 'skill_acad_3','skill_acad_4','skill_acad_5',
-                 'skill_acad_6','skill_acad_7'],
-    },
-    selfcare: {
-        get label() { return t('skill_domain_selfcare'); }, emoji: '🧼', color: '#1dd1a1',
-        skills: ['skill_selfcare_0','skill_selfcare_1','skill_selfcare_2',
-                 'skill_selfcare_3','skill_selfcare_4','skill_selfcare_5',
-                 'skill_selfcare_6','skill_selfcare_7'],
-    },
-    social: {
-        get label() { return t('skill_domain_social'); }, emoji: '🤝', color: '#a29bfe',
-        skills: ['skill_social_0','skill_social_1','skill_social_2',
-                 'skill_social_3','skill_social_4','skill_social_5',
-                 'skill_social_6','skill_social_7'],
-    },
-    motor: {
-        get label() { return t('skill_domain_motor'); }, emoji: '🏃', color: '#fd79a8',
-        skills: ['skill_motor_0','skill_motor_1','skill_motor_2',
-                 'skill_motor_3','skill_motor_4','skill_motor_5',
-                 'skill_motor_6','skill_motor_7'],
-    },
-};
-
-let _skillsDomain = 'communication';
-
-function skillsBack() {
-    showOnly('analysis-screen');
-}
-
-function goToSkills() {
-    requireAdultGate(() => {
-        showOnly('skills-screen');
-        document.getElementById('skillsStudentBadge').textContent = activeStudentName || '';
-        renderSkillsDomainTabs();
-        renderSkillsGrid();
-    });
-}
-
-function skillsKey() { return `skills_${activeStudentId || 'default'}`; }
-
-function loadSkillsSync() {
-    return DB.getSync(skillsKey()) || {};
-}
-
-function renderSkillsDomainTabs() {
-    const tabs = document.getElementById('skillsDomainTabs');
-    tabs.innerHTML = Object.entries(SKILL_MAP).map(([id, d]) => `
-        <button type="button" class="skills-tab ${id === _skillsDomain ? 'active' : ''}"
-            style="--sc:${d.color}" onclick="switchSkillsDomain('${id}')">
-            ${d.emoji} ${d.label}
-        </button>
-    `).join('');
-}
-
-function switchSkillsDomain(id) {
-    _skillsDomain = id;
-    renderSkillsDomainTabs();
-    renderSkillsGrid();
-}
-
-function renderSkillsGrid() {
-    const domain = SKILL_MAP[_skillsDomain];
-    const map = loadSkillsSync();
-    const grid = document.getElementById('skillsGrid');
-    grid.innerHTML = domain.skills.map((skill, i) => {
-        const key = `${_skillsDomain}:${i}`;
-        const status = map[key] || 'not_started';
-        const icon = status === 'mastered' ? '✅' : status === 'learning' ? '🔄' : '⬜';
-        return `
-        <button type="button" class="skill-card skill-${status}"
-            style="--sc:${domain.color}" onclick="cycleSkill('${key}')">
-            <span class="skill-icon">${icon}</span>
-            <span class="skill-label">${escapeHtml(t(skill))}</span>
-        </button>`;
-    }).join('');
-}
-
-async function cycleSkill(key) {
-    const map = loadSkillsSync();
-    const current = map[key] || 'not_started';
-    const next = current === 'not_started' ? 'learning'
-               : current === 'learning'    ? 'mastered'
-               :                             'not_started';
-    map[key] = next;
-    await DB.update(skillsKey(), () => map);
-    renderSkillsGrid();
-    const label = next === 'mastered' ? t('skill_mastered') : next === 'learning' ? t('skill_learning_status') : t('skill_reset');
-    speakFallback(label);
-}
-
-// =============================================
-// DAVRANIŞ KAYDI
-// =============================================
-let _behaviorCount = 1;
-
-function behaviorBack() {
-    showOnly('analysis-screen');
-}
-
-function goToBehavior() {
-    requireAdultGate(() => {
-        showOnly('behavior-screen');
-        document.getElementById('behaviorStudentBadge').textContent = activeStudentName || '';
-        _behaviorCount = 1;
-        document.getElementById('behaviorCount').textContent = '1';
-        renderBehaviorLog();
-    });
-}
-
-function behaviorKey() { return `behavior_${activeStudentId || 'default'}`; }
-
-function loadBehaviorSync() {
-    return DB.getSync(behaviorKey()) || [];
-}
-
-function behaviorCountChange(delta) {
-    _behaviorCount = Math.max(1, _behaviorCount + delta);
-    document.getElementById('behaviorCount').textContent = _behaviorCount;
-}
-
-function saveBehaviorEntry() {
-    const text = document.getElementById('behaviorText').value.trim();
-    if (!text) { document.getElementById('behaviorText').focus(); return; }
-    const log = loadBehaviorSync();
-    log.unshift({
-        id: 'b_' + Date.now(),
-        date: new Date().toISOString(),
-        behavior: text,
-        antecedent: document.getElementById('behaviorAntecedent').value.trim(),
-        consequence: document.getElementById('behaviorConsequence').value.trim(),
-        frequency: _behaviorCount,
-        duration: parseInt(document.getElementById('behaviorDuration').value) || 0,
-    });
-    DB.set(behaviorKey(), log.slice(0, 100)); // son 100 kayıt
-    // formu temizle
-    ['behaviorText','behaviorAntecedent','behaviorConsequence','behaviorDuration'].forEach(id => {
-        document.getElementById(id).value = '';
-    });
-    _behaviorCount = 1;
-    document.getElementById('behaviorCount').textContent = '1';
-    renderBehaviorLog();
-    speakFallback(t('behavior_added'));
-}
-
-function renderBehaviorLog() {
-    const log = loadBehaviorSync();
-    const el = document.getElementById('behaviorLogList');
-    if (!log.length) {
-        el.innerHTML = `<p class="behavior-empty">${t('behavior_empty')}</p>`;
-        return;
-    }
-    el.innerHTML = log.slice(0, 20).map(e => {
-        const d = new Date(e.date);
-        const dateStr = `${d.getDate()}.${d.getMonth()+1}.${d.getFullYear()} ${d.getHours()}:${String(d.getMinutes()).padStart(2,'0')}`;
-        return `
-        <div class="behavior-log-item">
-            <div class="behavior-log-top">
-                <strong>${escapeHtml(e.behavior)}</strong>
-                <span class="behavior-log-date">${dateStr}</span>
-            </div>
-            ${e.antecedent ? `<div class="behavior-log-abc"><span>A:</span> ${escapeHtml(e.antecedent)}</div>` : ''}
-            ${e.consequence ? `<div class="behavior-log-abc"><span>C:</span> ${escapeHtml(e.consequence)}</div>` : ''}
-            <div class="behavior-log-stats">
-                <span>×${e.frequency}</span>
-                ${e.duration ? `<span>${t('behavior_duration_unit').replace('{duration}', e.duration)}</span>` : ''}
-            </div>
-            <button class="behavior-delete-btn" onclick="deleteBehaviorEntry('${escapeHtml(e.id)}')">${t('behavior_delete')}</button>
-        </div>`;
-    }).join('');
-}
-
-function deleteBehaviorEntry(id) {
-    const log = loadBehaviorSync().filter(e => e.id !== id);
-    DB.set(behaviorKey(), log);
-    renderBehaviorLog();
-}
-
-// =============================================
 // WINDOW EXPORTS (YENİ)
 // =============================================
-saveBehaviorEntry = async function saveBehaviorEntry() {
-    const text = document.getElementById('behaviorText').value.trim();
-    if (!text) { document.getElementById('behaviorText').focus(); return; }
-    const log = loadBehaviorSync();
-    log.unshift({
-        id: 'b_' + Date.now(),
-        date: new Date().toISOString(),
-        behavior: text,
-        antecedent: document.getElementById('behaviorAntecedent').value.trim(),
-        consequence: document.getElementById('behaviorConsequence').value.trim(),
-        frequency: _behaviorCount,
-        duration: parseInt(document.getElementById('behaviorDuration').value) || 0,
-    });
-    await DB.update(behaviorKey(), () => log.slice(0, 100));
-    ['behaviorText','behaviorAntecedent','behaviorConsequence','behaviorDuration'].forEach(id => {
-        document.getElementById(id).value = '';
-    });
-    _behaviorCount = 1;
-    document.getElementById('behaviorCount').textContent = '1';
-    renderBehaviorLog();
-    speakFallback(t('behavior_added'));
-};
-
-deleteBehaviorEntry = async function deleteBehaviorEntry(id) {
-    const log = loadBehaviorSync().filter(e => e.id !== id);
-    await DB.update(behaviorKey(), () => log);
-    renderBehaviorLog();
-};
-
 window.goToLogin = goToLogin;
 window.exitSetEmailModal = exitSetEmailModal;
 window.submitSetEmailModal = submitSetEmailModal;
@@ -8707,23 +7979,3 @@ window.backFromStudentProfile = backFromStudentProfile;
 window.goToAnalysis = goToAnalysis;
 window.generateBepReport = generateBepReport;
 window.copyBepReport = copyBepReport;
-window.goToIep = goToIep;
-window.iepBack = iepBack;
-window.showIepGoalForm = showIepGoalForm;
-window.hideIepGoalForm = hideIepGoalForm;
-window.selectIepDomain = selectIepDomain;
-window.saveIepGoal = saveIepGoal;
-window.deleteIepGoal = deleteIepGoal;
-window.openSessionPanel = openSessionPanel;
-window.closeSessionPanel = closeSessionPanel;
-window.recordTrial = recordTrial;
-window.submitTrialSession = submitTrialSession;
-window.goToSkills = goToSkills;
-window.skillsBack = skillsBack;
-window.switchSkillsDomain = switchSkillsDomain;
-window.cycleSkill = cycleSkill;
-window.goToBehavior = goToBehavior;
-window.behaviorBack = behaviorBack;
-window.behaviorCountChange = behaviorCountChange;
-window.saveBehaviorEntry = saveBehaviorEntry;
-window.deleteBehaviorEntry = deleteBehaviorEntry;
