@@ -7447,6 +7447,7 @@ function normalizeStudentRecord(student, index = 0) {
         name: String(student.name || student.full_name || '').trim(),
         emoji: student.emoji || '🌟',
         createdAt: student.createdAt || student.created_at || new Date().toISOString(),
+        consentAt: student.consentAt || student.consent_at || null,
     };
 }
 
