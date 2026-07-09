@@ -6170,18 +6170,19 @@ async function _objShowCurrent() {
     document.getElementById('objFeedback').className = 'object-feedback';
     document.getElementById('objTextInput').value = '';
 
-    const fallback = document.getElementById('objFallback');
-    if (fallback) {
-        const shapeEmoji = { sphere: '⚽', box: '📦', star: '⭐' };
-        const idEmoji = {
-            ball: '⚽', star: '⭐', apple: '🍎', balloon: '🎈',
-            tree: '🌳', fish: '🐟', cup: '🥛', strawberry: '🍓', icecream: '🍦',
-            sun: '☀️', banana: '🍌', train: '🚂', plane: '✈️',
-        };
-        fallback.textContent = (item.type === 'primitive' ? shapeEmoji[item.shape] : idEmoji[item.id]) || '❓';
+    if (!_objRenderer) {
+        const fallback = document.getElementById('objFallback');
+        if (fallback) {
+            const shapeEmoji = { sphere: '⚽', box: '📦', star: '⭐' };
+            const idEmoji = {
+                ball: '⚽', star: '⭐', apple: '🍎', balloon: '🎈',
+                tree: '🌳', fish: '🐟', cup: '🥛', strawberry: '🍓', icecream: '🍦',
+                sun: '☀️', banana: '🍌', train: '🚂', plane: '✈️',
+            };
+            fallback.textContent = (item.type === 'primitive' ? shapeEmoji[item.shape] : idEmoji[item.id]) || '❓';
+        }
         return;
     }
-    if (!_objRenderer) return;
 
     if (_objMesh) {
         _objScene.remove(_objMesh);
