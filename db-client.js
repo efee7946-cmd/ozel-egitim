@@ -1,7 +1,11 @@
 // LMS Veri Katmanı
 // Hassas veriler (öğrenci, BEP, IEP, beceri, davranış) AES-GCM ile şifrelenir —
-// hem localStorage'da hem de /api/data üzerinden sunucuya giderken; sunucu
-// yalnızca opak şifreli metni görür, anahtar hiçbir zaman cihazdan çıkmaz.
+// hem localStorage'da hem de /api/data üzerinden sunucuya giderken; app_data
+// tablosu yalnızca opak şifreli metin içerir. Anahtar malzemesi (data_key)
+// sunucuda üretilir ve users tablosunda DATA_KEY_SECRET ile şifrelenmiş olarak
+// saklanır — yani bu uçtan uca şifreleme DEĞİLDİR: oturum açılışında sunucu
+// data_key'i çözüp istemciye verir. Koruduğu şey: app_data'nın tek başına
+// sızması (yedek, log vb.) ve DATA_KEY_SECRET olmadan tam DB sızıntısı.
 // sessionStorage: hızlı sync okuma için plaintext cache (sekme kapanınca silinir).
 // localStorage: şifreli kalıcı cache (offline destek).
 // /api/data üzerinden Aiven PostgreSQL ile cihazlar arası senkronizasyon.

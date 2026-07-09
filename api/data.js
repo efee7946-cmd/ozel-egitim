@@ -3,6 +3,7 @@
 // (user_key = "<kullanıcıadı>:<anahtar>"). DATABASE_URL env var'ı gereklidir.
 
 import { query } from './_db.js';
+import { sessionUsername } from './_auth.js';
 
 function cors(res) {
     res.setHeader('Access-Control-Allow-Origin', process.env.ALLOWED_ORIGIN || '*');
@@ -22,20 +23,6 @@ async function cleanupLeakedAuthKeys() {
     }
 }
 
-async function authUsername(req) {
-    const header = req.headers.authorization || '';
-    const token = header.startsWith('Bearer ') ? header.slice(7) : null;
-    if (!token) return null;
-    const rows = await query(
-        `SELECT s.username
-         FROM sessions s
-         JOIN users u ON u.username = s.username
-         WHERE s.token = $1 AND s.expires_at > now() AND u.email_verified = true`,
-        [token]
-    );
-    return rows.length ? rows[0].username : null;
-}
-
 export default async function handler(req, res) {
     cors(res);
     if (req.method === 'OPTIONS') return res.status(200).end();
@@ -43,7 +30,7 @@ export default async function handler(req, res) {
     try {
         await cleanupLeakedAuthKeys();
 
-        const username = await authUsername(req);
+        const username = await sessionUsername(req);
         if (!username) return res.status(401).json({ error: 'AUTH_REQUIRED' });
 
         if (req.method === 'GET') {

@@ -6,6 +6,7 @@
 import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 import { query } from './_db.js';
+import { hashToken, resolveToken } from './_auth.js';
 import { sendMail, resetCodeEmailHtml, verifyCodeEmailHtml } from './_mail.js';
 import { checkRateLimit } from './_rateLimit.js';
 import { isPasswordPwned } from './_pwned.js';
@@ -36,6 +37,12 @@ function _legacyHash(password, salt) {
 
 function expiresAt() {
     return new Date(Date.now() + SESSION_DAYS * 24 * 60 * 60 * 1000);
+}
+
+async function sessionRows(token) {
+    const stored = await resolveToken(token);
+    if (!stored) return [];
+    return query('SELECT username FROM sessions WHERE token = $1 AND expires_at > now()', [stored]);
 }
 
 let _columnsEnsured = false;
@@ -91,12 +98,63 @@ function generateSixDigitCode() {
     return String(crypto.randomInt(100000, 1000000));
 }
 
+// data_key sütunu DATA_KEY_SECRET'tan türetilen anahtarla AES-GCM ile
+// şifrelenir (dk1: öneki). Böylece tek başına DB sızıntısı app_data'daki
+// şifreli verileri çözmeye yetmez; env var yoksa eski (düz metin) davranışa
+// düşülür. Bu uçtan uca şifreleme değildir — sunucu çalışırken anahtarı görür.
+const DK_PREFIX = 'dk1:';
+let _kekWarned = false;
+
+function dataKeyKek() {
+    const secret = process.env.DATA_KEY_SECRET;
+    if (!secret) {
+        if (!_kekWarned) {
+            _kekWarned = true;
+            console.warn('UYARI: DATA_KEY_SECRET tanımlı değil — users.data_key düz metin saklanıyor. Güçlü bir rastgele değer üretip Vercel\'e eklemen önerilir.');
+        }
+        return null;
+    }
+    return crypto.createHash('sha256').update(secret).digest();
+}
+
+function encryptDataKey(plain) {
+    const kek = dataKeyKek();
+    if (!kek) return plain;
+    const iv = crypto.randomBytes(12);
+    const cipher = crypto.createCipheriv('aes-256-gcm', kek, iv);
+    const ct = Buffer.concat([cipher.update(plain, 'utf8'), cipher.final()]);
+    return DK_PREFIX + Buffer.concat([iv, ct, cipher.getAuthTag()]).toString('base64');
+}
+
+function decryptDataKey(stored) {
+    if (!stored || !stored.startsWith(DK_PREFIX)) return stored;
+    const kek = dataKeyKek();
+    if (!kek) throw new Error('data_key şifreli ama DATA_KEY_SECRET tanımlı değil');
+    const buf = Buffer.from(stored.slice(DK_PREFIX.length), 'base64');
+    const iv = buf.subarray(0, 12);
+    const tag = buf.subarray(buf.length - 16);
+    const ct = buf.subarray(12, buf.length - 16);
+    const decipher = crypto.createDecipheriv('aes-256-gcm', kek, iv);
+    decipher.setAuthTag(tag);
+    return Buffer.concat([decipher.update(ct), decipher.final()]).toString('utf8');
+}
+
+async function unwrapDataKey(username, stored) {
+    if (!stored) {
+        const dataKey = crypto.randomBytes(32).toString('hex');
+        await query('UPDATE users SET data_key = $1 WHERE username = $2', [encryptDataKey(dataKey), username]);
+        return dataKey;
+    }
+    const plain = decryptDataKey(stored);
+    if (plain === stored && dataKeyKek()) {
+        await query('UPDATE users SET data_key = $1 WHERE username = $2', [encryptDataKey(plain), username]);
+    }
+    return plain;
+}
+
 async function ensureDataKey(username) {
     const rows = await query('SELECT data_key FROM users WHERE username = $1', [username]);
-    if (rows[0]?.data_key) return rows[0].data_key;
-    const dataKey = crypto.randomBytes(32).toString('hex');
-    await query('UPDATE users SET data_key = $1 WHERE username = $2', [dataKey, username]);
-    return dataKey;
+    return unwrapDataKey(username, rows[0]?.data_key);
 }
 
 // Doğrulama kodu üretir, kaydeder ve e-postayla gönderir (best-effort)
@@ -152,7 +210,7 @@ export default async function handler(req, res) {
             const dataKey = crypto.randomBytes(32).toString('hex');
             await query(
                 'INSERT INTO users (username, display_name, hash, salt, email, data_key) VALUES ($1, $2, $3, $4, $5, $6)',
-                [u, displayName, hash, '', userEmail, dataKey]  // bcrypt hash'i salt içeriyor, ayrı sütun boş
+                [u, displayName, hash, '', userEmail, encryptDataKey(dataKey)]  // bcrypt hash'i salt içeriyor, ayrı sütun boş
             );
 
             // Doğrulama kodu gönder — mail hatası kaydı engellemesin
@@ -167,7 +225,7 @@ export default async function handler(req, res) {
             const tok = crypto.randomBytes(32).toString('hex');
             await query(
                 'INSERT INTO sessions (token, username, display_name, expires_at) VALUES ($1, $2, $3, $4)',
-                [tok, u, displayName, expiresAt()]
+                [hashToken(tok), u, displayName, expiresAt()]
             );
             return res.json({
                 ok: true, token: tok, displayName, dataKey,
@@ -178,6 +236,10 @@ export default async function handler(req, res) {
 
         /* ---- GİRİŞ YAP ---- */
         if (action === 'login') {
+            // Hesap bazlı kilit tek hesabı korur; bu limit aynı IP'den çok
+            // sayıda farklı hesaba parola spreylemeyi engeller
+            if (!(await checkRateLimit('login_ip:' + getClientIp(req), 100)))
+                return res.status(429).json({ error: 'AUTH_RATE_LIMITED' });
             if (!username || !password)
                 return res.status(400).json({ error: 'AUTH_FIELDS_REQUIRED' });
             const u = username.trim().toLowerCase();
@@ -224,10 +286,10 @@ export default async function handler(req, res) {
             }
 
             const tok = crypto.randomBytes(32).toString('hex');
-            const dataKey = user.data_key || await ensureDataKey(u);
+            const dataKey = await unwrapDataKey(u, user.data_key);
             await query(
                 'INSERT INTO sessions (token, username, display_name, expires_at) VALUES ($1, $2, $3, $4)',
-                [tok, u, user.display_name, expiresAt()]
+                [hashToken(tok), u, user.display_name, expiresAt()]
             );
             return res.json({
                 ok: true, token: tok, displayName: user.display_name, dataKey,
@@ -295,10 +357,10 @@ export default async function handler(req, res) {
             await query('DELETE FROM sessions WHERE username = $1', [user.username]);
 
             const tok = crypto.randomBytes(32).toString('hex');
-            const dataKey = user.data_key || await ensureDataKey(user.username);
+            const dataKey = await unwrapDataKey(user.username, user.data_key);
             await query(
                 'INSERT INTO sessions (token, username, display_name, expires_at) VALUES ($1, $2, $3, $4)',
-                [tok, user.username, user.display_name, expiresAt()]
+                [hashToken(tok), user.username, user.display_name, expiresAt()]
             );
             return res.json({ ok: true, token: tok, displayName: user.display_name, username: user.username, dataKey });
         }
@@ -309,7 +371,7 @@ export default async function handler(req, res) {
             const userEmail = email && String(email).trim().toLowerCase();
             if (!isValidEmail(userEmail))
                 return res.status(400).json({ error: 'AUTH_EMAIL_INVALID' });
-            const rows = await query('SELECT username FROM sessions WHERE token = $1 AND expires_at > now()', [token]);
+            const rows = await sessionRows(token);
             if (!rows.length) return res.status(401).json({ error: 'Geçersiz oturum' });
             // Bu action herhangi bir e-postaya sahiplik dogrulamasi olmadan
             // dogrulama maili gonderiyor - sinirsiz cagriya izin verilirse
@@ -333,7 +395,7 @@ export default async function handler(req, res) {
         /* ---- E-POSTA DOĞRULAMA KODU TEKRAR GÖNDER (oturumlu) ---- */
         if (action === 'send_email_verification') {
             if (!token) return res.status(400).json({ error: 'Token gerekli' });
-            const rows = await query('SELECT username FROM sessions WHERE token = $1 AND expires_at > now()', [token]);
+            const rows = await sessionRows(token);
             if (!rows.length) return res.status(401).json({ error: 'Geçersiz oturum' });
             await ensureAuthColumns();
             const users = await query('SELECT * FROM users WHERE username = $1', [rows[0].username]);
@@ -349,7 +411,7 @@ export default async function handler(req, res) {
         if (action === 'verify_email') {
             const { code } = req.body || {};
             if (!token || !code) return res.status(400).json({ error: 'AUTH_FIELDS_REQUIRED' });
-            const rows = await query('SELECT username FROM sessions WHERE token = $1 AND expires_at > now()', [token]);
+            const rows = await sessionRows(token);
             if (!rows.length) return res.status(401).json({ error: 'Geçersiz oturum' });
             await ensureAuthColumns();
             const users = await query('SELECT * FROM users WHERE username = $1', [rows[0].username]);
@@ -373,13 +435,14 @@ export default async function handler(req, res) {
 
         /* ---- OTURUM DOĞRULA ---- */
         if (action === 'verify') {
-            if (!token) return res.json({ valid: false });
+            const stored = await resolveToken(token);
+            if (!stored) return res.json({ valid: false });
             const rows = await query(
                 `SELECT s.username, s.display_name, u.email, u.email_verified
                  FROM sessions s
                  JOIN users u ON u.username = s.username
                  WHERE s.token = $1 AND s.expires_at > now()`,
-                [token]
+                [stored]
             );
             if (!rows.length) return res.json({ valid: false });
             const dataKey = await ensureDataKey(rows[0].username);
@@ -396,14 +459,14 @@ export default async function handler(req, res) {
 
         /* ---- ÇIKIŞ ---- */
         if (action === 'logout') {
-            if (token) await query('DELETE FROM sessions WHERE token = $1', [token]);
+            if (token) await query('DELETE FROM sessions WHERE token = $1 OR token = $2', [hashToken(token), token]);
             return res.json({ ok: true });
         }
 
         /* ---- HESAP SİL ---- */
         if (action === 'delete') {
             if (!token) return res.status(400).json({ error: 'Token gerekli' });
-            const rows = await query('SELECT username FROM sessions WHERE token = $1 AND expires_at > now()', [token]);
+            const rows = await sessionRows(token);
             if (!rows.length) return res.status(401).json({ error: 'Geçersiz oturum' });
             const { username: uname } = rows[0];
             // KVKK silme hakkı: hesapla birlikte tüm LMS verileri de gitmeli.

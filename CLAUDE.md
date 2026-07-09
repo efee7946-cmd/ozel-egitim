@@ -34,6 +34,7 @@ Tüm anahtarlar `lms_` öneki ile başlar: `lms_students`, `lms_iep_<studentId>`
 - `PEXELS_KEY` — Pexels fotoğraf/video
 - `GMAIL_USER` + `GMAIL_APP_PASSWORD` — Gmail SMTP (şifre sıfırlama/doğrulama kodları)
 - `DATABASE_URL` — PostgreSQL/Aiven bağlantısı
+- `DATA_KEY_SECRET` — `users.data_key` sütununu AES-GCM ile şifreleyen sunucu sırrı (yoksa data_key düz metin saklanır; bir kez ayarlandıktan sonra değiştirilmemeli/kaybedilmemeli)
 - `ALLOWED_ORIGIN` — CORS kısıtı (https://ozel-egitim.vercel.app)
 - `ADMIN_KEY` — /api/log hata listesini görüntüleme anahtarı
 
