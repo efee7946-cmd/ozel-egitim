@@ -586,6 +586,8 @@ const STRINGS = {
     therapy_level_tell: 'Anlat Bakalım',
     therapy_level_tell_example: 'Örn: Bugün neler yaptığını anlat',
     therapy_start_btn: 'Başla →',
+    therapy_error_no_topic: 'Başlamak için önce bir konu yaz ya da seç ✏️',
+    therapy_error_no_level: 'Başlamak için bir düzey seç 👆',
     therapy_loading: 'Sorular hazırlanıyor...',
     therapy_progress: 'Soru {a} / {t}',
     therapy_fallback_q: '{topic} hakkında ne düşünüyorsun?',
@@ -1420,6 +1422,8 @@ const STRINGS = {
     therapy_level_tell: 'Tell Me More',
     therapy_level_tell_example: 'e.g. Tell me what you did today',
     therapy_start_btn: 'Start →',
+    therapy_error_no_topic: 'Type or pick a topic to start ✏️',
+    therapy_error_no_level: 'Choose a level to start 👆',
     therapy_loading: 'Getting questions ready...',
     therapy_progress: 'Question {a} / {t}',
     therapy_fallback_q: 'What do you think about {topic}?',
@@ -2684,18 +2688,45 @@ function goToTherapy() {
     document.getElementById('topicInput').value = '';
     document.getElementById('topicLoading').style.display = 'none';
     document.getElementById('topicStartBtn').style.display = '';
+    hideTopicError();
     renderTherapyLevelOptions();
     setTimeout(() => document.getElementById('topicInput').focus(), 100);
 }
 
 function setTopicChip(topic) {
     document.getElementById('topicInput').value = topic;
+    hideTopicError();
     document.getElementById('topicInput').focus();
+}
+
+function showTopicError(msgKey) {
+    const el = document.getElementById('topicError');
+    if (!el) return;
+    el.textContent = t(msgKey);
+    el.style.display = 'block';
+    el.classList.remove('shake');
+    void el.offsetWidth;
+    el.classList.add('shake');
+    el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+}
+
+function hideTopicError() {
+    const el = document.getElementById('topicError');
+    if (el) el.style.display = 'none';
 }
 
 async function startTherapyWithTopic() {
     const input = document.getElementById('topicInput').value.trim();
-    if (!input) return;
+    if (!input) {
+        showTopicError('therapy_error_no_topic');
+        document.getElementById('topicInput').focus();
+        return;
+    }
+    if (!THERAPY_LEVELS[currentTherapyLevelKey]) {
+        showTopicError('therapy_error_no_level');
+        return;
+    }
+    hideTopicError();
     if (!guestTryConsume('therapy')) return;
     currentTopic = input;
     const level = getCurrentTherapyLevel();
@@ -4045,7 +4076,7 @@ const CITY_LOCATIONS = {
 
 let currentTherapyCategoryKey = 'daily_life';
 let currentCityLocationKey = 'school';
-let currentTherapyLevelKey = 'sentence';
+let currentTherapyLevelKey = '';
 let _useLocationQuestions = true;
 let unaskedQuestions = [...CITY_LOCATIONS[currentCityLocationKey].questions];
 let isWaiting = false;
@@ -4214,6 +4245,7 @@ function renderTherapyLevelOptions() {
 function setTherapyLevel(levelKey) {
     if (!THERAPY_LEVELS[levelKey]) return;
     currentTherapyLevelKey = levelKey;
+    hideTopicError();
     renderTherapyLevelOptions();
     updateTherapyTopicBadge();
 }

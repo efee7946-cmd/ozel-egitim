@@ -498,6 +498,7 @@ document.addEventListener('DOMContentLoaded', function(){
                 <input type="text" id="topicInput" class="topic-input"
                     data-i18n-placeholder="therapy_topic_placeholder"
                     placeholder="örn: alışveriş, futbol, okul..." maxlength="60"
+                    oninput="hideTopicError()"
                     onkeydown="if(event.key==='Enter') startTherapyWithTopic()">
                 <button type="button" class="topic-input-clear" onclick="document.getElementById('topicInput').value = ''; document.getElementById('topicInput').focus();" title="Temizle">✕</button>
             </div>
@@ -538,6 +539,7 @@ document.addEventListener('DOMContentLoaded', function(){
                 </div>
             </div>
 
+            <div class="topic-error" id="topicError" style="display:none" role="alert"></div>
             <button class="topic-start-btn" id="topicStartBtn" onclick="startTherapyWithTopic()">
                 <span data-i18n="therapy_start_btn">Başla →</span>
             </button>
