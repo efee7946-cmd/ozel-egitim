@@ -9,6 +9,7 @@ if (!existsSync(wwwDir)) mkdirSync(wwwDir);
 
 const files = [
     'index.html',
+    'error.html',
     'script.js',
     'style.css',
     'aac.css',

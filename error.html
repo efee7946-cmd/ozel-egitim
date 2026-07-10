@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, viewport-fit=cover">
+<title>YıldızCan</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Segoe UI', -apple-system, sans-serif;
+    background: linear-gradient(180deg, #eef5fb 0%, #dfe8f2 48%, #f8fbff 100%);
+    padding: 24px;
+    padding-top: max(24px, env(safe-area-inset-top));
+    padding-bottom: max(24px, env(safe-area-inset-bottom));
+    text-align: center;
+}
+.card {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 28px;
+    box-shadow: 0 20px 50px rgba(29, 47, 86, 0.12);
+    padding: 40px 28px;
+    max-width: 420px;
+    width: 100%;
+}
+.emoji { font-size: 3.5rem; margin-bottom: 14px; }
+h1 { font-size: 1.35rem; color: #1d2746; margin-bottom: 10px; }
+p { font-size: 0.98rem; color: #6e7894; line-height: 1.5; margin-bottom: 24px; }
+button {
+    width: 100%;
+    min-height: 52px;
+    border: none;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #6C63FF 0%, #8a63ff 100%);
+    color: #fff;
+    font-size: 1.05rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 10px 25px rgba(108, 99, 255, 0.3);
+}
+button:active { transform: scale(0.98); }
+</style>
+</head>
+<body>
+<div class="card">
+    <div class="emoji">📡</div>
+    <h1>İnternet bağlantısı gerekli</h1>
+    <p>YıldızCan'ı kullanabilmek için internete bağlı olman gerekiyor. Wi-Fi ya da mobil veri bağlantını kontrol edip tekrar dene.</p>
+    <button onclick="retry()">🔄 Tekrar Dene</button>
+</div>
+<script>
+var APP_URL = 'https://ozel-egitim.vercel.app';
+function retry() { window.location.replace(APP_URL); }
+window.addEventListener('online', retry);
+</script>
+</body>
+</html>

@@ -4,6 +4,7 @@
   "webDir": "www",
   "server": {
     "url": "https://ozel-egitim.vercel.app",
+    "errorPath": "error.html",
     "cleartext": false
   },
   "ios": {
