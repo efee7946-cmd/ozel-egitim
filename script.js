@@ -149,6 +149,7 @@ const STRINGS = {
     a11y_large_touch_desc: 'Buton boyutunu artırır',
     a11y_export: '📥 Verilerimi İndir',
     a11y_logout: '🚪 Çıkış Yap',
+    sound_hint: '🔔 Ses duymuyorsan telefonunun yan sessiz anahtarını kontrol et.',
     a11y_delete: '🗑️ Hesabı Sil',
     a11y_privacy: 'Gizlilik Politikası & KVKK',
     lang_toggle: 'EN',
@@ -986,6 +987,7 @@ const STRINGS = {
     a11y_large_touch_desc: 'Increases button size',
     a11y_export: '📥 Export My Data',
     a11y_logout: '🚪 Log Out',
+    sound_hint: '🔔 If you can\'t hear anything, check your phone\'s silent switch.',
     a11y_delete: '🗑️ Delete Account',
     a11y_privacy: 'Privacy Policy & KVKK',
     lang_toggle: 'TR',
@@ -2134,6 +2136,7 @@ async function showOnly(id, options = {}) {
     }
     _updateBottomNav(id);
     if (_objStopRender) (id === 'object-screen' ? _objStartRender : _objStopRender)();
+    _maybeToggleSoundHint(id);
 
     if (!_restoringScreen && isNewScreen) {
         const entryScreens = ['auth-screen', 'splash-screen', 'start-screen', 'login-screen'];
@@ -2168,6 +2171,24 @@ function _updateBottomNav(screenId) {
     nav.querySelectorAll('.bottom-nav-item').forEach(btn => btn.classList.remove('active'));
     const activeId = map[screenId];
     if (activeId) { const el = document.getElementById(activeId); if (el) el.classList.add('active'); }
+}
+
+function _maybeToggleSoundHint(screenId) {
+    const el = document.getElementById('soundHintBanner');
+    if (!el) return;
+    let show = false;
+    try {
+        show = (screenId === 'game-container' || screenId === 'aac-screen')
+            && Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'ios'
+            && !localStorage.getItem('lms_sound_hint_done');
+    } catch (_) {}
+    el.style.display = show ? 'flex' : 'none';
+}
+
+function dismissSoundHint() {
+    try { localStorage.setItem('lms_sound_hint_done', '1'); } catch (_) {}
+    const el = document.getElementById('soundHintBanner');
+    if (el) el.style.display = 'none';
 }
 
 // =============================================
