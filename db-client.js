@@ -15,6 +15,9 @@ const DB = (function () {
     const PFX_S = 'lms_s_'; // sessionStorage prefix (plaintext)
     const TS_KEY = 'lms__key_ts'; // anahtar başına son yazma zamanı (epoch ms)
     const CLOUD_RETRY_MS = 30000;
+    const API_BASE = (typeof Capacitor !== 'undefined' && Capacitor.isNativePlatform())
+        ? 'https://ozel-egitim.vercel.app'
+        : '';
     let _cloud = true;
     let _cloudRetryTimer = null;
     let _lastSyncAt = null;
@@ -320,7 +323,7 @@ const DB = (function () {
         const token = _apiToken();
         if (!token) return null;
         try {
-            const r = await fetch('/api/data?key=' + encodeURIComponent(key), {
+            const r = await fetch(API_BASE + '/api/data?key=' + encodeURIComponent(key), {
                 headers: { 'Authorization': 'Bearer ' + token },
                 signal: AbortSignal.timeout(4000)
             });
@@ -343,7 +346,7 @@ const DB = (function () {
         const token = _apiToken();
         if (!token) return;
         const body = isSensitive(key) ? await _encrypt(val) : val;
-        return fetch('/api/data', {
+        return fetch(API_BASE + '/api/data', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
             body: JSON.stringify({ key, value: body }),
@@ -368,7 +371,7 @@ const DB = (function () {
         if (!payload.length) return;
 
         try {
-            const r = await fetch('/api/data/batch', {
+            const r = await fetch(API_BASE + '/api/data/batch', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
                 body: JSON.stringify({ items: payload }),
@@ -391,7 +394,7 @@ const DB = (function () {
         if (!_cloud || isLocalOnly(key)) return;
         const token = _apiToken();
         if (!token) return;
-        fetch('/api/data?key=' + encodeURIComponent(key), {
+        fetch(API_BASE + '/api/data?key=' + encodeURIComponent(key), {
             method: 'DELETE',
             headers: { 'Authorization': 'Bearer ' + token }
         }).catch(() => {});
@@ -522,7 +525,7 @@ const DB = (function () {
             if (!_cloud || !token) return changed;
 
             try {
-                const r = await fetch('/api/data/batch', {
+                const r = await fetch(API_BASE + '/api/data/batch', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
                     body: JSON.stringify({ keys: validKeys }),

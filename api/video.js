@@ -1,10 +1,11 @@
 import { sessionUsername, guestCallAllowed } from './_auth.js';
 import { checkRateLimit } from './_rateLimit.js';
+import { allowOrigin } from './_cors.js';
 
 const GUEST_VIDEO_CAP = 30;
 
 export default async function handler(req, res) {
-    res.setHeader('Access-Control-Allow-Origin', process.env.ALLOWED_ORIGIN || '*');
+    allowOrigin(req, res);
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     if (req.method === 'OPTIONS') return res.status(200).end();

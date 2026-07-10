@@ -10,12 +10,13 @@ import { hashToken, resolveToken, guestByToken } from './_auth.js';
 import { sendMail, resetCodeEmailHtml, verifyCodeEmailHtml } from './_mail.js';
 import { checkRateLimit } from './_rateLimit.js';
 import { isPasswordPwned } from './_pwned.js';
+import { allowOrigin } from './_cors.js';
 
 const SESSION_DAYS = 14;
 const BCRYPT_ROUNDS = 12;
 
-function cors(res) {
-    res.setHeader('Access-Control-Allow-Origin', process.env.ALLOWED_ORIGIN || '*');
+function cors(req, res) {
+    allowOrigin(req, res);
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 }
@@ -197,7 +198,7 @@ async function sendVerificationCode(username, userEmail) {
 }
 
 export default async function handler(req, res) {
-    cors(res);
+    cors(req, res);
     if (req.method === 'OPTIONS') return res.status(200).end();
     if (req.method !== 'POST') return res.status(405).json({ error: 'POST gerekli' });
 

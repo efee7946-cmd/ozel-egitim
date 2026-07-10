@@ -24,4 +24,7 @@ for (const file of files) {
     console.log(`  copied: ${file}`);
 }
 
+cpSync(resolve(__dirname, 'models', 'objects'), resolve(wwwDir, 'models', 'objects'), { recursive: true });
+console.log('  copied: models/objects/');
+
 console.log('\nBuild tamamlandi -> www/');

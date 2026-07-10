@@ -4,9 +4,10 @@
 
 import { query } from './_db.js';
 import { sessionUsername } from './_auth.js';
+import { allowOrigin } from './_cors.js';
 
-function cors(res) {
-    res.setHeader('Access-Control-Allow-Origin', process.env.ALLOWED_ORIGIN || '*');
+function cors(req, res) {
+    allowOrigin(req, res);
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 }
@@ -24,7 +25,7 @@ async function cleanupLeakedAuthKeys() {
 }
 
 export default async function handler(req, res) {
-    cors(res);
+    cors(req, res);
     if (req.method === 'OPTIONS') return res.status(200).end();
 
     try {

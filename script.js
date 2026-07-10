@@ -4688,7 +4688,7 @@ async function rec() {
 }
 
 async function getGemmaResponse(text) {
-    var url = "/api/chat";
+    var url = API_BASE + "/api/chat";
     chatHistory.push({ role: "user", parts: [{ text: text }] });
     const currentCategory = getCurrentTherapyCategory();
     const currentLevel = getCurrentTherapyLevel();
