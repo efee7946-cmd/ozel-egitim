@@ -2133,6 +2133,7 @@ async function showOnly(id, options = {}) {
         maybeShowOnboarding();
     }
     _updateBottomNav(id);
+    if (_objStopRender) (id === 'object-screen' ? _objStartRender : _objStopRender)();
 
     if (!_restoringScreen && isNewScreen) {
         const entryScreens = ['auth-screen', 'splash-screen', 'start-screen', 'login-screen'];
@@ -5851,6 +5852,7 @@ let _objThree = null, _objGLTFLoader = null;
 let _objScene = null, _objCamera = null, _objRenderer = null, _objControls = null, _objMesh = null;
 let _objItems = [], _objIndex = 0, _objErrors = 0, _objAnimating = false, _objBusy = false;
 let _objAnimState = null, _objAnimTimer = 0, _objLoadSeq = 0;
+let _objStartRender = null, _objStopRender = null;
 
 async function goToObjectRecognition() {
     if (!guestTryConsume('obj')) return;
@@ -5924,7 +5926,9 @@ async function _objInitThree() {
         window.addEventListener('resize', resize);
         resize();
 
+        let renderActive = false;
         function animate() {
+            if (!renderActive) return;
             requestAnimationFrame(animate);
             if (_objMesh) {
                 if (_objAnimState === 'correct') {
@@ -5941,7 +5945,13 @@ async function _objInitThree() {
             controls.update();
             renderer.render(scene, camera);
         }
-        animate();
+        _objStartRender = () => {
+            if (renderActive) return;
+            renderActive = true;
+            requestAnimationFrame(animate);
+        };
+        _objStopRender = () => { renderActive = false; };
+        _objStartRender();
         return true;
     } catch (e) {
         console.error('Nesne Tanıma: WebGL başlatılamadı', e);
