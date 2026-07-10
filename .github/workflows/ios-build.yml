@@ -1,0 +1,153 @@
+name: iOS Build & TestFlight
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'ios/**'
+      - 'capacitor.config.json'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/ios-build.yml'
+  workflow_dispatch:
+    inputs:
+      testflight:
+        description: "TestFlight'a yükle (Apple secrets gerekli)"
+        type: boolean
+        default: false
+
+jobs:
+  build:
+    runs-on: macos-15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Node.js kur
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+
+      - name: Bağımlılıkları yükle
+        run: npm ci
+
+      - name: Web dosyalarını derle (www/)
+        run: npm run build
+
+      - name: Capacitor iOS sync
+        run: npx cap sync ios
+
+      - name: İmzasız iOS arşivi derle
+        run: |
+          xcodebuild archive \
+            -workspace ios/App/App.xcworkspace \
+            -scheme App \
+            -configuration Release \
+            -destination 'generic/platform=iOS' \
+            -archivePath build/App.xcarchive \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CURRENT_PROJECT_VERSION=${{ github.run_number }}
+
+      - name: İmzasız IPA paketle
+        run: |
+          mkdir -p build/Payload
+          cp -R build/App.xcarchive/Products/Applications/App.app build/Payload/
+          cd build && zip -qry yildizcan-unsigned.ipa Payload
+
+      - name: İmzasız IPA artifact olarak kaydet
+        uses: actions/upload-artifact@v4
+        with:
+          name: yildizcan-ios-unsigned-ipa
+          path: build/yildizcan-unsigned.ipa
+          retention-days: 30
+
+  testflight:
+    if: github.event_name == 'workflow_dispatch' && inputs.testflight
+    runs-on: macos-15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Node.js kur
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+
+      - name: Bağımlılıkları yükle
+        run: npm ci
+
+      - name: Web dosyalarını derle (www/)
+        run: npm run build
+
+      - name: Capacitor iOS sync
+        run: npx cap sync ios
+
+      - name: Dağıtım sertifikasını geçici keychain'e yükle
+        env:
+          IOS_CERT_BASE64: ${{ secrets.IOS_CERT_BASE64 }}
+          IOS_CERT_PASSWORD: ${{ secrets.IOS_CERT_PASSWORD }}
+        run: |
+          KEYCHAIN_PASSWORD=$(uuidgen)
+          KEYCHAIN_PATH=$RUNNER_TEMP/build.keychain-db
+          echo -n "$IOS_CERT_BASE64" | base64 --decode -o $RUNNER_TEMP/cert.p12
+          security create-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+          security set-keychain-settings -lut 21600 $KEYCHAIN_PATH
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+          security import $RUNNER_TEMP/cert.p12 -P "$IOS_CERT_PASSWORD" -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
+          security set-key-partition-list -S apple-tool:,apple: -s -k "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+          security list-keychain -d user -s $KEYCHAIN_PATH login.keychain-db
+
+      - name: App Store Connect API anahtarını yaz
+        env:
+          ASC_PRIVATE_KEY: ${{ secrets.ASC_PRIVATE_KEY }}
+        run: |
+          mkdir -p $RUNNER_TEMP/private_keys
+          printf '%s' "$ASC_PRIVATE_KEY" > $RUNNER_TEMP/private_keys/AuthKey_${{ secrets.ASC_KEY_ID }}.p8
+
+      - name: İmzalı iOS arşivi derle
+        run: |
+          xcodebuild archive \
+            -workspace ios/App/App.xcworkspace \
+            -scheme App \
+            -configuration Release \
+            -destination 'generic/platform=iOS' \
+            -archivePath build/App.xcarchive \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath $RUNNER_TEMP/private_keys/AuthKey_${{ secrets.ASC_KEY_ID }}.p8 \
+            -authenticationKeyID ${{ secrets.ASC_KEY_ID }} \
+            -authenticationKeyIssuerID ${{ secrets.ASC_ISSUER_ID }} \
+            DEVELOPMENT_TEAM=${{ secrets.APPLE_TEAM_ID }} \
+            CODE_SIGN_STYLE=Automatic \
+            CURRENT_PROJECT_VERSION=${{ github.run_number }}
+
+      - name: exportOptions.plist oluştur
+        run: |
+          cat > build/exportOptions.plist <<EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>method</key>
+            <string>app-store-connect</string>
+            <key>destination</key>
+            <string>upload</string>
+            <key>teamID</key>
+            <string>${{ secrets.APPLE_TEAM_ID }}</string>
+          </dict>
+          </plist>
+          EOF
+
+      - name: TestFlight'a yükle
+        run: |
+          xcodebuild -exportArchive \
+            -archivePath build/App.xcarchive \
+            -exportOptionsPlist build/exportOptions.plist \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath $RUNNER_TEMP/private_keys/AuthKey_${{ secrets.ASC_KEY_ID }}.p8 \
+            -authenticationKeyID ${{ secrets.ASC_KEY_ID }} \
+            -authenticationKeyIssuerID ${{ secrets.ASC_ISSUER_ID }}
