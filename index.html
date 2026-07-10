@@ -325,7 +325,7 @@
             </button>
             <button id="langToggleBtn" class="lang-toggle-btn" type="button" onclick="setLang(document.documentElement.lang==='en'?'tr':'en')">EN</button>
             <button class="icon-btn-a11y" type="button" onclick="toggleHelpPanel()" title="Yardım">❓</button>
-            <button class="icon-btn-a11y" type="button" onclick="toggleA11yPanel()" title="Erişilebilirlik Ayarları">⚙️</button>
+            <button class="icon-btn-a11y" type="button" onclick="toggleA11yPanel()" title="Ayarlar">⚙️</button>
         </div>
         <!-- JS uyumluluğu için gizli elementler -->
         <div class="account-chip" style="display:none"><span class="account-chip-label">Hesap</span><strong id="account-email">-</strong></div>
@@ -395,13 +395,6 @@
             <span class="tile-icon">📊</span>
             <span class="tile-label" data-i18n="menu_analysis_report">Analiz & Rapor</span>
             <span class="tile-desc" data-i18n="menu_analysis_report_desc">Gelişimi takip et</span>
-        </button>
-    </div>
-
-    <!-- Alt çubuk -->
-    <div class="menu-bottom-bar">
-        <button type="button" class="menu-logout-btn" onclick="authLogout()" data-i18n="logout">
-            Çıkış Yap
         </button>
     </div>
 
@@ -674,10 +667,10 @@ document.addEventListener('DOMContentLoaded', function(){
 </div>
 
 <!-- ===================== ERİŞİLEBİLİRLİK PANELİ ===================== -->
-<div id="a11y-panel" class="a11y-panel" style="display:none" role="dialog" aria-label="Erişilebilirlik Ayarları">
+<div id="a11y-panel" class="a11y-panel" style="display:none" role="dialog" aria-label="Ayarlar">
     <div class="a11y-panel-inner">
         <div class="a11y-panel-head">
-            <h3 data-i18n="a11y_title">⚙️ Erişilebilirlik</h3>
+            <h3 data-i18n="a11y_title">⚙️ Ayarlar</h3>
             <button type="button" class="a11y-close-btn" onclick="toggleA11yPanel()">✕</button>
         </div>
         <div class="a11y-panel-body">
@@ -701,6 +694,7 @@ document.addEventListener('DOMContentLoaded', function(){
                 </div>
                 <div class="a11y-account-actions">
                     <button type="button" class="a11y-account-btn" onclick="exportMyData()"><span data-i18n="a11y_export">📥 Verilerimi İndir</span></button>
+                    <button type="button" class="a11y-account-btn" onclick="authLogout()"><span data-i18n="a11y_logout">🚪 Çıkış Yap</span></button>
                     <button type="button" class="a11y-account-btn a11y-danger-btn" onclick="deleteAccount()"><span data-i18n="a11y_delete">🗑️ Hesabı Sil</span></button>
                 </div>
                 <a href="#" class="a11y-kvkk-link" onclick="openKvkkModal(event)"><span data-i18n="a11y_privacy">Gizlilik Politikası & KVKK</span></a>
