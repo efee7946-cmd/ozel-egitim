@@ -9,6 +9,18 @@ on:
       - 'package.json'
       - 'package-lock.json'
       - '.github/workflows/ios-build.yml'
+      - 'index.html'
+      - 'error.html'
+      - 'script.js'
+      - 'style.css'
+      - 'aac.css'
+      - 'aac-data.js'
+      - 'db-client.js'
+      - 'build-web.js'
+      - 'avatar.png'
+      - 'avatar3d.js'
+      - 'bear_avatar.glb'
+      - 'models/**'
   workflow_dispatch:
     inputs:
       testflight:
