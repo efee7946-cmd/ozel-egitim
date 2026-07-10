@@ -12,7 +12,7 @@ import { checkRateLimit } from './_rateLimit.js';
 import { isPasswordPwned } from './_pwned.js';
 import { allowOrigin } from './_cors.js';
 
-const SESSION_DAYS = 14;
+const SESSION_DAYS = 30;
 const BCRYPT_ROUNDS = 12;
 
 function cors(req, res) {
@@ -474,6 +474,7 @@ export default async function handler(req, res) {
                 [stored]
             );
             if (!rows.length) return res.json({ valid: false });
+            await query('UPDATE sessions SET expires_at = $1 WHERE token = $2', [expiresAt(), stored]);
             const dataKey = await ensureDataKey(rows[0].username);
             return res.json({
                 valid: true,
