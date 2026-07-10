@@ -36,6 +36,9 @@ jobs:
       - name: Web dosyalarını derle (www/)
         run: npm run build
 
+      - name: Paketli mod (server.url iOS derlemesinde kaldırılır)
+        run: node -e "const fs=require('fs');const c=JSON.parse(fs.readFileSync('capacitor.config.json','utf8'));delete c.server.url;fs.writeFileSync('capacitor.config.json',JSON.stringify(c,null,2));"
+
       - name: Capacitor iOS sync
         run: npx cap sync ios
 
@@ -83,6 +86,9 @@ jobs:
 
       - name: Web dosyalarını derle (www/)
         run: npm run build
+
+      - name: Paketli mod (server.url iOS derlemesinde kaldırılır)
+        run: node -e "const fs=require('fs');const c=JSON.parse(fs.readFileSync('capacitor.config.json','utf8'));delete c.server.url;fs.writeFileSync('capacitor.config.json',JSON.stringify(c,null,2));"
 
       - name: Capacitor iOS sync
         run: npx cap sync ios
