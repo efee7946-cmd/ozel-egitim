@@ -6182,6 +6182,43 @@ async function renderObjResultsSummary() {
  * yoksa Web Speech API'yi kullanır. Belirli bir ekranın DOM elemanlarına bağlı
  * değildir — tanınan metni (veya boş string) döndürür.
  */
+function _recognizeSpeechOnceIos(native) {
+    return new Promise((resolve) => {
+        let latest = '';
+        let done = false;
+        let silenceTimer = null;
+        let hardTimer = null;
+        const finish = () => {
+            if (done) return;
+            done = true;
+            clearTimeout(hardTimer);
+            clearTimeout(silenceTimer);
+            try { native.stop().catch(() => {}); } catch (_) {}
+            try { Promise.resolve(native.removeAllListeners()).catch(() => {}); } catch (_) {}
+            resolve(latest.trim());
+        };
+        hardTimer = setTimeout(finish, 8000);
+        try {
+            native.addListener('partialResults', (data) => {
+                if (data && Array.isArray(data.matches) && data.matches[0]) {
+                    latest = data.matches[0];
+                    clearTimeout(silenceTimer);
+                    silenceTimer = setTimeout(finish, 1800);
+                }
+            });
+        } catch (_) {}
+        native.start({
+            language: _lang === 'en' ? 'en-US' : 'tr-TR',
+            partialResults: true, popup: false
+        }).then((res) => {
+            if (res && Array.isArray(res.matches) && res.matches[0]) {
+                latest = res.matches[0];
+                finish();
+            }
+        }).catch(() => finish());
+    });
+}
+
 async function recognizeSpeechOnce() {
     const native = _getNativeSpeech();
     if (native) {
@@ -6192,6 +6229,7 @@ async function recognizeSpeechOnce() {
                 const perm = await native.requestPermissions();
                 if (perm && perm.speechRecognition === 'denied') return '';
             } catch (_) {}
+            if (Capacitor.getPlatform() === 'ios') return await _recognizeSpeechOnceIos(native);
             const res = await native.start({
                 language: _lang === 'en' ? 'en-US' : 'tr-TR',
                 maxResults: 1, partialResults: false, popup: false

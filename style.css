@@ -5608,7 +5608,7 @@ button:active, .menu-tile:active {
    ============================================= */
 .bottom-nav {
     position: fixed;
-    bottom: 16px;
+    bottom: calc(16px + env(safe-area-inset-bottom));
     left: 16px;
     right: 16px;
     height: 66px;
@@ -5685,8 +5685,9 @@ body.has-bottom-nav #aac-screen,
 body.has-bottom-nav #schedule-screen,
 body.has-bottom-nav #analysis-screen,
 body.has-bottom-nav #store-screen,
-body.has-bottom-nav #object-screen {
-    padding-bottom: 96px;
+body.has-bottom-nav #object-screen,
+body.has-bottom-nav .topic-overlay {
+    padding-bottom: calc(96px + env(safe-area-inset-bottom));
 }
 
 /* Geniş ekranda bottom nav gizle (tablet/desktop) */
@@ -5700,6 +5701,9 @@ body.has-bottom-nav #object-screen {
     body.has-bottom-nav #store-screen,
     body.has-bottom-nav #object-screen {
         padding-bottom: 0;
+    }
+    body.has-bottom-nav .topic-overlay {
+        padding-bottom: 24px;
     }
 }
 
