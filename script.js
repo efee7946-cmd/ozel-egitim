@@ -3748,16 +3748,16 @@ const THERAPY_CATEGORIES = {
         get label() { return t('therapy_daily_life_label'); },
         get summary() { return t('therapy_daily_life_summary'); },
         questions: [
-            { get q() { return t('therapy_daily_life_q1'); }, query: "child morning routine home", get goal() { return t('therapy_daily_life_goal1'); } },
-            { get q() { return t('therapy_daily_life_q2'); }, query: "child getting ready backpack school", get goal() { return t('therapy_daily_life_goal2'); } },
-            { get q() { return t('therapy_daily_life_q3'); }, query: "family kitchen child asking food", get goal() { return t('therapy_daily_life_goal3'); } },
-            { get q() { return t('therapy_daily_life_q4'); }, query: "child with parent grocery store", get goal() { return t('therapy_daily_life_goal4'); } },
-            { get q() { return t('therapy_daily_life_q5'); }, query: "family evening home child smiling", get goal() { return t('therapy_daily_life_goal5'); } },
-            { get q() { return t('therapy_daily_life_q6'); }, query: "child putting on shoes jacket", get goal() { return t('therapy_daily_life_goal6'); } },
-            { get q() { return t('therapy_daily_life_q7'); }, query: "child room toys books", get goal() { return t('therapy_daily_life_goal7'); } },
-            { get q() { return t('therapy_daily_life_q8'); }, query: "child washing hands sink", get goal() { return t('therapy_daily_life_goal8'); } },
-            { get q() { return t('therapy_daily_life_q9'); }, query: "family visiting child greeting", get goal() { return t('therapy_daily_life_goal9'); } },
-            { get q() { return t('therapy_daily_life_q10'); }, query: "parent helping child at home", get goal() { return t('therapy_daily_life_goal10'); } }
+            { get q() { return t('therapy_daily_life_q1'); }, query: "child morning routine home", videoIds: [10565816, 10566600, 12426492], get goal() { return t('therapy_daily_life_goal1'); } },
+            { get q() { return t('therapy_daily_life_q2'); }, query: "child getting ready backpack school", videoIds: [5088099, 8097527, 5088098], get goal() { return t('therapy_daily_life_goal2'); } },
+            { get q() { return t('therapy_daily_life_q3'); }, query: "family kitchen child asking food", videoIds: [7783337, 6305044, 7677093], get goal() { return t('therapy_daily_life_goal3'); } },
+            { get q() { return t('therapy_daily_life_q4'); }, query: "child with parent grocery store", videoIds: [3191108, 5090314, 7652367], get goal() { return t('therapy_daily_life_goal4'); } },
+            { get q() { return t('therapy_daily_life_q5'); }, query: "family evening home child smiling", videoIds: [6557760, 7884066, 6668277], get goal() { return t('therapy_daily_life_goal5'); } },
+            { get q() { return t('therapy_daily_life_q6'); }, query: "child putting on shoes jacket", videoIds: [8084137, 7413712, 8187799], get goal() { return t('therapy_daily_life_goal6'); } },
+            { get q() { return t('therapy_daily_life_q7'); }, query: "child room toys books", videoIds: [4016503, 3676820, 3676981], get goal() { return t('therapy_daily_life_goal7'); } },
+            { get q() { return t('therapy_daily_life_q8'); }, query: "child washing hands sink", videoIds: [8799075, 7413438, 7491034], get goal() { return t('therapy_daily_life_goal8'); } },
+            { get q() { return t('therapy_daily_life_q9'); }, query: "family visiting child greeting", videoIds: [6149761, 5738133, 5737816], get goal() { return t('therapy_daily_life_goal9'); } },
+            { get q() { return t('therapy_daily_life_q10'); }, query: "parent helping child at home", videoIds: [7982002, 7084641, 8122657], get goal() { return t('therapy_daily_life_goal10'); } }
         ]
     },
     emotions: {
@@ -3765,16 +3765,16 @@ const THERAPY_CATEGORIES = {
         get label() { return t('therapy_emotions_label'); },
         get summary() { return t('therapy_emotions_summary'); },
         questions: [
-            { get q() { return t('therapy_emotions_q1'); }, query: "child face expression happy calm", get goal() { return t('therapy_emotions_goal1'); } },
-            { get q() { return t('therapy_emotions_q2'); }, query: "happy child playing family", get goal() { return t('therapy_emotions_goal2'); } },
-            { get q() { return t('therapy_emotions_q3'); }, query: "child comfort emotional support", get goal() { return t('therapy_emotions_goal3'); } },
-            { get q() { return t('therapy_emotions_q4'); }, query: "excited child jumping smiling", get goal() { return t('therapy_emotions_goal4'); } },
-            { get q() { return t('therapy_emotions_q5'); }, query: "child seeking comfort parent", get goal() { return t('therapy_emotions_goal5'); } },
-            { get q() { return t('therapy_emotions_q6'); }, query: "friends hugging happy child", get goal() { return t('therapy_emotions_goal6'); } },
-            { get q() { return t('therapy_emotions_q7'); }, query: "child calming down quiet activity", get goal() { return t('therapy_emotions_goal7'); } },
-            { get q() { return t('therapy_emotions_q8'); }, query: "surprised child classroom", get goal() { return t('therapy_emotions_goal8'); } },
-            { get q() { return t('therapy_emotions_q9'); }, query: "child taking deep breath calm", get goal() { return t('therapy_emotions_goal9'); } },
-            { get q() { return t('therapy_emotions_q10'); }, query: "child smiling face close up", get goal() { return t('therapy_emotions_goal10'); } }
+            { get q() { return t('therapy_emotions_q1'); }, query: "child face expression happy calm", videoIds: [6248334, 6952296, 4156373], get goal() { return t('therapy_emotions_goal1'); } },
+            { get q() { return t('therapy_emotions_q2'); }, query: "happy child playing family", videoIds: [8503011, 7312129, 7312508], get goal() { return t('therapy_emotions_goal2'); } },
+            { get q() { return t('therapy_emotions_q3'); }, query: "child comfort emotional support", videoIds: [6594035, 7077315, 7696880], get goal() { return t('therapy_emotions_goal3'); } },
+            { get q() { return t('therapy_emotions_q4'); }, query: "excited child jumping smiling", videoIds: [4267882, 8385335, 8142277], get goal() { return t('therapy_emotions_goal4'); } },
+            { get q() { return t('therapy_emotions_q5'); }, query: "child seeking comfort parent", videoIds: [6296673, 6296661, 6594035], get goal() { return t('therapy_emotions_goal5'); } },
+            { get q() { return t('therapy_emotions_q6'); }, query: "friends hugging happy child", videoIds: [7143731, 7418480, 7119575], get goal() { return t('therapy_emotions_goal6'); } },
+            { get q() { return t('therapy_emotions_q7'); }, query: "child calming down quiet activity", videoIds: [8046561, 8046666, 7117643], get goal() { return t('therapy_emotions_goal7'); } },
+            { get q() { return t('therapy_emotions_q8'); }, query: "surprised child classroom", videoIds: [5427895, 7327600, 32965117], get goal() { return t('therapy_emotions_goal8'); } },
+            { get q() { return t('therapy_emotions_q9'); }, query: "child taking deep breath calm", videoIds: [7414827, 6952367, 8046718], get goal() { return t('therapy_emotions_goal9'); } },
+            { get q() { return t('therapy_emotions_q10'); }, query: "child smiling face close up", videoIds: [5553332, 9149384, 7327402], get goal() { return t('therapy_emotions_goal10'); } }
         ]
     },
     social_communication: {
@@ -3782,16 +3782,16 @@ const THERAPY_CATEGORIES = {
         get label() { return t('therapy_social_communication_label'); },
         get summary() { return t('therapy_social_communication_summary'); },
         questions: [
-            { get q() { return t('therapy_social_communication_q1'); }, query: "children greeting playground", get goal() { return t('therapy_social_communication_goal1'); } },
-            { get q() { return t('therapy_social_communication_q2'); }, query: "child asking teacher classroom", get goal() { return t('therapy_social_communication_goal2'); } },
-            { get q() { return t('therapy_social_communication_q3'); }, query: "children inviting to play", get goal() { return t('therapy_social_communication_goal3'); } },
-            { get q() { return t('therapy_social_communication_q4'); }, query: "child comforting friend school", get goal() { return t('therapy_social_communication_goal4'); } },
-            { get q() { return t('therapy_social_communication_q5'); }, query: "children waiting in line school", get goal() { return t('therapy_social_communication_goal5'); } },
-            { get q() { return t('therapy_social_communication_q6'); }, query: "kids apologizing playground", get goal() { return t('therapy_social_communication_goal6'); } },
-            { get q() { return t('therapy_social_communication_q7'); }, query: "children sharing toy", get goal() { return t('therapy_social_communication_goal7'); } },
-            { get q() { return t('therapy_social_communication_q8'); }, query: "children talking together classroom", get goal() { return t('therapy_social_communication_goal8'); } },
-            { get q() { return t('therapy_social_communication_q9'); }, query: "child introducing self friendly", get goal() { return t('therapy_social_communication_goal9'); } },
-            { get q() { return t('therapy_social_communication_q10'); }, query: "kids helping each other smiling", get goal() { return t('therapy_social_communication_goal10'); } }
+            { get q() { return t('therapy_social_communication_q1'); }, query: "children greeting playground", videoIds: [8813232, 17566449, 8747612], get goal() { return t('therapy_social_communication_goal1'); } },
+            { get q() { return t('therapy_social_communication_q2'); }, query: "child asking teacher classroom", videoIds: [8088553, 8612576, 8160138], get goal() { return t('therapy_social_communication_goal2'); } },
+            { get q() { return t('therapy_social_communication_q3'); }, query: "children inviting to play", videoIds: [36619321, 8435433, 8951288], get goal() { return t('therapy_social_communication_goal3'); } },
+            { get q() { return t('therapy_social_communication_q4'); }, query: "child comforting friend school", videoIds: [8343385, 8411138, 7395345], get goal() { return t('therapy_social_communication_goal4'); } },
+            { get q() { return t('therapy_social_communication_q5'); }, query: "children waiting in line school", videoIds: [8466936, 33787982, 32778876], get goal() { return t('therapy_social_communication_goal5'); } },
+            { get q() { return t('therapy_social_communication_q6'); }, query: "kids apologizing playground", videoIds: [3820545, 19066157, 3877708], get goal() { return t('therapy_social_communication_goal6'); } },
+            { get q() { return t('therapy_social_communication_q7'); }, query: "children sharing toy", videoIds: [8160025, 6949134, 3678330], get goal() { return t('therapy_social_communication_goal7'); } },
+            { get q() { return t('therapy_social_communication_q8'); }, query: "children talking together classroom", videoIds: [8088460, 8088621, 8088465], get goal() { return t('therapy_social_communication_goal8'); } },
+            { get q() { return t('therapy_social_communication_q9'); }, query: "child introducing self friendly", videoIds: [8159592, 8160271, 6296878], get goal() { return t('therapy_social_communication_goal9'); } },
+            { get q() { return t('therapy_social_communication_q10'); }, query: "kids helping each other smiling", videoIds: [8160132, 5378775, 8441301], get goal() { return t('therapy_social_communication_goal10'); } }
         ]
     },
     play_sports: {
@@ -3799,16 +3799,16 @@ const THERAPY_CATEGORIES = {
         get label() { return t('therapy_play_sports_label'); },
         get summary() { return t('therapy_play_sports_summary'); },
         questions: [
-            { get q() { return t('therapy_play_sports_q1'); }, query: "children playing in park", get goal() { return t('therapy_play_sports_goal1'); } },
-            { get q() { return t('therapy_play_sports_q2'); }, query: "kids football basketball playground", get goal() { return t('therapy_play_sports_goal2'); } },
-            { get q() { return t('therapy_play_sports_q3'); }, query: "children team game outdoors", get goal() { return t('therapy_play_sports_goal3'); } },
-            { get q() { return t('therapy_play_sports_q4'); }, query: "child indoor game home", get goal() { return t('therapy_play_sports_goal4'); } },
-            { get q() { return t('therapy_play_sports_q5'); }, query: "kids playing together sharing", get goal() { return t('therapy_play_sports_goal5'); } },
-            { get q() { return t('therapy_play_sports_q6'); }, query: "children cycling and ball game", get goal() { return t('therapy_play_sports_goal6'); } },
-            { get q() { return t('therapy_play_sports_q7'); }, query: "active child running smiling", get goal() { return t('therapy_play_sports_goal7'); } },
-            { get q() { return t('therapy_play_sports_q8'); }, query: "child learning game rules", get goal() { return t('therapy_play_sports_goal8'); } },
-            { get q() { return t('therapy_play_sports_q9'); }, query: "children passing ball teamwork", get goal() { return t('therapy_play_sports_goal9'); } },
-            { get q() { return t('therapy_play_sports_q10'); }, query: "child trying sports outdoors", get goal() { return t('therapy_play_sports_goal10'); } }
+            { get q() { return t('therapy_play_sports_q1'); }, query: "children playing in park", videoIds: [35026549, 6300728, 6299173], get goal() { return t('therapy_play_sports_goal1'); } },
+            { get q() { return t('therapy_play_sports_q2'); }, query: "kids football basketball playground", videoIds: [8813011, 35005315, 37483482], get goal() { return t('therapy_play_sports_goal2'); } },
+            { get q() { return t('therapy_play_sports_q3'); }, query: "children team game outdoors", videoIds: [8813229, 8813010, 8813225], get goal() { return t('therapy_play_sports_goal3'); } },
+            { get q() { return t('therapy_play_sports_q4'); }, query: "child indoor game home", videoIds: [35461749, 6337134, 7270073], get goal() { return t('therapy_play_sports_goal4'); } },
+            { get q() { return t('therapy_play_sports_q5'); }, query: "kids playing together sharing", videoIds: [8670996, 5266831, 34095824], get goal() { return t('therapy_play_sports_goal5'); } },
+            { get q() { return t('therapy_play_sports_q6'); }, query: "children cycling and ball game", videoIds: [32578916, 15092942, 8035236], get goal() { return t('therapy_play_sports_goal6'); } },
+            { get q() { return t('therapy_play_sports_q7'); }, query: "active child running smiling", videoIds: [5273821, 6300735, 7106839], get goal() { return t('therapy_play_sports_goal7'); } },
+            { get q() { return t('therapy_play_sports_q8'); }, query: "child learning game rules", videoIds: [7789322, 7789317, 7788806], get goal() { return t('therapy_play_sports_goal8'); } },
+            { get q() { return t('therapy_play_sports_q9'); }, query: "children passing ball teamwork", videoIds: [8813013, 8812925, 8813008], get goal() { return t('therapy_play_sports_goal9'); } },
+            { get q() { return t('therapy_play_sports_q10'); }, query: "child trying sports outdoors", videoIds: [8337361, 8224290, 7844324], get goal() { return t('therapy_play_sports_goal10'); } }
         ]
     }
 };
@@ -4008,16 +4008,16 @@ const CITY_LOCATIONS = {
         get description() { return t('city_home_description'); },
         get goals() { return [t('city_home_goal1'), t('city_home_goal2'), t('city_home_goal3')]; },
         questions: [
-            { get q() { return t('city_home_q1'); }, query: "child morning at home with family", get goal() { return t('city_home_qgoal1'); } },
-            { get q() { return t('city_home_q2'); }, query: "child asking for food at home", get goal() { return t('city_home_qgoal2'); } },
-            { get q() { return t('city_home_q3'); }, query: "parent helping child find toy at home", get goal() { return t('city_home_qgoal3'); } },
-            { get q() { return t('city_home_q4'); }, query: "family evening at home child smiling", get goal() { return t('city_home_qgoal4'); } },
-            { get q() { return t('city_home_q5'); }, query: "child bedtime routine brushing teeth", get goal() { return t('city_home_qgoal5'); } },
-            { get q() { return t('city_home_q6'); }, query: "child greeting guest at home", get goal() { return t('city_home_qgoal6'); } },
-            { get q() { return t('city_home_q7'); }, query: "child asking for blanket at home", get goal() { return t('city_home_qgoal7'); } },
-            { get q() { return t('city_home_q8'); }, query: "family dinner child speaking politely", get goal() { return t('city_home_qgoal8'); } },
-            { get q() { return t('city_home_q9'); }, query: "child organizing room toys books", get goal() { return t('city_home_qgoal9'); } },
-            { get q() { return t('city_home_q10'); }, query: "happy child home family moment", get goal() { return t('city_home_qgoal10'); } }
+            { get q() { return t('city_home_q1'); }, query: "child morning at home with family", videoIds: [6250053, 5426093, 7218626], get goal() { return t('city_home_qgoal1'); } },
+            { get q() { return t('city_home_q2'); }, query: "child asking for food at home", videoIds: [7077302, 5426093, 6305044], get goal() { return t('city_home_qgoal2'); } },
+            { get q() { return t('city_home_q3'); }, query: "parent helping child find toy at home", videoIds: [10565778, 7312399, 8747240], get goal() { return t('city_home_qgoal3'); } },
+            { get q() { return t('city_home_q4'); }, query: "family evening at home child smiling", videoIds: [6557760, 10565817, 6668277], get goal() { return t('city_home_qgoal4'); } },
+            { get q() { return t('city_home_q5'); }, query: "child bedtime routine brushing teeth", videoIds: [10565917, 10565816, 10566590], get goal() { return t('city_home_qgoal5'); } },
+            { get q() { return t('city_home_q6'); }, query: "child greeting guest at home", videoIds: [7418264, 7119590, 6194388], get goal() { return t('city_home_qgoal6'); } },
+            { get q() { return t('city_home_q7'); }, query: "child asking for blanket at home", videoIds: [10555330, 7505573, 7505331], get goal() { return t('city_home_qgoal7'); } },
+            { get q() { return t('city_home_q8'); }, query: "family dinner child speaking politely", videoIds: [7783337, 6305041, 6305176], get goal() { return t('city_home_qgoal8'); } },
+            { get q() { return t('city_home_q9'); }, query: "child organizing room toys books", videoIds: [8363236, 6949133, 6949125], get goal() { return t('city_home_qgoal9'); } },
+            { get q() { return t('city_home_q10'); }, query: "happy child home family moment", videoIds: [8503011, 7218708, 6667314], get goal() { return t('city_home_qgoal10'); } }
         ]
     },
     school: {
@@ -4027,16 +4027,16 @@ const CITY_LOCATIONS = {
         get description() { return t('city_school_description'); },
         get goals() { return [t('city_school_goal1'), t('city_school_goal2'), t('city_school_goal3')]; },
         questions: [
-            { get q() { return t('city_school_q1'); }, query: "child greeting teacher classroom morning", get goal() { return t('city_school_qgoal1'); } },
-            { get q() { return t('city_school_q2'); }, query: "teacher giving instruction to child in classroom", get goal() { return t('city_school_qgoal2'); } },
-            { get q() { return t('city_school_q3'); }, query: "child asking teacher for help classroom", get goal() { return t('city_school_qgoal3'); } },
-            { get q() { return t('city_school_q4'); }, query: "children talking in schoolyard", get goal() { return t('city_school_qgoal4'); } },
-            { get q() { return t('city_school_q5'); }, query: "child helping classmate pencil classroom", get goal() { return t('city_school_qgoal5'); } },
-            { get q() { return t('city_school_q6'); }, query: "child raising hand in classroom", get goal() { return t('city_school_qgoal6'); } },
-            { get q() { return t('city_school_q7'); }, query: "teacher and child talking about lessons", get goal() { return t('city_school_qgoal7'); } },
-            { get q() { return t('city_school_q8'); }, query: "child introducing self at school", get goal() { return t('city_school_qgoal8'); } },
-            { get q() { return t('city_school_q9'); }, query: "children waiting in line at school", get goal() { return t('city_school_qgoal9'); } },
-            { get q() { return t('city_school_q10'); }, query: "child saying goodbye to teacher", get goal() { return t('city_school_qgoal10'); } }
+            { get q() { return t('city_school_q1'); }, query: "child greeting teacher classroom morning", videoIds: [8160023, 8160138, 8499766], get goal() { return t('city_school_qgoal1'); } },
+            { get q() { return t('city_school_q2'); }, query: "teacher giving instruction to child in classroom", videoIds: [5904542, 8926828, 8617052], get goal() { return t('city_school_qgoal2'); } },
+            { get q() { return t('city_school_q3'); }, query: "child asking teacher for help classroom", videoIds: [8927383, 8617296, 5200023], get goal() { return t('city_school_qgoal3'); } },
+            { get q() { return t('city_school_q4'); }, query: "children talking in schoolyard", videoIds: [5391540, 8439331, 8439337], get goal() { return t('city_school_qgoal4'); } },
+            { get q() { return t('city_school_q5'); }, query: "child helping classmate pencil classroom", videoIds: [8363891, 5897659, 8363261], get goal() { return t('city_school_qgoal5'); } },
+            { get q() { return t('city_school_q6'); }, query: "child raising hand in classroom", videoIds: [8088631, 8342247, 8363230], get goal() { return t('city_school_qgoal6'); } },
+            { get q() { return t('city_school_q7'); }, query: "teacher and child talking about lessons", videoIds: [7580121, 7580126, 8927545], get goal() { return t('city_school_qgoal7'); } },
+            { get q() { return t('city_school_q8'); }, query: "child introducing self at school", videoIds: [8612577, 8500530, 8926873], get goal() { return t('city_school_qgoal8'); } },
+            { get q() { return t('city_school_q9'); }, query: "children waiting in line at school", videoIds: [8466936, 33787982, 32778876], get goal() { return t('city_school_qgoal9'); } },
+            { get q() { return t('city_school_q10'); }, query: "child saying goodbye to teacher", videoIds: [6935841, 8088619, 8617296], get goal() { return t('city_school_qgoal10'); } }
         ]
     },
     market: {
@@ -4046,16 +4046,16 @@ const CITY_LOCATIONS = {
         get description() { return t('city_market_description'); },
         get goals() { return [t('city_market_goal1'), t('city_market_goal2'), t('city_market_goal3')]; },
         questions: [
-            { get q() { return t('city_market_q1'); }, query: "child in grocery store asking for item", get goal() { return t('city_market_qgoal1'); } },
-            { get q() { return t('city_market_q2'); }, query: "child choosing fruit in market", get goal() { return t('city_market_qgoal2'); } },
-            { get q() { return t('city_market_q3'); }, query: "parent and child shopping together", get goal() { return t('city_market_qgoal3'); } },
-            { get q() { return t('city_market_q4'); }, query: "family waiting at grocery checkout", get goal() { return t('city_market_qgoal4'); } },
-            { get q() { return t('city_market_q5'); }, query: "store worker helping child in supermarket", get goal() { return t('city_market_qgoal5'); } },
-            { get q() { return t('city_market_q6'); }, query: "child asking snack at market", get goal() { return t('city_market_qgoal6'); } },
-            { get q() { return t('city_market_q7'); }, query: "child deciding drink in market aisle", get goal() { return t('city_market_qgoal7'); } },
-            { get q() { return t('city_market_q8'); }, query: "child saying thank you cashier store", get goal() { return t('city_market_qgoal8'); } },
-            { get q() { return t('city_market_q9'); }, query: "child asking help carrying grocery bag", get goal() { return t('city_market_qgoal9'); } },
-            { get q() { return t('city_market_q10'); }, query: "shopping basket groceries child speaking", get goal() { return t('city_market_qgoal10'); } }
+            { get q() { return t('city_market_q1'); }, query: "child in grocery store asking for item", videoIds: [3191108, 4121754, 4122971], get goal() { return t('city_market_qgoal1'); } },
+            { get q() { return t('city_market_q2'); }, query: "child choosing fruit in market", videoIds: [5100074, 8802294, 4121739], get goal() { return t('city_market_qgoal2'); } },
+            { get q() { return t('city_market_q3'); }, query: "parent and child shopping together", videoIds: [3191108, 7652367, 5090314], get goal() { return t('city_market_qgoal3'); } },
+            { get q() { return t('city_market_q4'); }, query: "family waiting at grocery checkout", videoIds: [7457422, 4121754, 4122971], get goal() { return t('city_market_qgoal4'); } },
+            { get q() { return t('city_market_q5'); }, query: "store worker helping child in supermarket", videoIds: [4122971, 3191108, 4230414], get goal() { return t('city_market_qgoal5'); } },
+            { get q() { return t('city_market_q6'); }, query: "child asking snack at market", videoIds: [36066727, 15955693, 8576591], get goal() { return t('city_market_qgoal6'); } },
+            { get q() { return t('city_market_q7'); }, query: "child deciding drink in market aisle", videoIds: [29846453, 33006235, 13752470], get goal() { return t('city_market_qgoal7'); } },
+            { get q() { return t('city_market_q8'); }, query: "child saying thank you cashier store", videoIds: [14936143, 1322056, 29832466], get goal() { return t('city_market_qgoal8'); } },
+            { get q() { return t('city_market_q9'); }, query: "child asking help carrying grocery bag", videoIds: [6950817, 6248171, 7652369], get goal() { return t('city_market_qgoal9'); } },
+            { get q() { return t('city_market_q10'); }, query: "shopping basket groceries child speaking", videoIds: [3191108, 8027660, 8420585], get goal() { return t('city_market_qgoal10'); } }
         ]
     },
     park: {
@@ -4065,16 +4065,16 @@ const CITY_LOCATIONS = {
         get description() { return t('city_park_description'); },
         get goals() { return [t('city_park_goal1'), t('city_park_goal2'), t('city_park_goal3')]; },
         questions: [
-            { get q() { return t('city_park_q1'); }, query: "children choosing game in park", get goal() { return t('city_park_qgoal1'); } },
-            { get q() { return t('city_park_q2'); }, query: "children at playground talking", get goal() { return t('city_park_qgoal2'); } },
-            { get q() { return t('city_park_q3'); }, query: "kids passing ball in park", get goal() { return t('city_park_qgoal3'); } },
-            { get q() { return t('city_park_q4'); }, query: "children waiting for slide in park", get goal() { return t('city_park_qgoal4'); } },
-            { get q() { return t('city_park_q5'); }, query: "active child running in park", get goal() { return t('city_park_qgoal5'); } },
-            { get q() { return t('city_park_q6'); }, query: "children talking after game in park", get goal() { return t('city_park_qgoal6'); } },
-            { get q() { return t('city_park_q7'); }, query: "children playing football and hide and seek", get goal() { return t('city_park_qgoal7'); } },
-            { get q() { return t('city_park_q8'); }, query: "child explaining game rules to friend", get goal() { return t('city_park_qgoal8'); } },
-            { get q() { return t('city_park_q9'); }, query: "child helping friend who fell at park", get goal() { return t('city_park_qgoal9'); } },
-            { get q() { return t('city_park_q10'); }, query: "children leaving park saying goodbye", get goal() { return t('city_park_qgoal10'); } }
+            { get q() { return t('city_park_q1'); }, query: "children choosing game in park", videoIds: [8034251, 8034266, 8034261], get goal() { return t('city_park_qgoal1'); } },
+            { get q() { return t('city_park_q2'); }, query: "children at playground talking", videoIds: [8439337, 8440014, 8441305], get goal() { return t('city_park_qgoal2'); } },
+            { get q() { return t('city_park_q3'); }, query: "kids passing ball in park", videoIds: [7844070, 7844079, 8034942], get goal() { return t('city_park_qgoal3'); } },
+            { get q() { return t('city_park_q4'); }, query: "children waiting for slide in park", videoIds: [4978365, 17566449, 35026549], get goal() { return t('city_park_qgoal4'); } },
+            { get q() { return t('city_park_q5'); }, query: "active child running in park", videoIds: [7102395, 7106803, 8208864], get goal() { return t('city_park_qgoal5'); } },
+            { get q() { return t('city_park_q6'); }, query: "children talking after game in park", videoIds: [8034251, 8034225, 8034266], get goal() { return t('city_park_qgoal6'); } },
+            { get q() { return t('city_park_q7'); }, query: "children playing football and hide and seek", videoIds: [35025845, 8813022, 38026650], get goal() { return t('city_park_qgoal7'); } },
+            { get q() { return t('city_park_q8'); }, query: "child explaining game rules to friend", videoIds: [7789319, 8034226, 8083044], get goal() { return t('city_park_qgoal8'); } },
+            { get q() { return t('city_park_q9'); }, query: "child helping friend who fell at park", videoIds: [10397888, 8747610, 7981668], get goal() { return t('city_park_qgoal9'); } },
+            { get q() { return t('city_park_q10'); }, query: "children leaving park saying goodbye", videoIds: [6299146, 8813155, 6300525], get goal() { return t('city_park_qgoal10'); } }
         ]
     },
     hospital: {
@@ -4084,16 +4084,16 @@ const CITY_LOCATIONS = {
         get description() { return t('city_hospital_description'); },
         get goals() { return [t('city_hospital_goal1'), t('city_hospital_goal2'), t('city_hospital_goal3')]; },
         questions: [
-            { get q() { return t('city_hospital_q1'); }, query: "child at hospital waiting room calm", get goal() { return t('city_hospital_qgoal1'); } },
-            { get q() { return t('city_hospital_q2'); }, query: "doctor listening to child patient", get goal() { return t('city_hospital_qgoal2'); } },
-            { get q() { return t('city_hospital_q3'); }, query: "child seeking comfort hospital", get goal() { return t('city_hospital_qgoal3'); } },
-            { get q() { return t('city_hospital_q4'); }, query: "doctor and child talking gently", get goal() { return t('city_hospital_qgoal4'); } },
-            { get q() { return t('city_hospital_q5'); }, query: "nurse helping child in hospital", get goal() { return t('city_hospital_qgoal5'); } },
-            { get q() { return t('city_hospital_q6'); }, query: "child relieved after doctor visit", get goal() { return t('city_hospital_qgoal6'); } },
-            { get q() { return t('city_hospital_q7'); }, query: "family in hospital waiting room", get goal() { return t('city_hospital_qgoal7'); } },
-            { get q() { return t('city_hospital_q8'); }, query: "child asking for blanket hospital", get goal() { return t('city_hospital_qgoal8'); } },
-            { get q() { return t('city_hospital_q9'); }, query: "doctor checking child wellness", get goal() { return t('city_hospital_qgoal9'); } },
-            { get q() { return t('city_hospital_q10'); }, query: "child thanking doctor after appointment", get goal() { return t('city_hospital_qgoal10'); } }
+            { get q() { return t('city_hospital_q1'); }, query: "child at hospital waiting room calm", videoIds: [8460065, 8460057, 6997945], get goal() { return t('city_hospital_qgoal1'); } },
+            { get q() { return t('city_hospital_q2'); }, query: "doctor listening to child patient", videoIds: [5998350, 5998345, 5998348], get goal() { return t('city_hospital_qgoal2'); } },
+            { get q() { return t('city_hospital_q3'); }, query: "child seeking comfort hospital", videoIds: [8375451, 8460012, 6036525], get goal() { return t('city_hospital_qgoal3'); } },
+            { get q() { return t('city_hospital_q4'); }, query: "doctor and child talking gently", videoIds: [5998347, 5998348, 8460056], get goal() { return t('city_hospital_qgoal4'); } },
+            { get q() { return t('city_hospital_q5'); }, query: "nurse helping child in hospital", videoIds: [8460012, 6036525], get goal() { return t('city_hospital_qgoal5'); } },
+            { get q() { return t('city_hospital_q6'); }, query: "child relieved after doctor visit", videoIds: [5998345, 8460052, 8460055], get goal() { return t('city_hospital_qgoal6'); } },
+            { get q() { return t('city_hospital_q7'); }, query: "family in hospital waiting room", videoIds: [6997945, 6997934, 6129938], get goal() { return t('city_hospital_qgoal7'); } },
+            { get q() { return t('city_hospital_q8'); }, query: "child asking for blanket hospital", videoIds: [10555330, 5858754, 5894886], get goal() { return t('city_hospital_qgoal8'); } },
+            { get q() { return t('city_hospital_q9'); }, query: "doctor checking child wellness", videoIds: [5998345, 5998350, 8460053], get goal() { return t('city_hospital_qgoal9'); } },
+            { get q() { return t('city_hospital_q10'); }, query: "child thanking doctor after appointment", videoIds: [5998347, 5998348, 8460055], get goal() { return t('city_hospital_qgoal10'); } }
         ]
     }
 };
@@ -4510,7 +4510,10 @@ async function loadNext() {
     try {
         const _videoCtrl = new AbortController();
         const _videoFetchTimer = setTimeout(() => _videoCtrl.abort(), 6000);
-        const r = await fetch(API_BASE + '/api/video?query=' + currentObj.query, { signal: _videoCtrl.signal, headers: apiAuthHeaders() });
+        const _videoParam = (Array.isArray(currentObj.videoIds) && currentObj.videoIds.length)
+            ? 'id=' + currentObj.videoIds[Math.floor(Math.random() * currentObj.videoIds.length)]
+            : 'query=' + currentObj.query;
+        const r = await fetch(API_BASE + '/api/video?' + _videoParam, { signal: _videoCtrl.signal, headers: apiAuthHeaders() });
         clearTimeout(_videoFetchTimer);
         const d = await r.json();
         if (d.videos && d.videos.length) {

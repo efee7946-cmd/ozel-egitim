@@ -20,10 +20,18 @@ export default async function handler(req, res) {
     }
 
     const PEXELS_KEY = process.env.PEXELS_KEY;
-    const { query } = req.query;
-    if (!query) return res.status(400).json({ error: 'query gerekli' });
+    const { query, id } = req.query;
+    if (!query && !id) return res.status(400).json({ error: 'query gerekli' });
 
     try {
+        if (id) {
+            if (!/^\d{1,12}$/.test(String(id))) return res.status(400).json({ error: 'gecersiz id' });
+            const response = await fetch(`https://api.pexels.com/videos/videos/${id}`, {
+                headers: { Authorization: PEXELS_KEY }
+            });
+            const video = await response.json();
+            return res.status(200).json({ videos: video && video.id ? [video] : [] });
+        }
         const response = await fetch(`https://api.pexels.com/videos/search?query=${encodeURIComponent(query)}&per_page=15&orientation=landscape`, {
             headers: { Authorization: PEXELS_KEY }
         });
