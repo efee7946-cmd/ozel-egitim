@@ -5864,6 +5864,7 @@ async function goToObjectRecognition() {
     _objErrors = 0;
 
     const ok = await _objInitThree();
+    if (ok) window.dispatchEvent(new Event('resize'));
     const canvas = document.getElementById('objectCanvas');
     const fallback = document.getElementById('objFallback');
     const hint = document.querySelector('.object-hint');
