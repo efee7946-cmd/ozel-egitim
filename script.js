@@ -150,6 +150,9 @@ const STRINGS = {
     a11y_export: '📥 Verilerimi İndir',
     a11y_logout: '🚪 Çıkış Yap',
     sound_hint: '🔔 Ses duymuyorsan telefonunun yan sessiz anahtarını kontrol et.',
+    offline_banner: '📡 İnternet bağlantın yok — giriş yapmak için bağlantı gerekiyor.',
+    offline_toast: 'Çevrimdışı moddasın — internet isteyen özellikler kapalı, ilerlemen bağlantı gelince eşitlenir.',
+    offline_action: 'Bu etkinlik için internet bağlantısı gerekiyor 📡',
     a11y_delete: '🗑️ Hesabı Sil',
     a11y_privacy: 'Gizlilik Politikası & KVKK',
     lang_toggle: 'EN',
@@ -988,6 +991,9 @@ const STRINGS = {
     a11y_export: '📥 Export My Data',
     a11y_logout: '🚪 Log Out',
     sound_hint: '🔔 If you can\'t hear anything, check your phone\'s silent switch.',
+    offline_banner: '📡 No internet connection — you need to be online to sign in.',
+    offline_toast: 'You\'re offline — online features are disabled and your progress will sync when you reconnect.',
+    offline_action: 'This activity needs an internet connection 📡',
     a11y_delete: '🗑️ Delete Account',
     a11y_privacy: 'Privacy Policy & KVKK',
     lang_toggle: 'TR',
@@ -2137,6 +2143,7 @@ async function showOnly(id, options = {}) {
     _updateBottomNav(id);
     if (_objStopRender) (id === 'object-screen' ? _objStartRender : _objStopRender)();
     _maybeToggleSoundHint(id);
+    _updateOfflineBanner();
 
     if (!_restoringScreen && isNewScreen) {
         const entryScreens = ['auth-screen', 'splash-screen', 'start-screen', 'login-screen'];
@@ -2189,6 +2196,20 @@ function dismissSoundHint() {
     try { localStorage.setItem('lms_sound_hint_done', '1'); } catch (_) {}
     const el = document.getElementById('soundHintBanner');
     if (el) el.style.display = 'none';
+}
+
+function _updateOfflineBanner() {
+    const el = document.getElementById('offlineBanner');
+    if (!el) return;
+    el.style.display = (currentScreenId === 'auth-screen' && navigator.onLine === false) ? 'flex' : 'none';
+}
+window.addEventListener('online', _updateOfflineBanner);
+window.addEventListener('offline', _updateOfflineBanner);
+
+function connectionErrorMsg() {
+    return navigator.onLine === false
+        ? t('offline_banner')
+        : (t('auth_connection_error') || t('AUTH_FIELDS_REQUIRED'));
 }
 
 // =============================================
@@ -2748,6 +2769,10 @@ async function startTherapyWithTopic() {
     }
     if (!THERAPY_LEVELS[currentTherapyLevelKey]) {
         showTopicError('therapy_error_no_level');
+        return;
+    }
+    if (navigator.onLine === false) {
+        showTopicError('offline_action');
         return;
     }
     hideTopicError();
@@ -6535,6 +6560,7 @@ async function checkAuthSession() {
                     return;
                 }
             }
+            if (res && res.fallback) setTimeout(() => showToast(t('offline_toast')), 800);
             await continueAuthenticatedEntry();
             return;
         }
@@ -6765,7 +6791,7 @@ async function requestResetCode() {
     const res = await authApi('request_reset', { identifier });
     btn.disabled = false; btn.textContent = t('auth_send_code_btn');
 
-    if (res.fallback) return showAuthError(t('auth_connection_error') || t('AUTH_FIELDS_REQUIRED'));
+    if (res.fallback) return showAuthError(connectionErrorMsg());
     if (!res.ok) return showAuthError(t(res.error) || t('auth_fill_all'));
 
     document.getElementById('resetCodeFields').style.display = '';
@@ -6951,7 +6977,7 @@ async function handleResetPassword(e) {
     const res = await authApi('reset_with_email_code', { identifier, code: codeValue, newPassword });
     btn.disabled = false; btn.textContent = t('auth_reset_btn');
 
-    if (res.fallback) return showAuthError(t('auth_connection_error') || t('AUTH_FIELDS_REQUIRED'));
+    if (res.fallback) return showAuthError(connectionErrorMsg());
     if (!res.ok) return showAuthError(t(res.error) || t('AUTH_RESET_CODE_INVALID'));
 
     _authToken = res.token;
@@ -7011,7 +7037,7 @@ async function handleLogin(e) {
     setAuthLoading(false);
 
     if (res.fallback) {
-        return showAuthError(t('auth_connection_error') || t('AUTH_FIELDS_REQUIRED'));
+        return showAuthError(connectionErrorMsg());
     }
     if (!res.ok) return showAuthError(t(res.error) || t('auth_fill_all'));
     _authToken = res.token;
@@ -7065,7 +7091,7 @@ async function handleRegister(e) {
     setAuthLoading(false);
 
     if (res.fallback) {
-        return showAuthError(t('auth_connection_error') || t('AUTH_FIELDS_REQUIRED'));
+        return showAuthError(connectionErrorMsg());
     }
     if (!res.ok) return showAuthError(t(res.error) || t('auth_fill_all'));
     _authToken = res.token;

@@ -5616,6 +5616,27 @@ button:active, .menu-tile:active {
     -webkit-overflow-scrolling: touch;
 }
 
+.offline-banner {
+    position: fixed;
+    top: calc(10px + env(safe-area-inset-top));
+    left: 12px;
+    right: 12px;
+    z-index: 1500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #eef2f7;
+    border: 1.5px solid #cbd5e0;
+    color: #334155;
+    border-radius: 14px;
+    padding: 12px 14px;
+    font-size: 0.88rem;
+    font-weight: 700;
+    text-align: center;
+    box-shadow: 0 8px 24px rgba(51, 65, 85, 0.12);
+    animation: fadeInModal 0.3s ease;
+}
+
 .sound-hint-banner {
     position: fixed;
     top: calc(10px + env(safe-area-inset-top));
