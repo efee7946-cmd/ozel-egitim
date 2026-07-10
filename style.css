@@ -5683,13 +5683,11 @@ button:active, .menu-tile:active {
 
 /* İçerik alanına alt nav için boşluk bırak */
 body.has-bottom-nav #menu-screen,
-body.has-bottom-nav #game-container,
 body.has-bottom-nav #aac-screen,
 body.has-bottom-nav #schedule-screen,
 body.has-bottom-nav #analysis-screen,
 body.has-bottom-nav #store-screen,
-body.has-bottom-nav #object-screen,
-body.has-bottom-nav .topic-overlay {
+body.has-bottom-nav #object-screen {
     padding-bottom: calc(96px + env(safe-area-inset-bottom));
 }
 
@@ -5697,16 +5695,12 @@ body.has-bottom-nav .topic-overlay {
 @media (min-width: 769px) {
     .bottom-nav { display: none !important; }
     body.has-bottom-nav #menu-screen,
-    body.has-bottom-nav #game-container,
     body.has-bottom-nav #aac-screen,
     body.has-bottom-nav #schedule-screen,
     body.has-bottom-nav #analysis-screen,
     body.has-bottom-nav #store-screen,
     body.has-bottom-nav #object-screen {
         padding-bottom: 0;
-    }
-    body.has-bottom-nav .topic-overlay {
-        padding-bottom: 24px;
     }
 }
 

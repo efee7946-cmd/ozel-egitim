@@ -2152,7 +2152,7 @@ window.addEventListener('popstate', (e) => {
 function _updateBottomNav(screenId) {
     const nav = document.getElementById('bottomNav');
     if (!nav) return;
-    const hideOn = ['auth-screen', 'splash-screen', 'start-screen', 'login-screen', 'student-setup-screen'];
+    const hideOn = ['auth-screen', 'splash-screen', 'start-screen', 'login-screen', 'student-setup-screen', 'game-container'];
     nav.style.display = hideOn.includes(screenId) ? 'none' : 'flex';
     const map = {
         'menu-screen': 'bnMenu',
@@ -5848,7 +5848,7 @@ const OBJECT_RECOGNITION_ITEMS = [
 let _objThree = null, _objGLTFLoader = null;
 let _objScene = null, _objCamera = null, _objRenderer = null, _objControls = null, _objMesh = null;
 let _objItems = [], _objIndex = 0, _objErrors = 0, _objAnimating = false, _objBusy = false;
-let _objAnimState = null, _objAnimTimer = 0;
+let _objAnimState = null, _objAnimTimer = 0, _objLoadSeq = 0;
 
 async function goToObjectRecognition() {
     if (!guestTryConsume('obj')) return;
@@ -6021,17 +6021,20 @@ async function _objShowCurrent() {
     const THREE = _objThree;
 
     if (item.type === 'glb' && item.model) {
+        const seq = ++_objLoadSeq;
+        let loaded = null;
         try {
             const gltf = await _objGLTFLoader.loadAsync(item.model);
-            _objMesh = gltf.scene;
+            loaded = gltf.scene;
         } catch (e) {
             console.error('Nesne Tanıma: model yüklenemedi', item.model, e);
             reportClientError('object3d model load failed: ' + item.model, e && e.stack);
-            _objMesh = new THREE.Mesh(
-                new THREE.BoxGeometry(1, 1, 1),
-                new THREE.MeshStandardMaterial({ color: 0xcccccc })
-            );
         }
+        if (seq !== _objLoadSeq) return;
+        _objMesh = loaded || new THREE.Mesh(
+            new THREE.BoxGeometry(1, 1, 1),
+            new THREE.MeshStandardMaterial({ color: 0xcccccc })
+        );
     } else {
         const geo = _objBuildPrimitiveGeometry(THREE, item.shape);
         const mat = new THREE.MeshStandardMaterial({ color: item.color, roughness: 0.4, metalness: 0.1 });
