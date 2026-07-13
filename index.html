@@ -863,34 +863,20 @@ document.addEventListener('DOMContentLoaded', function(){
 
 <!-- ===================== AAC PANOSU ===================== -->
 <div id="aac-screen">
-    <div class="aac-board" id="aacBoard">
-        <div class="aac-core-strip" id="aacCoreStrip"></div>
-        <div class="aac-nav" id="aacNav">
-            <button class="aac-nav-btn" onclick="goToMenu()" data-i18n="back_menu">← Menü</button>
-        </div>
-        <div class="aac-toolbar">
-            <input type="search" id="aacCardSearch" class="aac-card-search"
-                   data-i18n-placeholder="aac_search_ph" placeholder="🔍 Kart ara..." oninput="filterAacCards(this.value)" autocomplete="off">
-            <button type="button" class="aac-add-symbol-btn" id="aacAddSymbolBtn" style="display:none" onclick="aacOpenAddSymbol()" data-i18n="aac_add_symbol">+ Sembol</button>
-            <button type="button" class="aac-add-symbol-btn" id="aacAddBoardBtn" style="display:none" onclick="aacAddBoard()" data-i18n="aac_add_category">+ Kategori</button>
-            <button type="button" class="aac-add-symbol-btn" id="aacEditBoardBtn" style="display:none" onclick="openAacBoardEdit()" data-i18n="aac_edit_category">✏️ Kategori</button>
-            <button type="button" class="aac-add-symbol-btn" id="aacSettingsBtn" style="display:none" onclick="openAacSettings()" aria-label="AAC ayarları">⚙️</button>
-            <button type="button" class="aac-edit-btn" id="aacEditBtn"
-                    onpointerdown="aacEditHoldStart()" onpointerup="aacEditHoldEnd()"
-                    onpointerleave="aacEditHoldEnd()" onpointercancel="aacEditHoldEnd()"
-                    onclick="aacEditBtnClick()" oncontextmenu="return false">🔒 <span data-i18n="aac_edit_btn">Düzenle</span></button>
-        </div>
-        <div class="aac-grid-wrap">
-            <div class="aac-grid" id="aacGrid"></div>
-        </div>
+    <div class="aac-board">
         <div class="aac-sentence-bar">
-            <div id="aacSentenceWords" style="display:flex;align-items:center;gap:6px;flex:1;overflow-x:auto;min-width:0;">
+            <button type="button" class="aac-home-btn" onclick="goToMenu()" aria-label="Menüye dön">←</button>
+            <div id="aacSentenceWords" class="aac-sentence-words">
                 <span class="aac-sentence-placeholder" data-i18n="aac_sentence_placeholder">Kart seç, cümle oluştur...</span>
             </div>
             <div class="aac-sentence-actions">
                 <button type="button" class="aac-action-btn speak" id="aacSpeakBtn" onclick="speakAacSentence()" disabled>🔊</button>
                 <button type="button" class="aac-action-btn clear" onclick="clearAacSentence()">✕</button>
             </div>
+        </div>
+        <div class="aac-cats" id="aacCats"></div>
+        <div class="aac-grid-wrap">
+            <div class="aac-grid" id="aacGrid"></div>
         </div>
     </div>
 </div>
@@ -1132,115 +1118,6 @@ document.addEventListener('DOMContentLoaded', function(){
                 <button type="button" class="aac-action-btn speak" id="thAacSpeakBtn" onclick="submitTherapyAacAnswer()" disabled>✓</button>
                 <button type="button" class="aac-action-btn clear" onclick="clearTherapyAacSentence()">✕</button>
             </div>
-        </div>
-    </div>
-</div>
-
-<!-- AAC kart düzenleme modalı (yalnızca düzenleme modunda) -->
-<div id="aac-card-edit-modal" class="aac-search-overlay" style="display:none" onclick="if(event.target.id==='aac-card-edit-modal')this.style.display='none'">
-    <div class="aac-search-box">
-        <div class="aac-search-head">
-            <h3 data-i18n="aac_card_edit_title">✏️ Kartı Düzenle</h3>
-            <button type="button" class="aac-search-close" onclick="document.getElementById('aac-card-edit-modal').style.display='none'">✕</button>
-        </div>
-        <label class="aac-edit-label" for="aacEditCardLabel" data-i18n="aac_card_label">Kart adı</label>
-        <input type="text" id="aacEditCardLabel" class="aac-edit-input" maxlength="40">
-        <label class="aac-edit-label" for="aacEditCardSpoken" data-i18n="aac_card_spoken">Söylenecek metin</label>
-        <input type="text" id="aacEditCardSpoken" class="aac-edit-input" maxlength="120">
-        <div class="aac-edit-actions">
-            <button type="button" class="aac-edit-action-btn primary" onclick="saveAacCardEdit()" data-i18n="aac_save">Kaydet</button>
-            <button type="button" class="aac-edit-action-btn" onclick="startAacCardMove()" data-i18n="aac_move">↔️ Taşı</button>
-            <button type="button" class="aac-edit-action-btn danger" onclick="deleteAacCard()" data-i18n="aac_delete">🗑️ Sil</button>
-        </div>
-    </div>
-</div>
-
-<!-- AAC kategori düzenleme modalı -->
-<div id="aac-board-edit-modal" class="aac-search-overlay" style="display:none" onclick="if(event.target.id==='aac-board-edit-modal')this.style.display='none'">
-    <div class="aac-search-box">
-        <div class="aac-search-head">
-            <h3 data-i18n="aac_board_edit_title">✏️ Kategoriyi Düzenle</h3>
-            <button type="button" class="aac-search-close" onclick="document.getElementById('aac-board-edit-modal').style.display='none'">✕</button>
-        </div>
-        <label class="aac-edit-label" for="aacEditBoardLabel" data-i18n="aac_board_label">Kategori adı</label>
-        <input type="text" id="aacEditBoardLabel" class="aac-edit-input" maxlength="30">
-        <div class="aac-edit-actions">
-            <button type="button" class="aac-edit-action-btn primary" onclick="saveAacBoardEdit()" data-i18n="aac_save">Kaydet</button>
-            <button type="button" class="aac-edit-action-btn danger" onclick="deleteAacBoard()" data-i18n="aac_delete">🗑️ Sil</button>
-        </div>
-    </div>
-</div>
-
-<!-- AAC ayarları modalı -->
-<div id="aac-settings-modal" class="aac-search-overlay" style="display:none" onclick="if(event.target.id==='aac-settings-modal')this.style.display='none'">
-    <div class="aac-search-box">
-        <div class="aac-search-head">
-            <h3 data-i18n="aac_settings_title">⚙️ AAC Ayarları</h3>
-            <button type="button" class="aac-search-close" onclick="document.getElementById('aac-settings-modal').style.display='none'">✕</button>
-        </div>
-        <label class="aac-edit-label" data-i18n="aac_grid_size">Izgara boyutu (satır × sütun)</label>
-        <div class="aac-settings-grid-row">
-            <select id="aacSetRows" class="aac-edit-input">
-                <option>2</option><option>3</option><option>4</option><option>5</option><option>6</option>
-            </select>
-            <span>×</span>
-            <select id="aacSetCols" class="aac-edit-input">
-                <option>2</option><option>3</option><option>4</option><option>5</option><option>6</option>
-            </select>
-        </div>
-        <label class="aac-settings-check-row">
-            <input type="checkbox" id="aacSetCore">
-            <span data-i18n="aac_core_strip">Çekirdek şerit (üstteki hızlı kartlar)</span>
-        </label>
-        <label class="aac-edit-label" data-i18n="aac_tts_rate">Konuşma hızı</label>
-        <div class="aac-settings-grid-row">
-            <input type="range" id="aacSetRate" min="0.6" max="1.4" step="0.1" style="flex:1"
-                   oninput="document.getElementById('aacRateVal').textContent = this.value + '×'">
-            <span id="aacRateVal">1.0×</span>
-        </div>
-        <div class="aac-edit-actions">
-            <button type="button" class="aac-edit-action-btn primary" onclick="saveAacSettings()" data-i18n="aac_save">Kaydet</button>
-        </div>
-    </div>
-</div>
-
-<div id="aac-search-modal" class="aac-search-overlay" style="display:none" onclick="closeAacSearch(event)">
-    <div class="aac-search-box">
-        <div class="aac-search-head">
-            <h3 data-i18n="aac_add_card">➕ Kart Ekle</h3>
-            <button type="button" class="aac-search-close" onclick="document.getElementById('aac-search-modal').style.display='none'">✕</button>
-        </div>
-        <!-- Mod seçici -->
-        <div class="aac-mode-tabs">
-            <button type="button" class="aac-mode-tab active" id="aacModeEmoji" onclick="switchAacMode('emoji')" data-i18n="aac_mode_emoji">😊 Emoji</button>
-            <button type="button" class="aac-mode-tab" id="aacModePhoto" onclick="switchAacMode('photo')" data-i18n="aac_mode_photo">📷 Fotoğraf</button>
-        </div>
-
-        <!-- EMOJİ MODU -->
-        <div id="aacEmojiMode">
-            <div class="aac-emoji-tabs" id="aacEmojiTabs"></div>
-            <div class="aac-emoji-grid" id="aacEmojiGrid"></div>
-        </div>
-
-        <!-- FOTOĞRAF MODU -->
-        <div id="aacPhotoMode" style="display:none">
-            <div class="aac-photo-search-row">
-                <input type="text" id="aacPhotoQuery" data-i18n-placeholder="aac_photo_search_ph" placeholder="Kelime ara... (elma, köpek, oyun)"
-                       onkeydown="if(event.key==='Enter') searchAacPhoto()">
-                <button type="button" class="aac-photo-search-btn" onclick="searchAacPhoto()" data-i18n="search_btn">Ara</button>
-            </div>
-            <div class="aac-photo-grid" id="aacPhotoGrid">
-                <p class="aac-photo-hint" data-i18n="aac_photo_hint">Türkçe veya İngilizce kelime yaz, fotoğraflar gelsin.</p>
-            </div>
-            <a class="aac-pexels-credit" href="https://www.pexels.com" target="_blank" rel="noopener">Photos provided by Pexels</a>
-        </div>
-
-        <!-- Seçim + etiket satırı (her iki mod için) -->
-        <div class="aac-emoji-label-row" id="aacEmojiLabelRow" style="display:none">
-            <span class="aac-selected-emoji" id="aacSelectedEmoji"></span>
-            <input type="text" id="aacEmojiLabel" data-i18n-placeholder="aac_card_name_ph" placeholder="Kart adı yaz..."
-                   onkeydown="if(event.key==='Enter') addEmojiCard()">
-            <button type="button" class="aac-emoji-add-btn" onclick="addEmojiCard()" data-i18n="add_btn">Ekle</button>
         </div>
     </div>
 </div>

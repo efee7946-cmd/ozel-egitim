@@ -1840,11 +1840,7 @@ function setLang(lang) {
   // Menu ipucu banner'ı data-i18n değil, JS ile textContent yazıyor —
   // applyLang() bunu göremez, dil değişince manuel yeniden render gerekir.
   if (currentScreenId === 'menu-screen') renderMenuNudge();
-  if (activeStudentId && typeof AACData !== 'undefined') {
-    AACData.resyncLanguage(activeStudentId).then(changed => {
-      if (changed && currentScreenId === 'aac-screen') _aacRenderAll();
-    }).catch(() => {});
-  }
+  if (currentScreenId === 'aac-screen') renderAacBoard();
 }
 
 function applyLang() {
@@ -4103,55 +4099,50 @@ async function askAIMode(mode) {
     }
 }
 
-let _thAacBoards = [];
-let _thAacBoardId = null;
+let _thAacBoardKey = null;
 let _thAacSentence = [];
 
-async function openTherapyAacPicker() {
-    const sid = activeStudentId || 'default';
-    await AACData.migrateLegacyIfNeeded(sid);
-    await AACData.migrateV2IfNeeded(sid);
-    _thAacBoards = await AACData.listBoards(sid);
-    if (!_thAacBoards.length) return;
-    if (!_thAacBoardId || !_thAacBoards.find(b => b.id === _thAacBoardId)) {
-        _thAacBoardId = _thAacBoards[0].id;
+function openTherapyAacPicker() {
+    const boards = AACData.boards;
+    if (!_thAacBoardKey || !boards.find(b => b.key === _thAacBoardKey)) {
+        _thAacBoardKey = boards[0].key;
     }
     _thAacSentence = [];
     document.getElementById('therapy-aac-modal').style.display = 'flex';
-    await _renderTherapyAacPicker();
+    _renderTherapyAacPicker();
 }
 
-async function _renderTherapyAacPicker() {
+function _renderTherapyAacPicker() {
+    detectAacAssets();
+    const boards = AACData.boards;
+    const board = boards.find(b => b.key === _thAacBoardKey) || boards[0];
     const tabs = document.getElementById('thAacTabs');
-    tabs.innerHTML = _thAacBoards.map(b => `
-        <button type="button" class="aac-nav-btn${b.id === _thAacBoardId ? ' active' : ''}"
-            data-board-id="${escapeHtml(b.id)}">
-            ${_aacVisualHtml(b.visual, 'aac-card-emoji', '1rem')} ${escapeHtml(b.label)}
+    tabs.innerHTML = boards.map(b => `
+        <button type="button" class="aac-nav-btn${b.key === board.key ? ' active' : ''}"
+            data-board-key="${escapeHtml(b.key)}">
+            ${escapeHtml(b.visual.value)} ${escapeHtml(b.label)}
         </button>
     `).join('');
     tabs.querySelectorAll('.aac-nav-btn').forEach(btn => {
-        btn.addEventListener('click', () => setTherapyAacBoard(btn.dataset.boardId));
+        btn.addEventListener('click', () => setTherapyAacBoard(btn.dataset.boardKey));
     });
-    const cards = (await AACData.listCards(_thAacBoardId))
-        .slice()
-        .sort((a, b) => a.row - b.row || a.col - b.col);
     const grid = document.getElementById('thAacGrid');
-    grid.innerHTML = cards.length ? cards.map(c => `
+    grid.innerHTML = board.cards.map(c => `
         <button type="button" class="aac-card"
             data-spoken="${escapeHtml(c.spoken || c.label)}" data-label="${escapeHtml(c.label)}">
-            ${_aacVisualHtml(c.visual, 'aac-card-emoji')}
+            ${_aacCardVisual(c)}
             <span class="aac-card-text">${escapeHtml(c.label)}</span>
         </button>
-    `).join('') : `<p class="aac-photo-hint">${t('aac_no_results')}</p>`;
+    `).join('');
     grid.querySelectorAll('.aac-card').forEach(btn => {
         btn.addEventListener('click', () => tapTherapyAacCard(btn.dataset.spoken, btn.dataset.label));
     });
     _updateTherapyAacSentence();
 }
 
-async function setTherapyAacBoard(boardId) {
-    _thAacBoardId = boardId;
-    await _renderTherapyAacPicker();
+function setTherapyAacBoard(boardKey) {
+    _thAacBoardKey = boardKey;
+    _renderTherapyAacPicker();
 }
 
 function tapTherapyAacCard(spoken, label) {
@@ -5070,333 +5061,118 @@ function renderDailyTasks() {
 }
 
 // =============================================
-// AAC PANOSU
+// AAC PANOSU — sabit şablon, düzenleme yok
 // =============================================
-
-let _aacBoards = [];
-let _aacCurrentBoardId = null;
-let _aacSentence = []; // [{ label, spoken }]
-let _aacAudioObj = null; // Track current playing audio
-
-let _aacEditMode = false;
-let _aacJustEnteredEdit = false;
-let _aacHoldTimer = null;
-let _aacAddTarget = null;
-let _aacMoveCardId = null;
-let _aacMoveBoardId = null;
-let _aacEditingCardId = null;
-let _aacEditingBoardId = null;
+let _aacSentence = [];
+let _aacAudioObj = null;
+let _aacCurrentBoardKey = null;
 let _aacTtsRate = 1.0;
+let _aacAssetState = null;
+const _aacMissingAssets = new Set();
 
-async function goToAac() {
+function detectAacAssets() {
+    if (_aacAssetState) return;
+    _aacAssetState = 'checking';
+    const probe = new Image();
+    probe.onload = () => {
+        _aacAssetState = 'ready';
+        if (currentScreenId === 'aac-screen') renderAacBoard();
+    };
+    probe.onerror = () => { _aacAssetState = 'missing'; };
+    probe.src = 'aac-assets/cat_core.jpg';
+}
+
+function _aacCardVisual(card) {
+    const emoji = escapeHtml((card.visual && card.visual.value) || '❓');
+    const key = card.key || '';
+    if (_aacAssetState !== 'ready' || !key || _aacMissingAssets.has(key)) {
+        return `<span class="aac-card-emoji">${emoji}</span>`;
+    }
+    return `<img class="aac-card-img" src="aac-assets/${key}.jpg" alt="" loading="lazy"
+        onerror="_aacImgFail(this, '${key}')"><span class="aac-card-emoji" style="display:none">${emoji}</span>`;
+}
+
+function _aacImgFail(img, key) {
+    _aacMissingAssets.add(key);
+    img.style.display = 'none';
+    if (img.nextElementSibling) img.nextElementSibling.style.display = '';
+}
+
+function goToAac() {
     showOnly('aac-screen');
     _aacSentence = [];
-    _aacEditMode = false;
-    _aacAddTarget = null;
-    _aacMoveCardId = null;
-    _aacMoveBoardId = null;
-    const sid = activeStudentId || 'default';
-    await AACData.migrateLegacyIfNeeded(sid);
-    await AACData.migrateV2IfNeeded(sid);
-    await AACData.resyncLanguage(sid);
-    _aacBoards = await AACData.listBoards(sid);
-    _aacCurrentBoardId = _aacBoards[0]?.id || null;
-    await _aacRenderAll();
-}
-
-function aacSetEditMode(on) {
-    _aacEditMode = on;
-    _aacAddTarget = null;
-    _aacMoveCardId = null;
-    _aacMoveBoardId = null;
-    if (on) _aacJustEnteredEdit = true;
-    _aacRenderAll();
-}
-
-function aacEditHoldStart() {
-    if (_aacEditMode) return;
-    clearTimeout(_aacHoldTimer);
-    document.getElementById('aacEditBtn').classList.add('holding');
-    _aacHoldTimer = setTimeout(() => {
-        _aacHoldTimer = null;
-        document.getElementById('aacEditBtn').classList.remove('holding');
-        aacSetEditMode(true);
-    }, 2000);
-}
-
-function aacEditHoldEnd() {
-    document.getElementById('aacEditBtn').classList.remove('holding');
-    if (_aacHoldTimer) {
-        clearTimeout(_aacHoldTimer);
-        _aacHoldTimer = null;
-        if (!_aacEditMode) showToast(t('aac_hold_to_edit'));
+    const boards = AACData.boards;
+    if (!_aacCurrentBoardKey || !boards.find(b => b.key === _aacCurrentBoardKey)) {
+        _aacCurrentBoardKey = boards[0].key;
     }
+    renderAacBoard();
 }
 
-function aacEditBtnClick() {
-    if (_aacJustEnteredEdit) { _aacJustEnteredEdit = false; return; }
-    if (_aacEditMode) aacSetEditMode(false);
-}
+function renderAacBoard() {
+    detectAacAssets();
+    const boards = AACData.boards;
+    const board = boards.find(b => b.key === _aacCurrentBoardKey) || boards[0];
 
-function _aacUpdateToolbar() {
-    const show = (id, on) => {
-        const el = document.getElementById(id);
-        if (el) el.style.display = on ? '' : 'none';
-    };
-    show('aacAddSymbolBtn', _aacEditMode);
-    show('aacAddBoardBtn', _aacEditMode);
-    show('aacEditBoardBtn', _aacEditMode);
-    show('aacSettingsBtn', _aacEditMode);
-    show('aacCardSearch', !_aacEditMode);
-    const btn = document.getElementById('aacEditBtn');
-    if (btn) {
-        btn.classList.toggle('editing', _aacEditMode);
-        btn.innerHTML = _aacEditMode
-            ? '✓ ' + escapeHtml(t('aac_edit_done'))
-            : '🔒 ' + escapeHtml(t('aac_edit_btn'));
+    const cats = document.getElementById('aacCats');
+    if (cats) {
+        cats.innerHTML = boards.map(b => {
+            const catKey = 'cat_' + b.key;
+            const emoji = escapeHtml((b.visual && b.visual.value) || '❓');
+            const visual = (_aacAssetState === 'ready' && !_aacMissingAssets.has(catKey))
+                ? `<img class="aac-cat-img" src="aac-assets/${catKey}.jpg" alt="" loading="lazy"
+                    onerror="_aacImgFail(this, '${catKey}')"><span class="aac-cat-emoji" style="display:none">${emoji}</span>`
+                : `<span class="aac-cat-emoji">${emoji}</span>`;
+            return `
+                <button type="button" class="aac-cat-btn${b.key === board.key ? ' active' : ''}"
+                    data-board-key="${escapeHtml(b.key)}" aria-pressed="${b.key === board.key}">
+                    <span class="aac-cat-visual">${visual}</span>
+                    <span class="aac-cat-label">${escapeHtml(b.label)}</span>
+                </button>`;
+        }).join('');
+        cats.querySelectorAll('.aac-cat-btn').forEach(btn => {
+            btn.addEventListener('click', () => setAacBoard(btn.dataset.boardKey));
+        });
+        const activeBtn = cats.querySelector('.aac-cat-btn.active');
+        if (activeBtn) activeBtn.scrollIntoView({ block: 'nearest', inline: 'nearest' });
     }
-}
 
-
-async function _aacRenderAll() {
-    const sid = activeStudentId || 'default';
-    const settings = await AACData.getSettings(sid);
-    _aacTtsRate = settings.ttsRate || 1.0;
-
-    _aacUpdateToolbar();
-
-    // Çekirdek şerit
-    const coreStrip = document.getElementById('aacCoreStrip');
-    if (settings.coreStrip) {
-        const coreCards = [];
-        for (const b of _aacBoards) {
-            const cards = await AACData.listCards(b.id);
-            coreCards.push(...cards.filter(c => c.isCore));
-        }
-        coreStrip.style.display = coreCards.length ? 'flex' : 'none';
-        coreStrip.innerHTML = coreCards.map(c => `
-            <button type="button" class="aac-core-card"
-                data-card-id="${escapeHtml(c.id)}" data-spoken="${escapeHtml(c.spoken || c.label)}"
-                data-label="${escapeHtml(c.label)}" data-board-id="${escapeHtml(c.boardId)}">
-                ${_aacVisualHtml(c.visual, 'aac-card-emoji')}
-                <span style="font-size:0.65rem;font-weight:700;">${escapeHtml(c.label)}</span>
+    const grid = document.getElementById('aacGrid');
+    if (grid) {
+        grid.innerHTML = board.cards.map(c => `
+            <button type="button" class="aac-card"
+                data-label="${escapeHtml(c.label)}" data-spoken="${escapeHtml(c.spoken || c.label)}">
+                ${_aacCardVisual(c)}
+                <span class="aac-card-text">${escapeHtml(c.label)}</span>
             </button>
         `).join('');
-        coreStrip.querySelectorAll('.aac-core-card').forEach(btn => {
-            btn.addEventListener('click', () => tapAacCard(btn.dataset.cardId, btn.dataset.spoken, btn.dataset.label, btn.dataset.boardId));
+        grid.querySelectorAll('.aac-card').forEach(btn => {
+            btn.addEventListener('click', () => tapAacCard(btn));
         });
-    } else {
-        coreStrip.style.display = 'none';
     }
-
-    // Navigasyon sekmeleri
-    const nav = document.getElementById('aacNav');
-    const backBtn = `<button class="aac-nav-btn" onclick="goToMenu()">${t('back_menu')}</button>`;
-    const tabs = _aacBoards.map(b => `
-        <button type="button"
-            class="aac-nav-btn${b.id === _aacCurrentBoardId ? ' active' : ''}"
-            data-board-id="${escapeHtml(b.id)}">
-            ${_aacVisualHtml(b.visual, 'aac-card-emoji', '1rem')} ${escapeHtml(b.label)}
-        </button>
-    `).join('');
-    nav.innerHTML = backBtn + tabs;
-    nav.querySelectorAll('.aac-nav-btn[data-board-id]').forEach(btn => {
-        btn.addEventListener('click', () => setAacBoard(btn.dataset.boardId));
-    });
-
-    // Grid
-    if (_aacCurrentBoardId) {
-        const { rows, cols, matrix } = await AACData.buildGrid(sid, _aacCurrentBoardId);
-        const grid = document.getElementById('aacGrid');
-        grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
-        grid.style.gridTemplateRows    = `repeat(${rows}, 1fr)`;
-        grid.classList.toggle('aac-moving', !!_aacMoveCardId);
-        grid.innerHTML = matrix.map((rowArr, r) => rowArr.map((card, c) => {
-            if (!card) {
-                return _aacEditMode
-                    ? `<button type="button" class="aac-card empty add" data-empty-row="${r}" data-empty-col="${c}">＋</button>`
-                    : '<div class="aac-card empty"></div>';
-            }
-            return `
-                <button type="button" class="aac-card${_aacEditMode ? ' editable' : ''}"
-                    data-label="${escapeHtml(card.label)}" data-card-id="${escapeHtml(card.id)}"
-                    data-spoken="${escapeHtml(card.spoken || card.label)}" data-board-id="${escapeHtml(card.boardId)}">
-                    ${_aacVisualHtml(card.visual, 'aac-card-emoji')}
-                    <span class="aac-card-text">${escapeHtml(card.label)}</span>
-                </button>
-            `;
-        }).join('')).join('');
-        grid.querySelectorAll('.aac-card.empty.add').forEach(btn => {
-            btn.addEventListener('click', () => aacEmptySlotTap(+btn.dataset.emptyRow, +btn.dataset.emptyCol));
-        });
-        grid.querySelectorAll('.aac-card[data-card-id]').forEach(btn => {
-            btn.addEventListener('click', () => tapAacCard(btn.dataset.cardId, btn.dataset.spoken, btn.dataset.label, btn.dataset.boardId));
-        });
-        const searchInput = document.getElementById('aacCardSearch');
-        if (searchInput && searchInput.value && !_aacEditMode) filterAacCards(searchInput.value);
-    }
+    const gridWrap = document.querySelector('.aac-grid-wrap');
+    if (gridWrap) gridWrap.scrollTop = 0;
 
     _aacUpdateSentenceBar();
 }
 
-function _aacVisualHtml(visual, cls, size) {
-    if (!visual) return `<span class="${cls}">❓</span>`;
-    if (visual.type === 'image' && visual.value) {
-        const s = size ? `style="width:${size};height:${size};object-fit:contain;"` : '';
-        return `<img class="aac-card-img" src="${escapeHtml(visual.value)}" alt="" ${s}><span class="aac-pexels-badge">P</span>`;
-    }
-    const s = size ? `style="font-size:${size}"` : '';
-    return `<span class="${cls}" ${s}>${escapeHtml(visual.value || '❓')}</span>`;
+function setAacBoard(boardKey) {
+    _aacCurrentBoardKey = boardKey;
+    renderAacBoard();
 }
 
-async function setAacBoard(boardId) {
-    _aacCurrentBoardId = boardId;
-    await _aacRenderAll();
-}
-
-function tapAacCard(cardId, spoken, label, boardId) {
-    if (_aacEditMode) {
-        openAacCardEdit(boardId || _aacCurrentBoardId, cardId);
-        return;
-    }
-    _aacSentence.push({ label, spoken });
+function tapAacCard(btn) {
+    _aacSentence.push({ label: btn.dataset.label, spoken: btn.dataset.spoken });
     _aacUpdateSentenceBar();
-    speakFallback(spoken, null, _aacTtsRate);
-}
-
-async function aacEmptySlotTap(row, col) {
-    if (_aacMoveCardId) {
-        if (_aacMoveBoardId !== _aacCurrentBoardId) {
-            showToast(t('aac_move_other_board'));
-            _aacMoveCardId = null;
-            _aacMoveBoardId = null;
-            await _aacRenderAll();
-            return;
-        }
-        const board = _aacBoards.find(b => b.id === _aacMoveBoardId);
-        try {
-            await AACData.moveCard(board, _aacMoveCardId, row, col);
-        } catch {}
-        _aacMoveCardId = null;
-        _aacMoveBoardId = null;
-        await _aacRenderAll();
-        return;
-    }
-    _aacAddTarget = { row, col };
-    openAacSearch();
-}
-
-async function openAacCardEdit(boardId, cardId) {
-    const cards = await AACData.listCards(boardId);
-    const card = cards.find(c => c.id === cardId);
-    if (!card) return;
-    _aacEditingCardId = cardId;
-    _aacEditingBoardId = boardId;
-    document.getElementById('aacEditCardLabel').value = card.label;
-    document.getElementById('aacEditCardSpoken').value = card.spoken || card.label;
-    document.getElementById('aac-card-edit-modal').style.display = 'flex';
-}
-
-async function saveAacCardEdit() {
-    const label = (document.getElementById('aacEditCardLabel').value || '').trim();
-    const spoken = (document.getElementById('aacEditCardSpoken').value || '').trim();
-    if (!label) { document.getElementById('aacEditCardLabel').focus(); return; }
-    await AACData.updateCard(_aacEditingBoardId, _aacEditingCardId, { label, spoken: spoken || label });
-    document.getElementById('aac-card-edit-modal').style.display = 'none';
-    await _aacRenderAll();
-}
-
-async function deleteAacCard() {
-    if (!confirm(t('aac_delete_confirm'))) return;
-    await AACData.clearSlot(_aacEditingBoardId, _aacEditingCardId);
-    document.getElementById('aac-card-edit-modal').style.display = 'none';
-    await _aacRenderAll();
-}
-
-async function startAacCardMove() {
-    if (_aacEditingBoardId !== _aacCurrentBoardId) {
-        showToast(t('aac_move_other_board'));
-        return;
-    }
-    _aacMoveCardId = _aacEditingCardId;
-    _aacMoveBoardId = _aacEditingBoardId;
-    document.getElementById('aac-card-edit-modal').style.display = 'none';
-    showToast(t('aac_move_hint'));
-    await _aacRenderAll();
-}
-
-async function aacAddBoard() {
-    const name = prompt(t('aac_new_board_name'));
-    if (!name || !name.trim()) return;
-    const sid = activeStudentId || 'default';
-    const board = await AACData.createBoard(sid, { label: name.trim() });
-    _aacBoards = await AACData.listBoards(sid);
-    _aacCurrentBoardId = board.id;
-    await _aacRenderAll();
-}
-
-function openAacBoardEdit() {
-    const board = _aacBoards.find(b => b.id === _aacCurrentBoardId);
-    if (!board) return;
-    document.getElementById('aacEditBoardLabel').value = board.label;
-    document.getElementById('aac-board-edit-modal').style.display = 'flex';
-}
-
-async function saveAacBoardEdit() {
-    const label = (document.getElementById('aacEditBoardLabel').value || '').trim();
-    if (!label) { document.getElementById('aacEditBoardLabel').focus(); return; }
-    const sid = activeStudentId || 'default';
-    await AACData.updateBoard(sid, _aacCurrentBoardId, { label });
-    _aacBoards = await AACData.listBoards(sid);
-    document.getElementById('aac-board-edit-modal').style.display = 'none';
-    await _aacRenderAll();
-}
-
-async function deleteAacBoard() {
-    if (_aacBoards.length <= 1) { showToast(t('aac_last_board')); return; }
-    if (!confirm(t('aac_board_delete_confirm'))) return;
-    const sid = activeStudentId || 'default';
-    await AACData.deleteBoard(sid, _aacCurrentBoardId);
-    _aacBoards = await AACData.listBoards(sid);
-    _aacCurrentBoardId = _aacBoards[0]?.id || null;
-    document.getElementById('aac-board-edit-modal').style.display = 'none';
-    await _aacRenderAll();
-}
-
-async function openAacSettings() {
-    const sid = activeStudentId || 'default';
-    const s = await AACData.getSettings(sid);
-    document.getElementById('aacSetRows').value = String(s.grid.rows);
-    document.getElementById('aacSetCols').value = String(s.grid.cols);
-    document.getElementById('aacSetCore').checked = !!s.coreStrip;
-    document.getElementById('aacSetRate').value = String(s.ttsRate || 1.0);
-    document.getElementById('aacRateVal').textContent = (s.ttsRate || 1.0) + '×';
-    document.getElementById('aac-settings-modal').style.display = 'flex';
-}
-
-async function saveAacSettings() {
-    const sid = activeStudentId || 'default';
-    const rows = parseInt(document.getElementById('aacSetRows').value, 10);
-    const cols = parseInt(document.getElementById('aacSetCols').value, 10);
-    try {
-        await AACData.setGrid(sid, { rows, cols });
-    } catch (e) {
-        if (e && e.code === 'SHRINK_WOULD_ORPHAN') {
-            if (!confirm(t('aac_shrink_warn'))) return;
-            await AACData.setGrid(sid, { rows, cols }, { force: true });
-        }
-    }
-    await AACData.updateSettings(sid, {
-        coreStrip: document.getElementById('aacSetCore').checked,
-        ttsRate: parseFloat(document.getElementById('aacSetRate').value),
-    });
-    document.getElementById('aac-settings-modal').style.display = 'none';
-    await _aacRenderAll();
+    btn.classList.remove('tapped');
+    void btn.offsetWidth;
+    btn.classList.add('tapped');
+    speakFallback(btn.dataset.spoken, null, _aacTtsRate);
 }
 
 function _aacUpdateSentenceBar() {
     const wrap = document.getElementById('aacSentenceWords');
     const speakBtn = document.getElementById('aacSpeakBtn');
+    if (!wrap) return;
     if (!_aacSentence.length) {
         wrap.innerHTML = `<span class="aac-sentence-placeholder">${t('aac_sentence_placeholder')}</span>`;
         if (speakBtn) speakBtn.disabled = true;
@@ -5405,6 +5181,7 @@ function _aacUpdateSentenceBar() {
     wrap.innerHTML = _aacSentence.map((w, i) => `
         <span class="aac-word-chip" onclick="removeAacWord(${i})">${escapeHtml(w.label)} ✕</span>
     `).join('');
+    wrap.scrollLeft = wrap.scrollWidth;
     if (speakBtn) speakBtn.disabled = false;
 }
 
@@ -5448,177 +5225,6 @@ async function speakAacSentence() {
 function clearAacSentence() {
     _aacSentence = [];
     _aacUpdateSentenceBar();
-}
-
-function filterAacCards(q) {
-    const term = q.toLowerCase().trim();
-    document.querySelectorAll('#aacGrid .aac-card').forEach(card => {
-        if (card.classList.contains('empty')) {
-            card.style.display = term ? 'none' : '';
-            return;
-        }
-        const label = (card.dataset.label || '').toLowerCase();
-        card.style.display = (!term || label.includes(term)) ? '' : 'none';
-    });
-}
-
-const _aacEmojiCats = {
-    'Duygular':    ['😊','😢','😡','😨','😴','🤢','😍','😐','🤩','😲','😑','😳','🤒','🥵','🥶','🤕','🤗','😪','😅','🥹'],
-    'Yiyecekler':  ['🍞','🍎','🥦','🍖','🍝','🍚','🍲','🥛','🧃','🍪','🍫','🍦','🍕','🍔','🥚','🍌','🍇','🍓','🥕','🍋','🍩','🧁','🍉','🫐'],
-    'Etkinlikler': ['📚','✏️','🎨','🧩','📺','🏃','💃','🎤','🏊','🚴','⚽','🎵','🎮','🎲','🏋️','🛝','🎭','🖼️','🎯','🏓'],
-    'İnsanlar':    ['👩','👨','👶','👧','👦','👵','👴','👩‍🏫','👫','👨‍⚕️','🙋','👨‍👩‍👧','🧑','👩‍🍳','👮','🧑‍🎨'],
-    'Hayvanlar':   ['🐱','🐶','🐦','🐟','🐰','🐴','🐄','🐑','🦁','🐘','🐵','🦋','🐸','🦊','🐼','🐧','🦜','🐢','🦄','🐬'],
-    'Yerler':      ['🏠','🏫','🌳','🏥','🚗','🛁','🛏️','🍳','📖','🎡','🏪','🚌','✈️','🏖️','🏞️','🌆'],
-    'Semboller':   ['✅','❌','✋','➕','🏁','🆘','🤝','🚶','❤️','⭐','🌈','👍','👎','🔴','🔵','🟢','🟡','🟠','🟣','⬛','⬜'],
-};
-const _aacEmojiCatLabelKeys = {
-    'Duygular': 'aac_cat_feelings',
-    'Yiyecekler': 'aac_cat_foods',
-    'Etkinlikler': 'aac_cat_activities',
-    'İnsanlar': 'aac_cat_people',
-    'Hayvanlar': 'aac_cat_animals',
-    'Yerler': 'aac_cat_places',
-    'Semboller': 'aac_cat_symbols',
-};
-let _aacPickedEmoji = '';
-
-function aacOpenAddSymbol() {
-    _aacAddTarget = null;
-    openAacSearch();
-}
-
-function openAacSearch() {
-    document.getElementById('aac-search-modal').style.display = 'flex';
-    document.getElementById('aacEmojiLabelRow').style.display = 'none';
-    _aacPickedEmoji = '';
-    switchAacMode('emoji');
-}
-
-function closeAacSearch(e) {
-    if (e.target.id === 'aac-search-modal') {
-        document.getElementById('aac-search-modal').style.display = 'none';
-    }
-}
-
-function switchAacMode(mode) {
-    document.getElementById('aacModeEmoji').classList.toggle('active', mode === 'emoji');
-    document.getElementById('aacModePhoto').classList.toggle('active', mode === 'photo');
-    document.getElementById('aacEmojiMode').style.display  = mode === 'emoji' ? '' : 'none';
-    document.getElementById('aacPhotoMode').style.display  = mode === 'photo' ? '' : 'none';
-    document.getElementById('aacEmojiLabelRow').style.display = 'none';
-    _aacPickedEmoji = '';
-    if (mode === 'emoji') {
-        _aacRenderEmojiTabs();
-        _aacShowEmojiCat(Object.keys(_aacEmojiCats)[0]);
-    } else {
-        setTimeout(() => document.getElementById('aacPhotoQuery').focus(), 80);
-    }
-}
-
-async function searchAacPhoto() {
-    const q = (document.getElementById('aacPhotoQuery').value || '').trim();
-    if (!q) return;
-    const grid = document.getElementById('aacPhotoGrid');
-    grid.innerHTML = `<p class="aac-photo-hint">${t('aac_searching')}</p>`;
-    try {
-        const r = await fetch(API_BASE + '/api/photo?query=' + encodeURIComponent(q), { headers: apiAuthHeaders() });
-        const d = await r.json();
-        if (!d.photos || !d.photos.length) {
-            grid.innerHTML = `<p class="aac-photo-hint">${t('aac_no_results')}</p>`;
-            return;
-        }
-        grid.innerHTML = d.photos.map(p => {
-            const thumb = p.src.small;
-            const alt = escapeHtml(p.alt || q);
-            return `<button type="button" class="aac-photo-item" data-thumb="${escapeHtml(thumb)}" data-alt="${alt}">
-                <img src="${escapeHtml(thumb)}" alt="${alt}" loading="lazy">
-            </button>`;
-        }).join('');
-        grid.querySelectorAll('.aac-photo-item').forEach(btn => {
-            btn.addEventListener('click', () => selectAacPhoto(btn.dataset.thumb, btn.dataset.alt));
-        });
-    } catch {
-        grid.innerHTML = `<p class="aac-photo-hint">${t('aac_connection_error')}</p>`;
-    }
-}
-
-function selectAacPhoto(url, alt) {
-    _aacPickedEmoji = '__photo__' + url;
-    const preview = document.getElementById('aacSelectedEmoji');
-    preview.innerHTML = `<img src="${escapeHtml(url)}" style="width:48px;height:48px;object-fit:cover;border-radius:8px;">`;
-    document.getElementById('aacEmojiLabel').value = alt;
-    document.getElementById('aacEmojiLabelRow').style.display = 'flex';
-    setTimeout(() => document.getElementById('aacEmojiLabel').focus(), 60);
-}
-
-function _aacRenderEmojiTabs() {
-    const tabs = document.getElementById('aacEmojiTabs');
-    tabs.innerHTML = Object.keys(_aacEmojiCats).map((cat, i) =>
-        `<button type="button" class="aac-emoji-tab${i === 0 ? ' active' : ''}" data-cat="${escapeHtml(cat)}" onclick="_aacShowEmojiCat('${escapeHtml(cat)}')">${t(_aacEmojiCatLabelKeys[cat])}</button>`
-    ).join('');
-}
-
-function _aacShowEmojiCat(cat) {
-    document.querySelectorAll('.aac-emoji-tab').forEach(tabEl => tabEl.classList.toggle('active', tabEl.dataset.cat === cat));
-    const emojis = _aacEmojiCats[cat] || [];
-    document.getElementById('aacEmojiGrid').innerHTML = emojis.map(e =>
-        `<button type="button" class="aac-emoji-btn" onclick="selectAacEmoji('${e}')">${e}</button>`
-    ).join('');
-    document.getElementById('aacEmojiLabelRow').style.display = 'none';
-    _aacPickedEmoji = '';
-}
-
-function selectAacEmoji(emoji) {
-    _aacPickedEmoji = emoji;
-    document.getElementById('aacSelectedEmoji').textContent = emoji;
-    document.getElementById('aacEmojiLabel').value = '';
-    document.getElementById('aacEmojiLabelRow').style.display = 'flex';
-    setTimeout(() => document.getElementById('aacEmojiLabel').focus(), 60);
-}
-
-async function addEmojiCard() {
-    if (!_aacPickedEmoji || !_aacCurrentBoardId) return;
-    const label = (document.getElementById('aacEmojiLabel').value || '').trim();
-    if (!label) { document.getElementById('aacEmojiLabel').focus(); return; }
-
-    const sid = activeStudentId || 'default';
-    const board = _aacBoards.find(b => b.id === _aacCurrentBoardId);
-    if (!board) return;
-
-    const isPhoto = _aacPickedEmoji.startsWith('__photo__');
-    const visual = isPhoto
-        ? { type: 'image', value: _aacPickedEmoji.slice('__photo__'.length) }
-        : { type: 'emoji', value: _aacPickedEmoji };
-
-    const { rows, cols, matrix } = await AACData.buildGrid(sid, _aacCurrentBoardId);
-    let targetRow = -1, targetCol = -1;
-    if (_aacAddTarget && !matrix[_aacAddTarget.row]?.[_aacAddTarget.col]) {
-        targetRow = _aacAddTarget.row;
-        targetCol = _aacAddTarget.col;
-    } else {
-        outer: for (let r = 0; r < rows; r++) {
-            for (let c = 0; c < cols; c++) {
-                if (!matrix[r][c]) { targetRow = r; targetCol = c; break outer; }
-            }
-        }
-    }
-    _aacAddTarget = null;
-    if (targetRow === -1) {
-        await AACData.growGrid(sid, { rows: rows + 1, cols });
-        targetRow = rows;
-        targetCol = 0;
-    }
-
-    await AACData.placeCard(board, {
-        row: targetRow, col: targetCol,
-        label,
-        spoken: label,
-        visual,
-        isCore: false,
-    });
-
-    document.getElementById('aac-search-modal').style.display = 'none';
-    await _aacRenderAll();
 }
 
 // =============================================

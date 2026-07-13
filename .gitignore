@@ -10,3 +10,5 @@ www/
 bin/
 
 map-assets/*.png
+aac-assets/*.png
+aac-assets/PROMPTS.md
