@@ -18,12 +18,22 @@ const URLS = {
     linux: `https://github.com/rhasspy/piper/releases/download/${PIPER_VERSION}/piper_linux_x86_64.tar.gz`
 };
 
-async function downloadFile(url, destPath) {
-    console.log(`Downloading: ${url} -> ${destPath}`);
-    const res = await fetch(url);
-    if (!res.ok) throw new Error(`HTTP error! status: ${res.status} for URL: ${url}`);
-    const fileStream = fs.createWriteStream(destPath);
-    await finished(Readable.fromWeb(res.body).pipe(fileStream));
+async function downloadFile(url, destPath, attempts = 3) {
+    for (let attempt = 1; attempt <= attempts; attempt++) {
+        console.log(`Downloading: ${url} -> ${destPath}${attempt > 1 ? ` (attempt ${attempt}/${attempts})` : ''}`);
+        try {
+            const res = await fetch(url);
+            if (!res.ok) throw new Error(`HTTP error! status: ${res.status} for URL: ${url}`);
+            const fileStream = fs.createWriteStream(destPath);
+            await finished(Readable.fromWeb(res.body).pipe(fileStream));
+            return;
+        } catch (err) {
+            if (fs.existsSync(destPath)) fs.unlinkSync(destPath);
+            if (attempt === attempts) throw err;
+            console.warn(`Download failed (${err.message}), retrying in ${attempt * 5}s...`);
+            await new Promise(resolve => setTimeout(resolve, attempt * 5000));
+        }
+    }
 }
 
 function extractZipWindows(archivePath, destDir) {
