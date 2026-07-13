@@ -6177,10 +6177,16 @@ body.has-bottom-nav #object-screen {
     gap: 12px;
 }
 
+.map-back-btn {
+    top: 18px;
+    left: 18px;
+}
+
 .map-avatar-chip {
     background: rgba(255, 255, 255, 0.92);
     border: none;
     border-radius: 20px;
+    margin-top: 56px;
     padding: 10px 12px;
     display: flex;
     flex-direction: column;
