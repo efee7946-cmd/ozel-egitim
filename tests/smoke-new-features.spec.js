@@ -21,8 +21,10 @@ test.describe('Veli kapısı, misafir modu ve ilk kullanım akışı', () => {
     if (await consent.count()) await consent.check();
     await page.click('#loginSaveBtn');
 
-    // P2: ilk öğrenci sonrası menü yerine doğrudan konuşma pratiği açılmalı
-    await page.waitForSelector('#topicOverlay', { state: 'visible', timeout: 8000 });
+    // P2: ilk öğrenci sonrası menü yerine doğrudan konu haritası açılmalı
+    await page.waitForSelector('#speechmap-screen', { state: 'visible', timeout: 8000 });
+    await expect(page.locator('.map-node')).toHaveCount(10);
+    await expect(page.locator('.map-node-locked')).toHaveCount(9);
 
     // Menüye dön — tüm karolar tek menüde görünür olmalı
     await page.evaluate(() => window.goToMenu());

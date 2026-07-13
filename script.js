@@ -843,6 +843,76 @@ const STRINGS = {
     therapy_complete_stat: '{name} bugün {n} soruya cevap verdi! 👏',
     therapy_complete_show: 'Bu ekranı ailene göster 🌟',
     first_run_toast: 'Harika, hazırsınız! İlk pratik için bir konu seçin 🎤',
+
+    map_title: 'Konu Haritası',
+    map_greeting: 'Merhaba!',
+    map_greeting_sub: 'Konuşma pratiğine başlamadan önce konu yolculuğunu tamamlayalım.',
+    map_star_points: 'Yıldız Puanın',
+    map_progress_label: 'İlerleme Durumun',
+    map_bubble: 'Her konuyu tamamla, yeni maceraların kilidini aç!',
+    map_completed: 'Tamamlandı!',
+    map_locked_toast: 'Önce "{label}" konusunu tamamla 🔒',
+    map_level_chip: '🎚️ Düzey: {level}',
+    map_level_modal_title: 'Hangi düzeyde çalışalım?',
+    map_level_modal_sub: 'İstediğin zaman haritadan değiştirebilirsin.',
+    map_finished_title: 'Şehir Kaşifi! 🏆',
+    map_finished_sub: 'Bütün konuları tamamladın! İstediğin konuyu tekrar çalışabilirsin.',
+    map_complete_next: '🎉 Yeni konu açıldı: {label}',
+    map_back_to_map: '🗺️ Haritaya Dön',
+
+    map_topic_greetings: 'Selamlaşma',
+    map_topic_introduce: 'Kendini Tanıtma',
+    map_topic_emotions: 'Duygularını İfade Etme',
+    map_topic_daily: 'Günlük Aktiviteler',
+    map_topic_school: 'Okul ve Arkadaşlar',
+    map_topic_food: 'Yemek ve İçecekler',
+    map_topic_hobbies: 'Hobiler ve İlgi Alanları',
+    map_topic_places: 'Yerler ve Yönler',
+    map_topic_problem: 'Problem Çözme',
+    map_topic_dreams: 'Hayaller ve Gelecek',
+
+    map_greet_q1: 'Sabah uyanınca ailene ne dersin?',
+    map_greet_qgoal1: 'Günaydın deme',
+    map_intro_q1: 'Senin adın ne? Bana söyler misin?',
+    map_intro_qgoal1: 'Adını söyleme',
+    map_intro_q2: 'Kaç yaşındasın?',
+    map_intro_qgoal2: 'Yaşını söyleme',
+    map_intro_q3: 'Evde kimlerle yaşıyorsun?',
+    map_intro_qgoal3: 'Aile üyelerini sayma',
+    map_intro_q4: 'En sevdiğin oyuncağın ne? Bana anlatır mısın?',
+    map_intro_qgoal4: 'Sevdiği şeyi tanıtma',
+    map_food_q1: 'En sevdiğin yemek ne?',
+    map_food_qgoal1: 'Yemek tercihini söyleme',
+    map_hobby_q1: 'Boş zamanında ne yapmayı seversin?',
+    map_hobby_qgoal1: 'Hobisini anlatma',
+    map_hobby_q2: 'En sevdiğin çizgi film hangisi?',
+    map_hobby_qgoal2: 'Tercihini söyleme',
+    map_hobby_q3: 'Hangi oyunları oynamayı seversin?',
+    map_hobby_qgoal3: 'Sevdiği oyunları sayma',
+    map_places_q1: 'Okula nasıl gidiyorsun? Yürüyerek mi, arabayla mı?',
+    map_places_qgoal1: 'Ulaşım şeklini söyleme',
+    map_places_q2: 'Evde en çok hangi odada olmayı seversin?',
+    map_places_qgoal2: 'Yer bildirme',
+    map_places_q3: 'Parka gitmek istediğinde kime, ne söylersin?',
+    map_places_qgoal3: 'İstek bildirme',
+    map_places_q4: 'Gezmek için nereye gitmeyi seversin? Park mı, deniz mi?',
+    map_places_qgoal4: 'Yer tercihi söyleme',
+    map_problem_q1: 'Yüksekteki bir şeye ulaşamazsan ne yaparsın, kimden yardım istersin?',
+    map_problem_qgoal1: 'Yardım isteme',
+    map_problem_q2: 'Oyuncağın kırılırsa ne yaparsın?',
+    map_problem_qgoal2: 'Sorun karşısında çözüm söyleme',
+    map_dream_q1: 'Büyüyünce ne olmak istersin?',
+    map_dream_qgoal1: 'Hayalini söyleme',
+    map_dream_q2: 'Bir süper gücün olsaydı ne yapmak isterdin?',
+    map_dream_qgoal2: 'Hayal kurup anlatma',
+    map_dream_q3: 'Bir gün nereye seyahat etmek isterdin?',
+    map_dream_qgoal3: 'Yer tercihi söyleme',
+    map_dream_q4: 'Doğum gününde ne hediye istersin?',
+    map_dream_qgoal4: 'İstek bildirme',
+    map_dream_q5: 'Yarın ne yapmak istersin?',
+    map_dream_qgoal5: 'Plan anlatma',
+    map_dream_q6: 'En büyük hayalin ne? Bana anlatır mısın?',
+    map_dream_qgoal6: 'Hayalini anlatma',
   },
   en: {
     back_menu: '← Menu',
@@ -1684,6 +1754,76 @@ const STRINGS = {
     therapy_complete_stat: '{name} answered {n} questions today! 👏',
     therapy_complete_show: 'Show this screen to your family 🌟',
     first_run_toast: 'Great, you are all set! Pick a topic for the first practice 🎤',
+
+    map_title: 'Topic Map',
+    map_greeting: 'Hello!',
+    map_greeting_sub: "Let's complete the topic journey before starting speech practice.",
+    map_star_points: 'Your Star Points',
+    map_progress_label: 'Your Progress',
+    map_bubble: 'Complete every topic to unlock new adventures!',
+    map_completed: 'Completed!',
+    map_locked_toast: 'Finish "{label}" first 🔒',
+    map_level_chip: '🎚️ Level: {level}',
+    map_level_modal_title: 'Which level should we practice at?',
+    map_level_modal_sub: 'You can change it anytime from the map.',
+    map_finished_title: 'City Explorer! 🏆',
+    map_finished_sub: 'You completed every topic! You can practice any topic again.',
+    map_complete_next: '🎉 New topic unlocked: {label}',
+    map_back_to_map: '🗺️ Back to Map',
+
+    map_topic_greetings: 'Greetings',
+    map_topic_introduce: 'Introducing Yourself',
+    map_topic_emotions: 'Expressing Feelings',
+    map_topic_daily: 'Daily Activities',
+    map_topic_school: 'School and Friends',
+    map_topic_food: 'Food and Drinks',
+    map_topic_hobbies: 'Hobbies and Interests',
+    map_topic_places: 'Places and Directions',
+    map_topic_problem: 'Problem Solving',
+    map_topic_dreams: 'Dreams and Future',
+
+    map_greet_q1: 'What do you say to your family when you wake up in the morning?',
+    map_greet_qgoal1: 'Saying good morning',
+    map_intro_q1: 'What is your name? Can you tell me?',
+    map_intro_qgoal1: 'Saying their name',
+    map_intro_q2: 'How old are you?',
+    map_intro_qgoal2: 'Saying their age',
+    map_intro_q3: 'Who do you live with at home?',
+    map_intro_qgoal3: 'Naming family members',
+    map_intro_q4: 'What is your favorite toy? Can you tell me about it?',
+    map_intro_qgoal4: 'Describing a favorite thing',
+    map_food_q1: 'What is your favorite food?',
+    map_food_qgoal1: 'Stating a food preference',
+    map_hobby_q1: 'What do you like to do in your free time?',
+    map_hobby_qgoal1: 'Talking about a hobby',
+    map_hobby_q2: 'What is your favorite cartoon?',
+    map_hobby_qgoal2: 'Stating a preference',
+    map_hobby_q3: 'Which games do you like to play?',
+    map_hobby_qgoal3: 'Naming favorite games',
+    map_places_q1: 'How do you get to school? Walking or by car?',
+    map_places_qgoal1: 'Describing transportation',
+    map_places_q2: 'Which room at home do you like being in the most?',
+    map_places_qgoal2: 'Naming a place',
+    map_places_q3: 'When you want to go to the park, who do you ask and what do you say?',
+    map_places_qgoal3: 'Expressing a request',
+    map_places_q4: 'Where do you like to go for a trip? The park or the sea?',
+    map_places_qgoal4: 'Stating a place preference',
+    map_problem_q1: "If you can't reach something up high, what do you do and who do you ask for help?",
+    map_problem_qgoal1: 'Asking for help',
+    map_problem_q2: 'What do you do if your toy breaks?',
+    map_problem_qgoal2: 'Suggesting a solution to a problem',
+    map_dream_q1: 'What do you want to be when you grow up?',
+    map_dream_qgoal1: 'Sharing a dream',
+    map_dream_q2: 'If you had a superpower, what would you do?',
+    map_dream_qgoal2: 'Imagining and telling',
+    map_dream_q3: 'Where would you like to travel one day?',
+    map_dream_qgoal3: 'Stating a place preference',
+    map_dream_q4: 'What present do you want for your birthday?',
+    map_dream_qgoal4: 'Expressing a wish',
+    map_dream_q5: 'What do you want to do tomorrow?',
+    map_dream_qgoal5: 'Telling a plan',
+    map_dream_q6: 'What is your biggest dream? Can you tell me?',
+    map_dream_qgoal6: 'Describing a dream',
   }
 };
 
@@ -2061,12 +2201,10 @@ function isTherapyInProgress() {
     const container = document.getElementById('game-container');
     const mainCard = document.getElementById('therapyMainCard');
     const completeBox = document.getElementById('therapyCompleteBox');
-    const topicOverlay = document.getElementById('topicOverlay');
-    
-    return container && container.style.display !== 'none' && 
-           mainCard && mainCard.style.display !== 'none' && 
-           !completeBox && 
-           topicOverlay && topicOverlay.style.display === 'none';
+
+    return container && container.style.display !== 'none' &&
+           mainCard && mainCard.style.display !== 'none' &&
+           !completeBox;
 }
 
 function showCustomConfirm(message) {
@@ -2117,7 +2255,7 @@ async function showOnly(id, options = {}) {
     }
 
     const screens = ['start-screen','student-setup-screen','menu-screen','game-container',
-                      'schedule-screen','aac-screen','store-screen','object-screen',
+                      'speechmap-screen','schedule-screen','aac-screen','store-screen','object-screen',
                       'login-screen','auth-screen','analysis-screen'];
     const isNewScreen = currentScreenId !== id;
     const prevScreen = currentScreenId;
@@ -2137,8 +2275,10 @@ async function showOnly(id, options = {}) {
     }
     currentScreenId = id;
     if (id === 'menu-screen') {
-        requestAnimationFrame(() => renderCityScene());
         maybeShowOnboarding();
+    }
+    if (id === 'speechmap-screen') {
+        requestAnimationFrame(() => renderSpeechMap());
     }
     _updateBottomNav(id);
     if (_objStopRender) (id === 'object-screen' ? _objStartRender : _objStopRender)();
@@ -2170,6 +2310,7 @@ function _updateBottomNav(screenId) {
     const map = {
         'menu-screen': 'bnMenu',
         'game-container': 'bnTherapy',
+        'speechmap-screen': 'bnTherapy',
         'aac-screen': 'bnAAC',
         'schedule-screen': 'bnSchedule',
         'analysis-screen': 'bnAnalysis',
@@ -2609,7 +2750,6 @@ async function startApp(resetSession) {
         } else {
             showOnly('menu-screen');
         }
-        renderCityScene();
         return;
     }
     try {
@@ -2659,41 +2799,7 @@ document.addEventListener('DOMContentLoaded', function() {
 window.addEventListener('pagehide', persistSessionSnapshot);
 document.addEventListener('DOMContentLoaded', function() {
     ensureStudentEnhancements();
-    syncCityEntryPlacement(false);
-    renderCityScene();
 });
-
-function syncCityEntryPlacement(useTherapyHost) {
-    const cityShell = document.getElementById('cityEntryShell');
-    const menuHost = document.getElementById('menuCityHost');
-    const therapyHost = document.getElementById('therapyCityHost');
-    const startBtn = document.getElementById('cityStartBtn');
-    if (!cityShell || !menuHost || !therapyHost) return;
-    const targetHost = useTherapyHost ? therapyHost : menuHost;
-    cityShell.classList.toggle('therapy-entry-card', !useTherapyHost);
-    cityShell.classList.toggle('therapy-city-shell', useTherapyHost);
-    if (startBtn) {
-        startBtn.onclick = useTherapyHost ? startFocusedCityLocation : goToTherapy;
-    }
-    if (cityShell.parentElement !== targetHost) {
-        targetHost.appendChild(cityShell);
-    }
-}
-
-function setTherapySelectionMode(isSelecting) {
-    syncCityEntryPlacement(isSelecting);
-    const cityShell = document.getElementById('cityEntryShell');
-    const sideCard = document.getElementById('therapySideCard');
-    document.querySelectorAll('.therapy-session-ui').forEach((element) => {
-        element.style.display = isSelecting ? 'none' : '';
-    });
-    if (cityShell) {
-        cityShell.style.display = isSelecting ? '' : 'none';
-    }
-    if (sideCard) {
-        sideCard.style.display = isSelecting ? 'none' : '';
-    }
-}
 
 async function goToMenu() {
     if (isTherapyInProgress()) {
@@ -2712,12 +2818,7 @@ async function goToMenu() {
     const shouldAwardStars = therapySessionCompleted;
     therapySessionCompleted = false;
     persistSessionSnapshot();
-    setTherapySelectionMode(false);
-    syncCityEntryPlacement(false);
-    const cityShell = document.getElementById('cityEntryShell');
-    if (cityShell) cityShell.style.display = '';
     await showOnly('menu-screen', { skipTherapyConfirm: true });
-    renderCityScene();
     maybeGreetChild();
     if (shouldAwardStars) _showStarReward();
 }
@@ -2726,115 +2827,15 @@ let currentTopic = '';
 let sessionTotalQuestions = 0;
 let therapySessionCompleted = false;
 
-function goToTherapy() {
-    showOnly('game-container');
-    document.getElementById('topicOverlay').style.display = 'flex';
+async function goToTherapy() {
+    await showOnly('speechmap-screen');
+}
+
+function returnToMapFromComplete() {
+    const box = document.getElementById('therapyCompleteBox');
+    if (box) box.remove();
     document.getElementById('therapyMainCard').style.display = 'none';
-    document.getElementById('topicInput').value = '';
-    document.getElementById('topicLoading').style.display = 'none';
-    document.getElementById('topicStartBtn').style.display = '';
-    hideTopicError();
-    renderTherapyLevelOptions();
-    setTimeout(() => document.getElementById('topicInput').focus(), 100);
-}
-
-function setTopicChip(topic) {
-    document.getElementById('topicInput').value = topic;
-    hideTopicError();
-    document.getElementById('topicInput').focus();
-}
-
-function showTopicError(msgKey) {
-    const el = document.getElementById('topicError');
-    if (!el) return;
-    el.textContent = t(msgKey);
-    el.style.display = 'block';
-    el.classList.remove('shake');
-    void el.offsetWidth;
-    el.classList.add('shake');
-    el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-}
-
-function hideTopicError() {
-    const el = document.getElementById('topicError');
-    if (el) el.style.display = 'none';
-}
-
-async function startTherapyWithTopic() {
-    const input = document.getElementById('topicInput').value.trim();
-    if (!input) {
-        showTopicError('therapy_error_no_topic');
-        document.getElementById('topicInput').focus();
-        return;
-    }
-    if (!THERAPY_LEVELS[currentTherapyLevelKey]) {
-        showTopicError('therapy_error_no_level');
-        return;
-    }
-    if (navigator.onLine === false) {
-        showTopicError('offline_action');
-        return;
-    }
-    hideTopicError();
-    if (!guestTryConsume('therapy')) return;
-    currentTopic = input;
-    const level = getCurrentTherapyLevel();
-    const presetQuestions = getPresetTherapyQuestionsForTopic(currentTopic, currentTherapyLevelKey);
-
-    document.getElementById('topicLoading').style.display = 'flex';
-    document.getElementById('topicStartBtn').style.display = 'none';
-
-    try {
-        if (presetQuestions && presetQuestions.length) {
-            unaskedQuestions = presetQuestions;
-        } else {
-            const prompt = _lang === 'en'
-                ? `Generate 6 friendly, grammatically complete, and natural-sounding questions about "${currentTopic}" for a child (special education support). Each question must be a complete sentence and relate to daily life or social communication. ${level.promptHintEn} One question per line. On each line, write the question, then a vertical bar "|" followed by a short English search term (3-5 words) for Pexels that is highly relevant to the question (for example: "child playing football", "family eating dinner"). Write only the questions and search terms. No other text.`
-                : `Özel eğitim desteği alan bir çocuk için "${currentTopic}" konusunda 6 adet samimi, dil bilgisi açısından tam, kurallı ve doğal soru üret. Her soru günlük yaşam ve sosyal beceriye yönelik olsun. Kesinlikle yarım, kesik veya telgraf diliyle soru yazma (Örn: "Kime pas?", "Hangi renk?" gibi yarım sorular ASLA üretilmeyecektir). Her soru yeni satırda olsun ve sorunun yanına dik çizgi "|" koyarak Pexels'te aratmak için soruyla doğrudan alakalı İngilizce kısa bir arama terimi (3-5 kelime) yaz. Arama terimi çocuklarla, aileyle veya sosyal ortamla ilgili olsun (örneğin: "child playing football", "family eating dinner"). Sadece soruları ve arama terimlerini yaz. Başka açıklama yazma.`;
-            const therapyPrompt = _lang === 'en'
-                ? prompt
-                : `Özel eğitim desteği alan bir çocuk için "${currentTopic}" konusunda 6 adet samimi, dil bilgisi açısından tam, kurallı ve doğal soru üret. Her soru günlük yaşam ve sosyal iletişimle ilgili olsun. Kesinlikle yarım, kesik veya telgraf diliyle soru yazma (Örn: "Kime pas?", "Hangi renk?" gibi yarım sorular ASLA üretilmeyecektir). ${level.promptHintTr} Her soru yeni satırda olsun ve sorunun yanına dik çizgi "|" koyarak Pexels'te aratmak için soruyla doğrudan alakalı İngilizce kısa bir arama terimi (3-5 kelime) yaz. Arama terimi çocuklarla, aileyle veya sosyal ortamla ilgili olsun (örneğin: "child playing football", "family eating dinner"). Sadece soruları ve arama terimlerini yaz. Başka açıklama yazma.`;
-            const res = await fetch(API_BASE + '/api/chat', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', ...apiAuthHeaders() },
-                body: JSON.stringify({ contents: [{ role: 'user', parts: [{ text: therapyPrompt }] }] }),
-                signal: AbortSignal.timeout(15000)
-            });
-            const data = await res.json();
-            const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-            const lines = text.split('\n');
-            const questions = [];
-            for (const line of lines) {
-                const cleanLine = line.replace(/^[\d\-\.\*]+\s*/, '').trim();
-                if (!cleanLine) continue;
-                const parts = cleanLine.split('|');
-                const qText = parts[0].trim();
-                const engQuery = parts[1] ? parts[1].trim() : currentTopic;
-                if (qText.length > 5 && isQuestionSuitableForTherapyLevel(qText, currentTherapyLevelKey)) {
-                    questions.push({ q: qText, query: engQuery, goal: currentTopic });
-                }
-            }
-            unaskedQuestions = questions.length ? questions : [{ q: t('therapy_fallback_q').replace('{topic}', currentTopic), query: currentTopic, goal: currentTopic }];
-        }
-    } catch {
-        unaskedQuestions = (presetQuestions && presetQuestions.length)
-            ? presetQuestions
-            : [{ q: t('therapy_fallback_q').replace('{topic}', currentTopic), query: currentTopic, goal: currentTopic }];
-    }
-    sessionTotalQuestions = unaskedQuestions.length;
-    therapySessionCompleted = false;
-
-    chatHistory = [];
-    turnCount = 0;
-    currentObj = null;
-
-    updateTherapyTopicBadge();
-    document.getElementById('topicOverlay').style.display = 'none';
-    document.getElementById('therapyMainCard').style.display = '';
-    document.getElementById('chat-bubbles').innerHTML = '';
-
-    updateProgressBar();
-    await loadNext();
+    goToTherapy();
 }
 
 function getDateKey(date) {
@@ -3890,141 +3891,6 @@ const THERAPY_LEVEL_BUCKETS = {
     }
 };
 
-function detectTherapyTopicPreset(topic) {
-    const normalized = String(topic || '').toLocaleLowerCase('tr-TR').trim();
-    if (!normalized) return null;
-    if (/(alışveriş|alisveris|shopping|market)/.test(normalized)) return 'shopping';
-    if (/(okul|school|class)/.test(normalized)) return 'school';
-    if (/(futbol|football|soccer)/.test(normalized)) return 'football';
-    if (/(arkadaş|arkadas|friend)/.test(normalized)) return 'friendship';
-    if (/(yemek|food|meal|eat)/.test(normalized)) return 'food';
-    if (/(duygu|emotion|feeling)/.test(normalized)) return 'emotions';
-    return null;
-}
-
-function getPresetTherapyQuestionsForTopic(topic, levelKey) {
-    if (levelKey !== 'word') return null;
-    const presetKey = detectTherapyTopicPreset(topic);
-    if (!presetKey) return null;
-    const banks = _lang === 'en'
-        ? {
-            shopping: [
-                { q: 'Which fruit?', query: 'child choosing fruit in market' },
-                { q: 'Which drink?', query: 'child choosing drink in market' },
-                { q: 'What goes in the basket?', query: 'child putting groceries in basket' },
-                { q: 'Which snack?', query: 'child choosing snack in market' },
-                { q: 'Who is at the checkout?', query: 'cashier at grocery store' },
-                { q: 'Which vegetable?', query: 'child choosing vegetable in market' }
-            ],
-            school: [
-                { q: 'What is in your bag?', query: 'child school bag classroom' },
-                { q: 'Who is in class?', query: 'teacher in classroom with child' },
-                { q: 'What is on the desk?', query: 'child desk classroom pencil' },
-                { q: 'Who do you ask?', query: 'child asking teacher for help' },
-                { q: 'Which lesson?', query: 'child in classroom lesson board' },
-                { q: 'What do you write with?', query: 'child writing with pencil in class' }
-            ],
-            football: [
-                { q: 'What do you play with?', query: 'child football ball playground' },
-                { q: 'Who is in the goal?', query: 'goalkeeper child football field' },
-                { q: 'Which jersey?', query: 'child football jersey color' },
-                { q: 'Where is the ball?', query: 'football ball on field near child' },
-                { q: 'Who gets the pass?', query: 'children passing football' },
-                { q: 'What do you wear?', query: 'child football shoes field' }
-            ],
-            friendship: [
-                { q: 'Who do you play with?', query: 'child playing with friend' },
-                { q: 'What do you share?', query: 'children sharing toy' },
-                { q: 'What do you say first?', query: 'children greeting each other' },
-                { q: 'Which game?', query: 'children playing together' },
-                { q: 'Who helps you?', query: 'child comforting friend' },
-                { q: 'Who is your friend?', query: 'two children smiling together' }
-            ],
-            food: [
-                { q: 'What do you eat?', query: 'child eating meal at table' },
-                { q: 'What do you drink?', query: 'child drinking water juice' },
-                { q: 'Which fruit?', query: 'child choosing fruit at table' },
-                { q: 'What is for breakfast?', query: 'child breakfast table food' },
-                { q: 'What is on the plate?', query: 'plate with food on family table' },
-                { q: 'What is on the table?', query: 'family table plate spoon' }
-            ],
-            emotions: [
-                { q: 'How do you feel?', query: 'child face expression emotion' },
-                { q: 'Which feeling?', query: 'child emotion flashcard face' },
-                { q: 'Who helps you?', query: 'child seeking comfort parent' },
-                { q: 'Who do you call?', query: 'child seeking comfort parent' },
-                { q: 'How is your face?', query: 'child facial expression close up' },
-                { q: 'What calms you?', query: 'child calming down quiet activity' }
-            ]
-        }
-        : {
-            shopping: [
-                { q: 'Hangi meyve?', query: 'child choosing fruit in market' },
-                { q: 'Hangi içecek?', query: 'child choosing drink in market' },
-                { q: 'Sepete ne koyalım?', query: 'child putting groceries in basket' },
-                { q: 'Hangi atıştırmalık?', query: 'child choosing snack in market' },
-                { q: 'Kasada kim var?', query: 'cashier at grocery store' },
-                { q: 'Hangi sebze?', query: 'child choosing vegetable in market' }
-            ],
-            school: [
-                { q: 'Çantanda ne var?', query: 'child school bag classroom' },
-                { q: 'Sınıfta kim var?', query: 'teacher in classroom with child' },
-                { q: 'Masada ne var?', query: 'child desk classroom pencil' },
-                { q: 'Kime sorarsın?', query: 'child asking teacher for help' },
-                { q: 'Hangi ders?', query: 'child in classroom lesson board' },
-                { q: 'Ne ile yazarsın?', query: 'child writing with pencil in class' }
-            ],
-            football: [
-                { q: 'Ne ile oynarsın?', query: 'child football ball playground' },
-                { q: 'Kalede kim var?', query: 'goalkeeper child football field' },
-                { q: 'Hangi forma?', query: 'child football jersey color' },
-                { q: 'Top nerede?', query: 'football ball on field near child' },
-                { q: 'Kime pas?', query: 'children passing football' },
-                { q: 'Ayağında ne var?', query: 'child football shoes field' }
-            ],
-            friendship: [
-                { q: 'Kiminle oynarsın?', query: 'child playing with friend' },
-                { q: 'Neyi paylaşırsın?', query: 'children sharing toy' },
-                { q: 'İlk ne dersin?', query: 'children greeting each other' },
-                { q: 'Hangi oyun?', query: 'children playing together' },
-                { q: 'Kim yardım eder?', query: 'child comforting friend' },
-                { q: 'Arkadaşın kim?', query: 'two children smiling together' }
-            ],
-            food: [
-                { q: 'Ne yersin?', query: 'child eating meal at table' },
-                { q: 'Ne içersin?', query: 'child drinking water juice' },
-                { q: 'Hangi meyve?', query: 'child choosing fruit at table' },
-                { q: 'Kahvaltıda ne var?', query: 'child breakfast table food' },
-                { q: 'Tabakta ne var?', query: 'plate with food on family table' },
-                { q: 'Masada ne var?', query: 'family table plate spoon' }
-            ],
-            emotions: [
-                { q: 'Nasıl hissediyorsun?', query: 'child face expression emotion' },
-                { q: 'Hangi duygu?', query: 'child emotion flashcard face' },
-                { q: 'Kim yardım eder?', query: 'child seeking comfort parent' },
-                { q: 'Kimi çağırırsın?', query: 'child seeking comfort parent' },
-                { q: 'Yüzün nasıl?', query: 'child facial expression close up' },
-                { q: 'Ne rahatlatır?', query: 'child calming down quiet activity' }
-            ]
-    };
-    return (banks[presetKey] || []).map((item) => ({ ...item, goal: topic }));
-}
-
-function isQuestionSuitableForTherapyLevel(questionText, levelKey) {
-    const text = String(questionText || '').trim();
-    if (!text) return false;
-    if (levelKey !== 'word') return true;
-    const lowered = text.toLocaleLowerCase('tr-TR');
-    const wordCount = lowered.split(/\s+/).filter(Boolean).length;
-    if (wordCount > 6) return false;
-    if (/\d/.test(lowered)) return false;
-    if (!/(hangi|ne|kim|nerede|what|which|who|where)/.test(lowered)) return false;
-    if (/(kaç|fiyat|para|lira|öde|ödeyelim|neden|nasıl|niye|sence|kaçta|kaç tane|toplam|more fun|how much|price|money|why|how|compare|first|then)/.test(lowered)) {
-        return false;
-    }
-    return true;
-}
-
 const CITY_LOCATIONS = {
     home: {
         get label() { return t('city_home_label'); },
@@ -4123,11 +3989,75 @@ const CITY_LOCATIONS = {
     }
 };
 
+function cityQ(locationKey, n) { return CITY_LOCATIONS[locationKey].questions[n - 1]; }
+function catQ(categoryKey, n) { return THERAPY_CATEGORIES[categoryKey].questions[n - 1]; }
+function mapQ(prefix, n, query) {
+    return {
+        get q() { return t('map_' + prefix + '_q' + n); },
+        query,
+        get goal() { return t('map_' + prefix + '_qgoal' + n); }
+    };
+}
+
+const SPEECH_MAP_TOPICS = [
+    {
+        key: 'greetings', emoji: '👋', category: 'social_communication',
+        get label() { return t('map_topic_greetings'); },
+        questions: [cityQ('school', 1), cityQ('home', 6), catQ('social_communication', 1), cityQ('school', 10), cityQ('park', 10), mapQ('greet', 1, 'child waking up morning family')]
+    },
+    {
+        key: 'introduce', emoji: '🙋', category: 'social_communication',
+        get label() { return t('map_topic_introduce'); },
+        questions: [mapQ('intro', 1, 'child saying name introduction'), mapQ('intro', 2, 'child showing age fingers smiling'), mapQ('intro', 3, 'happy family portrait home'), mapQ('intro', 4, 'child favorite toy playing'), catQ('social_communication', 9), cityQ('school', 8)]
+    },
+    {
+        key: 'emotions', emoji: '😊', category: 'emotions',
+        get label() { return t('map_topic_emotions'); },
+        questions: [catQ('emotions', 1), catQ('emotions', 2), catQ('emotions', 3), catQ('emotions', 4), catQ('emotions', 5), catQ('emotions', 9)]
+    },
+    {
+        key: 'daily', emoji: '🌞', category: 'daily_life',
+        get label() { return t('map_topic_daily'); },
+        questions: [catQ('daily_life', 1), catQ('daily_life', 2), catQ('daily_life', 6), catQ('daily_life', 8), cityQ('home', 5), catQ('daily_life', 7)]
+    },
+    {
+        key: 'school', emoji: '🏫', category: 'social_communication',
+        get label() { return t('map_topic_school'); },
+        questions: [cityQ('school', 2), cityQ('school', 3), cityQ('school', 5), cityQ('school', 6), catQ('social_communication', 3), catQ('social_communication', 7)]
+    },
+    {
+        key: 'food', emoji: '🍎', category: 'daily_life',
+        get label() { return t('map_topic_food'); },
+        questions: [cityQ('home', 2), catQ('daily_life', 3), cityQ('market', 2), cityQ('market', 7), cityQ('home', 8), mapQ('food', 1, 'child eating favorite food happy')]
+    },
+    {
+        key: 'hobbies', emoji: '⚽', category: 'play_sports',
+        get label() { return t('map_topic_hobbies'); },
+        questions: [catQ('play_sports', 1), catQ('play_sports', 2), cityQ('park', 1), mapQ('hobby', 1, 'child drawing painting hobby'), mapQ('hobby', 2, 'child watching cartoon happy'), mapQ('hobby', 3, 'children playing board game home')]
+    },
+    {
+        key: 'places', emoji: '🗺️', category: 'daily_life',
+        get label() { return t('map_topic_places'); },
+        questions: [mapQ('places', 1, 'child going to school walking'), mapQ('places', 2, 'child cozy bedroom playing'), cityQ('home', 3), mapQ('places', 3, 'family going to park together'), mapQ('places', 4, 'family trip children beach'), cityQ('market', 1)]
+    },
+    {
+        key: 'problem', emoji: '💡', category: 'social_communication',
+        get label() { return t('map_topic_problem'); },
+        questions: [catQ('social_communication', 2), cityQ('park', 9), catQ('social_communication', 6), cityQ('market', 9), mapQ('problem', 1, 'child asking parent help reaching'), mapQ('problem', 2, 'child broken toy sad')]
+    },
+    {
+        key: 'dreams', emoji: '🌟', category: 'emotions',
+        get label() { return t('map_topic_dreams'); },
+        questions: [mapQ('dream', 1, 'child dreaming future profession'), mapQ('dream', 2, 'child superhero cape playing'), mapQ('dream', 3, 'child airplane travel window'), mapQ('dream', 4, 'child birthday present excited'), mapQ('dream', 5, 'children planning fun activity'), mapQ('dream', 6, 'happy child looking at sky')]
+    }
+];
+
 let currentTherapyCategoryKey = 'daily_life';
-let currentCityLocationKey = 'school';
 let currentTherapyLevelKey = '';
-let _useLocationQuestions = true;
-let unaskedQuestions = [...CITY_LOCATIONS[currentCityLocationKey].questions];
+let currentMapTopic = null;
+let _pendingMapTopicKey = null;
+let _mapSessionBaseline = null;
+let unaskedQuestions = [];
 let isWaiting = false;
 let isProcessingTherapySpeech = false;
 let chatHistory = [];
@@ -4277,39 +4207,20 @@ function getCurrentTherapyCategory() {
     return THERAPY_CATEGORIES[currentTherapyCategoryKey] || THERAPY_CATEGORIES.daily_life;
 }
 
-function getCurrentCityLocation() {
-    return CITY_LOCATIONS[currentCityLocationKey] || CITY_LOCATIONS.school;
-}
-
 function getCurrentTherapyLevel() {
     return THERAPY_LEVELS[currentTherapyLevelKey] || THERAPY_LEVELS.sentence;
 }
 
-function renderTherapyLevelOptions() {
-    document.querySelectorAll('.topic-level-btn').forEach((btn) => {
-        btn.classList.toggle('active', btn.dataset.level === currentTherapyLevelKey);
-    });
-}
-
-function setTherapyLevel(levelKey) {
-    if (!THERAPY_LEVELS[levelKey]) return;
-    currentTherapyLevelKey = levelKey;
-    hideTopicError();
-    renderTherapyLevelOptions();
-    updateTherapyTopicBadge();
+function getCurrentMapTopic() {
+    return currentMapTopic || SPEECH_MAP_TOPICS[0];
 }
 
 function updateTherapyTopicBadge() {
     const badge = document.getElementById('therapyTopicBadge');
     if (!badge) return;
     const levelLabel = t(getCurrentTherapyLevel().labelKey);
-    if (currentTopic) {
-        badge.textContent = `🎯 ${currentTopic} • ${levelLabel}`;
-        return;
-    }
-    const location = _useLocationQuestions ? getCurrentCityLocation() : null;
-    const label = location ? location.label : getCurrentTherapyCategory().label;
-    badge.textContent = label ? `🗣️ ${label} • ${levelLabel}` : '';
+    const topic = getCurrentMapTopic();
+    badge.textContent = `${topic.emoji} ${topic.label} • ${levelLabel}`;
 }
 
 function getQuestionsForCurrentLevel(questions, sourceType, sourceKey) {
@@ -4329,13 +4240,8 @@ function getQuestionsForCurrentLevel(questions, sourceType, sourceKey) {
 }
 
 function getActiveTherapyQuestions() {
-    if (_useLocationQuestions) {
-        const location = getCurrentCityLocation();
-        if (location && Array.isArray(location.questions) && location.questions.length) {
-            return getQuestionsForCurrentLevel(location.questions, 'location', currentCityLocationKey);
-        }
-    }
-    return getQuestionsForCurrentLevel(getCurrentTherapyCategory().questions, 'category', currentTherapyCategoryKey);
+    const topic = getCurrentMapTopic();
+    return getQuestionsForCurrentLevel(topic.questions, 'map', topic.key);
 }
 
 function shuffleArray(array) {
@@ -4354,15 +4260,36 @@ function resetTherapyQuestionPool() {
     updateTherapyTopicBadge();
 }
 
+function computeMapSessionStars() {
+    const base = _mapSessionBaseline || { mic: 0, card: 0, repeat: 0, simplify: 0 };
+    const mic = Math.max(0, (sessionData.micUsedInTherapy || 0) - base.mic);
+    const card = Math.max(0, (sessionData.cardUsedInTherapy || 0) - base.card);
+    const repeat = Math.max(0, (sessionData.repeatUsed || 0) - base.repeat);
+    const simplify = Math.max(0, (sessionData.simplifyUsed || 0) - base.simplify);
+    const total = mic + card + repeat + simplify;
+    if (total <= 0) return 2;
+    const indPct = Math.round(((mic + card) / total) * 100);
+    return indPct >= 75 ? 3 : (indPct >= 45 ? 2 : 1);
+}
+
 function showTherapySessionComplete() {
     clearTimeout(idleTimer);
     document.getElementById('micBtn').disabled = true;
     document.getElementById('nextBtn').classList.remove('pulse-anim');
     document.querySelectorAll('#therapyMainCard .therapy-session-ui').forEach(el => el.style.display = 'none');
     incrementDailyTask('therapy');
-    confetti({ particleCount: 120, spread: 90 });
     speakFallback(t('therapy_complete_msg'), () => {});
     therapySessionCompleted = true;
+
+    const topic = getCurrentMapTopic();
+    const prevState = getSpeechMapState();
+    const firstCompletion = !prevState.stars[topic.key];
+    const earnedStars = computeMapSessionStars();
+    const nextTopic = SPEECH_MAP_TOPICS[SPEECH_MAP_TOPICS.indexOf(topic) + 1];
+    const finishedAll = firstCompletion && !nextTopic;
+    recordSpeechMapCompletion(topic.key, earnedStars);
+    confetti({ particleCount: finishedAll ? 220 : 120, spread: finishedAll ? 120 : 90 });
+
     const card = document.getElementById('therapyMainCard');
     const box = document.createElement('div');
     box.className = 'therapy-complete therapy-session-ui';
@@ -4370,121 +4297,239 @@ function showTherapySessionComplete() {
     const answered = sessionTotalQuestions || turnCount || 0;
     const achName = escapeHtml(activeStudentName || childName || '');
     const achDate = new Date().toLocaleDateString(_lang === 'en' ? 'en-US' : 'tr-TR', { day: 'numeric', month: 'long' });
+    const unlockLine = firstCompletion && nextTopic
+        ? `<p class="therapy-complete-unlock">${t('map_complete_next').replace('{label}', nextTopic.label)}</p>`
+        : (finishedAll ? `<p class="therapy-complete-unlock">${t('map_finished_sub')}</p>` : '');
     box.innerHTML = `
         <div class="therapy-complete-glow" aria-hidden="true"></div>
-        <div class="therapy-complete-badge">🏆</div>
+        <div class="therapy-complete-badge">${finishedAll ? '🎖️' : '🏆'}</div>
         <div class="therapy-complete-copy">
-            <h2>${t('therapy_complete_title')}</h2>
+            <h2>${finishedAll ? t('map_finished_title') : t('therapy_complete_title')}</h2>
+            <div class="therapy-complete-stars">${'⭐'.repeat(earnedStars)}</div>
             <p class="therapy-complete-stat">${t('therapy_complete_stat').replace('{name}', achName).replace('{n}', answered)}</p>
+            ${unlockLine}
             <p class="therapy-complete-date">${escapeHtml(achDate)}</p>
             <p class="therapy-complete-show">${t('therapy_complete_show')}</p>
         </div>
         <div class="therapy-complete-actions">
-            <button type="button" class="btn-primary-gradient therapy-complete-btn" onclick="document.getElementById('therapyCompleteBox').remove(); currentTopic=''; goToTherapy();">${t('therapy_complete_new_topic')}</button>
-            <button type="button" class="menu-ghost-btn therapy-complete-btn" onclick="currentTopic=''; goToMenu();">${t('therapy_complete_menu')}</button>
+            <button type="button" class="btn-primary-gradient therapy-complete-btn" onclick="returnToMapFromComplete()">${t('map_back_to_map')}</button>
+            <button type="button" class="menu-ghost-btn therapy-complete-btn" onclick="goToMenu();">${t('therapy_complete_menu')}</button>
         </div>
     `;
     card.appendChild(box);
 }
 
-function renderTherapyCategories() {
-    const barEl = document.getElementById('therapyCategoryBar');
-    const summaryEl = document.getElementById('therapyCategorySummary');
-    if (!barEl || !summaryEl) return;
+function _speechMapKey() { return 'speechmap_' + (activeStudentId || 'default'); }
 
-    barEl.innerHTML = Object.entries(THERAPY_CATEGORIES).map(([key, category]) => `
-        <button type="button" class="therapy-category-btn ${currentTherapyCategoryKey === key ? 'active' : ''}" onclick="setTherapyCategory('${key}')">
-            <span class="therapy-cat-emoji">${category.emoji || ''}</span> ${category.label}
-        </button>
-    `).join('');
-
-    const location = getCurrentCityLocation();
-    summaryEl.textContent = location
-        ? `${location.label}: ${location.summary}`
-        : getCurrentTherapyCategory().summary;
+function getSpeechMapState() {
+    const s = DB.getSync(_speechMapKey()) || {};
+    s.stars = s.stars || {};
+    if (!THERAPY_LEVELS[s.level]) s.level = null;
+    return s;
 }
 
-function renderCityScene() {
-    const location = getCurrentCityLocation();
-    const sceneEl = document.getElementById('cityScene');
-    const titleEl = document.getElementById('cityFocusTitle');
-    const descEl = document.getElementById('cityFocusDescription');
-    const kickerEl = document.getElementById('cityFocusKicker');
-    const goalsEl = document.getElementById('cityFocusGoals');
-    const startBtn = document.getElementById('cityStartBtn');
-
-    if (sceneEl) {
-        sceneEl.querySelectorAll('.city-option-card').forEach((card) => {
-            card.classList.toggle('active', card.dataset.location === currentCityLocationKey);
-        });
+function speechMapUnlockedCount(state) {
+    let unlocked = 1;
+    for (const topic of SPEECH_MAP_TOPICS) {
+        if (!state.stars[topic.key]) break;
+        unlocked++;
     }
-
-    if (titleEl) titleEl.textContent = location.label;
-    if (descEl) descEl.textContent = location.description || location.summary;
-    if (kickerEl) kickerEl.textContent = t('city_in_focus').replace('{label}', location.label);
-    if (goalsEl) {
-        goalsEl.innerHTML = (location.goals || []).map((goal) => `<span>${goal}</span>`).join('');
-    }
-    if (startBtn) {
-        startBtn.textContent = currentScreenId === 'game-container'
-            ? t('city_open_area').replace('{label}', location.label)
-            : t('city_go_therapy');
-    }
+    return Math.min(unlocked, SPEECH_MAP_TOPICS.length);
 }
 
-function setTherapyCategory(categoryKey, shouldReload = true) {
-    if (!THERAPY_CATEGORIES[categoryKey]) return;
-    currentTherapyCategoryKey = categoryKey;
+function recordSpeechMapCompletion(topicKey, stars) {
+    const s = getSpeechMapState();
+    s.stars[topicKey] = Math.max(s.stars[topicKey] || 0, stars);
+    DB.set(_speechMapKey(), s);
+}
+
+let _mapAssetState = null;
+function detectMapAssets() {
+    if (_mapAssetState) return;
+    _mapAssetState = 'checking';
+    const probe = new Image();
+    probe.onload = () => {
+        _mapAssetState = 'ready';
+        if (currentScreenId === 'speechmap-screen') renderSpeechMap();
+    };
+    probe.onerror = () => { _mapAssetState = 'missing'; };
+    probe.src = 'map-assets/node-greetings.jpg';
+}
+
+function renderSpeechMap() {
+    detectMapAssets();
+    const state = getSpeechMapState();
+    const unlocked = speechMapUnlockedCount(state);
+    const doneCount = SPEECH_MAP_TOPICS.filter(topic => state.stars[topic.key]).length;
+
+    const starEl = document.getElementById('mapStarCount');
+    if (starEl) starEl.textContent = storeBalance(getStarState());
+
+    const levelChip = document.getElementById('mapLevelChip');
+    if (levelChip) {
+        const levelLabel = state.level ? t(THERAPY_LEVELS[state.level].labelKey) : '—';
+        levelChip.textContent = t('map_level_chip').replace('{level}', levelLabel);
+    }
+
+    const progressLabel = document.getElementById('mapProgressCount');
+    if (progressLabel) progressLabel.textContent = `${doneCount}/${SPEECH_MAP_TOPICS.length}`;
+    const progressFill = document.getElementById('mapProgressFill');
+    if (progressFill) progressFill.style.width = Math.round((doneCount / SPEECH_MAP_TOPICS.length) * 100) + '%';
+
+    const trail = document.getElementById('mapTrail');
+    if (!trail) return;
+    trail.querySelectorAll('.map-node').forEach(node => node.remove());
+
+    SPEECH_MAP_TOPICS.forEach((topic, i) => {
+        const isLast = i === SPEECH_MAP_TOPICS.length - 1;
+        const row = Math.floor(i / 3);
+        const col = isLast ? 1 : (row % 2 ? 2 - (i % 3) : i % 3);
+        const stars = state.stars[topic.key] || 0;
+        const status = stars ? 'done' : (i < unlocked ? 'current' : 'locked');
+
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'map-node map-node-' + status;
+        btn.style.gridRow = String(row + 1);
+        btn.style.gridColumn = String(col + 1);
+        btn.dataset.topic = topic.key;
+        if (status === 'locked') btn.setAttribute('aria-disabled', 'true');
+        btn.setAttribute('aria-label', `${i + 1}. ${topic.label}`);
+        btn.onclick = () => onMapNodeTap(topic.key);
+        btn.innerHTML = `
+            <span class="map-node-num">${i + 1}</span>
+            <span class="map-node-circle">
+                <img class="map-node-img" src="${_mapAssetState === 'ready' ? 'map-assets/node-' + topic.key + '.jpg' : 'avatar.png'}" alt="" onerror="this.onerror=null;this.src='avatar.png'">
+                ${status === 'locked' ? '<span class="map-node-lock">🔒</span>' : ''}
+                ${status === 'done' ? '<span class="map-node-check">✓</span>' : ''}
+                ${status === 'current' ? '<span class="map-node-flag">🚩</span>' : ''}
+            </span>
+            <span class="map-node-plate">
+                <span class="map-node-label">${topic.label}</span>
+                ${status === 'done' ? `<span class="map-node-stars">${'⭐'.repeat(stars)}</span>` : ''}
+            </span>`;
+        trail.appendChild(btn);
+    });
+
+    requestAnimationFrame(drawMapPath);
+}
+
+function drawMapPath() {
+    const trail = document.getElementById('mapTrail');
+    const road = document.getElementById('mapRoad');
+    const roadDash = document.getElementById('mapRoadDash');
+    const svg = document.getElementById('mapPathSvg');
+    if (!trail || !road || !roadDash || !svg) return;
+    const circles = [...trail.querySelectorAll('.map-node-circle')];
+    if (circles.length < 2) return;
+    const box = trail.getBoundingClientRect();
+    if (!box.width || !box.height) return;
+    svg.setAttribute('viewBox', `0 0 ${box.width} ${box.height}`);
+    const pts = circles.map(el => {
+        const r = el.getBoundingClientRect();
+        return { x: r.left - box.left + r.width / 2, y: r.top - box.top + r.height / 2 };
+    });
+    let d = `M ${pts[0].x} ${pts[0].y}`;
+    for (let i = 1; i < pts.length; i++) {
+        const prev = pts[i - 1];
+        const cur = pts[i];
+        const midX = (prev.x + cur.x) / 2;
+        d += ` C ${midX} ${prev.y}, ${midX} ${cur.y}, ${cur.x} ${cur.y}`;
+    }
+    road.setAttribute('d', d);
+    roadDash.setAttribute('d', d);
+}
+
+window.addEventListener('resize', () => {
+    if (currentScreenId === 'speechmap-screen') drawMapPath();
+});
+
+function onMapNodeTap(topicKey) {
+    const state = getSpeechMapState();
+    const index = SPEECH_MAP_TOPICS.findIndex(topic => topic.key === topicKey);
+    if (index < 0) return;
+    if (index >= speechMapUnlockedCount(state)) {
+        const prev = SPEECH_MAP_TOPICS[index - 1];
+        showToast(t('map_locked_toast').replace('{label}', prev.label));
+        const node = document.querySelector(`.map-node[data-topic="${topicKey}"]`);
+        if (node) {
+            node.classList.remove('shake');
+            void node.offsetWidth;
+            node.classList.add('shake');
+        }
+        return;
+    }
+    if (!state.level) {
+        _pendingMapTopicKey = topicKey;
+        openMapLevelModal();
+        return;
+    }
+    currentTherapyLevelKey = state.level;
+    startMapTopic(topicKey);
+}
+
+function openMapLevelModal() {
+    renderMapLevelOptions();
+    document.getElementById('mapLevelModal').style.display = 'flex';
+}
+
+function closeMapLevelModal() {
+    document.getElementById('mapLevelModal').style.display = 'none';
+    _pendingMapTopicKey = null;
+}
+
+function renderMapLevelOptions() {
+    const active = getSpeechMapState().level || currentTherapyLevelKey;
+    document.querySelectorAll('#mapLevelModal .topic-level-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.level === active);
+    });
+}
+
+function chooseMapLevel(levelKey) {
+    if (!THERAPY_LEVELS[levelKey]) return;
+    currentTherapyLevelKey = levelKey;
+    const s = getSpeechMapState();
+    s.level = levelKey;
+    DB.set(_speechMapKey(), s);
+    document.getElementById('mapLevelModal').style.display = 'none';
+    const pending = _pendingMapTopicKey;
+    _pendingMapTopicKey = null;
+    if (pending) startMapTopic(pending);
+    else renderSpeechMap();
+}
+
+function startMapTopic(topicKey) {
+    const topic = SPEECH_MAP_TOPICS.find(item => item.key === topicKey);
+    if (!topic) return;
+    if (navigator.onLine === false) {
+        showToast(t('offline_action'));
+        return;
+    }
+    if (!guestTryConsume('therapy')) return;
+    currentMapTopic = topic;
+    currentTherapyCategoryKey = topic.category;
     currentTopic = '';
-    _useLocationQuestions = false;
     turnCount = 0;
     currentObj = null;
     chatHistory = [];
     therapySessionCompleted = false;
+    _mapSessionBaseline = {
+        mic: sessionData.micUsedInTherapy || 0,
+        card: sessionData.cardUsedInTherapy || 0,
+        repeat: sessionData.repeatUsed || 0,
+        simplify: sessionData.simplifyUsed || 0
+    };
     resetTherapyQuestionPool();
-    renderTherapyCategories();
-
     const bubbles = document.getElementById('chat-bubbles');
     if (bubbles) bubbles.innerHTML = '';
-
-    if (shouldReload && currentScreenId === 'game-container') {
-        loadNext();
-    }
-}
-
-function focusCityLocation(locationKey) {
-    const location = CITY_LOCATIONS[locationKey];
-    if (!location) return;
-    currentCityLocationKey = locationKey;
-    currentTopic = '';
-    currentTherapyCategoryKey = location.category;
-    _useLocationQuestions = true;
-    resetTherapyQuestionPool();
-    renderCityScene();
-}
-
-function startFocusedCityLocation() {
-    if (!guestTryConsume('therapy')) return;
-    const location = getCurrentCityLocation();
-    currentTopic = '';
-    setTherapyCategory(location.category, false);
-    setTherapySelectionMode(false);
-    renderTherapyCategories();
-    therapySessionCompleted = false;
-    resetTherapyQuestionPool();
-    turnCount = 0;
-    const bubbles = document.getElementById('chat-bubbles');
-    if (bubbles) bubbles.innerHTML = '';
+    showOnly('game-container');
+    document.getElementById('therapyMainCard').style.display = '';
+    document.querySelectorAll('#therapyMainCard .therapy-session-ui').forEach(el => el.style.display = '');
     updateProgressBar();
     const vEl = document.getElementById('v');
     vEl.muted = true;
-    vEl.play().catch(()=>{});
+    vEl.play().catch(() => {});
     loadNext();
-}
-
-function openCityLocation(locationKey) {
-    focusCityLocation(locationKey);
-    startFocusedCityLocation();
 }
 
 function resetIdleTimer() {
@@ -4637,9 +4682,8 @@ async function processTherapySpeech(speech, source) {
     `;
     var aiRes = await getGemmaResponse(speech);
     addMessage(aiRes, "ai");
-    const currentLocation = CITY_LOCATIONS[currentCityLocationKey];
     sessionData.therapyTurns.push({
-        location: currentLocation ? currentLocation.label : '',
+        location: getCurrentMapTopic().label,
         category: categoryLabel,
         question: questionText,
         answer: speech,
@@ -4745,9 +4789,8 @@ async function getGemmaResponse(text) {
     const currentCategory = getCurrentTherapyCategory();
     const currentLevel = getCurrentTherapyLevel();
     const currentGoal = currentObj && currentObj.goal ? currentObj.goal : (_lang === 'en' ? 'clear and concise communication' : 'kısa ve anlaşılır konuşma');
-    const currentLocation = CITY_LOCATIONS[currentCityLocationKey];
     var instructions = _lang === 'en'
-        ? `You are a friendly AAC (Augmentative and Alternative Communication) companion bot working with special-education students on social skills, daily routines, and community life. Your name is Yıldız Can. Current topic: ${currentTopic || currentCategory.label}. Goal for this question: ${currentGoal}. Always remember the student's limited attention and verbal comprehension.
+        ? `You are a friendly AAC (Augmentative and Alternative Communication) companion bot working with special-education students on social skills, daily routines, and community life. Your name is Yıldız Can. Current topic: ${getCurrentMapTopic().label}. Goal for this question: ${currentGoal}. Always remember the student's limited attention and verbal comprehension.
 
 STRICT INTERACTION RULES:
 1. ${currentLevel.replyRuleEn} No long paragraphs, lectures, or conditional advice.
@@ -4756,7 +4799,7 @@ STRICT INTERACTION RULES:
 4. NO ANSWERING FOR THE CHILD: Never generate confirmations or statements on the child's behalf. Always keep control with the student.
 5. PEER-LANGUAGE REDIRECTION: If the student persists with negative behavior, briefly acknowledge the feeling, offer a short peer-appropriate alternative, and change the scene. (e.g. "Getting mad at a game is normal! ⚽ You can say 'I disagree with that call'.") Reply in English only.
 6. SPEECH RECOGNITION (STT) TOLERANCE: Since the student has special needs, tolerate articulation errors, letter omissions, phonetically distorted words, and speech-to-text typos. If the answer is phonetically similar to a correct or logical response, accept it and provide positive reinforcement. Never correct the child's pronunciation or spelling.`
-        : `Sen özel eğitim öğrencileriyle sosyal uyum, kurallar ve günlük yaşam rutinleri çalışan, çok kısa ve somut konuşan bir AAC (Alternatif İletişim) oyun arkadaşı botsun. Adın Yıldız Can. Çalışılan konu: ${currentTopic || currentCategory.label}. Bu sorunun hedefi: ${currentGoal}. Öğrencinin dikkat ve sözel anlama sınırililiklerini asla unutma.
+        : `Sen özel eğitim öğrencileriyle sosyal uyum, kurallar ve günlük yaşam rutinleri çalışan, çok kısa ve somut konuşan bir AAC (Alternatif İletişim) oyun arkadaşı botsun. Adın Yıldız Can. Çalışılan konu: ${getCurrentMapTopic().label}. Bu sorunun hedefi: ${currentGoal}. Öğrencinin dikkat ve sözel anlama sınırililiklerini asla unutma.
 
 KATI ETKİLEŞİM VE DİL KURALLARI:
 1. TEK CÜMLE KURALI: Her cevabın MAKSİMUM 1 kısa cümleden oluşmalıdır (En fazla 6-7 kelime). Asla uzun paragraflar, didaktik açıklamalar veya şartlı nasihatler yapma.
@@ -4767,7 +4810,7 @@ KATI ETKİLEŞİM VE DİL KURALLARI:
 6. SES TANIMA VE FONETİK TOLERANS: Öğrencinin özel gereksinimleri olduğu için artikülasyon (harf/hece yutma), yarım konuşma, kekemelik kaynaklı hataları ve ses tanıma yazılımının (STT) kelime çevrim hatalarını tolere et. Eğer cevap fonetik/sesletim olarak doğru veya mantıklı bir cevaba benziyorsa, bunu doğru kabul et ve olumlu pekiştireç ver. Çocuğun telaffuzunu veya kelime hatalarını düzeltmeye çalışma.`;
 
     if (_lang !== 'en') {
-        instructions = `Sen özel eğitim öğrencileriyle sosyal uyum, kurallar ve günlük yaşam rutinleri çalışan, çok kısa ve somut konuşan bir AAC (Alternatif İletişim) oyun arkadaşı botsun. Adın Yıldız Can. Çalışılan konu: ${currentTopic || currentCategory.label}. Bu sorunun hedefi: ${currentGoal}. Öğrencinin dikkat ve sözel anlama sınırlılıklarını asla unutma.
+        instructions = `Sen özel eğitim öğrencileriyle sosyal uyum, kurallar ve günlük yaşam rutinleri çalışan, çok kısa ve somut konuşan bir AAC (Alternatif İletişim) oyun arkadaşı botsun. Adın Yıldız Can. Çalışılan konu: ${getCurrentMapTopic().label}. Bu sorunun hedefi: ${currentGoal}. Öğrencinin dikkat ve sözel anlama sınırlılıklarını asla unutma.
 
 KATI ETKİLEŞİM VE DİL KURALLARI:
 1. ${currentLevel.replyRuleTr} Asla uzun paragraflar, didaktik açıklamalar veya şartlı nasihatler yapma.
@@ -6414,13 +6457,11 @@ window.setLang = setLang;
 window.continueAsGuest = continueAsGuest;
 window.goToMenu = goToMenu;
 window.goToTherapy = goToTherapy;
-window.setTopicChip = setTopicChip;
-window.setTherapyLevel = setTherapyLevel;
-window.startTherapyWithTopic = startTherapyWithTopic;
-window.setTherapyCategory = setTherapyCategory;
-window.focusCityLocation = focusCityLocation;
-window.startFocusedCityLocation = startFocusedCityLocation;
-window.openCityLocation = openCityLocation;
+window.onMapNodeTap = onMapNodeTap;
+window.openMapLevelModal = openMapLevelModal;
+window.closeMapLevelModal = closeMapLevelModal;
+window.chooseMapLevel = chooseMapLevel;
+window.returnToMapFromComplete = returnToMapFromComplete;
 window.goToReport = goToReport;
 window.rec = rec;
 window.loadNext = loadNext;
@@ -6694,7 +6735,6 @@ function onAuthSuccessWithStudent(student) {
     if (greetEl) greetEl.textContent = t('menu_greeting_named').replace('{name}', student.name);
     document.body.classList.add('has-bottom-nav');
     showOnly('menu-screen');
-    renderCityScene();
     syncUserDataFromCloud();
 }
 

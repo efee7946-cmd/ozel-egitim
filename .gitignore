@@ -9,3 +9,4 @@ android/app/keystore.jks
 www/
 bin/
 
+map-assets/*.png

@@ -126,7 +126,7 @@ test.describe('Kayıt, giriş ve veri eşitleme akışları', () => {
       && (req.postData() || '').includes('"key":"students_demo"'));
     await page.check('#loginVeliConsent');
     await page.click('#loginSaveBtn');
-    await page.waitForSelector('#topicOverlay', { state: 'visible', timeout: 8000 });
+    await page.waitForSelector('#speechmap-screen', { state: 'visible', timeout: 8000 });
 
     // Hassas anahtar cihazda ve ağda şifreli (ENC1:), sunucu düz metin görmez
     const stored = await page.evaluate(() => localStorage.getItem('lms_students_demo'));
@@ -159,7 +159,7 @@ test.describe('Kayıt, giriş ve veri eşitleme akışları', () => {
     await page.click('#loginSaveBtn');
 
     // Bulut kapalı olsa da ilk pratik akışı açılır ve veri cihazda durur
-    await page.waitForSelector('#topicOverlay', { state: 'visible', timeout: 8000 });
+    await page.waitForSelector('#speechmap-screen', { state: 'visible', timeout: 8000 });
     const stored = await page.evaluate(() => localStorage.getItem('lms_students_demo'));
     expect(stored.startsWith('ENC1:')).toBe(true);
     const student = await page.evaluate(() => window.DB.getSync('students_demo')[0]);
