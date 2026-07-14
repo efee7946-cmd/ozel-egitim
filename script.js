@@ -5250,8 +5250,8 @@ const STORE_CATS = ['hat', 'face', 'neck'];
 function _starsKey() { return 'stars_' + (activeStudentId || 'default'); }
 function getStarState() {
     const s = DB.getSync(_starsKey()) || {};
-    s.total = s.total || 0;
-    s.spent = s.spent || 0;
+    s.total = Number(s.total) || 0;
+    s.spent = Number(s.spent) || 0;
     s.owned = Array.isArray(s.owned) ? s.owned : [];
     s.equipped = s.equipped || null;
     if (s.equipped && !s.owned.includes(s.equipped)) s.owned.push(s.equipped);
