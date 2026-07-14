@@ -65,6 +65,8 @@ const DB = (function () {
         return Array.from(new Set((Array.isArray(values) ? values : []).filter(v => v !== undefined && v !== null)));
     }
 
+    function toNum(v) { return Number(v) || 0; }
+
     function mergeByIdentity(remote, local, identify, limit) {
         const order = [];
         const map = new Map();
@@ -109,13 +111,13 @@ const DB = (function () {
         const baseState = base || {};
         const remoteState = remote || {};
         const localState = local || {};
-        const totalDelta = Math.max(0, (localState.total || 0) - (baseState.total || 0));
-        const spentDelta = Math.max(0, (localState.spent || 0) - (baseState.spent || 0));
+        const totalDelta = Math.max(0, toNum(localState.total) - toNum(baseState.total));
+        const spentDelta = Math.max(0, toNum(localState.spent) - toNum(baseState.spent));
         const addedOwned = (Array.isArray(localState.owned) ? localState.owned : [])
             .filter(id => !(Array.isArray(baseState.owned) ? baseState.owned : []).includes(id));
         const merged = {
-            total: Math.max(0, (remoteState.total || 0) + totalDelta),
-            spent: Math.max(0, (remoteState.spent || 0) + spentDelta),
+            total: Math.max(0, toNum(remoteState.total) + totalDelta),
+            spent: Math.max(0, toNum(remoteState.spent) + spentDelta),
             owned: uniqueList([...(remoteState.owned || []), ...addedOwned]),
             equipped: remoteState.equipped || null,
         };
@@ -139,20 +141,20 @@ const DB = (function () {
             const baseCat = (baseState.categoryStats || {})[cat] || {};
             const remoteCat = (remoteState.categoryStats || {})[cat] || { turns: 0, simplify: 0, noResponse: 0 };
             const localCat = (localState.categoryStats || {})[cat] || {};
-            const turnsDelta = Math.max(0, (localCat.turns || 0) - (baseCat.turns || 0));
-            const simplifyDelta = Math.max(0, (localCat.simplify || 0) - (baseCat.simplify || 0));
-            const noResponseDelta = Math.max(0, (localCat.noResponse || 0) - (baseCat.noResponse || 0));
+            const turnsDelta = Math.max(0, toNum(localCat.turns) - toNum(baseCat.turns));
+            const simplifyDelta = Math.max(0, toNum(localCat.simplify) - toNum(baseCat.simplify));
+            const noResponseDelta = Math.max(0, toNum(localCat.noResponse) - toNum(baseCat.noResponse));
             mergedStats[cat] = {
-                turns: Math.max(0, (remoteCat.turns || 0) + turnsDelta),
-                simplify: Math.max(0, (remoteCat.simplify || 0) + simplifyDelta),
-                noResponse: Math.max(0, (remoteCat.noResponse || 0) + noResponseDelta),
+                turns: Math.max(0, toNum(remoteCat.turns) + turnsDelta),
+                simplify: Math.max(0, toNum(remoteCat.simplify) + simplifyDelta),
+                noResponse: Math.max(0, toNum(remoteCat.noResponse) + noResponseDelta),
             };
         });
         return {
             categoryStats: mergedStats,
-            simplifyTotal: Math.max(0, (remoteState.simplifyTotal || 0) + Math.max(0, (localState.simplifyTotal || 0) - (baseState.simplifyTotal || 0))),
-            totalTurns: Math.max(0, (remoteState.totalTurns || 0) + Math.max(0, (localState.totalTurns || 0) - (baseState.totalTurns || 0))),
-            totalSessions: Math.max(0, (remoteState.totalSessions || 0) + Math.max(0, (localState.totalSessions || 0) - (baseState.totalSessions || 0))),
+            simplifyTotal: Math.max(0, toNum(remoteState.simplifyTotal) + Math.max(0, toNum(localState.simplifyTotal) - toNum(baseState.simplifyTotal))),
+            totalTurns: Math.max(0, toNum(remoteState.totalTurns) + Math.max(0, toNum(localState.totalTurns) - toNum(baseState.totalTurns))),
+            totalSessions: Math.max(0, toNum(remoteState.totalSessions) + Math.max(0, toNum(localState.totalSessions) - toNum(baseState.totalSessions))),
             updatedAt: localState.updatedAt || remoteState.updatedAt || new Date().toISOString(),
         };
     }
