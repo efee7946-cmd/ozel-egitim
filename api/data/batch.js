@@ -35,9 +35,13 @@ export default async function handler(req, res) {
             const result = keys.map(key => {
                 const scoped = `${username}:${key}`;
                 const row = rowMap.get(scoped);
+                let value = null;
+                if (row && row.value != null) {
+                    try { value = JSON.parse(row.value); } catch { value = row.value; }
+                }
                 return {
                     key,
-                    value: row ? row.value : null,
+                    value,
                     updatedAt: row ? row.updated_at : null,
                 };
             });

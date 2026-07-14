@@ -553,12 +553,13 @@ const DB = (function () {
 
                     const localTs = _tsGet(key);
                     const localVal = getLocalValue(key);
+                    const localCorrupt = typeof localVal === 'string' && remote.value !== null && typeof remote.value === 'object';
 
                     if (remote.value === null) {
-                        if (localVal !== null) writes.push({ key, value: localVal });
+                        if (localVal !== null && !localCorrupt) writes.push({ key, value: localVal });
                         continue;
                     }
-                    if (localVal === null || remote.ts > localTs + SKEW_MS) {
+                    if (localVal === null || localCorrupt || remote.ts > localTs + SKEW_MS) {
                         if (isSensitive(key)) { ssPut(key, remote.value); lsPut(key, remote.value); }
                         else { try { localStorage.setItem(PFX + key, JSON.stringify(remote.value)); } catch {} }
                         _tsSet(key, remote.ts);
