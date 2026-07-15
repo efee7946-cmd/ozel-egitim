@@ -3145,12 +3145,15 @@ function renderStudentList() {
 
     statusEl.textContent = t('select_or_add_student');
     listEl.innerHTML = studentsCache.map(student => `
-        <button type="button" class="student-card ${student.id === activeStudentId ? 'active' : ''}" onclick="selectStudent('${escapeHtml(student.id)}')">
+        <button type="button" class="student-card ${student.id === activeStudentId ? 'active' : ''}" data-student-id="${escapeHtml(student.id)}">
             <h4>${escapeHtml(student.full_name) || t('sd_unnamed')}</h4>
             <p>${escapeHtml(student.support_notes) || t('sd_note_empty')}</p>
             <span class="student-card-meta">${student.birth_year ? t('sd_birth_year').replace('{y}', escapeHtml(String(student.birth_year))) : t('sd_birth_missing')}</span>
         </button>
     `).join('');
+    listEl.querySelectorAll('.student-card').forEach(btn => {
+        btn.addEventListener('click', () => selectStudent(btn.dataset.studentId));
+    });
     renderRoleDashboard();
     renderStudentDetailPanel();
 }
@@ -6163,7 +6166,6 @@ async function checkAuthSession() {
             _authUser  = savedUser;
             await DB.initEncryption(savedDataKey || savedToken).catch(() => {});
             const res = await authApi('verify', { token: savedToken });
-            hideSplash();
             if (res && !res.valid && !res.fallback) {
                 DB.del(authStorageKey());
                 DB.del(authUserStorageKey());
@@ -6172,6 +6174,7 @@ async function checkAuthSession() {
                 _authToken = null;
                 _authUser  = null;
                 showOnly('auth-screen');
+                hideSplash();
                 return;
             }
             if (res && res.valid) {
@@ -6196,6 +6199,7 @@ async function checkAuthSession() {
                     document.getElementById('authError').textContent = '';
                     switchAuthTab('login');
                     showEmailVerifyModal(null, false, true, 'logout');
+                    hideSplash();
                     return;
                 }
                 if (!res.hasEmail) {
@@ -6204,11 +6208,13 @@ async function checkAuthSession() {
                     document.getElementById('authError').textContent = '';
                     switchAuthTab('login');
                     showSetEmailModal(true, 'logout');
+                    hideSplash();
                     return;
                 }
             }
             if (res && res.fallback) setTimeout(() => showToast(t('offline_toast')), 800);
             await continueAuthenticatedEntry();
+            hideSplash();
             return;
         }
     } catch (e) {}

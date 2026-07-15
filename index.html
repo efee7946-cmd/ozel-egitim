@@ -459,15 +459,22 @@
     </div>
 </div>
 
-<!-- Auto-skip auth: show menu directly on page load -->
+<!-- Kayıtlı oturum varsa ekranı checkAuthSession() seçer; burada giriş formunu
+     açmak splash kalktığında kısa süreli login sıçramasına yol açar -->
 <script>
 document.addEventListener('DOMContentLoaded', function(){
     const hide = id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; };
     ['start-screen','student-setup-screen','menu-screen','game-container',
      'speechmap-screen','schedule-screen','aac-screen','store-screen','object-screen',
      'login-screen','analysis-screen'].forEach(hide);
-    const authEl = document.getElementById('auth-screen');
-    if (authEl) authEl.style.display = 'flex';
+    let hasSavedSession = false;
+    try {
+        hasSavedSession = !!localStorage.getItem('lms_auth_token') && !!localStorage.getItem('lms_auth_user');
+    } catch (_) {}
+    if (!hasSavedSession) {
+        const authEl = document.getElementById('auth-screen');
+        if (authEl) authEl.style.display = 'flex';
+    }
 });
 </script>
 <!-- ===================== KONU HARİTASI ===================== -->
@@ -587,8 +594,8 @@ document.addEventListener('DOMContentLoaded', function(){
 </div>
 <!-- ===================== NESNE TANIMA ===================== -->
 <div id="object-screen">
-    <button class="btn-back" onclick="goToMenu()"><span data-i18n="back_menu">← Menü</span></button>
     <div class="object-wrapper">
+        <button class="btn-back" onclick="goToMenu()"><span data-i18n="back_menu">← Menü</span></button>
         <div class="object-header">
             <h2 data-i18n="object_title">🔍 Nesne Tanıma</h2>
             <span class="object-progress-badge" id="objProgress">1 / 3</span>
@@ -622,8 +629,8 @@ document.addEventListener('DOMContentLoaded', function(){
 
 <!-- ===================== GİYİM MAĞAZASI ===================== -->
 <div id="store-screen">
-    <button class="btn-back" onclick="goToMenu()"><span data-i18n="back_menu">← Menü</span></button>
     <div class="store-wrapper">
+        <button class="btn-back" onclick="goToMenu()"><span data-i18n="back_menu">← Menü</span></button>
         <div class="store-header">
             <h2 data-i18n="store_title">🏪 Giyim Mağazası</h2>
             <div class="store-balance" id="storeBalance">⭐ 0</div>
@@ -848,8 +855,8 @@ document.addEventListener('DOMContentLoaded', function(){
 
 <!-- ===================== GÜNLÜK PROGRAM ===================== -->
 <div id="schedule-screen">
-    <button class="btn-back" onclick="goToMenu()"><span data-i18n="back_menu">← Menü</span></button>
     <div class="schedule-wrapper">
+        <button class="btn-back" onclick="goToMenu()"><span data-i18n="back_menu">← Menü</span></button>
         <div class="schedule-header">
             <div class="schedule-title-row">
                 <h2 class="schedule-title" data-i18n="schedule_screen_title">🎯 Günlük Görevler</h2>
