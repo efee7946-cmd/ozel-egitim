@@ -38,24 +38,7 @@ export default async function handler(req, res) {
             const { key } = req.query;
             if (!key) return res.status(400).json({ error: 'key gerekli' });
             const scoped = `${username}:${key}`;
-            let rows = await query('SELECT value, updated_at FROM app_data WHERE user_key = $1', [scoped]);
-
-            // Geçiş köprüsü: eski (kapsamsız) bep_profile_<kullanıcıadı> anahtarını taşı.
-            // Tam eşleşme şart — aksi halde başka bir kullanıcının adı bu
-            // kullanıcının key'ine alt dizge olarak denk gelirse (örn. "def"
-            // kullanıcısı "sometarget:stars_default" isteyip ".includes"
-            // ile kapsamsız bir kaydı okuyabilirdi) yetkisiz veri erişimi olurdu.
-            if (!rows.length && key === `bep_profile_${username}`) {
-                const legacy = await query('SELECT value, updated_at FROM app_data WHERE user_key = $1', [key]);
-                if (legacy.length) {
-                    await query(
-                        `INSERT INTO app_data (user_key, value, updated_at) VALUES ($1, $2, $3)
-                         ON CONFLICT (user_key) DO NOTHING`,
-                        [scoped, legacy[0].value, legacy[0].updated_at]
-                    );
-                    rows = legacy;
-                }
-            }
+            const rows = await query('SELECT value, updated_at FROM app_data WHERE user_key = $1', [scoped]);
 
             const raw = rows.length ? rows[0].value : null;
             let value = null;
