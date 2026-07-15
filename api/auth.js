@@ -28,20 +28,13 @@ function getClientIp(req) {
     return req.socket?.remoteAddress || 'unknown';
 }
 
-// Pepper ayarlı değilse sessizce zayıf bir sabite düşmek yerine hata ver —
-// sızan bir users tablosunun çevrimdışı kırılmasını engelleyen tek şey bu.
-// Değeri değiştirilemez: _legacyHash'in ürettiği mevcut hash'ler geçersiz olur.
+// Pepper ayarlı değilse sessizce bir sabite düşmek yerine hata ver.
+// Tek tüketici hashDeviceId; değiştirilirse mevcut guest_devices satırları
+// karşılıksız kalır (misafirler sıfır kotayla yeniden başlar), parola etkilenmez.
 function authPepper() {
     const pepper = process.env.AUTH_PEPPER;
     if (!pepper) throw new Error('AUTH_PEPPER tanımlı değil');
     return pepper;
-}
-
-// Legacy SHA-256 — kullanıcı geçişi sırasında kontrol için korunuyor
-function _legacyHash(password, salt) {
-    return crypto.createHash('sha256')
-        .update(salt + ':' + password + ':' + authPepper())
-        .digest('hex');
 }
 
 function expiresAt() {
@@ -289,15 +282,10 @@ export default async function handler(req, res) {
             if (user.lock_until && new Date(user.lock_until) > new Date())
                 return res.status(429).json({ error: 'AUTH_TOO_MANY_ATTEMPTS' });
 
-            let valid = false;
-            let needsMigration = false;
-
-            if (user.hash.startsWith('$2')) {
-                valid = await bcrypt.compare(password, user.hash);
-            } else {
-                valid = _legacyHash(password, user.salt) === user.hash;
-                if (valid) needsMigration = true;
-            }
+            // bcrypt öncesi SHA-256 hesaplar 2026-07-15'te bırakıldı; kalan
+            // kayıtlar e-posta ile şifre sıfırlayarak bcrypt'e geçer.
+            const valid = user.hash.startsWith('$2')
+                && await bcrypt.compare(password, user.hash);
 
             if (!valid) {
                 const fails = (user.failed_logins || 0) + 1;
@@ -314,12 +302,6 @@ export default async function handler(req, res) {
 
             if (user.failed_logins || user.lock_until)
                 await query('UPDATE users SET failed_logins = 0, lock_until = NULL WHERE username = $1', [u]);
-
-            // SHA-256 kullanan eski hesabı bcrypt'e geçir
-            if (needsMigration) {
-                const newHash = await bcrypt.hash(password, BCRYPT_ROUNDS);
-                await query('UPDATE users SET hash = $1, salt = $2 WHERE username = $3', [newHash, '', u]);
-            }
 
             const tok = crypto.randomBytes(32).toString('hex');
             const dataKey = await unwrapDataKey(u, user.data_key);
