@@ -28,4 +28,12 @@ for (const file of files) {
 cpSync(resolve(__dirname, 'models', 'objects'), resolve(wwwDir, 'models', 'objects'), { recursive: true });
 console.log('  copied: models/objects/');
 
+for (const dir of ['aac-assets', 'map-assets']) {
+    cpSync(resolve(__dirname, dir), resolve(wwwDir, dir), {
+        recursive: true,
+        filter: (src) => !src.endsWith('.png') && !src.endsWith('PROMPTS.md'),
+    });
+    console.log(`  copied: ${dir}/`);
+}
+
 console.log('\nBuild tamamlandi -> www/');

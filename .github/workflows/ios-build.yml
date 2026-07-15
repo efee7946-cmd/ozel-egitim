@@ -21,6 +21,8 @@ on:
       - 'avatar3d.js'
       - 'bear_avatar.glb'
       - 'models/**'
+      - 'aac-assets/**'
+      - 'map-assets/**'
   workflow_dispatch:
     inputs:
       testflight:
