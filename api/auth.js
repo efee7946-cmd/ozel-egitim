@@ -28,11 +28,19 @@ function getClientIp(req) {
     return req.socket?.remoteAddress || 'unknown';
 }
 
+// Pepper ayarlı değilse sessizce zayıf bir sabite düşmek yerine hata ver —
+// sızan bir users tablosunun çevrimdışı kırılmasını engelleyen tek şey bu.
+// Değeri değiştirilemez: _legacyHash'in ürettiği mevcut hash'ler geçersiz olur.
+function authPepper() {
+    const pepper = process.env.AUTH_PEPPER;
+    if (!pepper) throw new Error('AUTH_PEPPER tanımlı değil');
+    return pepper;
+}
+
 // Legacy SHA-256 — kullanıcı geçişi sırasında kontrol için korunuyor
 function _legacyHash(password, salt) {
-    const pepper = process.env.AUTH_PEPPER || 'yz2026';
     return crypto.createHash('sha256')
-        .update(salt + ':' + password + ':' + pepper)
+        .update(salt + ':' + password + ':' + authPepper())
         .digest('hex');
 }
 
@@ -182,8 +190,7 @@ async function ensureGuestTable() {
 }
 
 function hashDeviceId(rawId) {
-    const pepper = process.env.AUTH_PEPPER || 'yz2026';
-    return crypto.createHash('sha256').update('guest_device:' + pepper + ':' + rawId).digest('hex');
+    return crypto.createHash('sha256').update('guest_device:' + authPepper() + ':' + rawId).digest('hex');
 }
 
 // Doğrulama kodu üretir, kaydeder ve e-postayla gönderir (best-effort)

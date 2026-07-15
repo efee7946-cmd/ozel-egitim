@@ -11,7 +11,25 @@ const app = express();
 const port = 3000;
 
 app.use(express.json());
-app.use(express.static(__dirname));
+
+// Depo kökünü servis etme — 0.0.0.0'a bağlandığımız için kökteki her dosya
+// (android/app/keystore.jks dahil) yerel ağa açılır. Yalnızca uygulamanın
+// gerçekten istediği dosyalar servis edilir.
+const STATIC_FILES = [
+    'index.html', 'error.html', 'privacy.html', 'gizlilik.html',
+    'destek.html', 'delete-account.html',
+    'script.js', 'style.css', 'aac.css', 'aac-data.js', 'db-client.js',
+    'avatar3d.js', 'sw.js', 'avatar.png', 'bear_avatar.glb',
+];
+const STATIC_DIRS = ['aac-assets', 'map-assets', 'models', 'store-assets'];
+
+app.get('/', (_req, res) => res.sendFile(path.join(__dirname, 'index.html')));
+for (const file of STATIC_FILES) {
+    app.get('/' + file, (_req, res) => res.sendFile(path.join(__dirname, file)));
+}
+for (const dir of STATIC_DIRS) {
+    app.use('/' + dir, express.static(path.join(__dirname, dir)));
+}
 
 app.post('/api/chat', (req, res) => {
     res.json({ candidates: [{ content: { parts: [{ text: "Bu lokal test ortamı cevabıdır." }] } }] });

@@ -1,6 +1,9 @@
 // Ortak oturum doğrulama — token'lı uçlar (auth, data, chat, tts, photo, video) buradan import eder.
 // Token'lar DB'de SHA-256 hash'iyle saklanır; tablo sızsa bile aktif oturumlar çalınamaz.
-// Eski (düz metin) oturum kayıtları ilk kullanımda hash'e taşınır.
+//
+// Düz metin token ile hash'i ayırt edilemez (ikisi de 64 hex karakter), bu yüzden
+// ham girdiyi token sütunuyla karşılaştıran bir "eski kayıt" dalı eklenmemeli:
+// sızan bir hash doğrudan bearer token olarak kullanılabilir hale gelir.
 
 import crypto from 'crypto';
 import { query } from './_db.js';
@@ -12,12 +15,8 @@ export function hashToken(token) {
 export async function resolveToken(token) {
     if (!token) return null;
     const hashed = hashToken(token);
-    const byHash = await query('SELECT 1 FROM sessions WHERE token = $1 AND expires_at > now()', [hashed]);
-    if (byHash.length) return hashed;
-    const legacy = await query('SELECT 1 FROM sessions WHERE token = $1 AND expires_at > now()', [token]);
-    if (!legacy.length) return null;
-    await query('UPDATE sessions SET token = $1 WHERE token = $2', [hashed, token]);
-    return hashed;
+    const rows = await query('SELECT 1 FROM sessions WHERE token = $1 AND expires_at > now()', [hashed]);
+    return rows.length ? hashed : null;
 }
 
 export function bearerToken(req) {
@@ -63,10 +62,12 @@ export async function guestCallAllowed(req, column, cap) {
     const token = bearerToken(req);
     const g = await guestByToken(token);
     if (!g) return null;
-    if ((g[column] || 0) >= cap) return null;
-    await query(
-        `UPDATE guest_devices SET ${column} = ${column} + 1, last_seen = now() WHERE device_hash = $1`,
-        [g.device_hash]
+    const rows = await query(
+        `UPDATE guest_devices SET ${column} = ${column} + 1, last_seen = now()
+         WHERE device_hash = $1 AND ${column} < $2
+         RETURNING ${column}`,
+        [g.device_hash, cap]
     );
+    if (!rows.length) return null;
     return 'guest:' + g.device_hash.slice(0, 16);
 }
