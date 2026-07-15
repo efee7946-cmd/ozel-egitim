@@ -6,9 +6,11 @@
 ## Çalıştırma
 ```bash
 npm install
+npm run build         # Piper TTS binary + ses modellerini bin/ altına indirir (zorunlu)
 node server.js        # http://localhost:3000
 npm test              # Playwright e2e testleri
 ```
+`npm run build` atlanırsa uygulama açılır ama `/api/tts` `TTS_ENGINE_MISSING` döner.
 
 ## Temel Dosyalar
 - `index.html` — Tüm ekranların HTML'i (tek sayfa, ~1250 satır)
@@ -16,7 +18,9 @@ npm test              # Playwright e2e testleri
 - `style.css` — Tasarım sistemi (~5500 satır)
 - `db-client.js` — localStorage + sessionStorage (şifreli cache) + `/api/data` (Aiven Postgres) çift modlu veri katmanı
 - `server.js` — Express geliştirme sunucusu (port 3000)
-- `api/` — Vercel serverless fonksiyonlar (`auth`, `data`, `chat`, `tts`, `video`, `photo`, `log`, ve dahili `_db`/`_auth`/`_mail`)
+- `aac-data.js` — AAC panoları (`ALL_BOARDS_TR` / `ALL_BOARDS_EN`, ~130 kart); salt okunur, sunucuya yazılmaz
+- `api/` — Vercel serverless fonksiyonlar (`auth`, `data`, `chat`, `tts`, `video`, `log`, ve dahili `_db`/`_auth`/`_mail`). `api/photo.js` duruyor ama çağıran kod yok — ölü.
+- `piper-config.json` + `scripts/setup-piper.js` — Piper TTS model yapılandırması ve indirici; `bin/` build'de oluşur, repoda yoktur
 - `models/objects/*.glb` — Nesne Tanıma için Blender'da üretilen 3D modeller
 
 ## State Yönetimi
@@ -30,7 +34,7 @@ Tüm anahtarlar `lms_` öneki ile başlar: `lms_students`, `lms_obj_results_<stu
 
 ## Dış API'ler
 - `GEMINI_KEY` — Google Gemini (konuşma pratiği geri bildirimi, veli raporu)
-- `GOOGLE_TTS_CREDENTIALS` — Google Cloud TTS (Chirp 3 HD) servis hesabı JSON'ı
+- TTS için env yok — seslendirme **Piper** ile sunucuda yerel yapılır (`api/tts.js`, `tr_TR-dfki-medium` / `en_US-lessac-medium`). Bulut TTS servisi kullanılmaz; gizlilik politikası da bunu böyle beyan eder.
 - `PEXELS_KEY` — Pexels fotoğraf/video
 - `GMAIL_USER` + `GMAIL_APP_PASSWORD` — Gmail SMTP (şifre sıfırlama/doğrulama kodları)
 - `DATABASE_URL` — PostgreSQL/Aiven bağlantısı
