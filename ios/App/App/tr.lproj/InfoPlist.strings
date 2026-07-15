@@ -1,0 +1,2 @@
+"NSMicrophoneUsageDescription" = "Mikrofon, konuşma pratiği etkinliklerinde çocuğun sesini duymak için kullanılır.";
+"NSSpeechRecognitionUsageDescription" = "Konuşma tanıma, çocuğun söylediklerini yazıya çevirip etkinliğin geri bildirim verebilmesi için kullanılır.";

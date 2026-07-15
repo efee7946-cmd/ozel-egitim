@@ -3,7 +3,12 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
-	<string>tr</string>
+	<string>en</string>
+	<key>CFBundleLocalizations</key>
+	<array>
+		<string>en</string>
+		<string>tr</string>
+	</array>
 	<key>CFBundleDisplayName</key>
         <string>YıldızCan</string>
 	<key>CFBundleExecutable</key>
@@ -25,9 +30,9 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>Mikrofon, konuşma pratiği etkinliklerinde öğrencinin sesini duymak için kullanılır.</string>
+	<string>The microphone is used to hear the child's voice during speech practice activities.</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
-	<string>Konuşma tanıma, öğrencinin söylediklerini yazıya çevirip etkinliklere geri bildirim vermek için kullanılır.</string>
+	<string>Speech recognition is used to turn what the child says into text so the activity can give feedback.</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>

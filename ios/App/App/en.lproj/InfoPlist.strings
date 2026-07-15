@@ -1,0 +1,2 @@
+"NSMicrophoneUsageDescription" = "The microphone is used to hear the child's voice during speech practice activities.";
+"NSSpeechRecognitionUsageDescription" = "Speech recognition is used to turn what the child says into text so the activity can give feedback.";
