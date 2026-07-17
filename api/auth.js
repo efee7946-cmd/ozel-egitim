@@ -11,6 +11,7 @@ import { sendMail, resetCodeEmailHtml, verifyCodeEmailHtml } from './_mail.js';
 import { checkRateLimit } from './_rateLimit.js';
 import { isPasswordPwned } from './_pwned.js';
 import { allowOrigin } from './_cors.js';
+import { encryptDataKey, unwrapDataKey, ensureDataKey } from './_dataKey.js';
 
 const SESSION_DAYS = 30;
 const BCRYPT_ROUNDS = 12;
@@ -101,64 +102,8 @@ function generateSixDigitCode() {
     return String(crypto.randomInt(100000, 1000000));
 }
 
-// data_key sütunu DATA_KEY_SECRET'tan türetilen anahtarla AES-GCM ile
-// şifrelenir (dk1: öneki). Böylece tek başına DB sızıntısı app_data'daki
-// şifreli verileri çözmeye yetmez; env var yoksa eski (düz metin) davranışa
-// düşülür. Bu uçtan uca şifreleme değildir — sunucu çalışırken anahtarı görür.
-const DK_PREFIX = 'dk1:';
-let _kekWarned = false;
-
-function dataKeyKek() {
-    const secret = process.env.DATA_KEY_SECRET;
-    if (!secret) {
-        if (!_kekWarned) {
-            _kekWarned = true;
-            console.warn('UYARI: DATA_KEY_SECRET tanımlı değil — users.data_key düz metin saklanıyor. Güçlü bir rastgele değer üretip Vercel\'e eklemen önerilir.');
-        }
-        return null;
-    }
-    return crypto.createHash('sha256').update(secret).digest();
-}
-
-function encryptDataKey(plain) {
-    const kek = dataKeyKek();
-    if (!kek) return plain;
-    const iv = crypto.randomBytes(12);
-    const cipher = crypto.createCipheriv('aes-256-gcm', kek, iv);
-    const ct = Buffer.concat([cipher.update(plain, 'utf8'), cipher.final()]);
-    return DK_PREFIX + Buffer.concat([iv, ct, cipher.getAuthTag()]).toString('base64');
-}
-
-function decryptDataKey(stored) {
-    if (!stored || !stored.startsWith(DK_PREFIX)) return stored;
-    const kek = dataKeyKek();
-    if (!kek) throw new Error('data_key şifreli ama DATA_KEY_SECRET tanımlı değil');
-    const buf = Buffer.from(stored.slice(DK_PREFIX.length), 'base64');
-    const iv = buf.subarray(0, 12);
-    const tag = buf.subarray(buf.length - 16);
-    const ct = buf.subarray(12, buf.length - 16);
-    const decipher = crypto.createDecipheriv('aes-256-gcm', kek, iv);
-    decipher.setAuthTag(tag);
-    return Buffer.concat([decipher.update(ct), decipher.final()]).toString('utf8');
-}
-
-async function unwrapDataKey(username, stored) {
-    if (!stored) {
-        const dataKey = crypto.randomBytes(32).toString('hex');
-        await query('UPDATE users SET data_key = $1 WHERE username = $2', [encryptDataKey(dataKey), username]);
-        return dataKey;
-    }
-    const plain = decryptDataKey(stored);
-    if (plain === stored && dataKeyKek()) {
-        await query('UPDATE users SET data_key = $1 WHERE username = $2', [encryptDataKey(plain), username]);
-    }
-    return plain;
-}
-
-async function ensureDataKey(username) {
-    const rows = await query('SELECT data_key FROM users WHERE username = $1', [username]);
-    return unwrapDataKey(username, rows[0]?.data_key);
-}
+// data_key şifreleme/çözme ve app_data ENC1 çözme ./_dataKey.js'e taşındı —
+// admin.js (okuma yolu) ile tek kaynaktan paylaşılıyor.
 
 // Misafir deneme hakları cihaz kimliğine bağlıdır: Android'de ANDROID_ID
 // uygulama silinip yeniden kurulsa da değişmez, bu yüzden hak sıfırlanmaz.
