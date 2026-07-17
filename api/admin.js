@@ -1,6 +1,7 @@
 // Yönetim paneli okuma API'si — YıldızCan verisini çapraz kullanıcı okur.
-// ADMIN_KEY ile korunur (x-admin-key header, log.js ile aynı desen). Sunucudan
-// sunucuya çağrılır (.NET paneli); tarayıcıya ADMIN_KEY asla inmemeli.
+// ADMIN_API_KEY ile korunur (x-admin-key header, log.js deseniyle aynı ama AYRI
+// anahtar: log görüntüleme key'i sızsa bile PII açılmasın). Sunucudan sunucuya
+// çağrılır (.NET paneli); anahtar tarayıcıya asla inmemeli.
 //
 // Yalnızca okuma (GET). Yazma/işaretleme v2'ye ait.
 // Öğrenci rosteri ve adaptive verisi app_data'da ENC1 şifreli — _dataKey.js ile
@@ -26,7 +27,9 @@ function safeCompare(a, b) {
 }
 
 function requireAdmin(req) {
-    const adminKey = process.env.ADMIN_KEY;
+    // /api/log'un ADMIN_KEY'inden ayrı: admin PII endpoint'i kendi anahtarını ister.
+    // Ayarlı değilse fail-closed (401).
+    const adminKey = process.env.ADMIN_API_KEY;
     // Sadece header — query string tarayıcı geçmişine/loglara/Referer'a sızabilir.
     const provided = req.headers['x-admin-key'];
     return !!adminKey && !!provided && safeCompare(provided, adminKey);

@@ -38,7 +38,7 @@ Amaç *hız değil öğrenme* — hız olsaydı mevcut Node stack'ine admin sayf
 
 Tek Vercel fonksiyonu `api/admin.js`, `?resource=` ile yönlendirir (data.js'in `?key=` stiliyle uyumlu).
 Auth: `x-admin-key` header + `timingSafeEqual` ([log.js](api/log.js#L77-L84) deseni). Sadece GET, `Cache-Control: no-store`,
-her okuma `console.log('[admin] …')` ile loglanır. Sunucudan sunucuya çağrılır; `ADMIN_KEY` tarayıcıya inmez.
+her okuma `console.log('[admin] …')` ile loglanır. Sunucudan sunucuya çağrılır; `ADMIN_API_KEY` tarayıcıya inmez.
 
 **PII kararı:** Çözülüyor. Öğrenci rosteri (`students`) ve `adaptive_` app_data'da `ENC1:` şifreli;
 `api/_dataKey.js` kullanıcının `data_key`'ini `DATA_KEY_SECRET` ile çözüp AES-GCM blob'unu deşifre eder
@@ -57,7 +57,7 @@ Gerçekleşen endpoint'ler (hepsi `x-admin-key` ister):
 
 **v2 (henüz yok):** `POST resource=content` (soru/etkinlik ekle), `resource=ai-flags` (hatalı AI cevabı işaretle/listele).
 
-> Güvenlik: `ADMIN_KEY` artık `DATA_KEY_SECRET` kadar hassas (sızarsa tüm çocuk PII'ı açılır). Panel .NET
+> Güvenlik: `ADMIN_API_KEY` artık `DATA_KEY_SECRET` kadar hassas (sızarsa tüm çocuk PII'ı açılır). Panel .NET
 > backend'inde saklanır, tarayıcıya asla verilmez; her erişim loglanır. KVKK işleme envanterine "çapraz
 > kullanıcı özel nitelikli veri okuma" olarak eklenmeli. (bkz. SAST — kiracılık değişmezi hassas.)
 
@@ -84,7 +84,7 @@ Gerçekleşen endpoint'ler (hepsi `x-admin-key` ister):
 - [x] `api/_dataKey.js` — paylaşılan data_key + ENC1 çözme (auth.js buna bağlandı)
 - [x] `api/admin.js` — users / students / student / sessions / stats endpoint'leri
 - [x] ENC1 çözme kripto round-trip testiyle doğrulandı (6/6)
-- [ ] Prod'da `ADMIN_KEY` gerçek istekle duman testi (DB gerektirir)
+- [ ] Prod'da `ADMIN_API_KEY` gerçek istekle duman testi (DB gerektirir)
 
 **.NET tarafı:**
 - [ ] Solution iskeleti: `Api` (Web API) + `Web` (Blazor) + `Shared` (DTO'lar)
@@ -103,5 +103,5 @@ Gerçekleşen endpoint'ler (hepsi `x-admin-key` ister):
 ## 8. Sıradaki adım (seçilecek)
 - [x] (A) Node admin API — yazıldı, kripto doğrulandı
 - (B) .NET solution iskeletini kur (`Api` + `Web` Blazor + `Shared` DTO'lar, Identity, `YildizCanApiClient`)
-- (C) Prod'da `ADMIN_KEY` ile gerçek duman testi (bir öğrenci hesabıyla uçtan uca okuma)
+- (C) Prod'da `ADMIN_API_KEY` ile gerçek duman testi (bir öğrenci hesabıyla uçtan uca okuma)
 - Not: DTO'lar §4'teki tabloda sabitlendi; .NET `Shared` projesindeki record'lar bunları birebir yansıtacak.
