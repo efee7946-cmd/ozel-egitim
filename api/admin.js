@@ -4,9 +4,12 @@
 // çağrılır (.NET paneli); anahtar tarayıcıya asla inmemeli.
 //
 // Yalnızca okuma (GET). Yazma/işaretleme v2'ye ait.
-// Öğrenci rosteri ve adaptive verisi app_data'da ENC1 şifreli — _dataKey.js ile
-// kullanıcının data_key'i çözülüp burada deşifre edilir. obj_results / speechmap /
-// session_history / stars düz JSON, doğrudan okunur.
+// Anahtar haritası (app_data user_key = "<username>:<key>"):
+//   teacher_students_<username>  roster (DÜZ JSON, zengin: full_name/birth_year/support_notes)
+//   session_history_<username>   seans geçmişi (DÜZ, kullanıcı bazlı; öğrenciye student_id ile süzülür)
+//   obj_results_<studentId>      nesne tanıma sonuçları (DÜZ)
+//   speechmap_<studentId>, stars_<studentId>  (DÜZ)
+//   adaptive_<studentId>, students_<username>  ENC1 şifreli — _dataKey.js ile data_key çözülüp deşifre edilir
 
 import crypto from 'crypto';
 import { query } from './_db.js';
@@ -70,20 +73,24 @@ async function listUsers() {
     return query('SELECT username, display_name, email, email_verified FROM users ORDER BY username');
 }
 
+// Kanonik roster teacher_students_<username> altında ve düz JSON (SENSITIVE değil).
+// students_<username> yalnızca şifreli, normalize (name'li, tek öğrenci) yedek.
 async function getStudents(username) {
+    const rich = await readPlain(username, 'teacher_students_' + username);
+    if (Array.isArray(rich) && rich.length) return rich;
     const dataKey = await readDataKey(username);
-    const arr = await readSensitive(username, 'students', dataKey);
-    return Array.isArray(arr) ? arr : [];
+    const norm = await readSensitive(username, 'students_' + username, dataKey);
+    return Array.isArray(norm) ? norm : [];
 }
 
 function studentDto(username, s) {
     return {
         username,
         id: s.id,
-        fullName: s.full_name ?? null,
+        fullName: s.full_name ?? s.name ?? null,
         birthYear: s.birth_year ?? null,
         supportNotes: s.support_notes ?? null,
-        createdAt: s.created_at ?? null,
+        createdAt: s.created_at ?? s.createdAt ?? null,
         updatedAt: s.updated_at ?? null,
     };
 }
@@ -157,7 +164,10 @@ export default async function handler(req, res) {
         if (resource === 'sessions') {
             if (!user || !id) return res.status(400).json({ error: 'user ve id gerekli' });
             const objResults = await readPlain(user, 'obj_results_' + id);
-            const speechHistory = await readPlain(user, 'session_history_' + id);
+            // session_history kullanıcı bazlı tutulur; ilgili öğrenciye göre süz.
+            const historyAll = await readPlain(user, 'session_history_' + user);
+            const speechHistory = (Array.isArray(historyAll) ? historyAll : [])
+                .filter(h => h && h.student_id === id);
             return res.json({
                 objResults: (Array.isArray(objResults) ? objResults : []).map(r => ({
                     id: r.id,
@@ -166,7 +176,7 @@ export default async function handler(req, res) {
                     errors: r.errors,
                     accuracy: accuracyOf(r.items, r.errors),
                 })),
-                speechHistory: Array.isArray(speechHistory) ? speechHistory : [],
+                speechHistory,
             });
         }
 
