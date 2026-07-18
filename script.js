@@ -4417,6 +4417,31 @@ function recordSpeechMapCompletion(topicKey, stars) {
     const s = getSpeechMapState();
     s.stars[topicKey] = Math.max(s.stars[topicKey] || 0, stars);
     DB.set(_speechMapKey(), s);
+    if (stars >= 2) maybeRequestStoreReview();
+}
+
+function _inAppReviewPlugin() {
+    try {
+        if (typeof Capacitor !== 'undefined' && Capacitor.isNativePlatform()
+            && Capacitor.Plugins && Capacitor.Plugins.InAppReview) {
+            return Capacitor.Plugins.InAppReview;
+        }
+    } catch (_) {}
+    return null;
+}
+
+function maybeRequestStoreReview() {
+    const plugin = _inAppReviewPlugin();
+    if (!plugin) return;
+    let state = {};
+    try { state = JSON.parse(localStorage.getItem('lms_review_ask') || '{}') || {}; } catch (_) {}
+    state.count = (state.count || 0) + 1;
+    const cooledDown = !state.askedAt || (Date.now() - state.askedAt) > 30 * 24 * 60 * 60 * 1000;
+    if (state.count >= 2 && cooledDown) {
+        state.askedAt = Date.now();
+        setTimeout(function() { plugin.requestReview().catch(function() {}); }, 2500);
+    }
+    try { localStorage.setItem('lms_review_ask', JSON.stringify(state)); } catch (_) {}
 }
 
 let _mapAssetState = null;

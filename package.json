@@ -25,6 +25,7 @@
   },
   "homepage": "https://github.com/efee7946-cmd/ozel-egitim#readme",
   "dependencies": {
+    "@capacitor-community/in-app-review": "^7.1.0",
     "@capacitor-community/speech-recognition": "^7.0.1",
     "@capacitor/device": "^7.0.1",
     "@capacitor/local-notifications": "^7.0.1",
