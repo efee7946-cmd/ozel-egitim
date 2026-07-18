@@ -18,8 +18,19 @@ import { readDataKey, decryptAppData } from './_dataKey.js';
 
 function cors(req, res) {
     allowOrigin(req, res);
-    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, x-admin-key');
+}
+
+// Panelden yönetilen küresel soru havuzu. '__global' bir kullanıcı adı olamaz,
+// bu yüzden gerçek kullanıcı verisiyle çakışmaz. Yayınlananlar /api/content'ten
+// uygulamalara iner (taslaklar inmez).
+const CONTENT_KEY = '__global:content_questions';
+const TOPIC_KEYS = ['greetings', 'introduce', 'emotions', 'daily', 'school', 'food', 'hobbies', 'places', 'problem', 'dreams'];
+const MAX_QUESTIONS = 200;
+
+function cleanText(v, maxLen) {
+    return String(v ?? '').trim().slice(0, maxLen);
 }
 
 function safeCompare(a, b) {
@@ -116,18 +127,93 @@ function summarize(list) {
     };
 }
 
+async function readContentList() {
+    const rows = await query('SELECT value FROM app_data WHERE user_key = $1', [CONTENT_KEY]);
+    if (!rows.length) return [];
+    const list = parseColumn(rows[0].value);
+    return Array.isArray(list) ? list : [];
+}
+
+async function writeContentList(list) {
+    await query(
+        `INSERT INTO app_data (user_key, value, updated_at) VALUES ($1, $2, now())
+         ON CONFLICT (user_key) DO UPDATE SET value = $2, updated_at = now()`,
+        [CONTENT_KEY, JSON.stringify(list)]
+    );
+}
+
+async function handleContentPost(req, res) {
+    const { action } = req.body || {};
+    const list = await readContentList();
+
+    if (action === 'upsert') {
+        const q = req.body?.question || {};
+        const topic = cleanText(q.topic, 30);
+        const tr = cleanText(q.tr, 300);
+        if (!TOPIC_KEYS.includes(topic)) return res.status(400).json({ error: 'GECERSIZ_TOPIC', valid: TOPIC_KEYS });
+        if (!tr) return res.status(400).json({ error: 'TR_METIN_GEREKLI' });
+        const entry = {
+            id: cleanText(q.id, 40) || 'cq_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
+            topic,
+            tr,
+            en: cleanText(q.en, 300),
+            goalTr: cleanText(q.goalTr, 300),
+            goalEn: cleanText(q.goalEn, 300),
+            query: cleanText(q.query, 100),
+        };
+        const idx = list.findIndex(x => x.id === entry.id);
+        if (idx >= 0) {
+            list[idx] = { ...list[idx], ...entry, updatedAt: new Date().toISOString() };
+        } else {
+            if (list.length >= MAX_QUESTIONS) return res.status(400).json({ error: 'HAVUZ_DOLU', max: MAX_QUESTIONS });
+            list.push({ ...entry, published: false, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() });
+        }
+        await writeContentList(list);
+        return res.json({ ok: true, question: list[idx >= 0 ? idx : list.length - 1] });
+    }
+
+    if (action === 'publish') {
+        const id = cleanText(req.body?.id, 40);
+        const published = req.body?.published === true;
+        const idx = list.findIndex(x => x.id === id);
+        if (idx < 0) return res.status(404).json({ error: 'NOT_FOUND' });
+        list[idx] = { ...list[idx], published, updatedAt: new Date().toISOString() };
+        await writeContentList(list);
+        return res.json({ ok: true, question: list[idx] });
+    }
+
+    if (action === 'delete') {
+        const id = cleanText(req.body?.id, 40);
+        const next = list.filter(x => x.id !== id);
+        if (next.length === list.length) return res.status(404).json({ error: 'NOT_FOUND' });
+        await writeContentList(next);
+        return res.json({ ok: true });
+    }
+
+    return res.status(400).json({ error: 'Gecersiz action', valid: ['upsert', 'publish', 'delete'] });
+}
+
 export default async function handler(req, res) {
     cors(req, res);
     if (req.method === 'OPTIONS') return res.status(200).end();
-    if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
+    if (req.method !== 'GET' && req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
     if (!requireAdmin(req)) return res.status(401).json({ error: 'Yetkisiz' });
 
     const { resource, user, id } = req.query;
-    console.log('[admin]', clientIp(req), resource || '-', user || '-', id || '-');
+    console.log('[admin]', clientIp(req), req.method, resource || '-', user || '-', id || '-');
     res.setHeader('Cache-Control', 'no-store');
 
     try {
+        if (req.method === 'POST') {
+            if (resource !== 'content') return res.status(400).json({ error: 'POST yalnizca resource=content' });
+            return await handleContentPost(req, res);
+        }
+
+        if (resource === 'content') {
+            return res.json({ questions: await readContentList() });
+        }
+
         if (resource === 'users') {
             const users = await listUsers();
             const out = [];
@@ -192,7 +278,7 @@ export default async function handler(req, res) {
             });
         }
 
-        return res.status(400).json({ error: 'Geçersiz resource', valid: ['users', 'students', 'student', 'sessions', 'stats'] });
+        return res.status(400).json({ error: 'Geçersiz resource', valid: ['users', 'students', 'student', 'sessions', 'stats', 'content'] });
 
     } catch (err) {
         console.error('Admin error:', err);

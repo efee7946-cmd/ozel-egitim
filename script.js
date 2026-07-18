@@ -2788,6 +2788,7 @@ async function startApp(resetSession) {
 document.addEventListener('DOMContentLoaded', function() {
     // Supabase auth atlanıyor — kendi auth sistemimizi kullanıyoruz
     checkAuthSession();
+    loadCustomQuestions();
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('/sw.js').catch(() => {});
     }
@@ -4233,9 +4234,36 @@ function getQuestionsForCurrentLevel(questions, sourceType, sourceKey) {
     return selected;
 }
 
+let _customQuestions = [];
+
+function customQuestionsForTopic(topicKey) {
+    const useEn = _lang === 'en';
+    return _customQuestions
+        .filter(c => c && c.topic === topicKey && (useEn ? c.en : c.tr))
+        .map(c => ({
+            q: useEn ? c.en : c.tr,
+            query: c.query || 'happy child talking',
+            goal: (useEn ? c.goalEn : c.goalTr) || ''
+        }));
+}
+
+async function loadCustomQuestions() {
+    try { _customQuestions = JSON.parse(localStorage.getItem('lms_custom_questions')) || []; } catch (_) { _customQuestions = []; }
+    try {
+        const r = await fetch(API_BASE + '/api/content', { signal: AbortSignal.timeout(8000) });
+        if (!r.ok) return;
+        const d = await r.json();
+        if (Array.isArray(d.questions)) {
+            _customQuestions = d.questions;
+            try { localStorage.setItem('lms_custom_questions', JSON.stringify(d.questions)); } catch (_) {}
+        }
+    } catch (_) {}
+}
+
 function getActiveTherapyQuestions() {
     const topic = getCurrentMapTopic();
-    return getQuestionsForCurrentLevel(topic.questions, 'map', topic.key);
+    const base = getQuestionsForCurrentLevel(topic.questions, 'map', topic.key);
+    return [...base, ...customQuestionsForTopic(topic.key)];
 }
 
 function shuffleArray(array) {
