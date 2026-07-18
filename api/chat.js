@@ -1,6 +1,7 @@
 import { sessionUsername, guestCallAllowed } from './_auth.js';
 import { checkRateLimit } from './_rateLimit.js';
 import { allowOrigin } from './_cors.js';
+import { logAiReply } from './_aiLog.js';
 
 const GUEST_CHAT_CAP = 30;
 
@@ -50,6 +51,23 @@ export default async function handler(req, res) {
         if (!response.ok) {
             console.error("Google API Hatası:", data);
             return res.status(response.status).json(data);
+        }
+
+        // Terapi sohbeti (meta gönderen tek akış) denetim için loglanır.
+        // Yalnızca AI metni; kullanıcı turlarına dokunulmaz, çocuk adı maskelenir.
+        // Serverless yanıttan sonra donabileceği için res'ten ÖNCE beklenir.
+        const meta = req.body.meta;
+        if (meta && Array.isArray(data?.candidates) && data.candidates.length) {
+            const replyText = (data.candidates[0]?.content?.parts || [])
+                .map(p => (p && p.text) || '').join(' ').trim();
+            await logAiReply({
+                actor,
+                topic: meta.topic,
+                level: meta.level,
+                lang: meta.lang,
+                reply: replyText,
+                mask: meta.mask
+            });
         }
 
         res.status(200).json(data);

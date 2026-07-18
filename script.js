@@ -4889,7 +4889,13 @@ KATI ETKİLEŞİM VE DİL KURALLARI:
         contents: [
             { role: "user", parts: [{ text: "GÖREV: " + instructions }] },
             { role: "model", parts: [{ text: _lang === 'en' ? "Got it! Starting the conversation." : "Tamam! Sohbeti başlatıyorum." }] }
-        ].concat(chatHistory)
+        ].concat(chatHistory),
+        meta: {
+            topic: getCurrentMapTopic().key,
+            level: currentTherapyLevelKey,
+            lang: _lang,
+            mask: activeStudentName || ''
+        }
     };
     try {
         var res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json', ...apiAuthHeaders() }, body: JSON.stringify(payload) });

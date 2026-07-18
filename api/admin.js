@@ -15,6 +15,7 @@ import crypto from 'crypto';
 import { query } from './_db.js';
 import { allowOrigin } from './_cors.js';
 import { readDataKey, decryptAppData } from './_dataKey.js';
+import { ensureAiRepliesTable, cleanupOldAiReplies } from './_aiLog.js';
 
 function cors(req, res) {
     allowOrigin(req, res);
@@ -235,6 +236,20 @@ async function handleContentPost(req, res) {
     return res.status(400).json({ error: 'Gecersiz action', valid: ['upsert', 'publish', 'delete', 'override', 'restore'] });
 }
 
+async function handleAiFlagPost(req, res) {
+    await ensureAiRepliesTable();
+    const id = Number(req.body?.id);
+    if (!Number.isInteger(id) || id <= 0) return res.status(400).json({ error: 'GECERSIZ_ID' });
+    const flagged = req.body?.flagged === true;
+    const note = cleanText(req.body?.note, 300);
+    const rows = await query(
+        'UPDATE ai_replies SET flagged = $1, flag_note = $2 WHERE id = $3 RETURNING id',
+        [flagged, flagged ? note || null : null, id]
+    );
+    if (!rows.length) return res.status(404).json({ error: 'NOT_FOUND' });
+    return res.json({ ok: true });
+}
+
 export default async function handler(req, res) {
     cors(req, res);
     if (req.method === 'OPTIONS') return res.status(200).end();
@@ -248,8 +263,25 @@ export default async function handler(req, res) {
 
     try {
         if (req.method === 'POST') {
-            if (resource !== 'content') return res.status(400).json({ error: 'POST yalnizca resource=content' });
-            return await handleContentPost(req, res);
+            if (resource === 'content') return await handleContentPost(req, res);
+            if (resource === 'aireplies') return await handleAiFlagPost(req, res);
+            return res.status(400).json({ error: 'POST yalnizca resource=content|aireplies' });
+        }
+
+        if (resource === 'aireplies') {
+            await ensureAiRepliesTable();
+            await cleanupOldAiReplies();
+            const params = [];
+            const where = [];
+            if (user) { params.push(user); where.push(`actor = $${params.length}`); }
+            if (req.query.flagged === '1') where.push('flagged = true');
+            const rows = await query(
+                `SELECT id, actor, topic, level, lang, reply, flagged, flag_note, created_at
+                 FROM ai_replies${where.length ? ' WHERE ' + where.join(' AND ') : ''}
+                 ORDER BY id DESC LIMIT 200`,
+                params
+            );
+            return res.json({ replies: rows });
         }
 
         if (resource === 'content') {
@@ -321,7 +353,7 @@ export default async function handler(req, res) {
             });
         }
 
-        return res.status(400).json({ error: 'Geçersiz resource', valid: ['users', 'students', 'student', 'sessions', 'stats', 'content'] });
+        return res.status(400).json({ error: 'Geçersiz resource', valid: ['users', 'students', 'student', 'sessions', 'stats', 'content', 'aireplies'] });
 
     } catch (err) {
         console.error('Admin error:', err);
