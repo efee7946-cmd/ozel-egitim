@@ -11,6 +11,12 @@ test.describe('Veli kapısı, misafir modu ve ilk kullanım akışı', () => {
     await page.evaluate(() => { localStorage.clear(); localStorage.setItem('lms_lang', 'tr'); });
     await page.reload();
 
+    // İlk kurulumda tanıtım ekranı auth'un üstünde açılır, Atla kapatır
+    await page.waitForSelector('#intro-screen', { state: 'visible' });
+    await expect(page.locator('#introDots .ob-dot')).toHaveCount(4);
+    await page.click('.intro-skip');
+    await expect(page.locator('#intro-screen')).toBeHidden();
+
     // Giriş ekranında misafir butonu görünür ve çalışır olmalı
     await page.waitForSelector('#auth-screen', { state: 'visible' });
     await page.click('.auth-guest-btn');

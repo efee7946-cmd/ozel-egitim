@@ -50,7 +50,7 @@ function mockDataRoutes(page, posts) {
 
 async function freshStart(page) {
   await page.goto('/');
-  await page.evaluate(() => { localStorage.clear(); sessionStorage.clear(); localStorage.setItem('lms_lang', 'tr'); });
+  await page.evaluate(() => { localStorage.clear(); sessionStorage.clear(); localStorage.setItem('lms_lang', 'tr'); localStorage.setItem('lms_intro_seen', '1'); });
   await page.reload();
   await page.waitForSelector('#auth-screen', { state: 'visible' });
 }
