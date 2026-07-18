@@ -236,6 +236,82 @@ async function handleContentPost(req, res) {
     return res.status(400).json({ error: 'Gecersiz action', valid: ['upsert', 'publish', 'delete', 'override', 'restore'] });
 }
 
+// Gemini ile soru önerisi üretir. Üretilen hiçbir şey doğrudan yayına girmez:
+// panel önerileri gösterir, seçilenler taslak olarak havuza eklenir, yayın
+// kararı insanda kalır.
+const TOPIC_LABELS_TR = {
+    greetings: 'Selamlaşma', introduce: 'Kendini Tanıtma', emotions: 'Duygular',
+    daily: 'Günlük Yaşam', school: 'Okul', food: 'Yemek', hobbies: 'Hobiler',
+    places: 'Yerler', problem: 'Problem Çözme', dreams: 'Hayaller',
+};
+const LEVEL_RULES_TR = {
+    word: 'Tek kelimeyle cevaplanabilir olmalı (kelime seviyesi).',
+    sentence: 'Tam bir cümleyle cevaplanmalı (cümle seviyesi).',
+    tell: 'Kısa bir anlatımla cevaplanmalı, 2-3 cümlelik anlatıma davet etmeli (anlatma seviyesi).',
+};
+
+async function handleGeneratePost(req, res) {
+    const GEMINI_KEY = process.env.GEMINI_KEY;
+    if (!GEMINI_KEY) return res.status(500).json({ error: 'GEMINI_KEY_MISSING' });
+
+    const topic = cleanText(req.body?.topic, 30);
+    if (!TOPIC_KEYS.includes(topic)) return res.status(400).json({ error: 'GECERSIZ_TOPIC', valid: TOPIC_KEYS });
+    const level = ['word', 'sentence', 'tell'].includes(req.body?.level) ? req.body.level : 'sentence';
+    const ageMin = Math.min(Math.max(Number(req.body?.ageMin) || 4, 3), 12);
+    const ageMax = Math.min(Math.max(Number(req.body?.ageMax) || 8, ageMin), 14);
+    const count = Math.min(Math.max(Number(req.body?.count) || 5, 1), 8);
+
+    const prompt = `Sen özel gereksinimli çocuklar (otizm, dil-konuşma gecikmesi) için konuşma pratiği sorusu yazan bir özel eğitim uzmanısın.
+
+GÖREV: "${TOPIC_LABELS_TR[topic]}" konusunda, ${ageMin}-${ageMax} yaş aralığı için ${count} adet soru üret.
+
+KURALLAR:
+- ${LEVEL_RULES_TR[level]}
+- Kısa, somut, tek fikirli sorular. Soyut kavram, mecaz, ironi YOK.
+- Çocuğun günlük yaşamından; bir fotoğrafla desteklenebilir olmalı.
+- Olumsuz, korkutucu, yargılayıcı veya kişisel/mahrem içerik YOK.
+- Her soru için: Türkçe soru (tr), İngilizce çevirisi (en), Türkçe eğitim hedefi (goalTr, kısa: "Yiyecek adı söyleyebilme" gibi), İngilizce hedef (goalEn), Pexels fotoğraf araması için 3-6 kelimelik İngilizce arama terimi (query).
+
+ÇIKTI: Yalnızca şu şemada bir JSON dizisi döndür:
+[{"tr":"...","en":"...","goalTr":"...","goalEn":"...","query":"..."}]`;
+
+    const r = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=${GEMINI_KEY}`,
+        {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                contents: [{ role: 'user', parts: [{ text: prompt }] }],
+                generationConfig: { responseMimeType: 'application/json', temperature: 0.9 },
+            }),
+        }
+    );
+    const data = await r.json();
+    if (!r.ok) {
+        console.error('Generate Gemini hatasi:', data);
+        return res.status(502).json({ error: 'GEMINI_ERROR' });
+    }
+
+    let parsed;
+    try {
+        parsed = JSON.parse((data.candidates?.[0]?.content?.parts || []).map(p => p?.text || '').join(''));
+    } catch {
+        return res.status(502).json({ error: 'GEMINI_BAD_JSON' });
+    }
+    const suggestions = (Array.isArray(parsed) ? parsed : [])
+        .map(s => ({
+            tr: cleanText(s?.tr, 300),
+            en: cleanText(s?.en, 300),
+            goalTr: cleanText(s?.goalTr, 300),
+            goalEn: cleanText(s?.goalEn, 300),
+            query: cleanText(s?.query, 100),
+        }))
+        .filter(s => s.tr)
+        .slice(0, count);
+    if (!suggestions.length) return res.status(502).json({ error: 'GEMINI_EMPTY' });
+    return res.json({ suggestions });
+}
+
 async function handleAiFlagPost(req, res) {
     await ensureAiRepliesTable();
     const id = Number(req.body?.id);
@@ -265,7 +341,8 @@ export default async function handler(req, res) {
         if (req.method === 'POST') {
             if (resource === 'content') return await handleContentPost(req, res);
             if (resource === 'aireplies') return await handleAiFlagPost(req, res);
-            return res.status(400).json({ error: 'POST yalnizca resource=content|aireplies' });
+            if (resource === 'generate') return await handleGeneratePost(req, res);
+            return res.status(400).json({ error: 'POST yalnizca resource=content|aireplies|generate' });
         }
 
         if (resource === 'aireplies') {
