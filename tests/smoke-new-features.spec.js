@@ -42,6 +42,11 @@ test.describe('Veli kapısı, misafir modu ve ilk kullanım akışı', () => {
     // Misafir şeridi menüde görünmeli
     await expect(page.locator('#guestBanner')).toBeVisible();
 
+    // Rutin hatırlatma kartı menüde, karolarla footer arasında
+    await expect(page.locator('#routineCard')).toBeVisible();
+    await expect(page.locator('#routineToggleBtn')).toBeDisabled();
+    await expect(page.locator('#routineStatus')).toContainText('mobil uygulamada');
+
     // Kota: nesne tanıma 1 kez açılır, ikinci deneme limit modalına takılır
     await page.click('.tile-sequence');
     await page.waitForSelector('#object-screen', { state: 'visible' });
@@ -81,13 +86,10 @@ test.describe('Veli kapısı, misafir modu ve ilk kullanım akışı', () => {
     await expect(page.locator('#parentGateModal')).toBeHidden();
     await page.waitForSelector('#analysis-screen', { state: 'visible' });
 
-    // Veli Özeti sekmesi: haftalık kart (boş durum) ve rutin kartı orada
+    // Veli Özeti sekmesi: haftalık kart (boş durum)
     await page.click('#repTabParent');
     await expect(page.locator('#weeklySummaryCard')).toBeVisible();
     await expect(page.locator('#weeklySummaryCard')).toContainText('Bu hafta henüz pratik yapılmadı');
-    await expect(page.locator('#routineCard')).toBeVisible();
-    await expect(page.locator('#routineToggleBtn')).toBeDisabled();
-    await expect(page.locator('#routineStatus')).toContainText('mobil uygulamada');
 
     // Kilit açıkken analize tekrar giriş kapısız olmalı
     await page.evaluate(() => window.goToMenu());

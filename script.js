@@ -2278,13 +2278,21 @@ async function showOnly(id, options = {}) {
         if (el) el.style.display = 'none';
     });
     const target = document.getElementById(id);
-    if (target) target.style.display = 'flex';
+    if (target) {
+        target.style.display = 'flex';
+        if (isNewScreen) {
+            target.classList.remove('screen-enter');
+            void target.offsetWidth;
+            target.classList.add('screen-enter');
+        }
+    }
 
     if (id === 'menu-screen') {
         try {
             updateStarBadge();
             renderMenuNudge();
             updateGuestBanner();
+            renderRoutineCard();
         } catch (_) {}
     }
     currentScreenId = id;
@@ -2298,6 +2306,7 @@ async function showOnly(id, options = {}) {
     if (_objStopRender) (id === 'object-screen' ? _objStartRender : _objStopRender)();
     _maybeToggleSoundHint(id);
     _updateOfflineBanner();
+    updateKeepAwake(id);
 
     if (!_restoringScreen && isNewScreen) {
         const entryScreens = ['auth-screen', 'splash-screen', 'start-screen', 'login-screen'];
@@ -2667,6 +2676,66 @@ function _localNotifPlugin() {
     } catch (_) {}
     return null;
 }
+
+function _hapticsPlugin() {
+    try {
+        if (typeof Capacitor !== 'undefined' && Capacitor.isNativePlatform()
+            && Capacitor.Plugins && Capacitor.Plugins.Haptics) {
+            return Capacitor.Plugins.Haptics;
+        }
+    } catch (_) {}
+    return null;
+}
+
+function hapticTap() {
+    const plugin = _hapticsPlugin();
+    if (plugin) { plugin.impact({ style: 'LIGHT' }).catch(() => {}); return; }
+    try { if (navigator.vibrate) navigator.vibrate(8); } catch (_) {}
+}
+
+function hapticSuccess() {
+    const plugin = _hapticsPlugin();
+    if (plugin) { plugin.notification({ type: 'SUCCESS' }).catch(() => {}); return; }
+    try { if (navigator.vibrate) navigator.vibrate([12, 60, 18]); } catch (_) {}
+}
+
+let _screenWakeLock = null;
+const KEEP_AWAKE_SCREENS = ['game-container', 'aac-screen', 'object-screen'];
+
+async function updateKeepAwake(screenId) {
+    const wanted = KEEP_AWAKE_SCREENS.includes(screenId);
+    let plugin = null;
+    try {
+        if (typeof Capacitor !== 'undefined' && Capacitor.isNativePlatform()
+            && Capacitor.Plugins && Capacitor.Plugins.KeepAwake) {
+            plugin = Capacitor.Plugins.KeepAwake;
+        }
+    } catch (_) {}
+    if (plugin) {
+        try { await (wanted ? plugin.keepAwake() : plugin.allowSleep()); } catch (_) {}
+        return;
+    }
+    try {
+        if (wanted && !_screenWakeLock && navigator.wakeLock) {
+            _screenWakeLock = await navigator.wakeLock.request('screen');
+            _screenWakeLock.addEventListener('release', () => { _screenWakeLock = null; });
+        } else if (!wanted && _screenWakeLock) {
+            const lock = _screenWakeLock;
+            _screenWakeLock = null;
+            await lock.release();
+        }
+    } catch (_) { _screenWakeLock = null; }
+}
+
+document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && KEEP_AWAKE_SCREENS.includes(currentScreenId)) {
+        updateKeepAwake(currentScreenId);
+    }
+});
+
+document.addEventListener('click', e => {
+    if (e.target.closest('.menu-tile, .bottom-nav-item, .intro-next, .topic-start-btn, .aac-card')) hapticTap();
+});
 
 function renderRoutineCard() {
     const statusEl = document.getElementById('routineStatus');
@@ -3599,7 +3668,6 @@ async function _populateReportTab() {
     renderReportHistory(history);
     renderObjResultsSummary();
     renderWeeklySummaryCard();
-    renderRoutineCard();
 
     // İstatistikler son 7 günü anlatır — rapor ne zaman açılırsa açılsın dolu
     const weekAgo = Date.now() - 7 * 86400000;
@@ -5662,6 +5730,7 @@ function _showStarReward() {
     titleEl.textContent = title;
     subEl.textContent = sub;
     modal.style.display = 'flex';
+    hapticSuccess();
 
     if (typeof confetti === 'function' && stars >= 3) {
         setTimeout(() => confetti({ particleCount: stars === 5 ? 140 : 70, spread: 80, origin: { y: 0.45 } }), 400);

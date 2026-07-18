@@ -453,6 +453,19 @@
         </button>
     </div>
 
+    <!-- Günlük rutin hatırlatması -->
+    <div class="routine-card" id="routineCard">
+        <div class="routine-info">
+            <strong data-i18n="routine_title">⏰ Günlük Hatırlatma</strong>
+            <p data-i18n="routine_sub">Pratik için en uygun saati seçin; o saatte tek ve nazik bir hatırlatma gönderelim. Kaçan gün dert değil.</p>
+            <span class="routine-status" id="routineStatus"></span>
+        </div>
+        <div class="routine-controls">
+            <input type="time" id="routineTime" value="18:30">
+            <button type="button" class="routine-btn" id="routineToggleBtn" onclick="toggleRoutineReminder()" data-i18n="routine_enable">Hatırlatmayı Kur</button>
+        </div>
+    </div>
+
     <!-- Gizli legacy stub'lar -->
     <div id="onboarding-panel" style="display:none"><div class="onboarding-copy"></div><div class="onboarding-steps"></div></div>
     <div class="menu-actions-grid" style="display:none"></div>
@@ -1130,19 +1143,6 @@ document.addEventListener('DOMContentLoaded', function(){
                     <div class="skel-line skel-short skeleton" style="height:14px;margin:4px 0"></div>
                 </div>
                 <p id="aiEvalText" class="ai-eval-text" style="display:none"></p>
-            </div>
-        </div>
-
-        <!-- Günlük rutin hatırlatması -->
-        <div class="routine-card" id="routineCard">
-            <div class="routine-info">
-                <strong data-i18n="routine_title">⏰ Günlük Hatırlatma</strong>
-                <p data-i18n="routine_sub">Pratik için en uygun saati seçin; o saatte tek ve nazik bir hatırlatma gönderelim. Kaçan gün dert değil.</p>
-                <span class="routine-status" id="routineStatus"></span>
-            </div>
-            <div class="routine-controls">
-                <input type="time" id="routineTime" value="18:30">
-                <button type="button" class="routine-btn" id="routineToggleBtn" onclick="toggleRoutineReminder()" data-i18n="routine_enable">Hatırlatmayı Kur</button>
             </div>
         </div>
 
