@@ -47,7 +47,9 @@ const DB = (function () {
     }
 
     // Şifreli saklanacak anahtarlar (KVKK md.6 özel nitelikli veri)
-    const SENSITIVE = ['students', 'bep_profile_', 'iep_', 'skills_', 'behavior_', 'adaptive_', 'trials_'];
+    // 'teacher_students_' zengin roster (ad/doğum yılı/destek notu) ve
+    // 'session_history_' (child_name içerir) 2026-07 SAST bulgusuyla eklendi.
+    const SENSITIVE = ['students', 'teacher_students_', 'session_history_', 'bep_profile_', 'iep_', 'skills_', 'behavior_', 'adaptive_', 'trials_'];
     function isSensitive(key) { return SENSITIVE.some(p => key.startsWith(p)); }
 
     function deepClone(val) {
@@ -404,6 +406,8 @@ const DB = (function () {
 
     /* ---------- Public API ---------- */
     return {
+        encryptionReady() { return !!_encKey; },
+
         /**
          * Şifrelemeyi başlatır. Oturum açıldığında çağrılmalı.
          * Mevcut şifreli localStorage verilerini sessionStorage'a yükler.

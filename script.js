@@ -3163,6 +3163,15 @@ async function loadStudentsForCurrentUser() {
     const userId = await getCurrentUserId();
     if (!userId) { studentsCache = []; return []; }
     const data = await DB.get('teacher_students_' + userId) || [];
+    if (data.length && DB.encryptionReady && DB.encryptionReady()
+        && !localStorage.getItem('lms_enc_mig_' + userId)) {
+        try {
+            await DB.set('teacher_students_' + userId, data);
+            const hist = await DB.get('session_history_' + userId);
+            if (hist && hist.length) await DB.set('session_history_' + userId, hist);
+            localStorage.setItem('lms_enc_mig_' + userId, '1');
+        } catch (_) {}
+    }
     studentsCache = data.filter(s => s.active !== false);
     return studentsCache;
 }

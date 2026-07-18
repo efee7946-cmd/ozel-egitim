@@ -88,12 +88,12 @@ async function listUsers() {
     return query('SELECT username, display_name, email, email_verified FROM users ORDER BY username');
 }
 
-// Kanonik roster teacher_students_<username> altında ve düz JSON (SENSITIVE değil).
-// students_<username> yalnızca şifreli, normalize (name'li, tek öğrenci) yedek.
+// Kanonik roster teacher_students_<username>. 2026-07'den beri istemci ENC1
+// şifreli yazar; eski kayıtlar düz JSON olabilir — readSensitive ikisini de okur.
 async function getStudents(username) {
-    const rich = await readPlain(username, 'teacher_students_' + username);
-    if (Array.isArray(rich) && rich.length) return rich;
     const dataKey = await readDataKey(username);
+    const rich = await readSensitive(username, 'teacher_students_' + username, dataKey);
+    if (Array.isArray(rich) && rich.length) return rich;
     const norm = await readSensitive(username, 'students_' + username, dataKey);
     return Array.isArray(norm) ? norm : [];
 }
@@ -292,8 +292,9 @@ export default async function handler(req, res) {
         if (resource === 'sessions') {
             if (!user || !id) return res.status(400).json({ error: 'user ve id gerekli' });
             const objResults = await readPlain(user, 'obj_results_' + id);
-            // session_history kullanıcı bazlı tutulur; ilgili öğrenciye göre süz.
-            const historyAll = await readPlain(user, 'session_history_' + user);
+            // session_history kullanıcı bazlı ve artık şifreli olabilir; öğrenciye göre süz.
+            const historyDataKey = await readDataKey(user);
+            const historyAll = await readSensitive(user, 'session_history_' + user, historyDataKey);
             const speechHistory = (Array.isArray(historyAll) ? historyAll : [])
                 .filter(h => h && h.student_id === id);
             return res.json({
