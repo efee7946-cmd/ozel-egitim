@@ -312,6 +312,86 @@ KURALLAR:
     return res.json({ suggestions });
 }
 
+// Öğrencinin seans verilerinin SAYISAL özetini Gemini'ye gönderir — isim/PII
+// asla gitmez. Dönen değerlendirme panelde gösterilir; klinik karar değildir.
+async function handleAnalyzePost(req, res) {
+    const GEMINI_KEY = process.env.GEMINI_KEY;
+    if (!GEMINI_KEY) return res.status(500).json({ error: 'GEMINI_KEY_MISSING' });
+    const user = cleanText(req.body?.user, 80);
+    const id = cleanText(req.body?.id, 40);
+    if (!user || !id) return res.status(400).json({ error: 'user ve id gerekli' });
+
+    const dataKey = await readDataKey(user);
+    const objResults = await readPlain(user, 'obj_results_' + id);
+    const adaptive = await readSensitive(user, 'adaptive_' + id, dataKey);
+    const speechMap = await readPlain(user, 'speechmap_' + id);
+
+    const obj = Array.isArray(objResults) ? objResults : [];
+    const summary = summarize(obj);
+    const recentAcc = obj.slice(0, 10)
+        .map(r => accuracyOf(r.items, r.errors))
+        .filter(a => a !== null);
+
+    const catStats = adaptive && adaptive.categoryStats ? adaptive.categoryStats : {};
+    const cats = Object.entries(catStats).map(([k, v]) =>
+        `${k}: ${Number(v?.turns) || 0} tur, ${Number(v?.simplify) || 0} basitleştirme, ${Number(v?.noResponse) || 0} cevapsız`);
+    const stars = speechMap && speechMap.stars ? speechMap.stars : {};
+    const starsTxt = Object.entries(stars).map(([k, v]) => `${TOPIC_LABELS_TR[k] || k}: ${Number(v) || 0}/3 yıldız`);
+
+    if (!recentAcc.length && !cats.length && !starsTxt.length) {
+        return res.status(400).json({ error: 'VERI_YOK' });
+    }
+
+    const statsText = [
+        summary.plays ? `Nesne tanıma: toplam ${summary.plays} oyun, genel doğruluk %${summary.accuracy ?? '-'}, hatasız oyun sayısı ${summary.perfect}.` : '',
+        recentAcc.length ? `Son oyunların doğruluk yüzdeleri (yeniden eskiye): ${recentAcc.join(', ')}.` : '',
+        cats.length ? `Konuşma pratiği kategori istatistikleri (basitleştirme = AI sorunun kolaylaştırılmasını gerektirdi): ${cats.join(' | ')}.` : '',
+        starsTxt.length ? `Konuşma haritası konu yıldızları: ${starsTxt.join(', ')}.` : '',
+    ].filter(Boolean).join('\n');
+
+    const prompt = `Sen özel eğitim alanında deneyimli bir danışmansın. Aşağıda 4-8 yaş aralığındaki özel gereksinimli bir öğrencinin uygulama verilerinin sayısal özeti var. İsim veya kimlik bilgisi yok; isteme, uydurma.
+
+VERİ:
+${statsText}
+
+GÖREV: Bu verilere dayanarak kısa, somut, veli/öğretmenin anlayacağı bir değerlendirme yap. Abartma; veri neyi gösteriyorsa onu söyle, veri azsa temkinli konuş.
+ÇIKTI: Yalnızca şu şemada JSON döndür (alan değerleri Türkçe, strengths/difficulties en fazla 3'er madde):
+{"strengths":["..."],"difficulties":["..."],"suggestion":"sonraki seanslar için 1-2 cümlelik somut öneri"}`;
+
+    const r = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=${GEMINI_KEY}`,
+        {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                contents: [{ role: 'user', parts: [{ text: prompt }] }],
+                generationConfig: { responseMimeType: 'application/json', temperature: 0.4 },
+            }),
+        }
+    );
+    const data = await r.json();
+    if (!r.ok) {
+        console.error('Analyze Gemini hatasi:', data);
+        return res.status(502).json({ error: 'GEMINI_ERROR' });
+    }
+    let parsed;
+    try {
+        parsed = JSON.parse((data.candidates?.[0]?.content?.parts || []).map(p => p?.text || '').join(''));
+    } catch {
+        return res.status(502).json({ error: 'GEMINI_BAD_JSON' });
+    }
+    const toList = v => (Array.isArray(v) ? v : []).map(x => cleanText(x, 300)).filter(Boolean).slice(0, 3);
+    const analysis = {
+        strengths: toList(parsed?.strengths),
+        difficulties: toList(parsed?.difficulties),
+        suggestion: cleanText(parsed?.suggestion, 500),
+    };
+    if (!analysis.strengths.length && !analysis.difficulties.length && !analysis.suggestion) {
+        return res.status(502).json({ error: 'GEMINI_EMPTY' });
+    }
+    return res.json({ analysis, statsText });
+}
+
 async function handleAiFlagPost(req, res) {
     await ensureAiRepliesTable();
     const id = Number(req.body?.id);
@@ -342,7 +422,8 @@ export default async function handler(req, res) {
             if (resource === 'content') return await handleContentPost(req, res);
             if (resource === 'aireplies') return await handleAiFlagPost(req, res);
             if (resource === 'generate') return await handleGeneratePost(req, res);
-            return res.status(400).json({ error: 'POST yalnizca resource=content|aireplies|generate' });
+            if (resource === 'analyze') return await handleAnalyzePost(req, res);
+            return res.status(400).json({ error: 'POST yalnizca resource=content|aireplies|generate|analyze' });
         }
 
         if (resource === 'aireplies') {
