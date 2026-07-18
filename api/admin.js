@@ -26,7 +26,11 @@ function cors(req, res) {
 // bu yüzden gerçek kullanıcı verisiyle çakışmaz. Yayınlananlar /api/content'ten
 // uygulamalara iner (taslaklar inmez).
 const CONTENT_KEY = '__global:content_questions';
+// Yerleşik (koda gömülü) soruların panel düzenlemeleri: "<topic>:<0-5>" ->
+// { hidden?, tr?, en?, query? }. Uygulama seans kurarken uygular.
+const OVERRIDES_KEY = '__global:content_overrides';
 const TOPIC_KEYS = ['greetings', 'introduce', 'emotions', 'daily', 'school', 'food', 'hobbies', 'places', 'problem', 'dreams'];
+const OVERRIDE_KEY_RE = new RegExp(`^(?:${TOPIC_KEYS.join('|')}):[0-5]$`);
 const MAX_QUESTIONS = 200;
 
 function cleanText(v, maxLen) {
@@ -134,12 +138,23 @@ async function readContentList() {
     return Array.isArray(list) ? list : [];
 }
 
-async function writeContentList(list) {
+async function writeGlobal(userKey, value) {
     await query(
         `INSERT INTO app_data (user_key, value, updated_at) VALUES ($1, $2, now())
          ON CONFLICT (user_key) DO UPDATE SET value = $2, updated_at = now()`,
-        [CONTENT_KEY, JSON.stringify(list)]
+        [userKey, JSON.stringify(value)]
     );
+}
+
+async function writeContentList(list) {
+    await writeGlobal(CONTENT_KEY, list);
+}
+
+async function readOverrides() {
+    const rows = await query('SELECT value FROM app_data WHERE user_key = $1', [OVERRIDES_KEY]);
+    if (!rows.length) return {};
+    const v = parseColumn(rows[0].value);
+    return v && typeof v === 'object' && !Array.isArray(v) ? v : {};
 }
 
 async function handleContentPost(req, res) {
@@ -190,7 +205,34 @@ async function handleContentPost(req, res) {
         return res.json({ ok: true });
     }
 
-    return res.status(400).json({ error: 'Gecersiz action', valid: ['upsert', 'publish', 'delete'] });
+    if (action === 'override') {
+        const key = cleanText(req.body?.key, 30);
+        if (!OVERRIDE_KEY_RE.test(key)) return res.status(400).json({ error: 'GECERSIZ_KEY', format: '<topic>:<0-5>' });
+        const o = {};
+        if (req.body?.hidden === true) o.hidden = true;
+        const tr = cleanText(req.body?.tr, 300);
+        const en = cleanText(req.body?.en, 300);
+        const q = cleanText(req.body?.query, 100);
+        if (tr) o.tr = tr;
+        if (en) o.en = en;
+        if (q) o.query = q;
+        if (!Object.keys(o).length) return res.status(400).json({ error: 'BOS_OVERRIDE' });
+        const map = await readOverrides();
+        map[key] = { ...o, updatedAt: new Date().toISOString() };
+        await writeGlobal(OVERRIDES_KEY, map);
+        return res.json({ ok: true, key, override: map[key] });
+    }
+
+    if (action === 'restore') {
+        const key = cleanText(req.body?.key, 30);
+        const map = await readOverrides();
+        if (!map[key]) return res.status(404).json({ error: 'NOT_FOUND' });
+        delete map[key];
+        await writeGlobal(OVERRIDES_KEY, map);
+        return res.json({ ok: true });
+    }
+
+    return res.status(400).json({ error: 'Gecersiz action', valid: ['upsert', 'publish', 'delete', 'override', 'restore'] });
 }
 
 export default async function handler(req, res) {
@@ -211,7 +253,7 @@ export default async function handler(req, res) {
         }
 
         if (resource === 'content') {
-            return res.json({ questions: await readContentList() });
+            return res.json({ questions: await readContentList(), overrides: await readOverrides() });
         }
 
         if (resource === 'users') {

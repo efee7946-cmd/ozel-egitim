@@ -4235,6 +4235,7 @@ function getQuestionsForCurrentLevel(questions, sourceType, sourceKey) {
 }
 
 let _customQuestions = [];
+let _customOverrides = {};
 
 function customQuestionsForTopic(topicKey) {
     const useEn = _lang === 'en';
@@ -4247,22 +4248,48 @@ function customQuestionsForTopic(topicKey) {
         }));
 }
 
+function applyQuestionOverrides(topicKey, questions) {
+    if (!_customOverrides || !Object.keys(_customOverrides).length) return questions;
+    const useEn = _lang === 'en';
+    const out = [];
+    questions.forEach((orig, i) => {
+        const o = _customOverrides[topicKey + ':' + i];
+        if (!o) { out.push(orig); return; }
+        if (o.hidden) return;
+        out.push({
+            q: (useEn ? o.en : o.tr) || orig.q,
+            query: o.query || orig.query,
+            goal: orig.goal
+        });
+    });
+    return out;
+}
+
 async function loadCustomQuestions() {
-    try { _customQuestions = JSON.parse(localStorage.getItem('lms_custom_questions')) || []; } catch (_) { _customQuestions = []; }
+    try {
+        const cached = JSON.parse(localStorage.getItem('lms_custom_questions'));
+        if (Array.isArray(cached)) {
+            _customQuestions = cached;
+        } else if (cached && typeof cached === 'object') {
+            _customQuestions = Array.isArray(cached.q) ? cached.q : [];
+            _customOverrides = cached.o && typeof cached.o === 'object' ? cached.o : {};
+        }
+    } catch (_) { _customQuestions = []; _customOverrides = {}; }
     try {
         const r = await fetch(API_BASE + '/api/content', { signal: AbortSignal.timeout(8000) });
         if (!r.ok) return;
         const d = await r.json();
         if (Array.isArray(d.questions)) {
             _customQuestions = d.questions;
-            try { localStorage.setItem('lms_custom_questions', JSON.stringify(d.questions)); } catch (_) {}
+            _customOverrides = d.overrides && typeof d.overrides === 'object' ? d.overrides : {};
+            try { localStorage.setItem('lms_custom_questions', JSON.stringify({ q: _customQuestions, o: _customOverrides })); } catch (_) {}
         }
     } catch (_) {}
 }
 
 function getActiveTherapyQuestions() {
     const topic = getCurrentMapTopic();
-    const base = getQuestionsForCurrentLevel(topic.questions, 'map', topic.key);
+    const base = applyQuestionOverrides(topic.key, getQuestionsForCurrentLevel(topic.questions, 'map', topic.key));
     return [...base, ...customQuestionsForTopic(topic.key)];
 }
 

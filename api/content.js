@@ -6,6 +6,12 @@ import { query } from './_db.js';
 import { allowOrigin } from './_cors.js';
 
 const CONTENT_KEY = '__global:content_questions';
+const OVERRIDES_KEY = '__global:content_overrides';
+
+function parseJsonColumn(rows) {
+    if (!rows.length) return null;
+    try { return JSON.parse(rows[0].value); } catch { return null; }
+}
 
 export default async function handler(req, res) {
     allowOrigin(req, res);
@@ -16,10 +22,23 @@ export default async function handler(req, res) {
 
     try {
         const rows = await query('SELECT value FROM app_data WHERE user_key = $1', [CONTENT_KEY]);
-        let list = [];
-        if (rows.length) {
-            try { list = JSON.parse(rows[0].value) || []; } catch { list = []; }
+        const list = parseJsonColumn(rows) || [];
+
+        const ovRows = await query('SELECT value FROM app_data WHERE user_key = $1', [OVERRIDES_KEY]);
+        const ovRaw = parseJsonColumn(ovRows);
+        const overrides = {};
+        if (ovRaw && typeof ovRaw === 'object' && !Array.isArray(ovRaw)) {
+            for (const [key, o] of Object.entries(ovRaw)) {
+                if (!o || typeof o !== 'object') continue;
+                const out = {};
+                if (o.hidden === true) out.hidden = true;
+                if (o.tr) out.tr = o.tr;
+                if (o.en) out.en = o.en;
+                if (o.query) out.query = o.query;
+                if (Object.keys(out).length) overrides[key] = out;
+            }
         }
+
         const questions = (Array.isArray(list) ? list : [])
             .filter(q => q && q.published === true && q.topic && q.tr)
             .map(q => ({
@@ -32,7 +51,7 @@ export default async function handler(req, res) {
                 query: q.query || '',
             }));
         res.setHeader('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=3600');
-        return res.json({ questions });
+        return res.json({ questions, overrides });
     } catch (err) {
         console.error('Content error:', err);
         return res.status(500).json({ error: 'SERVER_ERROR' });
