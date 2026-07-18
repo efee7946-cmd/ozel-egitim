@@ -788,6 +788,15 @@ const STRINGS = {
     ob_skip: 'Atla',
     ob_next: 'İleri →',
     ob_start: 'Başlayalım! 🎉',
+    intro_s1_title: "YıldızCan'a Hoş Geldin! 👋",
+    intro_s1_text: 'Özel gereksinimli çocuklar için konuşma, iletişim ve öğrenme arkadaşı. Kısaca tanıtalım mı?',
+    intro_s2_title: 'Konuşarak Pratik Yap',
+    intro_s2_text: 'Bir konu seç, Yıldız Can sorular sorsun. Çocuk mikrofona konuşarak yanıt verir, anında teşvik alır.',
+    intro_s3_title: 'Kartlarla İletişim Kur',
+    intro_s3_text: 'Konuşmanın zor olduğu anlarda AAC panosundaki kartlara dokunarak iletişim kurun; Günlük Görevler rutinleri kolaylaştırsın.',
+    intro_s4_title: 'Yıldız Topla, Gelişimi İzle',
+    intro_s4_text: 'Oyunlar ve seanslarla yıldız biriktirin. Gelişim grafiği, veli raporu ve BEP taslağı Analiz ekranında hazır.',
+    intro_next: 'Devam →',
     auth_email_label: 'E-posta',
     AUTH_EMAIL_REQUIRED: 'E-posta adresi gerekli',
     auth_reset_email_info: 'Kullanıcı adınızı veya e-postanızı girin, kayıtlı e-postanıza sıfırlama kodu gönderelim.',
@@ -1699,6 +1708,15 @@ const STRINGS = {
     ob_skip: 'Skip',
     ob_next: 'Next →',
     ob_start: "Let's start! 🎉",
+    intro_s1_title: 'Welcome to YıldızCan! 👋',
+    intro_s1_text: 'A speech, communication and learning buddy for children with special needs. Here is a quick tour.',
+    intro_s2_title: 'Practice by Speaking',
+    intro_s2_text: 'Pick a topic and Yıldız Can asks questions. The child answers by speaking into the microphone and gets instant encouragement.',
+    intro_s3_title: 'Communicate with Cards',
+    intro_s3_text: 'When speaking is hard, tap the AAC board cards to communicate; Daily Tasks make routines easier.',
+    intro_s4_title: 'Collect Stars, Track Progress',
+    intro_s4_text: 'Earn stars through games and sessions. The progress chart, parent report and IEP draft are ready on the Analysis screen.',
+    intro_next: 'Continue →',
     auth_email_label: 'Email',
     AUTH_EMAIL_REQUIRED: 'Email address is required',
     auth_reset_email_info: 'Enter your username or email and we will send a reset code to your registered email.',
@@ -4800,6 +4818,72 @@ function finishOnboarding() {
     if (modal) modal.style.display = 'none';
 }
 
+let _introStep = 0;
+const INTRO_STEPS = 4;
+
+function maybeShowIntro() {
+    if (localStorage.getItem('lms_intro_seen') || localStorage.getItem('lms_onboarding_done')) return;
+    const screen = document.getElementById('intro-screen');
+    if (!screen) return;
+    _introStep = 0;
+    _renderIntroStep();
+    screen.style.display = 'flex';
+}
+
+function _renderIntroStep() {
+    const track = document.getElementById('introTrack');
+    if (track) track.style.transform = 'translateX(-' + (_introStep * 100) + '%)';
+    document.querySelectorAll('#intro-screen .intro-slide').forEach(el => {
+        el.classList.toggle('active', Number(el.dataset.step) === _introStep);
+    });
+    const dots = document.getElementById('introDots');
+    if (dots) {
+        dots.innerHTML = Array.from({ length: INTRO_STEPS }, (_, i) =>
+            `<span class="ob-dot${i === _introStep ? ' active' : ''}"></span>`).join('');
+    }
+    const nextBtn = document.getElementById('introNextBtn');
+    if (nextBtn) nextBtn.textContent = _introStep === INTRO_STEPS - 1 ? t('ob_start') : t('intro_next');
+}
+
+function nextIntroStep() {
+    if (_introStep >= INTRO_STEPS - 1) return finishIntro(false);
+    _introStep++;
+    _renderIntroStep();
+}
+
+function prevIntroStep() {
+    if (_introStep <= 0) return;
+    _introStep--;
+    _renderIntroStep();
+}
+
+function finishIntro(skipped) {
+    localStorage.setItem('lms_intro_seen', '1');
+    if (!skipped) localStorage.setItem('lms_onboarding_done', '1');
+    const screen = document.getElementById('intro-screen');
+    if (screen) screen.style.display = 'none';
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const screen = document.getElementById('intro-screen');
+    if (!screen) return;
+    let introSwipeStartX = null;
+    screen.addEventListener('touchstart', e => {
+        introSwipeStartX = e.touches[0].clientX;
+    }, { passive: true });
+    screen.addEventListener('touchend', e => {
+        if (introSwipeStartX === null) return;
+        const dx = e.changedTouches[0].clientX - introSwipeStartX;
+        introSwipeStartX = null;
+        if (Math.abs(dx) < 50) return;
+        if (dx < 0) {
+            if (_introStep < INTRO_STEPS - 1) nextIntroStep();
+        } else {
+            prevIntroStep();
+        }
+    }, { passive: true });
+});
+
 function _getNativeSpeech() {
     try {
         if (typeof Capacitor !== 'undefined' && Capacitor.isNativePlatform()
@@ -6291,6 +6375,7 @@ async function checkAuthSession() {
 
     hideSplash();
     showOnly('auth-screen');
+    maybeShowIntro();
 }
 
 // Cihaz kimliği: Android'de ANDROID_ID (uygulama silinip yeniden kurulsa da

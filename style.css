@@ -5094,6 +5094,147 @@ body.a11y-reduce-motion * { transition: none !important; animation: none !import
     font-size: 1rem; font-weight: 700; cursor: pointer;
 }
 
+/* ========== İLK KURULUM TANITIMI ========== */
+#intro-screen {
+    position: fixed; inset: 0; z-index: 9500;
+    background: linear-gradient(180deg, #92d8e8 0%, #109486 100%);
+    display: flex; flex-direction: column;
+    overflow: hidden;
+}
+.intro-skip {
+    position: absolute; top: calc(14px + env(safe-area-inset-top)); right: 16px; z-index: 2;
+    background: rgba(255,255,255,0.22); color: #fff;
+    border: none; border-radius: 999px;
+    padding: 10px 22px; min-height: 44px;
+    font-size: 0.95rem; font-weight: 700; cursor: pointer;
+}
+.intro-track {
+    flex: 1; display: flex; align-items: stretch;
+    transition: transform 0.35s ease;
+}
+.intro-slide {
+    min-width: 100%; box-sizing: border-box;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center; padding: 24px 32px;
+}
+.intro-slide h2 {
+    margin: 26px 0 10px; color: #fffaf0; font-size: 1.45rem; font-weight: 800;
+    text-shadow: 0 2px 6px rgba(8, 90, 82, 0.45);
+}
+.intro-slide p {
+    margin: 0; max-width: 340px;
+    color: rgba(255,255,255,0.94); font-size: 1rem; line-height: 1.6;
+    text-shadow: 0 1px 3px rgba(8, 90, 82, 0.35);
+}
+.intro-visual {
+    position: relative; width: 200px; height: 190px;
+    display: flex; align-items: center; justify-content: center;
+}
+.intro-fx { pointer-events: none; user-select: none; }
+.intro-avatar-ring {
+    width: 132px; height: 132px; border-radius: 50%;
+    border: 5px solid rgba(255,255,255,0.95);
+    overflow: hidden; background: #fff;
+    box-shadow: 0 12px 36px rgba(0,0,0,0.22);
+}
+.intro-avatar-ring img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.intro-slide.active .intro-avatar-ring { animation: intro-pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+.intro-wave {
+    position: absolute; bottom: 2px; right: 6px; font-size: 42px;
+    transform-origin: 70% 70%;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+}
+.intro-slide.active .intro-wave { animation: intro-wave 1.4s ease-in-out 0.5s 3; }
+.intro-twinkle { position: absolute; animation: splash-twinkle 1.6s ease-in-out infinite; }
+.intro-twinkle.tw1 { top: -4px; left: 4px; font-size: 26px; }
+.intro-twinkle.tw2 { top: 20px; right: -2px; font-size: 18px; animation-delay: 0.4s; }
+.intro-twinkle.tw3 { bottom: 14px; left: -10px; font-size: 17px; animation-delay: 0.7s; }
+.intro-twinkle.tw4 { bottom: -2px; right: 34px; font-size: 21px; animation-delay: 0.2s; }
+.intro-emoji-main {
+    font-size: 84px;
+    filter: drop-shadow(0 8px 18px rgba(0,0,0,0.25));
+}
+.intro-slide.active .intro-emoji-main { animation: intro-pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+.intro-mic-rings span {
+    position: absolute; inset: 32px; border-radius: 50%;
+    border: 3px solid rgba(255,255,255,0.75);
+    opacity: 0;
+}
+.intro-slide.active .intro-mic-rings span { animation: intro-ring 1.8s ease-out infinite; }
+.intro-slide.active .intro-mic-rings span:nth-child(2) { animation-delay: 0.9s; }
+.intro-bubble { position: absolute; font-size: 34px; opacity: 0; }
+.intro-bubble.bb1 { top: 2px; left: -4px; }
+.intro-bubble.bb2 { top: 30px; right: -8px; font-size: 28px; }
+.intro-slide.active .intro-bubble { animation: intro-rise-in 0.5s ease 0.5s both, intro-bob 2.4s ease-in-out 1s infinite; }
+.intro-slide.active .intro-bubble.bb2 { animation-delay: 0.8s, 1.3s; }
+.intro-cards { display: flex; gap: 14px; }
+.intro-card {
+    width: 74px; height: 88px;
+    background: #fff; border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 38px;
+    box-shadow: 0 10px 24px rgba(0,0,0,0.18);
+    opacity: 0;
+}
+.intro-slide.active .intro-card { animation: intro-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+.intro-slide.active .intro-card.ic2 { animation-delay: 0.18s; }
+.intro-slide.active .intro-card.ic3 { animation-delay: 0.36s; }
+.intro-drop { position: absolute; top: -6px; font-size: 30px; opacity: 0; }
+.intro-drop.dr1 { left: 20px; }
+.intro-drop.dr2 { left: 88px; font-size: 24px; }
+.intro-drop.dr3 { right: 18px; }
+.intro-slide.active .intro-drop { animation: intro-drop 2.2s ease-in infinite; }
+.intro-slide.active .intro-drop.dr2 { animation-delay: 0.6s; }
+.intro-slide.active .intro-drop.dr3 { animation-delay: 1.2s; }
+.intro-footer {
+    display: flex; flex-direction: column; align-items: center; gap: 16px;
+    padding: 10px 24px calc(26px + env(safe-area-inset-bottom));
+}
+#intro-screen .ob-dot { background: rgba(255,255,255,0.4); }
+#intro-screen .ob-dot.active { background: #fff; }
+.intro-next {
+    width: 100%; max-width: 340px; min-height: 54px;
+    background: #fff; color: #0e7a6e;
+    border: none; border-radius: 16px;
+    font-size: 1.1rem; font-weight: 800; cursor: pointer;
+    box-shadow: 0 10px 26px rgba(0,0,0,0.2);
+}
+.intro-next:active { transform: scale(0.98); }
+@keyframes intro-pop {
+    from { opacity: 0; transform: scale(0); }
+    to   { opacity: 1; transform: scale(1); }
+}
+@keyframes intro-wave {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-16deg); }
+    60% { transform: rotate(14deg); }
+}
+@keyframes intro-ring {
+    from { opacity: 0.9; transform: scale(0.55); }
+    to   { opacity: 0; transform: scale(1.3); }
+}
+@keyframes intro-rise-in {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes intro-bob {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-7px); }
+}
+@keyframes intro-drop {
+    0%   { opacity: 0; transform: translateY(-16px); }
+    12%  { opacity: 1; }
+    75%  { opacity: 1; transform: translateY(118px); }
+    100% { opacity: 0; transform: translateY(146px); }
+}
+@media (prefers-reduced-motion: reduce) {
+    .intro-track { transition: none; }
+    #intro-screen * { animation: none !important; }
+    .intro-bubble, .intro-card { opacity: 1; }
+    .intro-mic-rings, .intro-drop { display: none; }
+}
+
 /* ========== ANALİZ İLERLEME GRAFİĞİ ========== */
 .az-trend-chart { position: relative; margin-top: 6px; touch-action: pan-y; }
 .az-trend-tooltip {

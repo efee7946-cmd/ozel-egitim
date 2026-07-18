@@ -43,6 +43,60 @@
     <div class="splash-spinner"></div>
 </div>
 
+<!-- ===================== İLK KURULUM TANITIMI ===================== -->
+<div id="intro-screen" style="display:none">
+    <button type="button" class="intro-skip" onclick="finishIntro(true)" data-i18n="ob_skip">Atla</button>
+    <div class="intro-track" id="introTrack">
+        <div class="intro-slide active" data-step="0">
+            <div class="intro-visual">
+                <span class="intro-fx intro-twinkle tw1">⭐</span>
+                <span class="intro-fx intro-twinkle tw2">✨</span>
+                <span class="intro-fx intro-twinkle tw3">⭐</span>
+                <span class="intro-fx intro-twinkle tw4">✨</span>
+                <div class="intro-avatar-ring"><img src="avatar.png" alt=""></div>
+                <span class="intro-fx intro-wave">👋</span>
+            </div>
+            <h2 data-i18n="intro_s1_title">YıldızCan'a Hoş Geldin!</h2>
+            <p data-i18n="intro_s1_text">Özel gereksinimli çocuklar için konuşma, iletişim ve öğrenme arkadaşı. Kısaca tanıtalım mı?</p>
+        </div>
+        <div class="intro-slide" data-step="1">
+            <div class="intro-visual">
+                <div class="intro-mic-rings"><span></span><span></span></div>
+                <span class="intro-emoji-main">🎤</span>
+                <span class="intro-fx intro-bubble bb1">💬</span>
+                <span class="intro-fx intro-bubble bb2">🗨️</span>
+            </div>
+            <h2 data-i18n="intro_s2_title">Konuşarak Pratik Yap</h2>
+            <p data-i18n="intro_s2_text">Bir konu seç, Yıldız Can sorular sorsun. Çocuk mikrofona konuşarak yanıt verir, anında teşvik alır.</p>
+        </div>
+        <div class="intro-slide" data-step="2">
+            <div class="intro-visual">
+                <div class="intro-cards">
+                    <span class="intro-card ic1">🍎</span>
+                    <span class="intro-card ic2">⚽</span>
+                    <span class="intro-card ic3">🚗</span>
+                </div>
+            </div>
+            <h2 data-i18n="intro_s3_title">Kartlarla İletişim Kur</h2>
+            <p data-i18n="intro_s3_text">Konuşmanın zor olduğu anlarda AAC panosundaki kartlara dokunarak iletişim kurun; Günlük Görevler rutinleri kolaylaştırsın.</p>
+        </div>
+        <div class="intro-slide" data-step="3">
+            <div class="intro-visual">
+                <span class="intro-fx intro-drop dr1">⭐</span>
+                <span class="intro-fx intro-drop dr2">⭐</span>
+                <span class="intro-fx intro-drop dr3">⭐</span>
+                <span class="intro-emoji-main">🏆</span>
+            </div>
+            <h2 data-i18n="intro_s4_title">Yıldız Topla, Gelişimi İzle</h2>
+            <p data-i18n="intro_s4_text">Oyunlar ve seanslarla yıldız biriktirin. Gelişim grafiği, veli raporu ve BEP taslağı Analiz ekranında hazır.</p>
+        </div>
+    </div>
+    <div class="intro-footer">
+        <div class="onboarding-dots" id="introDots"></div>
+        <button type="button" class="intro-next" id="introNextBtn" onclick="nextIntroStep()">Devam →</button>
+    </div>
+</div>
+
 <!-- ===================== KİMLİK DOĞRULAMA EKRANI ===================== -->
 <div id="auth-screen" style="display:none">
     <div class="auth-card">
