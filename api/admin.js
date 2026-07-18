@@ -257,8 +257,8 @@ async function handleGeneratePost(req, res) {
     const topic = cleanText(req.body?.topic, 30);
     if (!TOPIC_KEYS.includes(topic)) return res.status(400).json({ error: 'GECERSIZ_TOPIC', valid: TOPIC_KEYS });
     const level = ['word', 'sentence', 'tell'].includes(req.body?.level) ? req.body.level : 'sentence';
-    const ageMin = Math.min(Math.max(Number(req.body?.ageMin) || 4, 3), 12);
-    const ageMax = Math.min(Math.max(Number(req.body?.ageMax) || 8, ageMin), 14);
+    const ageMin = Math.min(Math.max(Number(req.body?.ageMin) || 4, 3), 14);
+    const ageMax = Math.min(Math.max(Number(req.body?.ageMax) || 14, ageMin), 14);
     const count = Math.min(Math.max(Number(req.body?.count) || 5, 1), 8);
 
     const prompt = `Sen özel gereksinimli çocuklar (otizm, dil-konuşma gecikmesi) için konuşma pratiği sorusu yazan bir özel eğitim uzmanısın.
@@ -349,7 +349,7 @@ async function handleAnalyzePost(req, res) {
         starsTxt.length ? `Konuşma haritası konu yıldızları: ${starsTxt.join(', ')}.` : '',
     ].filter(Boolean).join('\n');
 
-    const prompt = `Sen özel eğitim alanında deneyimli bir danışmansın. Aşağıda 4-8 yaş aralığındaki özel gereksinimli bir öğrencinin uygulama verilerinin sayısal özeti var. İsim veya kimlik bilgisi yok; isteme, uydurma.
+    const prompt = `Sen özel eğitim alanında deneyimli bir danışmansın. Aşağıda okul çağındaki (4-14 yaş, okul öncesi-ortaokul) özel gereksinimli bir öğrencinin uygulama verilerinin sayısal özeti var. İsim veya kimlik bilgisi yok; isteme, uydurma.
 
 VERİ:
 ${statsText}

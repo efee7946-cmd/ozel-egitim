@@ -1,7 +1,7 @@
 # Yıldız Sınıfı — CLAUDE.md
 
 ## Proje Özeti
-Özel eğitim öğretmenleri, terapistler ve veliler için Türkçe web uygulaması. Hedef kitle 4-8 yaş özel gereksinimli çocuklar. Vanilla JS + HTML + CSS single-page app; backend Vercel serverless + PostgreSQL (Aiven).
+Özel eğitim öğretmenleri, terapistler ve veliler için Türkçe web uygulaması. Hedef kitle 4-14 yaş (okul öncesi–ortaokul) özel gereksinimli çocuklar. Vanilla JS + HTML + CSS single-page app; backend Vercel serverless + PostgreSQL (Aiven).
 
 ## Çalıştırma
 ```bash
