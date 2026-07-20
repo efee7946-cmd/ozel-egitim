@@ -58,6 +58,9 @@ const STRINGS = {
     wiz_consent_sub: 'Bilgileri kaydetmeden önce veli onayını al.',
     wiz_back: '← Geri',
     wiz_next: 'Devam →',
+    wiz_login_link: 'Zaten hesabım var, giriş yap',
+    wiz_tour_object_toast: 'Şimdi nesne tanımayı deneyelim! 🧸',
+    wiz_tour_done_toast: 'Harika! Artık her şeye hazırsın 🎉',
     reg_username_placeholder: 'örnek: ahmet_ogretmen (harf, rakam, _)',
     reg_student_placeholder: 'örn: Ali',
     auth_kvkk_link1: 'Aydınlatma Metni',
@@ -166,6 +169,7 @@ const STRINGS = {
     offline_banner: '📡 İnternet bağlantın yok — giriş yapmak için bağlantı gerekiyor.',
     offline_toast: 'Çevrimdışı moddasın — internet isteyen özellikler kapalı, ilerlemen bağlantı gelince eşitlenir.',
     offline_action: 'Bu etkinlik için internet bağlantısı gerekiyor 📡',
+    press_back_again_exit: 'Çıkmak için tekrar geri tuşuna bas',
     a11y_delete: '🗑️ Hesabı Sil',
     a11y_privacy: 'Gizlilik Politikası & KVKK',
     lang_toggle: 'EN',
@@ -992,6 +996,9 @@ const STRINGS = {
     wiz_consent_sub: 'Get the parent’s consent before saving.',
     wiz_back: '← Back',
     wiz_next: 'Continue →',
+    wiz_login_link: 'I already have an account, log in',
+    wiz_tour_object_toast: "Let's try object recognition next! 🧸",
+    wiz_tour_done_toast: "Great! You're all set 🎉",
     reg_username_placeholder: 'e.g.: john_teacher (letters, numbers, _)',
     reg_student_placeholder: 'e.g.: Alex',
     auth_kvkk_link1: 'Privacy Notice',
@@ -1099,6 +1106,7 @@ const STRINGS = {
     offline_banner: '📡 No internet connection — you need to be online to sign in.',
     offline_toast: 'You\'re offline — online features are disabled and your progress will sync when you reconnect.',
     offline_action: 'This activity needs an internet connection 📡',
+    press_back_again_exit: 'Press back again to exit',
     a11y_delete: '🗑️ Delete Account',
     a11y_privacy: 'Privacy Policy & KVKK',
     lang_toggle: 'TR',
@@ -2225,6 +2233,7 @@ function setCharacterEmotion(emotion) {
 
 function celebrateCorrectAnswer() {
     setCharacterEmotion(CharacterEmotion.EXCITED);
+    hapticSuccess();
     confetti({ particleCount: 100, spread: 80, origin: { y: 0.5 } });
     if (window.avatar3d && window.avatar3d.triggerCelebration) {
         window.avatar3d.triggerCelebration();
@@ -2279,6 +2288,14 @@ function showCustomConfirm(message) {
     });
 }
 
+const FEATURE_SCREENS = ['game-container', 'speechmap-screen', 'schedule-screen', 'aac-screen', 'store-screen', 'object-screen', 'analysis-screen'];
+
+function _navDirection(fromId, toId) {
+    if (toId === 'menu-screen' && FEATURE_SCREENS.includes(fromId)) return 'back';
+    if (fromId === 'menu-screen' && FEATURE_SCREENS.includes(toId)) return 'forward';
+    return null;
+}
+
 async function showOnly(id, options = {}) {
     if (!options.skipTherapyConfirm && isTherapyInProgress() && id !== 'game-container') {
         const msg = _lang === 'en'
@@ -2307,9 +2324,11 @@ async function showOnly(id, options = {}) {
     if (target) {
         target.style.display = 'flex';
         if (isNewScreen) {
-            target.classList.remove('screen-enter');
+            const dir = _navDirection(prevScreen, id);
+            const animClass = dir === 'back' ? 'screen-enter-back' : dir === 'forward' ? 'screen-enter-fwd' : 'screen-enter';
+            target.classList.remove('screen-enter', 'screen-enter-fwd', 'screen-enter-back');
             void target.offsetWidth;
-            target.classList.add('screen-enter');
+            target.classList.add(animClass);
         }
     }
 
@@ -2725,6 +2744,12 @@ function hapticSuccess() {
     try { if (navigator.vibrate) navigator.vibrate([12, 60, 18]); } catch (_) {}
 }
 
+function hapticWarning() {
+    const plugin = _hapticsPlugin();
+    if (plugin) { plugin.notification({ type: 'WARNING' }).catch(() => {}); return; }
+    try { if (navigator.vibrate) navigator.vibrate([10, 40, 10]); } catch (_) {}
+}
+
 let _screenWakeLock = null;
 const KEEP_AWAKE_SCREENS = ['game-container', 'aac-screen', 'object-screen'];
 
@@ -2760,7 +2785,7 @@ document.addEventListener('visibilitychange', () => {
 });
 
 document.addEventListener('click', e => {
-    if (e.target.closest('.menu-tile, .bottom-nav-item, .intro-next, .topic-start-btn, .aac-card')) hapticTap();
+    if (e.target.closest('button, .wiz-choice-card, .wiz-cond-chip')) hapticTap();
 });
 
 function renderRoutineCard() {
@@ -2898,10 +2923,30 @@ async function startApp(resetSession) {
 
 // Supabase auth listener kaldırıldı — kendi auth sistemi kullanılıyor
 
+let _backPressedOnce = false;
+let _backPressedTimer = null;
+
+function initHardwareBackButton() {
+    try {
+        if (typeof Capacitor === 'undefined' || !Capacitor.isNativePlatform()) return;
+        const AppPlugin = Capacitor.Plugins && Capacitor.Plugins.App;
+        if (!AppPlugin) return;
+        AppPlugin.addListener('backButton', ({ canGoBack }) => {
+            if (canGoBack) { window.history.back(); return; }
+            if (_backPressedOnce) { AppPlugin.exitApp(); return; }
+            _backPressedOnce = true;
+            showToast(t('press_back_again_exit'));
+            clearTimeout(_backPressedTimer);
+            _backPressedTimer = setTimeout(() => { _backPressedOnce = false; }, 2000);
+        });
+    } catch (_) {}
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     // Supabase auth atlanıyor — kendi auth sistemimizi kullanıyoruz
     checkAuthSession();
     loadCustomQuestions();
+    initHardwareBackButton();
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('/sw.js').catch(() => {});
     }
@@ -2912,6 +2957,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 async function goToMenu() {
+    const _leavingScreen = currentScreenId;
     if (isTherapyInProgress()) {
         const msg = _lang === 'en'
             ? "Are you sure you want to leave the speech practice session? Your progress will be lost."
@@ -2931,6 +2977,7 @@ async function goToMenu() {
     await showOnly('menu-screen', { skipTherapyConfirm: true });
     maybeGreetChild();
     if (shouldAwardStars) _showStarReward();
+    advanceMobileFirstLaunch(_leavingScreen);
 }
 
 let currentTopic = '';
@@ -4458,6 +4505,7 @@ function showTherapySessionComplete() {
     const nextTopic = SPEECH_MAP_TOPICS[SPEECH_MAP_TOPICS.indexOf(topic) + 1];
     const finishedAll = firstCompletion && !nextTopic;
     recordSpeechMapCompletion(topic.key, earnedStars);
+    hapticSuccess();
     confetti({ particleCount: finishedAll ? 220 : 120, spread: finishedAll ? 120 : 90 });
 
     const card = document.getElementById('therapyMainCard');
@@ -5291,6 +5339,7 @@ function incrementDailyTask(type) {
             setTimeout(() => {
                 addStars(10);
                 showToast(t('task_all_done_toast'));
+                hapticSuccess();
                 if (typeof confetti === 'function') confetti({ particleCount: 150, spread: 100 });
             }, 900);
         }
@@ -5645,6 +5694,7 @@ function buyStoreItem(id) {
     s.equipped = id;
     DB.update(_starsKey(), () => s);
     showToast(t('store_bought_toast').replace('{item}', item.emoji + ' ' + item.label));
+    hapticSuccess();
     if (typeof confetti === 'function') confetti({ particleCount: 90, spread: 75 });
     _renderStoreMannequin();
     _renderStoreGrid();
@@ -6060,6 +6110,7 @@ function _objCheckAnswer(raw) {
         _objAnimTimer = 0;
         _objFeedbackShow(true, t('object_correct'));
         speakFallback(t('object_correct'));
+        hapticSuccess();
         if (typeof confetti === 'function') confetti({ particleCount: 100, spread: 80, origin: { y: 0.5 } });
         incrementDailyTask('object');
         setTimeout(() => { _objAnimState = null; _objBusy = false; _objNext(); }, 1400);
@@ -6067,6 +6118,7 @@ function _objCheckAnswer(raw) {
         _objErrors++;
         _objFeedbackShow(false, t('object_wrong'));
         speakFallback(t('object_try_again'));
+        hapticWarning();
     }
 }
 
@@ -6121,6 +6173,7 @@ function _objComplete() {
     document.getElementById('objComplete').style.display = '';
     _saveObjResult().catch(() => {});
     addStars(_objErrors === 0 ? 3 : (_objErrors <= 2 ? 2 : 1));
+    hapticSuccess();
     if (typeof confetti === 'function') confetti({ particleCount: 120, spread: 90 });
     speakFallback(t('object_complete_title'));
 }
@@ -6422,6 +6475,12 @@ function hideSplash() {
     const splash = document.getElementById('splash-screen');
     if (!splash || _splashHiding) return;
     _splashHiding = true;
+    try {
+        if (typeof Capacitor !== 'undefined' && Capacitor.isNativePlatform()
+            && Capacitor.Plugins && Capacitor.Plugins.SplashScreen) {
+            Capacitor.Plugins.SplashScreen.hide().catch(() => {});
+        }
+    } catch (_) {}
     const wait = Math.max(0, 2500 - (Date.now() - _splashShownAt));
     setTimeout(() => {
         splash.classList.add('splash-hide');
@@ -6494,8 +6553,16 @@ async function checkAuthSession() {
     } catch (e) {}
 
     hideSplash();
-    showOnly('auth-screen');
-    maybeShowIntro();
+    if (isNativeMobileApp() && !localStorage.getItem('lms_mobile_first_launch_done')) {
+        startMobileFirstLaunchFlow();
+    } else {
+        showOnly('auth-screen');
+        maybeShowIntro();
+    }
+}
+
+function isNativeMobileApp() {
+    try { return typeof Capacitor !== 'undefined' && Capacitor.isNativePlatform(); } catch (_) { return false; }
 }
 
 // Cihaz kimliği: Android'de ANDROID_ID (uygulama silinip yeniden kurulsa da
@@ -6543,6 +6610,46 @@ async function continueAsGuest() {
     _authUser = { username: 'guest', displayName: _lang === 'en' ? 'Guest' : 'Misafir' };
     await DB.initEncryption(_authToken).catch(() => {});
     await continueAuthenticatedEntry();
+}
+
+// Mobil uygulamada ilk kurulumdan sonraki ilk açılışta auth-screen yerine
+// doğrudan misafir gibi öğrenci ekleme sihirbazı açılır, ardından konuşma
+// pratiği ve nesne tanıma özellikleri sırayla gerçek ekranlarında denetilir.
+let _mobileFirstLaunchActive = false;
+let _mobileFirstLaunchStep = 0;
+
+async function startMobileFirstLaunchFlow() {
+    localStorage.setItem('lms_mobile_first_launch_done', '1');
+    localStorage.setItem('lms_intro_seen', '1');
+    localStorage.setItem('lms_onboarding_done', '1');
+    _mobileFirstLaunchActive = true;
+    _mobileFirstLaunchStep = 0;
+    document.body.classList.add('mobile-first-launch');
+    await continueAsGuest();
+}
+
+async function exitMobileFirstLaunchToAuth() {
+    _mobileFirstLaunchActive = false;
+    _mobileFirstLaunchStep = 0;
+    document.body.classList.remove('mobile-first-launch');
+    await clearAuthSessionLocal();
+    showOnly('auth-screen');
+    document.getElementById('authError').textContent = '';
+    switchAuthTab('login');
+}
+
+function advanceMobileFirstLaunch(leavingScreen) {
+    if (!_mobileFirstLaunchActive) return;
+    if (_mobileFirstLaunchStep === 1 && leavingScreen === 'game-container') {
+        _mobileFirstLaunchStep = 2;
+        showToast(t('wiz_tour_object_toast'));
+        setTimeout(() => { if (_mobileFirstLaunchActive) goToObjectRecognition(); }, 900);
+    } else if (_mobileFirstLaunchStep === 2 && leavingScreen === 'object-screen') {
+        _mobileFirstLaunchActive = false;
+        _mobileFirstLaunchStep = 0;
+        document.body.classList.remove('mobile-first-launch');
+        showToast(t('wiz_tour_done_toast'));
+    }
 }
 
 function onAuthSuccess() {
@@ -7532,7 +7639,10 @@ async function createStudentFromLogin() {
     activeStudentName = student.name;
     childName = student.name;
     onAuthSuccessWithStudent(student);
-    if (!existing) maybeStartFirstPractice();
+    if (!existing) {
+        if (_mobileFirstLaunchActive) _mobileFirstLaunchStep = 1;
+        maybeStartFirstPractice();
+    }
 }
 
 function goToLogin() {

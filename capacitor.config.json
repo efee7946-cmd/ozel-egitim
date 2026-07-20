@@ -10,5 +10,13 @@
   "ios": {
     "contentInset": "never",
     "backgroundColor": "#ffffff"
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchAutoHide": false,
+      "backgroundColor": "#109486",
+      "androidScaleType": "CENTER_CROP",
+      "showSpinner": false
+    }
   }
 }

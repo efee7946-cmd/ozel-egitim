@@ -4597,6 +4597,8 @@ body.a11y-reduce-motion * { transition: none !important; animation: none !import
     padding: 6px 10px;
 }
 .wiz-exit-btn:hover { color: #6c5ce7; }
+.wiz-login-link { display: none; }
+body.mobile-first-launch .wiz-login-link { display: block; }
 .login-teacher-btn {
     background: none; border: 2px solid #dde3ee; border-radius: 14px;
     padding: 12px 24px; font-size: 0.88rem; font-weight: 700; color: #6c5ce7;
@@ -6878,6 +6880,16 @@ body.has-bottom-nav #object-screen {
     from { opacity: 0; transform: translateY(12px); }
     to   { opacity: 1; transform: none; }
 }
+.screen-enter-fwd { animation: screen-enter-fwd 0.26s cubic-bezier(.22,.61,.36,1) both; }
+@keyframes screen-enter-fwd {
+    from { opacity: 0; transform: translateX(36px); }
+    to   { opacity: 1; transform: none; }
+}
+.screen-enter-back { animation: screen-enter-back 0.26s cubic-bezier(.22,.61,.36,1) both; }
+@keyframes screen-enter-back {
+    from { opacity: 0; transform: translateX(-36px); }
+    to   { opacity: 1; transform: none; }
+}
 @media (prefers-reduced-motion: reduce) {
-    .screen-enter { animation: none; }
+    .screen-enter, .screen-enter-fwd, .screen-enter-back { animation: none; }
 }
