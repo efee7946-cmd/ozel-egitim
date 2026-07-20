@@ -118,6 +118,7 @@ test.describe('Kayıt, giriş ve veri eşitleme akışları', () => {
 
     // Veli onayı işaretlenmeden öğrenci oluşturulamaz
     await page.fill('#loginNameInput', 'Sync Çocuk');
+    for (let i = 0; i < 4; i++) await page.click('#wizNextBtn');
     await page.click('#loginSaveBtn');
     await expect(page.locator('#loginProfileStatus')).toContainText('onaylayın');
 
@@ -155,6 +156,7 @@ test.describe('Kayıt, giriş ve veri eşitleme akışları', () => {
     await page.waitForSelector('#login-screen', { state: 'visible' });
 
     await page.fill('#loginNameInput', 'Offline Çocuk');
+    for (let i = 0; i < 4; i++) await page.click('#wizNextBtn');
     await page.check('#loginVeliConsent');
     await page.click('#loginSaveBtn');
 

@@ -270,57 +270,104 @@
         <div class="login-students" id="loginStudents">
             <div class="login-loading" data-i18n="loading">Yükleniyor...</div>
         </div>
-        <div class="login-add-form" id="loginAddForm">
-            <div class="auth-field">
-                <label data-i18n="auth_student_name">Öğrencinin Adı</label>
-                <input type="text" id="loginNameInput" class="login-name-input"
-                    data-i18n-placeholder="student_placeholder" placeholder="Öğrenci adı" maxlength="30">
+        <div class="login-add-form wiz" id="loginAddForm">
+            <div class="wiz-topbar">
+                <div class="wiz-progress"><div class="wiz-progress-bar" id="wizProgressBar"></div></div>
+                <span class="wiz-step-counter" id="wizStepCounter">1 / 5</span>
+            </div>
+
+            <!-- Adım 1: Ad -->
+            <div class="wiz-step active" data-step="1">
+                <div class="wiz-step-head">
+                    <span class="wiz-step-icon">✏️</span>
+                    <h3 class="wiz-step-title" data-i18n="wiz_name_title">Öğrencinin adı ne?</h3>
+                    <p class="wiz-step-sub" data-i18n="wiz_name_sub">Uygulama boyunca bu isimle hitap edeceğiz.</p>
+                </div>
+                <input type="text" id="loginNameInput" class="wiz-text-input"
+                    data-i18n-placeholder="student_placeholder" placeholder="Öğrenci adı" maxlength="30"
+                    autocomplete="off"
+                    onkeydown="if(event.key==='Enter'){event.preventDefault();wizNext();}">
                 <div class="guest-name-hint" id="guestNameHint" style="display:none" data-i18n="guest_name_hint">Denemek için gerçek isim yerine takma ad yazabilirsiniz.</div>
             </div>
-            <div class="auth-field">
-                <label data-i18n="auth_student_emoji">Öğrenci Emojisi</label>
+
+            <!-- Adım 2: Avatar -->
+            <div class="wiz-step" data-step="2">
+                <div class="wiz-step-head">
+                    <span class="wiz-step-icon">🎨</span>
+                    <h3 class="wiz-step-title" data-i18n="wiz_emoji_title">Bir avatar seç</h3>
+                    <p class="wiz-step-sub" data-i18n="wiz_emoji_sub">Öğrencinin profilinde bu simge görünecek.</p>
+                </div>
                 <div class="login-emoji-picker" id="loginEmojiPicker"></div>
                 <input type="hidden" id="loginStudentEmoji" value="🌟">
             </div>
-            <div class="auth-field">
-                <label data-i18n="auth_edu_level">Eğitim Kademesi</label>
-                <div class="reg-level-group">
-                    <label class="reg-level-opt">
+
+            <!-- Adım 3: Kademe -->
+            <div class="wiz-step" data-step="3">
+                <div class="wiz-step-head">
+                    <span class="wiz-step-icon">🎓</span>
+                    <h3 class="wiz-step-title" data-i18n="wiz_level_title">Eğitim kademesi</h3>
+                    <p class="wiz-step-sub" data-i18n="wiz_level_sub">İçerik zorluğunu buna göre ayarlıyoruz.</p>
+                </div>
+                <div class="wiz-choice-group">
+                    <label class="wiz-choice-card">
                         <input type="radio" name="loginLevel" value="ogreti">
-                        <span data-i18n="auth_level_mild">Hafif – Öğretilebilir</span>
+                        <span class="wiz-choice-body"><span class="wiz-choice-title" data-i18n="auth_level_mild">Hafif – Öğretilebilir</span></span>
+                        <span class="wiz-choice-mark"></span>
                     </label>
-                    <label class="reg-level-opt">
+                    <label class="wiz-choice-card">
                         <input type="radio" name="loginLevel" value="egit" checked>
-                        <span data-i18n="auth_level_moderate">Orta – Eğitilebilir</span>
+                        <span class="wiz-choice-body"><span class="wiz-choice-title" data-i18n="auth_level_moderate">Orta – Eğitilebilir</span></span>
+                        <span class="wiz-choice-mark"></span>
                     </label>
-                    <label class="reg-level-opt">
+                    <label class="wiz-choice-card">
                         <input type="radio" name="loginLevel" value="destekli">
-                        <span data-i18n="auth_level_severe">Ağır/İleri – Desteklenen</span>
+                        <span class="wiz-choice-body"><span class="wiz-choice-title" data-i18n="auth_level_severe">Ağır/İleri – Desteklenen</span></span>
+                        <span class="wiz-choice-mark"></span>
                     </label>
                 </div>
             </div>
-            <div class="auth-field">
-                <label data-i18n="auth_diagnosis">Tanı / Eşlik Eden Durumlar</label>
-                <div class="reg-condition-chips">
-                    <label class="reg-chip"><input type="checkbox" class="login-cond" value="osb"> <span data-i18n="auth_cond_osb">OSB</span></label>
-                    <label class="reg-chip"><input type="checkbox" class="login-cond" value="dehb"> <span data-i18n="auth_cond_dehb">DEHB</span></label>
-                    <label class="reg-chip"><input type="checkbox" class="login-cond" value="dil"> <span data-i18n="auth_cond_dil">Dil / Konuşma</span></label>
-                    <label class="reg-chip"><input type="checkbox" class="login-cond" value="down"> <span data-i18n="auth_cond_down">Down Sendromu</span></label>
-                    <label class="reg-chip"><input type="checkbox" class="login-cond" value="cp"> <span data-i18n="auth_cond_cp">Serebral Palsi</span></label>
-                    <label class="reg-chip"><input type="checkbox" class="login-cond" value="oog"> <span data-i18n="auth_cond_oog">Öz. Öğrenme Güçlüğü</span></label>
-                    <label class="reg-chip"><input type="checkbox" class="login-cond" value="ekolali"> <span data-i18n="auth_cond_ekolali">Ekolali</span></label>
-                    <label class="reg-chip"><input type="checkbox" class="login-cond" value="stereotipik"> <span data-i18n="auth_cond_stereotipik">Stereotipik Hareket</span></label>
+
+            <!-- Adım 4: Tanı -->
+            <div class="wiz-step" data-step="4">
+                <div class="wiz-step-head">
+                    <span class="wiz-step-icon">🧩</span>
+                    <h3 class="wiz-step-title" data-i18n="wiz_cond_title">Tanı / eşlik eden durumlar</h3>
+                    <p class="wiz-step-sub" data-i18n="wiz_cond_sub">İstediğin kadar seç — bu adımı geçebilirsin.</p>
+                </div>
+                <div class="wiz-cond-grid">
+                    <label class="wiz-cond-chip"><input type="checkbox" class="login-cond" value="osb"><span data-i18n="auth_cond_osb">OSB</span></label>
+                    <label class="wiz-cond-chip"><input type="checkbox" class="login-cond" value="dehb"><span data-i18n="auth_cond_dehb">DEHB</span></label>
+                    <label class="wiz-cond-chip"><input type="checkbox" class="login-cond" value="dil"><span data-i18n="auth_cond_dil">Dil / Konuşma</span></label>
+                    <label class="wiz-cond-chip"><input type="checkbox" class="login-cond" value="down"><span data-i18n="auth_cond_down">Down Sendromu</span></label>
+                    <label class="wiz-cond-chip"><input type="checkbox" class="login-cond" value="cp"><span data-i18n="auth_cond_cp">Serebral Palsi</span></label>
+                    <label class="wiz-cond-chip"><input type="checkbox" class="login-cond" value="oog"><span data-i18n="auth_cond_oog">Öz. Öğrenme Güçlüğü</span></label>
+                    <label class="wiz-cond-chip"><input type="checkbox" class="login-cond" value="ekolali"><span data-i18n="auth_cond_ekolali">Ekolali</span></label>
+                    <label class="wiz-cond-chip"><input type="checkbox" class="login-cond" value="stereotipik"><span data-i18n="auth_cond_stereotipik">Stereotipik Hareket</span></label>
                 </div>
             </div>
-            <label class="veli-consent-label">
-                <input type="checkbox" id="loginVeliConsent">
-                <span><span data-i18n="veli_consent_pre">Bu öğrencinin velisi </span><a href="#" onclick="openKvkkModal(event)" data-i18n="veli_consent_link">KVKK Aydınlatma Metni</a><span data-i18n="veli_consent_post"> kapsamında bilgilendirildi ve rıza verdi.</span></span>
-            </label>
-            <div class="auth-error login-profile-status" id="loginProfileStatus"></div>
-            <div class="login-form-btns">
-                <button type="button" class="login-save-btn" id="loginSaveBtn" onclick="createStudentFromLogin()" data-i18n="save">Kaydet</button>
-                <button type="button" class="login-cancel-btn" id="loginBackBtn" onclick="backFromStudentProfile()" style="display:none" data-i18n="back_menu">← Menü</button>
+
+            <!-- Adım 5: Onay -->
+            <div class="wiz-step" data-step="5">
+                <div class="wiz-step-head">
+                    <span class="wiz-step-icon">✅</span>
+                    <h3 class="wiz-step-title" data-i18n="wiz_consent_title">Son bir onay</h3>
+                    <p class="wiz-step-sub" data-i18n="wiz_consent_sub">Bilgileri kaydetmeden önce veli onayını al.</p>
+                </div>
+                <div class="wiz-summary" id="wizSummary"></div>
+                <label class="veli-consent-label wiz-consent">
+                    <input type="checkbox" id="loginVeliConsent">
+                    <span><span data-i18n="veli_consent_pre">Bu öğrencinin velisi </span><a href="#" onclick="openKvkkModal(event)" data-i18n="veli_consent_link">KVKK Aydınlatma Metni</a><span data-i18n="veli_consent_post"> kapsamında bilgilendirildi ve rıza verdi.</span></span>
+                </label>
             </div>
+
+            <div class="auth-error login-profile-status" id="loginProfileStatus"></div>
+
+            <div class="wiz-nav">
+                <button type="button" class="wiz-back-btn" id="wizBackBtn" onclick="wizPrev()" data-i18n="wiz_back">← Geri</button>
+                <button type="button" class="wiz-next-btn" id="wizNextBtn" onclick="wizNext()" data-i18n="wiz_next">Devam →</button>
+                <button type="button" class="login-save-btn wiz-save-btn" id="loginSaveBtn" onclick="createStudentFromLogin()" data-i18n="save" style="display:none">Kaydet</button>
+            </div>
+            <button type="button" class="wiz-exit-btn" id="loginBackBtn" onclick="backFromStudentProfile()" style="display:none" data-i18n="back_menu">← Menü</button>
         </div>
     </div>
 </div>

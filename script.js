@@ -45,6 +45,19 @@ const STRINGS = {
     auth_cond_oog: 'Öz. Öğrenme Güçlüğü',
     auth_cond_ekolali: 'Ekolali',
     auth_cond_stereotipik: 'Stereotipik Hareket',
+    wiz_name_title: 'Öğrencinin adı ne?',
+    wiz_name_sub: 'Uygulama boyunca bu isimle hitap edeceğiz.',
+    wiz_emoji_title: 'Bir avatar seç',
+    wiz_emoji_sub: 'Öğrencinin profilinde bu simge görünecek.',
+    wiz_level_title: 'Eğitim kademesi',
+    wiz_level_sub: 'İçerik zorluğunu buna göre ayarlıyoruz.',
+    wiz_cond_title: 'Tanı / eşlik eden durumlar',
+    wiz_cond_sub: 'İstediğin kadar seç — bu adımı geçebilirsin.',
+    wiz_cond_none: 'Seçim yapılmadı',
+    wiz_consent_title: 'Son bir onay',
+    wiz_consent_sub: 'Bilgileri kaydetmeden önce veli onayını al.',
+    wiz_back: '← Geri',
+    wiz_next: 'Devam →',
     reg_username_placeholder: 'örnek: ahmet_ogretmen (harf, rakam, _)',
     reg_student_placeholder: 'örn: Ali',
     auth_kvkk_link1: 'Aydınlatma Metni',
@@ -966,6 +979,19 @@ const STRINGS = {
     auth_cond_oog: 'Learning Disability',
     auth_cond_ekolali: 'Echolalia',
     auth_cond_stereotipik: 'Stereotypic Movement',
+    wiz_name_title: "What's the student's name?",
+    wiz_name_sub: "We'll use this name throughout the app.",
+    wiz_emoji_title: 'Pick an avatar',
+    wiz_emoji_sub: "This icon will appear on the student's profile.",
+    wiz_level_title: 'Education level',
+    wiz_level_sub: 'We adjust content difficulty accordingly.',
+    wiz_cond_title: 'Diagnosis / co-occurring conditions',
+    wiz_cond_sub: 'Select as many as you like — you can skip this step.',
+    wiz_cond_none: 'None selected',
+    wiz_consent_title: 'One last confirmation',
+    wiz_consent_sub: 'Get the parent’s consent before saving.',
+    wiz_back: '← Back',
+    wiz_next: 'Continue →',
     reg_username_placeholder: 'e.g.: john_teacher (letters, numbers, _)',
     reg_student_placeholder: 'e.g.: Alex',
     auth_kvkk_link1: 'Privacy Notice',
@@ -7376,6 +7402,7 @@ async function renderLoginStudents(students) {
     document.querySelectorAll('.login-cond').forEach(input => {
         input.checked = Array.isArray(profile?.conditions) && profile.conditions.includes(input.value);
     });
+    wizReset();
 }
 
 function selectLoginEmoji(emoji, btn) {
@@ -7383,6 +7410,85 @@ function selectLoginEmoji(emoji, btn) {
     if (hidden) hidden.value = emoji;
     document.querySelectorAll('#loginEmojiPicker .emoji-pick-btn').forEach(b => b.classList.remove('selected'));
     btn.classList.add('selected');
+}
+
+const WIZ_TOTAL_STEPS = 5;
+let _wizStep = 1;
+
+function wizReset() {
+    _wizStep = 1;
+    wizRender();
+}
+
+function wizRender() {
+    const form = document.getElementById('loginAddForm');
+    if (!form) return;
+    form.querySelectorAll('.wiz-step').forEach(step => {
+        step.classList.toggle('active', Number(step.getAttribute('data-step')) === _wizStep);
+    });
+    const bar = document.getElementById('wizProgressBar');
+    if (bar) bar.style.width = Math.round((_wizStep / WIZ_TOTAL_STEPS) * 100) + '%';
+    const counter = document.getElementById('wizStepCounter');
+    if (counter) counter.textContent = _wizStep + ' / ' + WIZ_TOTAL_STEPS;
+
+    const isLast = _wizStep === WIZ_TOTAL_STEPS;
+    const backBtn = document.getElementById('wizBackBtn');
+    const nextBtn = document.getElementById('wizNextBtn');
+    const saveBtn = document.getElementById('loginSaveBtn');
+    if (backBtn) backBtn.style.display = _wizStep === 1 ? 'none' : '';
+    if (nextBtn) nextBtn.style.display = isLast ? 'none' : '';
+    if (saveBtn) saveBtn.style.display = isLast ? '' : 'none';
+
+    const statusEl = document.getElementById('loginProfileStatus');
+    if (statusEl) statusEl.textContent = '';
+
+    if (isLast) wizRenderSummary();
+
+    const active = form.querySelector('.wiz-step.active');
+    const firstText = active?.querySelector('input[type="text"]');
+    if (firstText) setTimeout(() => firstText.focus(), 60);
+}
+
+function wizRenderSummary() {
+    const box = document.getElementById('wizSummary');
+    if (!box) return;
+    const name = document.getElementById('loginNameInput')?.value.trim() || '—';
+    const emoji = document.getElementById('loginStudentEmoji')?.value || '🌟';
+    const levelInput = document.querySelector('input[name="loginLevel"]:checked');
+    const levelLabel = levelInput ? (BEP_CATEGORY_LABELS[levelInput.value] || '—') : '—';
+    const conds = [...document.querySelectorAll('.login-cond:checked')]
+        .map(c => BEP_CONDITION_LABELS[c.value] || c.value);
+    const condText = conds.length ? conds.join(', ') : t('wiz_cond_none');
+    box.innerHTML = `
+        <div class="wiz-summary-avatar">${escapeHtml(emoji)}</div>
+        <div class="wiz-summary-rows">
+            <div class="wiz-summary-name">${escapeHtml(name)}</div>
+            <div class="wiz-summary-meta">${escapeHtml(levelLabel)}</div>
+            <div class="wiz-summary-meta">${escapeHtml(condText)}</div>
+        </div>`;
+}
+
+function wizValidateStep(step) {
+    const statusEl = document.getElementById('loginProfileStatus');
+    if (step === 1) {
+        const nameEl = document.getElementById('loginNameInput');
+        if (!nameEl || !nameEl.value.trim()) {
+            if (statusEl) statusEl.textContent = t('student_name_required');
+            nameEl?.focus();
+            return false;
+        }
+    }
+    if (statusEl) statusEl.textContent = '';
+    return true;
+}
+
+function wizNext() {
+    if (!wizValidateStep(_wizStep)) return;
+    if (_wizStep < WIZ_TOTAL_STEPS) { _wizStep++; wizRender(); }
+}
+
+function wizPrev() {
+    if (_wizStep > 1) { _wizStep--; wizRender(); }
 }
 
 async function createStudentFromLogin() {

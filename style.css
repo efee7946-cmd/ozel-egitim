@@ -4465,6 +4465,138 @@ body.a11y-reduce-motion * { transition: none !important; animation: none !import
     background: #f0f3f8; border: 2px solid #dde3ee; border-radius: 12px;
     padding: 12px 20px; font-size: 0.9rem; font-weight: 600; color: #7a8fa8; cursor: pointer;
 }
+
+/* ======================================================
+   ÖĞRENCİ PROFİLİ SİHİRBAZI (adım adım form)
+   ====================================================== */
+.login-add-form.wiz { padding: 22px 20px 20px; overflow: hidden; }
+.wiz-topbar { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+.wiz-progress {
+    flex: 1; height: 8px; border-radius: 999px;
+    background: #eaf0fb; overflow: hidden;
+}
+.wiz-progress-bar {
+    height: 100%; width: 20%; border-radius: 999px;
+    background: linear-gradient(90deg, #4a7bff, #5fb8ff);
+    transition: width .35s cubic-bezier(.4,0,.2,1);
+}
+.wiz-step-counter {
+    font-size: 0.78rem; font-weight: 800; color: #7a8fa8;
+    min-width: 34px; text-align: right; font-variant-numeric: tabular-nums;
+}
+
+.wiz-step { display: none; }
+.wiz-step.active { display: block; animation: wizStepIn .3s ease; }
+@keyframes wizStepIn {
+    from { opacity: 0; transform: translateX(14px); }
+    to   { opacity: 1; transform: none; }
+}
+
+.wiz-step-head { text-align: center; margin-bottom: 18px; }
+.wiz-step-icon {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 60px; height: 60px; margin-bottom: 12px;
+    border-radius: 50%; font-size: 1.8rem;
+    background: linear-gradient(180deg, #eef4ff, #e2ecfb);
+    box-shadow: 0 6px 16px rgba(74,123,255,0.15);
+}
+.wiz-step-title { margin: 0 0 4px; font-size: 1.25rem; font-weight: 900; color: #1a2f4a; }
+.wiz-step-sub  { margin: 0; font-size: 0.88rem; color: #7a8fa8; line-height: 1.5; }
+
+.wiz-text-input {
+    width: 100%; box-sizing: border-box; text-align: center;
+    border: 2px solid #e4edf8; border-radius: 14px;
+    padding: 15px 16px; font-size: 1.15rem; font-weight: 700; color: #1a2f4a;
+    transition: border-color .15s, box-shadow .15s;
+}
+.wiz-text-input:focus {
+    outline: none; border-color: #4a7bff;
+    box-shadow: 0 0 0 4px rgba(74,123,255,0.14);
+}
+
+.login-add-form.wiz .login-emoji-picker { gap: 10px; margin-bottom: 0; }
+.login-add-form.wiz .emoji-pick-btn { width: 52px; height: 52px; font-size: 1.7rem; }
+
+.wiz-choice-group { display: flex; flex-direction: column; gap: 10px; }
+.wiz-choice-card {
+    position: relative;
+    display: flex; align-items: center; gap: 12px;
+    padding: 15px 16px; border-radius: 15px;
+    border: 2px solid #e4edf8; background: #f7faff;
+    cursor: pointer; transition: all .16s; user-select: none;
+}
+.wiz-choice-card input { position: absolute; opacity: 0; pointer-events: none; }
+.wiz-choice-body { flex: 1; }
+.wiz-choice-title { font-size: 0.98rem; font-weight: 700; color: #33415c; }
+.wiz-choice-mark {
+    width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0;
+    border: 2px solid #cdd8ec;
+    display: flex; align-items: center; justify-content: center;
+    transition: all .16s;
+}
+.wiz-choice-card:has(input:checked) { border-color: #6c5ce7; background: #f2f0ff; }
+.wiz-choice-card:has(input:checked) .wiz-choice-title { color: #4a3fbf; }
+.wiz-choice-card:has(input:checked) .wiz-choice-mark { border-color: #6c5ce7; background: #6c5ce7; }
+.wiz-choice-card:has(input:checked) .wiz-choice-mark::after {
+    content: '✓'; color: #fff; font-size: 0.8rem; font-weight: 900;
+}
+
+.wiz-cond-grid { display: flex; flex-wrap: wrap; gap: 9px; justify-content: center; }
+.wiz-cond-chip {
+    display: inline-flex; align-items: center;
+    padding: 10px 16px; border-radius: 999px;
+    border: 2px solid #e4edf8; background: #f7faff;
+    font-size: 0.86rem; font-weight: 700; color: #5a6a8a;
+    cursor: pointer; transition: all .15s; user-select: none;
+}
+.wiz-cond-chip input { display: none; }
+.wiz-cond-chip:has(input:checked) { border-color: #6c5ce7; background: #ebe9ff; color: #4a3fbf; }
+
+.wiz-summary {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 16px; margin-bottom: 14px;
+    border-radius: 16px; background: #f5f8ff; border: 1.5px solid #e4edf8;
+}
+.wiz-summary-avatar {
+    width: 52px; height: 52px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%; font-size: 1.7rem;
+    background: linear-gradient(180deg, #f0f6ff, #e4edf8);
+}
+.wiz-summary-rows { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.wiz-summary-name { font-size: 1.05rem; font-weight: 800; color: #1a2f4a; }
+.wiz-summary-meta { font-size: 0.82rem; color: #7a8fa8; }
+.veli-consent-label.wiz-consent {
+    background: #fff7ed; border: 1.5px solid #ffe4c4; border-radius: 14px;
+    padding: 12px 14px; margin: 0;
+}
+
+.wiz-nav { display: flex; gap: 10px; margin-top: 22px; }
+.wiz-back-btn {
+    background: #f0f3f8; border: 2px solid #dde3ee; border-radius: 14px;
+    padding: 13px 20px; font-size: 0.9rem; font-weight: 700; color: #7a8fa8;
+    cursor: pointer; transition: all .15s;
+}
+.wiz-back-btn:hover { background: #e6ebf5; }
+.wiz-next-btn {
+    flex: 1; border: none; border-radius: 14px; padding: 13px;
+    font-size: 1rem; font-weight: 800; color: #fff; cursor: pointer;
+    background: linear-gradient(135deg, #4a7bff, #5fb8ff);
+    box-shadow: 0 6px 18px rgba(74,123,255,0.28);
+    transition: transform .12s, box-shadow .15s;
+}
+.wiz-next-btn:hover { box-shadow: 0 8px 22px rgba(74,123,255,0.36); }
+.wiz-next-btn:active { transform: scale(0.98); }
+.login-add-form.wiz .wiz-save-btn {
+    flex: 1; padding: 13px; font-size: 1rem; font-weight: 800;
+    border-radius: 14px; box-shadow: 0 6px 18px rgba(74,123,255,0.28);
+}
+.wiz-exit-btn {
+    display: block; margin: 12px auto 0; background: none; border: none;
+    font-size: 0.85rem; font-weight: 600; color: #9aa8bd; cursor: pointer;
+    padding: 6px 10px;
+}
+.wiz-exit-btn:hover { color: #6c5ce7; }
 .login-teacher-btn {
     background: none; border: 2px solid #dde3ee; border-radius: 14px;
     padding: 12px 24px; font-size: 0.88rem; font-weight: 700; color: #6c5ce7;
