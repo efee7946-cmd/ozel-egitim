@@ -1917,7 +1917,7 @@ function applyLang() {
   });
   document.querySelectorAll('.pw-toggle').forEach(btn => {
     const input = btn.parentElement && btn.parentElement.querySelector('input');
-    btn.setAttribute('aria-label', t(input && input.type === 'text' ? 'pw_hide' : 'pw_show'));
+    setPwToggleState(btn, !!input && input.type === 'text');
   });
   const langBtn = document.getElementById('langToggleBtn');
   if (langBtn) langBtn.textContent = t('lang_toggle');
@@ -6388,6 +6388,16 @@ function toggleHelpPanel() {
     panel.style.display = isOpen ? 'none' : 'flex';
 }
 
+const PW_ICON_HIDDEN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 12S6.2 5.8 12 5.8 21.5 12 21.5 12 17.8 18.2 12 18.2 2.5 12 2.5 12Z"/><circle cx="12" cy="12" r="3.1"/><line x1="4.2" y1="19.8" x2="19.8" y2="4.2"/></svg>';
+const PW_ICON_SHOWN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 12S6.2 5.8 12 5.8 21.5 12 21.5 12 17.8 18.2 12 18.2 2.5 12 2.5 12Z"/><circle cx="12" cy="12" r="3.1"/></svg>';
+
+function setPwToggleState(btn, revealed) {
+    btn.innerHTML = revealed ? PW_ICON_SHOWN : PW_ICON_HIDDEN;
+    const label = t(revealed ? 'pw_hide' : 'pw_show');
+    btn.setAttribute('aria-label', label);
+    btn.title = label;
+}
+
 function enhancePasswordFields() {
     document.querySelectorAll('input[type="password"]').forEach(input => {
         if (input.parentElement && input.parentElement.classList.contains('pw-wrap')) return;
@@ -6399,13 +6409,11 @@ function enhancePasswordFields() {
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'pw-toggle';
-        btn.textContent = '👁️';
-        btn.setAttribute('aria-label', t('pw_show'));
+        setPwToggleState(btn, false);
         btn.addEventListener('click', () => {
             const reveal = input.type === 'password';
             input.type = reveal ? 'text' : 'password';
-            btn.textContent = reveal ? '🙈' : '👁️';
-            btn.setAttribute('aria-label', t(reveal ? 'pw_hide' : 'pw_show'));
+            setPwToggleState(btn, reveal);
             input.focus();
         });
         wrap.appendChild(btn);
