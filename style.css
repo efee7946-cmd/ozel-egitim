@@ -5106,7 +5106,7 @@ body.mobile-first-launch .wiz-login-link { display: block; }
 }
 .pw-toggle svg { width: 21px; height: 21px; display: block; }
 .pw-toggle:hover { color: #2d3a5c; background: #eef1fb; }
-.pw-toggle:active { background: #e3e8f7; }
+.pw-toggle:active { background: #e3e8f7; transform: translateY(-50%); }
 .pw-toggle:focus-visible { outline: 2px solid #667eea; outline-offset: 1px; color: #2d3a5c; }
 body.a11y-large-touch .pw-wrap input { min-height: 56px; }
 .auth-submit-btn {
