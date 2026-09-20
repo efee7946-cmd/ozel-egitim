@@ -831,6 +831,8 @@ const STRINGS = {
     AUTH_RESET_CODE_INVALID: 'Kod hatalı veya süresi dolmuş',
     AUTH_RESET_TOO_SOON: 'Az önce kod gönderildi, lütfen e-postanızı kontrol edin',
     AUTH_MAIL_FAILED: 'Kod gönderilemedi, lütfen daha sonra tekrar deneyin',
+    pw_show: 'Şifreyi göster',
+    pw_hide: 'Şifreyi gizle',
     a11y_set_email: '📧 E-posta Ekle/Güncelle',
     a11y_email_label: 'E-posta',
     a11y_email_edit: 'Düzenle',
@@ -1769,6 +1771,8 @@ const STRINGS = {
     AUTH_RESET_CODE_INVALID: 'Code is incorrect or expired',
     AUTH_RESET_TOO_SOON: 'A code was just sent, please check your email',
     AUTH_MAIL_FAILED: 'Could not send the code, please try again later',
+    pw_show: 'Show password',
+    pw_hide: 'Hide password',
     a11y_set_email: '📧 Add/Update Email',
     a11y_email_label: 'Email',
     a11y_email_edit: 'Edit',
@@ -1910,6 +1914,10 @@ function applyLang() {
   });
   document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
     el.placeholder = t(el.getAttribute('data-i18n-placeholder'));
+  });
+  document.querySelectorAll('.pw-toggle').forEach(btn => {
+    const input = btn.parentElement && btn.parentElement.querySelector('input');
+    btn.setAttribute('aria-label', t(input && input.type === 'text' ? 'pw_hide' : 'pw_show'));
   });
   const langBtn = document.getElementById('langToggleBtn');
   if (langBtn) langBtn.textContent = t('lang_toggle');
@@ -6380,9 +6388,34 @@ function toggleHelpPanel() {
     panel.style.display = isOpen ? 'none' : 'flex';
 }
 
+function enhancePasswordFields() {
+    document.querySelectorAll('input[type="password"]').forEach(input => {
+        if (input.parentElement && input.parentElement.classList.contains('pw-wrap')) return;
+        const wrap = document.createElement('div');
+        wrap.className = 'pw-wrap';
+        input.parentNode.insertBefore(wrap, input);
+        wrap.appendChild(input);
+
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'pw-toggle';
+        btn.textContent = '👁️';
+        btn.setAttribute('aria-label', t('pw_show'));
+        btn.addEventListener('click', () => {
+            const reveal = input.type === 'password';
+            input.type = reveal ? 'text' : 'password';
+            btn.textContent = reveal ? '🙈' : '👁️';
+            btn.setAttribute('aria-label', t(reveal ? 'pw_hide' : 'pw_show'));
+            input.focus();
+        });
+        wrap.appendChild(btn);
+    });
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     const settings = loadA11ySettings();
     applyA11yClasses(settings);
+    enhancePasswordFields();
     applyLang();
     const gateInput = document.getElementById('parentGateInput');
     if (gateInput) gateInput.addEventListener('keydown', e => { if (e.key === 'Enter') submitParentGate(); });
