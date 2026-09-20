@@ -11,11 +11,13 @@ function getTransporter() {
         if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) {
             throw new Error('GMAIL_USER / GMAIL_APP_PASSWORD tanımlı değil');
         }
+        // Google uygulama şifresini "abcd efgh ijkl mnop" diye gösteriyor; olduğu gibi
+        // kopyalanırsa Gmail 535-5.7.8 BadCredentials döner. Boşlukları burada atıyoruz.
         _transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
-                user: process.env.GMAIL_USER,
-                pass: process.env.GMAIL_APP_PASSWORD,
+                user: process.env.GMAIL_USER.trim(),
+                pass: process.env.GMAIL_APP_PASSWORD.replace(/\s+/g, ''),
             },
         });
     }

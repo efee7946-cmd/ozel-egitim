@@ -139,7 +139,17 @@ async function sendVerificationCode(username, userEmail) {
         `UPDATE users SET verify_hash = $1, verify_expires = now() + interval '15 minutes', verify_attempts = 0 WHERE username = $2`,
         [codeHash, username]
     );
-    await sendMail(userEmail, 'YıldızCan e-posta doğrulama kodu', verifyCodeEmailHtml(code));
+    try {
+        await sendMail(userEmail, 'YıldızCan e-posta doğrulama kodu', verifyCodeEmailHtml(code));
+    } catch (e) {
+        // Mail gitmediyse kaydı geri al: yoksa "tekrar gönder" bir dakika boyunca
+        // AUTH_RESET_TOO_SOON döner, kullanıcı ne kod alır ne yeniden deneyebilir.
+        await query(
+            `UPDATE users SET verify_hash = NULL, verify_expires = NULL WHERE username = $1`,
+            [username]
+        );
+        throw e;
+    }
 }
 
 export default async function handler(req, res) {
@@ -284,7 +294,17 @@ export default async function handler(req, res) {
                 `UPDATE users SET reset_hash = $1, reset_expires = now() + interval '15 minutes', reset_attempts = 0 WHERE username = $2`,
                 [codeHash, user.username]
             );
-            await sendMail(user.email, 'YıldızCan şifre sıfırlama kodu', resetCodeEmailHtml(code));
+            try {
+                await sendMail(user.email, 'YıldızCan şifre sıfırlama kodu', resetCodeEmailHtml(code));
+            } catch (e) {
+                // Mail gitmediyse kaydı geri al, yoksa 60 sn'lik tekrar isteme kilidi
+                // hiç gönderilmemiş bir kod yüzünden kullanıcıyı dışarıda bırakır.
+                await query(
+                    `UPDATE users SET reset_hash = NULL, reset_expires = NULL WHERE username = $1`,
+                    [user.username]
+                );
+                console.error('Sıfırlama maili gönderilemedi:', e.message);
+            }
             return res.json(genericResetResponse());
         }
 
@@ -366,7 +386,14 @@ export default async function handler(req, res) {
             if (!user || !user.email) return res.status(400).json({ error: 'AUTH_NO_EMAIL' });
             if (user.verify_expires && new Date(user.verify_expires).getTime() - Date.now() > 14 * 60 * 1000)
                 return res.status(429).json({ error: 'AUTH_RESET_TOO_SOON' });
-            await sendVerificationCode(user.username, user.email);
+            try {
+                await sendVerificationCode(user.username, user.email);
+            } catch (e) {
+                // Genel SERVER_ERROR yerine ne olduğunu söyle: kullanıcı boşuna
+                // gelen kutusunu beklemesin.
+                console.error('Doğrulama maili gönderilemedi:', e.message);
+                return res.status(502).json({ error: 'AUTH_MAIL_FAILED' });
+            }
             return res.json({ ok: true, emailMasked: maskEmail(user.email) });
         }
 
