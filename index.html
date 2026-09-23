@@ -445,122 +445,79 @@
         <div><h2 id="menu-greeting-hidden">x</h2><p class="menu-subtitle"></p></div>
     </div>
 
-    <div class="home-shell">
+    <!-- Misafir modu şeridi -->
+    <button type="button" id="guestBanner" class="menu-banner" style="display:none" onclick="guestExitToRegister()">
+        <span class="menu-banner-text">
+            <strong data-i18n="guest_banner_title">👀 Misafir modundasın — deneme hakkın: 1 konuşma pratiği + 1 nesne tanıma</strong>
+            <small data-i18n="guest_banner_sub">Kayıt tamamen ücretsiz: tüm etkinliklere tam erişim kazanırsın, ilerlemen kaybolmaz.</small>
+        </span>
+        <span class="menu-banner-cta" data-i18n="guest_banner_btn">Ücretsiz Kayıt Ol</span>
+    </button>
 
-        <button type="button" id="guestBanner" class="menu-banner" style="display:none" onclick="guestExitToRegister()">
-            <span class="menu-banner-text">
-                <strong data-i18n="guest_banner_title">👀 Misafir modundasın — deneme hakkın: 1 konuşma pratiği + 1 nesne tanıma</strong>
-                <small data-i18n="guest_banner_sub">Kayıt tamamen ücretsiz: tüm etkinliklere tam erişim kazanırsın, ilerlemen kaybolmaz.</small>
-            </span>
-            <span class="menu-banner-cta" data-i18n="guest_banner_btn">Ücretsiz Kayıt Ol</span>
+    <!-- Karşılama alanı -->
+    <div class="menu-welcome">
+        <button type="button" class="welcome-avatar-wrap" id="welcomeAvatarWrap" onclick="openStarInfo()">
+            <img src="avatar.png" class="welcome-avatar" alt="Yıldız Can">
+            <span class="welcome-accessory" id="welcomeAccessory"></span>
+            <span class="welcome-star-badge" id="welcomeStarBadge" style="display:none">⭐ 0</span>
+        </button>
+        <h1 id="menu-greeting" class="welcome-title" data-i18n="menu_greeting_default">Merhaba! 👋</h1>
+        <p class="welcome-sub" data-i18n="welcome_sub">Bugün ne yapmak istersin?</p>
+        <button type="button" class="menu-nudge" id="menuNudge" style="display:none"></button>
+    </div>
+
+    <!-- Ana navigasyon -->
+    <div class="menu-tiles">
+        <button class="menu-tile tile-primary" type="button" onclick="goToTherapy()">
+            <span class="tile-icon">🎤</span>
+            <span class="tile-label" data-i18n="menu_therapy">Konuşma Pratiği</span>
+            <span class="tile-desc" data-i18n="menu_therapy_desc">Sorulara sesli cevap ver</span>
+        </button>
+        <button class="menu-tile tile-sequence" type="button" onclick="goToSequence()">
+            <span class="tile-icon">🔍</span>
+            <span class="tile-label" data-i18n="menu_sequence">Nesne Tanıma</span>
+            <span class="tile-desc" data-i18n="menu_sequence_desc">3D nesneleri tanı, söyle</span>
+        </button>
+        <button class="menu-tile tile-aac" type="button" onclick="goToAac()">
+            <span class="tile-icon">🗣️</span>
+            <span class="tile-label" data-i18n="menu_aac">AAC Panosu</span>
+            <span class="tile-desc" data-i18n="menu_aac_desc">Görsellerle iletişim kur</span>
         </button>
 
-        <section class="home-hero">
-            <div class="menu-welcome">
-                <button type="button" class="welcome-avatar-wrap" id="welcomeAvatarWrap" onclick="openStarInfo()">
-                    <img src="avatar.png" class="welcome-avatar" alt="Yıldız Can">
-                    <span class="welcome-accessory" id="welcomeAccessory"></span>
-                    <span class="welcome-star-badge" id="welcomeStarBadge" style="display:none">⭐ 0</span>
-                </button>
-                <h1 id="menu-greeting" class="welcome-title" data-i18n="menu_greeting_default">Merhaba! 👋</h1>
-                <p class="welcome-sub" data-i18n="welcome_sub">Bugün ne yapmak istersin?</p>
-                <button type="button" class="menu-nudge" id="menuNudge" style="display:none">
-                    <span class="menu-nudge-icon"></span>
-                    <span class="menu-nudge-text"></span>
-                    <span class="menu-nudge-arrow" aria-hidden="true">→</span>
-                </button>
-            </div>
-        </section>
-
-        <section class="home-group">
-            <div class="home-group-head">
-                <span class="home-group-mark mark-learn" aria-hidden="true">🌱</span>
-                <h2 class="home-group-title" data-i18n="home_group_learn">Öğren &amp; İletişim Kur</h2>
-                <span class="home-group-note" data-i18n="home_group_learn_note">Konuşma, nesne tanıma ve görsel iletişim</span>
-            </div>
-            <div class="home-card-grid">
-                <button class="home-card accent-therapy" type="button" onclick="goToTherapy()">
-                    <span class="home-card-icon" aria-hidden="true">🎤</span>
-                    <span class="home-card-body">
-                        <span class="home-card-title" data-i18n="menu_therapy">Konuşma Pratiği</span>
-                        <span class="home-card-desc" data-i18n="menu_therapy_desc">Sorulara sesli cevap ver</span>
-                        <span class="home-card-meter" id="therapyMeter" style="display:none">
-                            <span class="home-meter-track"><span class="home-meter-fill" id="therapyMeterFill"></span></span>
-                            <span class="home-meter-label" id="therapyMeterLabel"></span>
-                        </span>
-                    </span>
-                    <span class="home-card-go" aria-hidden="true"></span>
-                </button>
-                <button class="home-card accent-object" type="button" onclick="goToSequence()">
-                    <span class="home-card-icon" aria-hidden="true">🔍</span>
-                    <span class="home-card-body">
-                        <span class="home-card-title" data-i18n="menu_sequence">Nesne Tanıma</span>
-                        <span class="home-card-desc" data-i18n="menu_sequence_desc">3D nesneleri tanı, söyle</span>
-                    </span>
-                    <span class="home-card-go" aria-hidden="true"></span>
-                </button>
-                <button class="home-card accent-aac" type="button" onclick="goToAac()">
-                    <span class="home-card-icon" aria-hidden="true">🗣️</span>
-                    <span class="home-card-body">
-                        <span class="home-card-title" data-i18n="menu_aac">AAC Panosu</span>
-                        <span class="home-card-desc" data-i18n="menu_aac_desc">Görsellerle iletişim kur</span>
-                    </span>
-                    <span class="home-card-go" aria-hidden="true"></span>
-                </button>
-            </div>
-        </section>
-
-        <section class="home-group">
-            <div class="home-group-head">
-                <span class="home-group-mark mark-track" aria-hidden="true">📋</span>
-                <h2 class="home-group-title" data-i18n="home_group_track">Günlük Takip</h2>
-                <span class="home-group-note" data-i18n="home_group_track_note">Görevler, ödüller ve gelişim raporu</span>
-            </div>
-            <div class="home-card-grid">
-                <button class="home-card accent-schedule" type="button" onclick="goToSchedule()">
-                    <span class="home-card-icon" aria-hidden="true">🎯</span>
-                    <span class="home-card-body">
-                        <span class="home-card-title" data-i18n="menu_schedule">Günlük Görevler</span>
-                        <span class="home-card-desc" data-i18n="menu_schedule_desc">Bugünün görevlerini tamamla</span>
-                    </span>
-                    <span class="home-card-go" aria-hidden="true"></span>
-                </button>
-                <button class="home-card accent-store" type="button" onclick="goToStore()">
-                    <span class="home-card-icon" aria-hidden="true">🏪</span>
-                    <span class="home-card-body">
-                        <span class="home-card-title" data-i18n="menu_store">Giyim Mağazası</span>
-                        <span class="home-card-desc" data-i18n="menu_store_desc">Yıldızlarını harca, giydir</span>
-                    </span>
-                    <span class="home-card-go" aria-hidden="true"></span>
-                </button>
-                <button class="home-card accent-analysis" type="button" onclick="goToAnalysis()">
-                    <span class="home-card-icon" aria-hidden="true">📊</span>
-                    <span class="home-card-body">
-                        <span class="home-card-title" data-i18n="menu_analysis_report">Analiz &amp; Rapor</span>
-                        <span class="home-card-desc" data-i18n="menu_analysis_report_desc">Gelişimi takip et</span>
-                    </span>
-                    <span class="home-card-go" aria-hidden="true"></span>
-                </button>
-            </div>
-        </section>
-
-        <div class="routine-card" id="routineCard">
-            <span class="routine-mark" aria-hidden="true">🔔</span>
-            <div class="routine-info">
-                <strong data-i18n="routine_title">Günlük Hatırlatma</strong>
-                <p data-i18n="routine_sub">Pratik için en uygun saati seçin; o saatte tek ve nazik bir hatırlatma gönderelim. Kaçan gün dert değil.</p>
-                <span class="routine-status" id="routineStatus"></span>
-            </div>
-            <div class="routine-controls">
-                <input type="time" id="routineTime" value="18:30">
-                <button type="button" class="routine-btn" id="routineToggleBtn" onclick="toggleRoutineReminder()" data-i18n="routine_enable">Hatırlatmayı Kur</button>
-            </div>
-        </div>
-
-        <div id="onboarding-panel" style="display:none"><div class="onboarding-copy"></div><div class="onboarding-steps"></div></div>
-        <div class="menu-actions-grid" style="display:none"></div>
-        <p class="footer">© 2026 Efe Erman · <a href="mailto:yildizsiniflari@gmail.com">yildizsiniflari@gmail.com</a></p>
+        <button class="menu-tile tile-schedule" type="button" onclick="goToSchedule()">
+            <span class="tile-icon">🎯</span>
+            <span class="tile-label" data-i18n="menu_schedule">Günlük Görevler</span>
+            <span class="tile-desc" data-i18n="menu_schedule_desc">Bugünün görevlerini tamamla</span>
+        </button>
+        <button class="menu-tile tile-store" type="button" onclick="goToStore()">
+            <span class="tile-icon">🏪</span>
+            <span class="tile-label" data-i18n="menu_store">Giyim Mağazası</span>
+            <span class="tile-desc" data-i18n="menu_store_desc">Yıldızlarını harca, giydir</span>
+        </button>
+        <button class="menu-tile tile-analysis" type="button" onclick="goToAnalysis()">
+            <span class="tile-icon">📊</span>
+            <span class="tile-label" data-i18n="menu_analysis_report">Analiz & Rapor</span>
+            <span class="tile-desc" data-i18n="menu_analysis_report_desc">Gelişimi takip et</span>
+        </button>
     </div>
+
+    <!-- Günlük rutin hatırlatması -->
+    <div class="routine-card" id="routineCard">
+        <div class="routine-info">
+            <strong data-i18n="routine_title">⏰ Günlük Hatırlatma</strong>
+            <p data-i18n="routine_sub">Pratik için en uygun saati seçin; o saatte tek ve nazik bir hatırlatma gönderelim. Kaçan gün dert değil.</p>
+            <span class="routine-status" id="routineStatus"></span>
+        </div>
+        <div class="routine-controls">
+            <input type="time" id="routineTime" value="18:30">
+            <button type="button" class="routine-btn" id="routineToggleBtn" onclick="toggleRoutineReminder()" data-i18n="routine_enable">Hatırlatmayı Kur</button>
+        </div>
+    </div>
+
+    <!-- Gizli legacy stub'lar -->
+    <div id="onboarding-panel" style="display:none"><div class="onboarding-copy"></div><div class="onboarding-steps"></div></div>
+    <div class="menu-actions-grid" style="display:none"></div>
+    <p class="footer">© 2026 Efe Erman · <a href="mailto:yildizsiniflari@gmail.com">yildizsiniflari@gmail.com</a></p>
 </div>
 
 <!-- ===================== ALT NAVİGASYON ÇUBUĞU ===================== -->
