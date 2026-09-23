@@ -6919,3 +6919,44 @@ body.has-bottom-nav #object-screen {
 @media (prefers-reduced-motion: reduce) {
     .screen-enter, .screen-enter-fwd, .screen-enter-back { animation: none; }
 }
+
+/* ===================== ANA MENÜ ARKA PLANI ===================== */
+#menu-screen {
+    position: relative;
+    background: linear-gradient(180deg, #e9f2ff 0%, #f2f7ff 42%, #fbfcff 78%, #fdfcf8 100%);
+}
+
+#menu-screen::before {
+    display: block !important;
+    content: '';
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+    background: url('map-assets/map-bg.jpg') center top / cover no-repeat;
+    opacity: 0.52;
+    filter: saturate(0.72) brightness(1.07);
+}
+
+#menu-screen::after {
+    display: block !important;
+    content: '';
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+    background: linear-gradient(180deg,
+        rgba(255, 255, 255, 0.04) 0%,
+        rgba(250, 252, 255, 0.3) 34%,
+        rgba(251, 253, 255, 0.68) 62%,
+        rgba(253, 253, 255, 0.9) 100%);
+}
+
+#menu-screen > * {
+    position: relative;
+    z-index: 1;
+}
