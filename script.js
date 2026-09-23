@@ -70,6 +70,13 @@ const STRINGS = {
     auth_fill_all: 'Tüm alanları doldurun',
     auth_passwords_mismatch: 'Şifreler uyuşmuyor',
     auth_password_short: 'Şifre en az 8 karakter olmalı',
+    auth_email_invalid: 'Geçerli bir e-posta adresi girin',
+    reg_step_email_title: 'E-posta adresiniz',
+    reg_step_email_sub: 'Doğrulama kodunu ve şifre sıfırlama bağlantılarını buraya göndereceğiz.',
+    reg_step_pw_title: 'Bir şifre belirleyin',
+    reg_step_pw_sub: 'Hesabınıza bu şifreyle gireceksiniz.',
+    reg_step_user_title: 'Kullanıcı adı seçin',
+    reg_step_user_sub: 'Girişte bu adı kullanacaksınız.',
     auth_kvkk_required: 'Devam etmek için Aydınlatma Metni\'ni kabul etmelisiniz',
     AUTH_FIELDS_REQUIRED: 'Kullanıcı adı ve şifre gerekli',
     AUTH_USERNAME_TOO_SHORT: 'Kullanıcı adı en az 3 karakter olmalı',
@@ -969,7 +976,7 @@ const STRINGS = {
     auth_tagline: 'Special education management platform',
     auth_username_label: 'Username',
     auth_password_label: 'Password',
-    auth_password_hint: '(at least 6 characters)',
+    auth_password_hint: '(at least 8 characters)',
     auth_password_repeat: 'Confirm Password',
     auth_student_name: "Student's Name",
     auth_student_emoji: 'Student Emoji',
@@ -1010,7 +1017,14 @@ const STRINGS = {
     auth_kvkk_agree: ' – I have read and agree.',
     auth_fill_all: 'Please fill in all fields',
     auth_passwords_mismatch: 'Passwords do not match',
-    auth_password_short: 'Password must be at least 6 characters',
+    auth_password_short: 'Password must be at least 8 characters',
+    auth_email_invalid: 'Enter a valid email address',
+    reg_step_email_title: 'Your email address',
+    reg_step_email_sub: 'We will send the verification code and password reset links here.',
+    reg_step_pw_title: 'Choose a password',
+    reg_step_pw_sub: 'You will sign in with this password.',
+    reg_step_user_title: 'Pick a username',
+    reg_step_user_sub: 'You will use this name to sign in.',
     auth_kvkk_required: 'You must accept the Privacy Notice to continue',
     AUTH_FIELDS_REQUIRED: 'Username and password are required',
     AUTH_USERNAME_TOO_SHORT: 'Username must be at least 3 characters',
@@ -6841,7 +6855,72 @@ function switchAuthTab(mode) {
     document.getElementById('tabLogin').classList.toggle('active',    mode === 'login');
     document.getElementById('tabRegister').classList.toggle('active', mode === 'register');
     document.getElementById('authError').textContent = '';
-    if (mode === 'register') renderRegisterEmojiPicker();
+    if (mode === 'register') { renderRegisterEmojiPicker(); regWizReset(); }
+}
+
+const REG_FORM_STEPS = 3;
+const REG_TOTAL_STEPS = 4;
+let _regStep = 1;
+
+function regWizReset() {
+    _regStep = 1;
+    regWizRender();
+}
+
+function regWizRender() {
+    const form = document.getElementById('registerForm');
+    if (!form) return;
+    form.querySelectorAll('.wiz-step').forEach(step => {
+        step.classList.toggle('active', Number(step.getAttribute('data-step')) === _regStep);
+    });
+    const bar = document.getElementById('regProgressBar');
+    if (bar) bar.style.width = Math.round((_regStep / REG_TOTAL_STEPS) * 100) + '%';
+    const counter = document.getElementById('regStepCounter');
+    if (counter) counter.textContent = _regStep + ' / ' + REG_TOTAL_STEPS;
+
+    const isLast = _regStep === REG_FORM_STEPS;
+    const backBtn = document.getElementById('regBackBtn');
+    const nextBtn = document.getElementById('regNextBtn');
+    const submitBtn = document.getElementById('registerBtn');
+    if (backBtn) backBtn.style.display = _regStep === 1 ? 'none' : '';
+    if (nextBtn) nextBtn.style.display = isLast ? 'none' : '';
+    if (submitBtn) submitBtn.style.display = isLast ? '' : 'none';
+    showAuthError('');
+
+    const active = form.querySelector('.wiz-step.active');
+    const firstInput = active && active.querySelector('input:not([type="checkbox"])');
+    if (firstInput) setTimeout(() => firstInput.focus(), 60);
+}
+
+function regWizGo(step) {
+    _regStep = step;
+    regWizRender();
+}
+
+function regStepError(step) {
+    if (step === 1) {
+        const email = document.getElementById('regEmail').value.trim();
+        if (!email) return 'auth_fill_all';
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return 'auth_email_invalid';
+    }
+    if (step === 2) {
+        const password = document.getElementById('regPassword').value;
+        const password2 = document.getElementById('regPassword2').value;
+        if (!password || !password2) return 'auth_fill_all';
+        if (password.length < 8) return 'auth_password_short';
+        if (password !== password2) return 'auth_passwords_mismatch';
+    }
+    return '';
+}
+
+function regWizNext() {
+    const err = regStepError(_regStep);
+    if (err) return showAuthError(t(err));
+    if (_regStep < REG_FORM_STEPS) regWizGo(_regStep + 1);
+}
+
+function regWizPrev() {
+    if (_regStep > 1) regWizGo(_regStep - 1);
 }
 
 function showResetForm() {
@@ -7047,7 +7126,7 @@ async function handleResetPassword(e) {
     const newPassword2 = document.getElementById('resetPassword2').value;
     if (!identifier || !codeValue || !newPassword) return showAuthError(t('auth_fill_all'));
     if (newPassword !== newPassword2) return showAuthError(t('auth_passwords_mismatch'));
-    if (newPassword.length < 6) return showAuthError(t('auth_password_short'));
+    if (newPassword.length < 8) return showAuthError(t('auth_password_short'));
 
     const btn = document.getElementById('resetBtn');
     btn.disabled = true; btn.textContent = t('auth_waiting');
@@ -7158,10 +7237,12 @@ async function handleRegister(e) {
     const password    = document.getElementById('regPassword').value;
     const password2   = document.getElementById('regPassword2').value;
     const regEmail    = document.getElementById('regEmail').value.trim();
+    for (const step of [1, 2]) {
+        const err = regStepError(step);
+        if (err) { regWizGo(step); return showAuthError(t(err)); }
+    }
+    if (!username) return showAuthError(t('auth_fill_all'));
     if (!document.getElementById('kvkkConsent').checked) return showAuthError(t('auth_kvkk_required'));
-    if (!username || !password || !regEmail) return showAuthError(t('auth_fill_all'));
-    if (password !== password2) return showAuthError(t('auth_passwords_mismatch'));
-    if (password.length < 8) return showAuthError(t('auth_password_short'));
     setAuthLoading(true);
 
     const res = await authApi('register', { username, password, email: regEmail, kvkkAccepted: true });

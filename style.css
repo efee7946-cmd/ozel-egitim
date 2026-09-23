@@ -6960,3 +6960,17 @@ body.has-bottom-nav #object-screen {
     position: relative;
     z-index: 1;
 }
+
+.auth-wiz .wiz-step { text-align: left; }
+.auth-wiz .wiz-topbar { margin-bottom: 18px; }
+.auth-wiz .wiz-nav { margin-top: 14px; }
+.auth-wiz .wiz-save-btn {
+    flex: 1;
+    width: auto;
+    margin-top: 0;
+    padding: 13px;
+    font-size: 1rem;
+    font-weight: 800;
+    border-radius: 14px;
+}
+.auth-wiz .auth-field + .auth-field { margin-top: 12px; }

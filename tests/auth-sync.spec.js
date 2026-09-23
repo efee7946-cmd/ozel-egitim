@@ -65,21 +65,32 @@ test.describe('Kayıt, giriş ve veri eşitleme akışları', () => {
 
     await page.evaluate(() => window.switchAuthTab('register'));
     await expect(page.locator('#registerForm')).toBeVisible();
-    await page.fill('#regUsername', 'testuser');
-    await page.fill('#regPassword', 'CokGizli1234');
-    await page.fill('#regPassword2', 'CokGizli1234');
+
+    // Adımlar sırayla: kayıt butonu son adıma kadar görünmez
+    await expect(page.locator('#registerBtn')).toBeHidden();
+    await page.click('#regNextBtn');
+    await expect(page.locator('#authError')).toContainText('doldurun');
+
     await page.fill('#regEmail', 'test@example.com');
+    await page.click('#regNextBtn');
+    await expect(page.locator('#regStepCounter')).toHaveText('2 / 4');
 
-    // KVKK kutusu işaretlenmeden: tarayıcı doğrulaması submit'i durdurur
+    await page.fill('#regPassword', 'CokGizli1234');
+    await page.fill('#regPassword2', 'BaskaSifre99');
+    await page.click('#regNextBtn');
+    await expect(page.locator('#authError')).toContainText('uyuşmuyor');
+
+    await page.fill('#regPassword2', 'CokGizli1234');
+    await page.click('#regNextBtn');
+    await expect(page.locator('#regStepCounter')).toHaveText('3 / 4');
+
+    await page.fill('#regUsername', 'testuser');
+    await expect(page.locator('#registerBtn')).toBeVisible();
+
+    // KVKK kutusu işaretlenmeden JS tarafındaki koruma isteği engeller
     await page.evaluate(() => document.getElementById('registerForm').requestSubmit());
-    await page.waitForTimeout(300);
-    await expect(page.locator('#emailVerifyModal')).toBeHidden();
-    expect(registerBody).toBeNull();
-
-    // Tarayıcı doğrulaması atlansa bile JS tarafındaki koruma isteği engeller
-    await page.evaluate(() =>
-      document.getElementById('registerForm').dispatchEvent(new Event('submit', { cancelable: true })));
     await expect(page.locator('#authError')).toContainText('kabul etmelisiniz');
+    await expect(page.locator('#emailVerifyModal')).toBeHidden();
     expect(registerBody).toBeNull();
 
     await page.check('#kvkkConsent');

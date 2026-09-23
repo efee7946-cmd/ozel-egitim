@@ -158,37 +158,70 @@
         </form>
 
         <!-- Kayıt formu (gizli) -->
-        <form id="registerForm" class="auth-form" style="display:none" onsubmit="handleRegister(event)">
-            <div class="auth-field">
-                <label data-i18n="auth_username_label">Kullanıcı Adı</label>
-                <input type="text" id="regUsername" autocomplete="username"
-                    placeholder="ornek: ahmet_ogretmen (harf, rakam, _)" data-i18n-placeholder="reg_username_placeholder" required>
+        <form id="registerForm" class="auth-form auth-wiz" style="display:none" onsubmit="handleRegister(event)">
+            <div class="wiz-topbar">
+                <div class="wiz-progress"><div class="wiz-progress-bar" id="regProgressBar"></div></div>
+                <span class="wiz-step-counter" id="regStepCounter">1 / 4</span>
             </div>
-            <div class="auth-field">
-                <label><span data-i18n="auth_password_label">Şifre</span> <small data-i18n="auth_password_hint">(en az 6 karakter)</small></label>
-                <input type="password" id="regPassword" autocomplete="new-password"
-                    placeholder="••••••" required>
+
+            <div class="wiz-step active" data-step="1">
+                <div class="wiz-step-head">
+                    <span class="wiz-step-icon">📧</span>
+                    <h3 class="wiz-step-title" data-i18n="reg_step_email_title">E-posta adresiniz</h3>
+                    <p class="wiz-step-sub" data-i18n="reg_step_email_sub">Doğrulama kodunu ve şifre sıfırlama bağlantılarını buraya göndereceğiz.</p>
+                </div>
+                <div class="auth-field">
+                    <label data-i18n="auth_email_label">E-posta</label>
+                    <input type="email" id="regEmail" autocomplete="email" placeholder="ornek@gmail.com"
+                        onkeydown="if(event.key==='Enter'){event.preventDefault();regWizNext();}">
+                </div>
             </div>
-            <div class="auth-field">
-                <label data-i18n="auth_password_repeat">Şifre Tekrar</label>
-                <input type="password" id="regPassword2" autocomplete="new-password"
-                    placeholder="••••••" required>
+
+            <div class="wiz-step" data-step="2">
+                <div class="wiz-step-head">
+                    <span class="wiz-step-icon">🔒</span>
+                    <h3 class="wiz-step-title" data-i18n="reg_step_pw_title">Bir şifre belirleyin</h3>
+                    <p class="wiz-step-sub" data-i18n="reg_step_pw_sub">Hesabınıza bu şifreyle gireceksiniz.</p>
+                </div>
+                <div class="auth-field">
+                    <label><span data-i18n="auth_password_label">Şifre</span> <small data-i18n="auth_password_hint">(en az 8 karakter)</small></label>
+                    <input type="password" id="regPassword" autocomplete="new-password" placeholder="••••••"
+                        onkeydown="if(event.key==='Enter'){event.preventDefault();regWizNext();}">
+                </div>
+                <div class="auth-field">
+                    <label data-i18n="auth_password_repeat">Şifre Tekrar</label>
+                    <input type="password" id="regPassword2" autocomplete="new-password" placeholder="••••••"
+                        onkeydown="if(event.key==='Enter'){event.preventDefault();regWizNext();}">
+                </div>
             </div>
-            <div class="auth-field">
-                <label data-i18n="auth_email_label">E-posta</label>
-                <input type="email" id="regEmail" autocomplete="email"
-                    placeholder="ornek@gmail.com" required>
+
+            <div class="wiz-step" data-step="3">
+                <div class="wiz-step-head">
+                    <span class="wiz-step-icon">👤</span>
+                    <h3 class="wiz-step-title" data-i18n="reg_step_user_title">Kullanıcı adı seçin</h3>
+                    <p class="wiz-step-sub" data-i18n="reg_step_user_sub">Girişte bu adı kullanacaksınız.</p>
+                </div>
+                <div class="auth-field">
+                    <label data-i18n="auth_username_label">Kullanıcı Adı</label>
+                    <input type="text" id="regUsername" autocomplete="username"
+                        placeholder="ornek: ahmet_ogretmen (harf, rakam, _)" data-i18n-placeholder="reg_username_placeholder">
+                </div>
+                <div class="kvkk-consent-row">
+                    <label class="kvkk-consent-label">
+                        <input type="checkbox" id="kvkkConsent">
+                        <span>
+                            <a href="#" onclick="openKvkkModal(event)" data-i18n="auth_kvkk_link1">Aydınlatma Metni</a><span data-i18n="auth_kvkk_sep">'ni ve</span>
+                            <a href="#" onclick="openKvkkModal(event)" data-i18n="auth_kvkk_link2">Gizlilik Politikası</a><span data-i18n="auth_kvkk_agree">'nı okudum, kabul ediyorum.</span>
+                        </span>
+                    </label>
+                </div>
             </div>
-            <div class="kvkk-consent-row">
-                <label class="kvkk-consent-label">
-                    <input type="checkbox" id="kvkkConsent" required>
-                    <span>
-                        <a href="#" onclick="openKvkkModal(event)" data-i18n="auth_kvkk_link1">Aydınlatma Metni</a><span data-i18n="auth_kvkk_sep">'ni ve</span>
-                        <a href="#" onclick="openKvkkModal(event)" data-i18n="auth_kvkk_link2">Gizlilik Politikası</a><span data-i18n="auth_kvkk_agree">'nı okudum, kabul ediyorum.</span>
-                    </span>
-                </label>
+
+            <div class="wiz-nav">
+                <button type="button" class="wiz-back-btn" id="regBackBtn" onclick="regWizPrev()" data-i18n="wiz_back" style="display:none">← Geri</button>
+                <button type="button" class="wiz-next-btn" id="regNextBtn" onclick="regWizNext()" data-i18n="wiz_next">Devam →</button>
+                <button type="submit" class="auth-submit-btn wiz-save-btn" id="registerBtn" data-i18n="register_btn" style="display:none">Kayıt Ol</button>
             </div>
-            <button type="submit" class="auth-submit-btn" id="registerBtn" data-i18n="register_btn">Kayıt Ol</button>
         </form>
 
         <div class="auth-error" id="authError"></div>
