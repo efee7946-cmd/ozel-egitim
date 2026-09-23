@@ -500,6 +500,8 @@
     </div>
 
     <!-- Ana navigasyon -->
+    <section class="menu-section">
+    <h2 class="menu-section-title" data-i18n="menu_section_learn">Öğren ve Konuş</h2>
     <div class="menu-tiles">
         <button class="menu-tile tile-primary" type="button" onclick="goToTherapy()">
             <span class="tile-icon">🎤</span>
@@ -516,25 +518,37 @@
             <span class="tile-label" data-i18n="menu_aac">AAC Panosu</span>
             <span class="tile-desc" data-i18n="menu_aac_desc">Görsellerle iletişim kur</span>
         </button>
+    </div>
+    </section>
 
+    <section class="menu-section">
+    <h2 class="menu-section-title" data-i18n="menu_section_earn">Yıldız Kazan, Harca</h2>
+    <div class="menu-tiles menu-tiles-earn">
         <button class="menu-tile tile-schedule" type="button" onclick="goToSchedule()">
             <span class="tile-icon">🎯</span>
             <span class="tile-label" data-i18n="menu_schedule">Günlük Görevler</span>
             <span class="tile-desc" data-i18n="menu_schedule_desc">Bugünün görevlerini tamamla</span>
         </button>
+        <span class="earn-flow" aria-hidden="true">⭐<span>→</span></span>
         <button class="menu-tile tile-store" type="button" onclick="goToStore()">
-            <span class="tile-icon">🏪</span>
+            <span class="tile-icon">👕</span>
             <span class="tile-label" data-i18n="menu_store">Giyim Mağazası</span>
             <span class="tile-desc" data-i18n="menu_store_desc">Yıldızlarını harca, giydir</span>
         </button>
-        <button class="menu-tile tile-analysis" type="button" onclick="goToAnalysis()">
-            <span class="tile-icon">📊</span>
-            <span class="tile-label" data-i18n="menu_analysis_report">Analiz & Rapor</span>
-            <span class="tile-desc" data-i18n="menu_analysis_report_desc">Gelişimi takip et</span>
-        </button>
     </div>
+    </section>
 
-    <!-- Günlük rutin hatırlatması -->
+    <section class="menu-section menu-section-parent">
+    <h2 class="menu-section-title" data-i18n="menu_section_parent">👪 Ebeveyn Alanı</h2>
+    <div class="parent-grid">
+        <button class="parent-link" type="button" onclick="goToAnalysis()">
+            <span class="parent-link-icon">📊</span>
+            <span class="parent-link-text">
+                <strong data-i18n="menu_analysis_report">Analiz & Rapor</strong>
+                <small data-i18n="menu_analysis_report_desc">Gelişimi takip et</small>
+            </span>
+        </button>
+
     <div class="routine-card" id="routineCard">
         <div class="routine-info">
             <strong data-i18n="routine_title">⏰ Günlük Hatırlatma</strong>
@@ -546,6 +560,8 @@
             <button type="button" class="routine-btn" id="routineToggleBtn" onclick="toggleRoutineReminder()" data-i18n="routine_enable">Hatırlatmayı Kur</button>
         </div>
     </div>
+    </div>
+    </section>
 
     <!-- Gizli legacy stub'lar -->
     <div id="onboarding-panel" style="display:none"><div class="onboarding-copy"></div><div class="onboarding-steps"></div></div>

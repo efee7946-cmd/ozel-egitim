@@ -37,7 +37,7 @@ test.describe('Veli kapısı, misafir modu ve ilk kullanım akışı', () => {
     await page.waitForSelector('#menu-screen', { state: 'visible' });
     const obSkip = page.locator('#onboardingModal .onboarding-skip');
     if (await obSkip.isVisible().catch(() => false)) await obSkip.click();
-    await expect(page.locator('.tile-analysis')).toBeVisible();
+    await expect(page.locator('.parent-link')).toBeVisible();
 
     // Misafir şeridi menüde görünmeli
     await expect(page.locator('#guestBanner')).toBeVisible();
@@ -72,7 +72,7 @@ test.describe('Veli kapısı, misafir modu ve ilk kullanım akışı', () => {
     await page.click('#guestLimitModal .auth-forgot-link');
 
     // Analiz girişi veli kapısıyla korunur: önce yanlış cevap
-    await page.click('.tile-analysis');
+    await page.click('.parent-link');
     await page.waitForSelector('#parentGateModal', { state: 'visible' });
     const question = await page.locator('#parentGateQuestion').textContent();
     expect(question).toMatch(/\d+\s*\+\s*\d+/);
@@ -94,7 +94,7 @@ test.describe('Veli kapısı, misafir modu ve ilk kullanım akışı', () => {
     // Kilit açıkken analize tekrar giriş kapısız olmalı
     await page.evaluate(() => window.goToMenu());
     await page.waitForSelector('#menu-screen', { state: 'visible' });
-    await page.click('.tile-analysis');
+    await page.click('.parent-link');
     await expect(page.locator('#parentGateModal')).toBeHidden();
     await page.waitForSelector('#analysis-screen', { state: 'visible' });
   });
