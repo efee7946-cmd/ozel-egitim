@@ -98,6 +98,10 @@ const STRINGS = {
     menu_sequence_desc: '3D nesneleri tanı, söyle',
     menu_analysis_report: 'Analiz & Rapor',
     menu_analysis_report_desc: 'Gelişimi takip et',
+    home_group_learn: 'Öğren & İletişim Kur',
+    home_group_learn_note: 'Konuşma, nesne tanıma ve görsel iletişim',
+    home_group_track: 'Günlük Takip',
+    home_group_track_note: 'Görevler, ödüller ve gelişim raporu',
     menu_store: 'Giyim Mağazası',
     menu_store_desc: 'Yıldızlarını harca, giydir',
     menu_parent_report: 'Veli Raporu',
@@ -848,7 +852,7 @@ const STRINGS = {
     weekly_empty: 'Bu hafta henüz pratik yapılmadı. Kısa bir seans her zaman iyi bir başlangıçtır.',
     weekly_empty_btn: '🎤 Pratiği Başlat',
     weekly_tip_label: '🏠 Evde deneyin',
-    routine_title: '⏰ Günlük Hatırlatma',
+    routine_title: 'Günlük Hatırlatma',
     routine_sub: 'Pratik için en uygun saati seçin; o saatte tek ve nazik bir hatırlatma gönderelim. Kaçan gün dert değil.',
     routine_enable: 'Hatırlatmayı Kur',
     routine_disable: 'Kapat',
@@ -1038,6 +1042,10 @@ const STRINGS = {
     menu_sequence_desc: 'Recognize 3D objects, say it',
     menu_analysis_report: 'Analysis & Report',
     menu_analysis_report_desc: 'Track progress',
+    home_group_learn: 'Learn & Communicate',
+    home_group_learn_note: 'Speech, object recognition and visual communication',
+    home_group_track: 'Daily Tracking',
+    home_group_track_note: 'Tasks, rewards and progress reports',
     menu_store: 'Clothing Store',
     menu_store_desc: 'Spend your stars, dress up',
     menu_parent_report: 'Parent Report',
@@ -1788,7 +1796,7 @@ const STRINGS = {
     weekly_empty: 'No practice yet this week. A short session is always a good start.',
     weekly_empty_btn: '🎤 Start Practice',
     weekly_tip_label: '🏠 Try at home',
-    routine_title: '⏰ Daily Reminder',
+    routine_title: 'Daily Reminder',
     routine_sub: 'Pick the best time for practice; we will send one gentle reminder at that time. Missed days are no problem.',
     routine_enable: 'Set Reminder',
     routine_disable: 'Turn Off',
@@ -2346,6 +2354,7 @@ async function showOnly(id, options = {}) {
         try {
             updateStarBadge();
             renderMenuNudge();
+            renderTherapyMeter();
             updateGuestBanner();
             renderRoutineCard();
         } catch (_) {}
@@ -5755,26 +5764,44 @@ async function renderMenuNudge() {
             ? Math.floor((Date.now() - new Date(lastTherapy.createdAt).getTime()) / 86400000)
             : null;
 
-        let text = '', action = null;
+        let icon = '', text = '', action = null;
         if (daysSince !== null && daysSince >= 3) {
-            text = '🎤 ' + t('nudge_therapy_gap').replace('{d}', daysSince);
+            icon = '🎤';
+            text = t('nudge_therapy_gap').replace('{d}', daysSince);
             action = () => goToTherapy();
         } else if (results[0]) {
             const last = results[0];
             const acc = last.items + (last.errors || 0) > 0
                 ? Math.round((last.items / (last.items + (last.errors || 0))) * 100) : 100;
-            text = `🔍 ` + t('nudge_sort_again').replace('{game}', t('object_title')).replace('{acc}', acc);
+            icon = '🔍';
+            text = t('nudge_sort_again').replace('{game}', t('object_title')).replace('{acc}', acc);
             action = () => goToObjectRecognition();
         } else if (!history.length) {
-            text = '✨ ' + t('nudge_first');
+            icon = '✨';
+            text = t('nudge_first');
             action = () => goToTherapy();
         }
         if (text && action) {
-            el.textContent = text;
+            el.querySelector('.menu-nudge-icon').textContent = icon;
+            el.querySelector('.menu-nudge-text').textContent = text;
             el.onclick = action;
             el.style.display = '';
         }
     } catch (_) {}
+}
+
+function renderTherapyMeter() {
+    const wrap = document.getElementById('therapyMeter');
+    if (!wrap) return;
+    wrap.style.display = 'none';
+    if (!activeStudentId) return;
+    const state = getSpeechMapState();
+    const done = SPEECH_MAP_TOPICS.filter(topic => state.stars[topic.key]).length;
+    if (!done) return;
+    document.getElementById('therapyMeterFill').style.width =
+        Math.round((done / SPEECH_MAP_TOPICS.length) * 100) + '%';
+    document.getElementById('therapyMeterLabel').textContent = done + ' / ' + SPEECH_MAP_TOPICS.length;
+    wrap.style.display = '';
 }
 
 function _showStarReward() {

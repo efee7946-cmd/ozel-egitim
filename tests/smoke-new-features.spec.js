@@ -37,7 +37,7 @@ test.describe('Veli kapısı, misafir modu ve ilk kullanım akışı', () => {
     await page.waitForSelector('#menu-screen', { state: 'visible' });
     const obSkip = page.locator('#onboardingModal .onboarding-skip');
     if (await obSkip.isVisible().catch(() => false)) await obSkip.click();
-    await expect(page.locator('.tile-analysis')).toBeVisible();
+    await expect(page.locator('.accent-analysis')).toBeVisible();
 
     // Misafir şeridi menüde görünmeli
     await expect(page.locator('#guestBanner')).toBeVisible();
@@ -48,11 +48,11 @@ test.describe('Veli kapısı, misafir modu ve ilk kullanım akışı', () => {
     await expect(page.locator('#routineStatus')).toContainText('mobil uygulamada');
 
     // Kota: nesne tanıma 1 kez açılır, ikinci deneme limit modalına takılır
-    await page.click('.tile-sequence');
+    await page.click('.accent-object');
     await page.waitForSelector('#object-screen', { state: 'visible' });
     await page.evaluate(() => window.goToMenu());
     await page.waitForSelector('#menu-screen', { state: 'visible' });
-    await page.click('.tile-sequence');
+    await page.click('.accent-object');
     await page.waitForSelector('#guestLimitModal', { state: 'visible' });
     await expect(page.locator('#object-screen')).toBeHidden();
     await page.click('#guestLimitModal .auth-forgot-link');
@@ -67,12 +67,12 @@ test.describe('Veli kapısı, misafir modu ve ilk kullanım akışı', () => {
     // mevcut öğrenciyle doğrudan menüye düşer
     await page.click('.auth-guest-btn');
     await page.waitForSelector('#menu-screen', { state: 'visible' });
-    await page.click('.tile-sequence');
+    await page.click('.accent-object');
     await page.waitForSelector('#guestLimitModal', { state: 'visible' });
     await page.click('#guestLimitModal .auth-forgot-link');
 
     // Analiz girişi veli kapısıyla korunur: önce yanlış cevap
-    await page.click('.tile-analysis');
+    await page.click('.accent-analysis');
     await page.waitForSelector('#parentGateModal', { state: 'visible' });
     const question = await page.locator('#parentGateQuestion').textContent();
     expect(question).toMatch(/\d+\s*\+\s*\d+/);
@@ -94,7 +94,7 @@ test.describe('Veli kapısı, misafir modu ve ilk kullanım akışı', () => {
     // Kilit açıkken analize tekrar giriş kapısız olmalı
     await page.evaluate(() => window.goToMenu());
     await page.waitForSelector('#menu-screen', { state: 'visible' });
-    await page.click('.tile-analysis');
+    await page.click('.accent-analysis');
     await expect(page.locator('#parentGateModal')).toBeHidden();
     await page.waitForSelector('#analysis-screen', { state: 'visible' });
   });
