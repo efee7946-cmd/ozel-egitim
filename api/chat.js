@@ -5,8 +5,8 @@ import { logAiReply } from './_aiLog.js';
 
 const GUEST_CHAT_CAP = 30;
 
-const PRIMARY_MODEL = process.env.GEMINI_CHAT_MODEL || 'gemini-3.1-flash-lite';
-const FALLBACK_MODELS = ['gemini-3.5-flash-lite', 'gemini-3.8-flash'];
+const PRIMARY_MODEL = process.env.GEMINI_CHAT_MODEL || 'gemini-3.5-flash-lite';
+const FALLBACK_MODELS = ['gemini-3.1-flash-lite', 'gemini-3.8-flash'];
 
 function modelAttempts(isTherapyChat) {
     if (isTherapyChat) {
