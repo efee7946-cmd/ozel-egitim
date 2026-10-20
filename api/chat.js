@@ -5,6 +5,22 @@ import { logAiReply } from './_aiLog.js';
 
 const GUEST_CHAT_CAP = 30;
 
+const PRIMARY_MODEL = process.env.GEMINI_CHAT_MODEL || 'gemini-3.1-flash-lite';
+const FALLBACK_MODEL = 'gemini-2.5-flash-lite';
+
+function modelAttempts(isTherapyChat) {
+    if (isTherapyChat) {
+        return [
+            { model: PRIMARY_MODEL, timeoutMs: 8000, generationConfig: { maxOutputTokens: 256, thinkingConfig: { thinkingLevel: 'minimal' } } },
+            { model: FALLBACK_MODEL, timeoutMs: 7000, generationConfig: { maxOutputTokens: 256 } }
+        ];
+    }
+    return [
+        { model: PRIMARY_MODEL, timeoutMs: 25000, generationConfig: { thinkingConfig: { thinkingLevel: 'low' } } },
+        { model: FALLBACK_MODEL, timeoutMs: 20000, generationConfig: {} }
+    ];
+}
+
 export default async function handler(req, res) {
     allowOrigin(req, res);
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
@@ -33,23 +49,38 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'Geçersiz istek' });
     }
 
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=${GEMINI_KEY}`;
-
-    const requestBody = { contents };
-    if (system_instruction) requestBody.system_instruction = system_instruction;
-
     try {
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(requestBody)
-        });
+        let response = null;
+        let data = null;
+        for (const attempt of modelAttempts(!!req.body.meta)) {
+            const requestBody = { contents, generationConfig: attempt.generationConfig };
+            if (system_instruction) requestBody.system_instruction = system_instruction;
+            try {
+                response = await fetch(
+                    `https://generativelanguage.googleapis.com/v1beta/models/${attempt.model}:generateContent?key=${GEMINI_KEY}`,
+                    {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(requestBody),
+                        signal: AbortSignal.timeout(attempt.timeoutMs)
+                    }
+                );
+                data = await response.json();
+            } catch (err) {
+                console.error(`Gemini ${attempt.model} ulasilamadi:`, err.name, err.message);
+                response = null;
+                data = null;
+                continue;
+            }
+            const hasText = (data?.candidates?.[0]?.content?.parts || []).some(p => p && p.text);
+            if (response.ok && hasText) break;
+            console.error(`Gemini ${attempt.model} hatasi:`, response.status, JSON.stringify(data).slice(0, 500));
+        }
 
-        const data = await response.json();
-
-        // Eğer Google hata döndürürse bunu yakalayalım
+        if (!response) {
+            return res.status(504).json({ error: 'AI_TIMEOUT' });
+        }
         if (!response.ok) {
-            console.error("Google API Hatası:", data);
             return res.status(response.status).json(data);
         }
 
