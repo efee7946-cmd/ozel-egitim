@@ -34,14 +34,20 @@ export default async function handler(req, res) {
         return res.status(405).json({ error: 'Sadece POST isteği atılabilir.' });
     }
 
+    const timings = [];
+    let mark = Date.now();
+    const lap = (label) => { const now = Date.now(); timings.push(`${label}=${now - mark}ms`); mark = now; };
+
     let actor = await sessionUsername(req);
     if (!actor) actor = await guestCallAllowed(req, 'chat_calls', GUEST_CHAT_CAP);
     if (!actor) {
         return res.status(401).json({ error: 'AUTH_REQUIRED' });
     }
+    lap('auth');
     if (!(await checkRateLimit('chat:' + actor, 60))) {
         return res.status(429).json({ error: 'RATE_LIMITED' });
     }
+    lap('rate');
 
     const { contents, system_instruction } = req.body;
 
@@ -67,12 +73,14 @@ export default async function handler(req, res) {
                 );
                 data = await response.json();
             } catch (err) {
+                lap(`${attempt.model}:${err.name}`);
                 console.error(`Gemini ${attempt.model} ulasilamadi:`, err.name, err.message);
                 response = null;
                 data = null;
                 continue;
             }
             const hasText = (data?.candidates?.[0]?.content?.parts || []).some(p => p && p.text);
+            lap(`${attempt.model}:${response.status}`);
             if (response.ok && hasText) break;
             console.error(`Gemini ${attempt.model} hatasi:`, response.status, JSON.stringify(data).slice(0, 500));
         }
@@ -101,6 +109,8 @@ export default async function handler(req, res) {
             });
         }
 
+        lap('log');
+        console.log('chat timing', timings.join(' '));
         res.status(200).json(data);
     } catch (error) {
         console.error('Chat error:', error);
