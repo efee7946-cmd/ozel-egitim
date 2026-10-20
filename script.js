@@ -5184,15 +5184,13 @@ KATI ETKİLEŞİM VE DİL KURALLARI:
         var reply = (data?.candidates?.[0]?.content?.parts || []).map(p => (p && !p.thought && p.text) || '').join('').trim();
         if (!reply) {
             console.error('Gemini yanıt boş:', JSON.stringify(data));
-            if (isGuestUser()) return guestPraise();
-            return _lang === 'en' ? 'AI is not responding right now, please wait.' : 'Yapay zeka şu an yanıt veremiyor, biraz bekle.';
+            return guestPraise();
         }
         chatHistory.push({ role: "model", parts: [{ text: reply }] });
         return reply;
     } catch (e) {
         console.error('Gemini hata:', e);
-        if (isGuestUser()) return guestPraise();
-        return _lang === 'en' ? 'AI is not responding right now, please wait.' : 'Yapay zeka şu an yanıt veremiyor, biraz bekle.';
+        return guestPraise();
     }
 }
 
