@@ -6,19 +6,25 @@ import { logAiReply } from './_aiLog.js';
 const GUEST_CHAT_CAP = 30;
 
 const PRIMARY_MODEL = process.env.GEMINI_CHAT_MODEL || 'gemini-3.5-flash-lite';
-const FALLBACK_MODELS = ['gemini-3.1-flash-lite', 'gemini-3.8-flash'];
+const SECONDARY_MODEL = 'gemini-3.1-flash-lite';
+const LAST_RESORT_MODEL = 'gemini-3.8-flash';
 
-function modelAttempts(isTherapyChat) {
-    if (isTherapyChat) {
-        return [
-            { model: PRIMARY_MODEL, timeoutMs: 7000, generationConfig: { maxOutputTokens: 256, thinkingConfig: { thinkingLevel: 'minimal' } } },
-            ...FALLBACK_MODELS.map(model => ({ model, timeoutMs: 6000, generationConfig: { maxOutputTokens: 256, thinkingConfig: { thinkingLevel: 'low' } } }))
-        ];
-    }
-    return [
-        { model: PRIMARY_MODEL, timeoutMs: 20000, generationConfig: { thinkingConfig: { thinkingLevel: 'low' } } },
-        ...FALLBACK_MODELS.map(model => ({ model, timeoutMs: 15000, generationConfig: { thinkingConfig: { thinkingLevel: 'low' } } }))
-    ];
+const THERAPY_CONFIG = { maxOutputTokens: 256, thinkingConfig: { thinkingLevel: 'minimal' } };
+const REPORT_CONFIG = { thinkingConfig: { thinkingLevel: 'low' } };
+
+async function callGemini(apiKey, model, body, signal) {
+    const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+        {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body),
+            signal
+        }
+    );
+    const data = await response.json();
+    const hasText = (data?.candidates?.[0]?.content?.parts || []).some(p => p && p.text);
+    return { model, response, data, ok: response.ok && hasText };
 }
 
 export default async function handler(req, res) {
@@ -56,34 +62,58 @@ export default async function handler(req, res) {
     }
 
     try {
-        let response = null;
-        let data = null;
-        for (const attempt of modelAttempts(!!req.body.meta)) {
-            const requestBody = { contents, generationConfig: attempt.generationConfig };
-            if (system_instruction) requestBody.system_instruction = system_instruction;
+        const isTherapyChat = !!req.body.meta;
+        const buildBody = (generationConfig) => {
+            const body = { contents, generationConfig };
+            if (system_instruction) body.system_instruction = system_instruction;
+            return body;
+        };
+        const failures = [];
+        const attempt = async (model, generationConfig, timeoutMs, cancel) => {
+            const signal = cancel
+                ? AbortSignal.any([cancel.signal, AbortSignal.timeout(timeoutMs)])
+                : AbortSignal.timeout(timeoutMs);
             try {
-                response = await fetch(
-                    `https://generativelanguage.googleapis.com/v1beta/models/${attempt.model}:generateContent?key=${GEMINI_KEY}`,
-                    {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(requestBody),
-                        signal: AbortSignal.timeout(attempt.timeoutMs)
-                    }
-                );
-                data = await response.json();
+                const result = await callGemini(GEMINI_KEY, model, buildBody(generationConfig), signal);
+                lap(`${model}:${result.response.status}`);
+                if (!result.ok) {
+                    console.error(`Gemini ${model} hatasi:`, result.response.status, JSON.stringify(result.data).slice(0, 500));
+                    failures.push(result);
+                    throw new Error(model + ' failed');
+                }
+                return result;
             } catch (err) {
-                lap(`${attempt.model}:${err.name}`);
-                console.error(`Gemini ${attempt.model} ulasilamadi:`, err.name, err.message);
-                response = null;
-                data = null;
-                continue;
+                if (err.name === 'AbortError' && cancel && cancel.signal.aborted) throw err;
+                if (err.name === 'TimeoutError' || err.name === 'TypeError' || err.name === 'SyntaxError') {
+                    lap(`${model}:${err.name}`);
+                    console.error(`Gemini ${model} ulasilamadi:`, err.name, err.message);
+                }
+                throw err;
             }
-            const hasText = (data?.candidates?.[0]?.content?.parts || []).some(p => p && p.text);
-            lap(`${attempt.model}:${response.status}`);
-            if (response.ok && hasText) break;
-            console.error(`Gemini ${attempt.model} hatasi:`, response.status, JSON.stringify(data).slice(0, 500));
+        };
+
+        let winner = null;
+        if (isTherapyChat) {
+            const cancel = new AbortController();
+            try {
+                winner = await Promise.any([
+                    attempt(PRIMARY_MODEL, THERAPY_CONFIG, 12000, cancel),
+                    attempt(SECONDARY_MODEL, THERAPY_CONFIG, 12000, cancel)
+                ]);
+            } catch (_) {}
+            cancel.abort();
+            if (!winner) {
+                try { winner = await attempt(LAST_RESORT_MODEL, THERAPY_CONFIG, 5000); } catch (_) {}
+            }
+        } else {
+            for (const [model, timeoutMs] of [[PRIMARY_MODEL, 20000], [SECONDARY_MODEL, 15000], [LAST_RESORT_MODEL, 15000]]) {
+                try { winner = await attempt(model, REPORT_CONFIG, timeoutMs); break; } catch (_) {}
+            }
         }
+
+        const lastFailure = failures[failures.length - 1];
+        const response = winner ? winner.response : (lastFailure ? lastFailure.response : null);
+        const data = winner ? winner.data : (lastFailure ? lastFailure.data : null);
 
         if (!response) {
             return res.status(504).json({ error: 'AI_TIMEOUT' });
