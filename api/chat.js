@@ -5,19 +5,19 @@ import { logAiReply } from './_aiLog.js';
 
 const GUEST_CHAT_CAP = 30;
 
-const PRIMARY_MODEL = process.env.GEMINI_CHAT_MODEL || 'gemini-3.1-flash-lite';
-const FALLBACK_MODEL = 'gemini-2.5-flash-lite';
+const PRIMARY_MODEL = process.env.GEMINI_CHAT_MODEL || 'gemini-3.5-flash-lite';
+const FALLBACK_MODELS = ['gemini-3.8-flash', 'gemini-3.1-flash-lite'];
 
 function modelAttempts(isTherapyChat) {
     if (isTherapyChat) {
         return [
-            { model: PRIMARY_MODEL, timeoutMs: 8000, generationConfig: { maxOutputTokens: 256, thinkingConfig: { thinkingLevel: 'minimal' } } },
-            { model: FALLBACK_MODEL, timeoutMs: 7000, generationConfig: { maxOutputTokens: 256 } }
+            { model: PRIMARY_MODEL, timeoutMs: 7000, generationConfig: { maxOutputTokens: 256, thinkingConfig: { thinkingLevel: 'minimal' } } },
+            ...FALLBACK_MODELS.map(model => ({ model, timeoutMs: 6000, generationConfig: { maxOutputTokens: 256, thinkingConfig: { thinkingLevel: 'low' } } }))
         ];
     }
     return [
-        { model: PRIMARY_MODEL, timeoutMs: 25000, generationConfig: { thinkingConfig: { thinkingLevel: 'low' } } },
-        { model: FALLBACK_MODEL, timeoutMs: 20000, generationConfig: {} }
+        { model: PRIMARY_MODEL, timeoutMs: 20000, generationConfig: { thinkingConfig: { thinkingLevel: 'low' } } },
+        ...FALLBACK_MODELS.map(model => ({ model, timeoutMs: 15000, generationConfig: { thinkingConfig: { thinkingLevel: 'low' } } }))
     ];
 }
 

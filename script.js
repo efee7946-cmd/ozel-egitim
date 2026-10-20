@@ -5179,7 +5179,7 @@ KATI ETKİLEŞİM VE DİL KURALLARI:
         }
     };
     try {
-        var res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json', ...apiAuthHeaders() }, body: JSON.stringify(payload), signal: AbortSignal.timeout(20000) });
+        var res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json', ...apiAuthHeaders() }, body: JSON.stringify(payload), signal: AbortSignal.timeout(25000) });
         var data = await res.json();
         var reply = (data?.candidates?.[0]?.content?.parts || []).map(p => (p && !p.thought && p.text) || '').join('').trim();
         if (!reply) {
