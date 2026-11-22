@@ -27,15 +27,31 @@
     .ds-shadow { width: 140px; height: 80px; background: #fff; border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; font-size: var(--fs-xs); }
     .ds-flex { display: flex; gap: var(--space-4); flex-wrap: wrap; align-items: flex-start; }
     .ds-demo { max-width: 380px; }
+    .ds-icons { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: var(--space-3); }
+    .ds-icon { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--space-4) var(--space-2); display: flex; flex-direction: column; align-items: center; gap: var(--space-1); font-size: var(--fs-xs); color: var(--color-muted); }
+    .ds-icon .ui-icon { font-size: 28px; color: var(--color-ink); margin-bottom: var(--space-1); }
+    .ds-icon b { color: var(--color-ink); font-weight: var(--fw-bold); }
     .ds-do { color: var(--color-success); font-weight: var(--fw-bold); }
     .ds-dont { color: var(--color-danger); font-weight: var(--fw-bold); }
 </style>
 </head>
 <body>
+<!-- index.html içindeki sprite'ın kopyası; simge eklerken ikisini birlikte güncelleyin -->
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true">
+    <symbol id="i-home" viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></symbol>
+    <symbol id="i-mic" viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><path d="M12 19v3"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
+    <symbol id="i-message" viewBox="0 0 24 24"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></symbol>
+    <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></symbol>
+    <symbol id="i-shirt" viewBox="0 0 24 24"><path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/></symbol>
+    <symbol id="i-chart" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></symbol>
+    <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></symbol>
+    <symbol id="i-settings" viewBox="0 0 24 24"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></symbol>
+</svg>
 <main class="ds">
     <h1>YıldızCan tasarım sistemi</h1>
     <p>Değişkenler <code>style.css</code> dosyasının başındaki <code>:root</code> bloğundadır. Yeni bir kural yazarken renk kodu, px boyutu ya da köşe değeri yazmak yerine buradaki değişkenleri kullanın. Bir değer burada yoksa önce buraya ekleyin.</p>
-    <p>İlk adımda giriş, kayıt, öğrenci sihirbazı ve ana ekran bu sisteme taşındı. Konuşma, AAC, harita, nesne tanıma ve analiz ekranları sonraki adımlarda taşınacak; orada hâlâ eski renkler var.</p>
+    <p>İlk adımda giriş, kayıt, öğrenci sihirbazı ve ana ekran bu sisteme taşındı. Konuşma, AAC, harita, nesne tanıma ve analiz ekranları sonraki adımlarda taşınacak; orada hâlâ eski renkler var. Giriş ekranı, ana ekranla aynı gökyüzü ve orman sahnesini kullanır.</p>
 
     <h2>Renk</h2>
     <p>Ana renk mor. Beyaz yazıyla en az 4.5:1 kontrast verir. Ana düğmeler ve bağlantılar bu renktedir; aynı ekranda ikinci bir "ana" renk kullanılmaz.</p>
@@ -141,9 +157,24 @@
 
     <p style="margin-top:var(--space-6)"><b>Etkinlik kutusu</b> · <code>.menu-tile</code> + <code>.tile-*</code></p>
     <div class="menu-tiles" style="max-width:680px">
-        <button type="button" class="menu-tile tile-primary"><span class="tile-icon">🎤</span><span class="tile-label">Konuşma Pratiği</span><span class="tile-desc">Sorulara sesli cevap ver</span></button>
-        <button type="button" class="menu-tile tile-sequence"><span class="tile-icon">🔍</span><span class="tile-label">Nesne Tanıma</span><span class="tile-desc">3D nesneleri tanı, söyle</span></button>
-        <button type="button" class="menu-tile tile-aac"><span class="tile-icon">🗣️</span><span class="tile-label">AAC</span><span class="tile-desc">Görsellerle iletişim kur</span></button>
+        <button type="button" class="menu-tile tile-primary"><span class="tile-icon"><svg class="ui-icon" aria-hidden="true"><use href="#i-mic"/></svg></span><span class="tile-label">Konuşma Pratiği</span><span class="tile-desc">Sorulara sesli cevap ver</span></button>
+        <button type="button" class="menu-tile tile-sequence"><span class="tile-icon"><svg class="ui-icon" aria-hidden="true"><use href="#i-search"/></svg></span><span class="tile-label">Nesne Tanıma</span><span class="tile-desc">3D nesneleri tanı, söyle</span></button>
+        <button type="button" class="menu-tile tile-aac"><span class="tile-icon"><svg class="ui-icon" aria-hidden="true"><use href="#i-message"/></svg></span><span class="tile-label">AAC</span><span class="tile-desc">Görsellerle iletişim kur</span></button>
+    </div>
+
+    <h2>Simgeler</h2>
+    <p>Arayüz simgeleri tek tarzda çizgi SVG'lerdir (Lucide, ISC lisanslı; <code>vendor/icons/LICENSE.txt</code>). Her cihazda aynı görünürler. Rengi yazı renginden, boyutu yazı boyutundan alırlar: <code>&lt;svg class="ui-icon" aria-hidden="true"&gt;&lt;use href="#i-mic"/&gt;&lt;/svg&gt;</code>. Simgenin yanında yazı yoksa düğmeye <code>aria-label</code> verilir.</p>
+    <p>Emoji yalnızca çocuğun gördüğü içerikte kalır: AAC kartları, avatar seçimi, kutlamalar.</p>
+    <div class="ds-icons">
+        <div class="ds-icon"><svg class="ui-icon" aria-hidden="true"><use href="#i-home"/></svg><b>i-home</b><span>Ana ekran</span></div>
+        <div class="ds-icon"><svg class="ui-icon" aria-hidden="true"><use href="#i-mic"/></svg><b>i-mic</b><span>Konuşma</span></div>
+        <div class="ds-icon"><svg class="ui-icon" aria-hidden="true"><use href="#i-search"/></svg><b>i-search</b><span>Nesne tanıma</span></div>
+        <div class="ds-icon"><svg class="ui-icon" aria-hidden="true"><use href="#i-message"/></svg><b>i-message</b><span>AAC</span></div>
+        <div class="ds-icon"><svg class="ui-icon" aria-hidden="true"><use href="#i-target"/></svg><b>i-target</b><span>Görevler</span></div>
+        <div class="ds-icon"><svg class="ui-icon" aria-hidden="true"><use href="#i-shirt"/></svg><b>i-shirt</b><span>Mağaza</span></div>
+        <div class="ds-icon"><svg class="ui-icon" aria-hidden="true"><use href="#i-chart"/></svg><b>i-chart</b><span>Analiz</span></div>
+        <div class="ds-icon"><svg class="ui-icon" aria-hidden="true"><use href="#i-help"/></svg><b>i-help</b><span>Yardım</span></div>
+        <div class="ds-icon"><svg class="ui-icon" aria-hidden="true"><use href="#i-settings"/></svg><b>i-settings</b><span>Ayarlar</span></div>
     </div>
 
     <h2>Kurallar</h2>

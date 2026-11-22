@@ -17,7 +17,7 @@ app.use(express.json());
 // gerçekten istediği dosyalar servis edilir.
 const STATIC_FILES = [
     'index.html', 'error.html', 'privacy.html', 'gizlilik.html',
-    'destek.html', 'delete-account.html',
+    'destek.html', 'delete-account.html', 'tasarim-sistemi.html',
     'script.js', 'style.css', 'aac.css', 'aac-data.js', 'db-client.js', 'reply-engine.js', 'therapy-replies.js', 'report-text.js',
     'avatar3d.js', 'sw.js', 'avatar.png', 'bear_avatar.glb',
 ];
