@@ -650,7 +650,6 @@ const STRINGS = {
     mic_prompt: 'Konuşmak için mikrofona bas!',
     welcome_sub: 'Bugün ne yapmak istersin?',
     logout: 'Çıkış Yap',
-    repeat_btn: 'Tekrar Et',
     simplify_btn: 'Daha Basit',
     tab_analysis: 'BEP Analizi',
     tab_parent: 'Veli Özeti',
@@ -660,7 +659,7 @@ const STRINGS = {
     analysis_ind_comm: 'İletişim Bağımsızlığı',
     analysis_ind_comm_hint: 'Hiçbir yardım almadan doğrudan mikrofona konuştu',
     analysis_repeat_label: 'Tekrar Dinleme İhtiyacı',
-    analysis_repeat_hint: '"Tekrar Et" butonuna basarak soruyu yeniden dinledi',
+    analysis_repeat_hint: 'Hoparlör düğmesine basarak soruyu yeniden dinledi',
     analysis_simplify_label: 'Dil Adaptasyon İhtiyacı',
     analysis_simplify_hint: '"Daha Basit" butonu ile dili hafifletmesini istedi',
     analysis_no_data: 'Henüz seans kaydı yok. İlk konuşma pratiği seansını tamamladıktan sonra veriler burada görünür.',
@@ -1626,7 +1625,6 @@ const STRINGS = {
     mic_prompt: 'Press the microphone to speak!',
     welcome_sub: 'What would you like to do today?',
     logout: 'Log Out',
-    repeat_btn: 'Repeat',
     simplify_btn: 'Simpler',
     tab_analysis: 'IEP Analysis',
     tab_parent: 'Parent Summary',
@@ -1636,7 +1634,7 @@ const STRINGS = {
     analysis_ind_comm: 'Communication Independence',
     analysis_ind_comm_hint: 'Spoke directly into the microphone without any help',
     analysis_repeat_label: 'Need for Repeat Listening',
-    analysis_repeat_hint: 'Listened to the question again using the "Repeat" button',
+    analysis_repeat_hint: 'Listened to the question again using the speaker button',
     analysis_simplify_label: 'Language Adaptation Need',
     analysis_simplify_hint: 'Requested simpler language using the "Simpler" button',
     analysis_no_data: 'No sessions recorded yet. Complete your first speech practice session to see data here.',
@@ -2173,6 +2171,9 @@ let activeStudentName = '';
 let studentsCache = [];
 
 // Oturum verisi — tüm modüller buraya yazar
+// Ekrandaki soru; ilk soru yüklenene kadar boş (hoparlör düğmesi erken basılırsa hata vermesin)
+var currentObj = null;
+
 const sessionData = {
     startTime: null,
     therapyTurns: [],
@@ -4203,8 +4204,10 @@ function updateProgressBar() {
     if (label) label.textContent = t('therapy_progress').replace('{a}', answered).replace('{t}', total);
 }
 
+// Soru çubuğunun yanındaki hoparlör; veli raporundaki "tekrar dinledi" sayısı buradan gelir
 function rereadQuestion() {
     if (currentObj) {
+        sessionData.repeatUsed++;
         speak(currentObj.q, () => {});
     }
 }
@@ -4212,9 +4215,7 @@ function rereadQuestion() {
 async function askAIMode(mode) {
     if (!currentObj) return;
     if (mode === 'repeat') {
-        sessionData.repeatUsed++;
-        addMessage(_lang === 'en' ? 'Reading the question again...' : 'Soruyu tekrar okuyorum...', 'ai');
-        speak(currentObj.q, () => {});
+        rereadQuestion();
     } else if (mode === 'simplify') {
         sessionData.simplifyUsed++;
         const _sCat = getCurrentTherapyCategory().label;
