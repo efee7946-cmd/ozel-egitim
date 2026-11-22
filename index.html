@@ -117,12 +117,12 @@
         <!-- Giriş formu -->
         <form id="loginForm" class="auth-form" onsubmit="handleLogin(event)">
             <div class="auth-field">
-                <label data-i18n="auth_username_label">Kullanıcı Adı</label>
+                <label for="loginUsername" data-i18n="auth_username_label">Kullanıcı Adı</label>
                 <input type="text" id="loginUsername" autocomplete="username"
                     placeholder="kullaniciadi" data-i18n-placeholder="login_username" required>
             </div>
             <div class="auth-field">
-                <label data-i18n="auth_password_label">Şifre</label>
+                <label for="loginPassword" data-i18n="auth_password_label">Şifre</label>
                 <input type="password" id="loginPassword" autocomplete="current-password"
                     placeholder="••••••" data-i18n-placeholder="login_password" required>
             </div>
@@ -134,7 +134,7 @@
         <form id="resetForm" class="auth-form" style="display:none" onsubmit="handleResetPassword(event)">
             <p class="auth-reset-info" id="resetInfoText" data-i18n="auth_reset_email_info">Kullanıcı adınızı veya e-postanızı girin, kayıtlı e-postanıza sıfırlama kodu gönderelim.</p>
             <div class="auth-field">
-                <label data-i18n="auth_identifier_label">Kullanıcı Adı veya E-posta</label>
+                <label for="resetIdentifier" data-i18n="auth_identifier_label">Kullanıcı Adı veya E-posta</label>
                 <input type="text" id="resetIdentifier" autocomplete="username"
                     placeholder="kullaniciadi veya ornek@gmail.com" data-i18n-placeholder="auth_identifier_ph">
             </div>
@@ -142,16 +142,16 @@
                 onclick="requestResetCode()" data-i18n="auth_send_code_btn">E-postama Kod Gönder</button>
             <div id="resetCodeFields" style="display:none">
                 <div class="auth-field">
-                    <label data-i18n="auth_email_code_label">E-postadaki 6 Haneli Kod</label>
+                    <label for="resetCodeInput" data-i18n="auth_email_code_label">E-postadaki 6 Haneli Kod</label>
                     <input type="text" id="resetCodeInput" autocomplete="one-time-code"
                         inputmode="numeric" placeholder="123456">
                 </div>
                 <div class="auth-field">
-                    <label><span data-i18n="auth_new_password_label">Yeni Şifre</span> <small data-i18n="auth_password_hint">(en az 6 karakter)</small></label>
+                    <label for="resetPassword"><span data-i18n="auth_new_password_label">Yeni Şifre</span> <small data-i18n="auth_password_hint">(en az 6 karakter)</small></label>
                     <input type="password" id="resetPassword" autocomplete="new-password" placeholder="••••••">
                 </div>
                 <div class="auth-field">
-                    <label data-i18n="auth_password_repeat">Şifre Tekrar</label>
+                    <label for="resetPassword2" data-i18n="auth_password_repeat">Şifre Tekrar</label>
                     <input type="password" id="resetPassword2" autocomplete="new-password" placeholder="••••••">
                 </div>
                 <button type="submit" class="auth-submit-btn" id="resetBtn" data-i18n="auth_reset_btn">Şifreyi Sıfırla</button>
@@ -173,7 +173,7 @@
                     <p class="wiz-step-sub" data-i18n="reg_step_email_sub">Doğrulama kodunu ve şifre sıfırlama bağlantılarını buraya göndereceğiz.</p>
                 </div>
                 <div class="auth-field">
-                    <label data-i18n="auth_email_label">E-posta</label>
+                    <label for="regEmail" data-i18n="auth_email_label">E-posta</label>
                     <input type="email" id="regEmail" autocomplete="email" placeholder="ornek@gmail.com"
                         onkeydown="if(event.key==='Enter'){event.preventDefault();regWizNext();}">
                 </div>
@@ -186,12 +186,12 @@
                     <p class="wiz-step-sub" data-i18n="reg_step_pw_sub">Hesabınıza bu şifreyle gireceksiniz.</p>
                 </div>
                 <div class="auth-field">
-                    <label><span data-i18n="auth_password_label">Şifre</span> <small data-i18n="auth_password_hint">(en az 8 karakter)</small></label>
+                    <label for="regPassword"><span data-i18n="auth_password_label">Şifre</span> <small data-i18n="auth_password_hint">(en az 8 karakter)</small></label>
                     <input type="password" id="regPassword" autocomplete="new-password" placeholder="••••••"
                         onkeydown="if(event.key==='Enter'){event.preventDefault();regWizNext();}">
                 </div>
                 <div class="auth-field">
-                    <label data-i18n="auth_password_repeat">Şifre Tekrar</label>
+                    <label for="regPassword2" data-i18n="auth_password_repeat">Şifre Tekrar</label>
                     <input type="password" id="regPassword2" autocomplete="new-password" placeholder="••••••"
                         onkeydown="if(event.key==='Enter'){event.preventDefault();regWizNext();}">
                 </div>
@@ -204,7 +204,7 @@
                     <p class="wiz-step-sub" data-i18n="reg_step_user_sub">Girişte bu adı kullanacaksınız.</p>
                 </div>
                 <div class="auth-field">
-                    <label data-i18n="auth_username_label">Kullanıcı Adı</label>
+                    <label for="regUsername" data-i18n="auth_username_label">Kullanıcı Adı</label>
                     <input type="text" id="regUsername" autocomplete="username"
                         placeholder="ornek: ahmet_ogretmen (harf, rakam, _)" data-i18n-placeholder="reg_username_placeholder">
                 </div>
@@ -226,7 +226,7 @@
             </div>
         </form>
 
-        <div class="auth-error" id="authError"></div>
+        <div class="auth-error" id="authError" role="alert"></div>
 
         <button type="button" class="auth-guest-btn" onclick="continueAsGuest()">
             <span class="auth-guest-icon">👀</span>
@@ -621,7 +621,7 @@
         <button type="button" class="recovery-modal-dismiss" onclick="closeGuestLimitModal()" aria-label="Kapat">✕</button>
         <div class="recovery-modal-icon">🌟</div>
         <h3 data-i18n="guest_limit_title">Deneme hakkın doldu 🌟</h3>
-        <p data-i18n="guest_limit_sub">Beğendiysen ücretsiz kayıt ol — tüm etkinliklere tam erişim kazanırsın, ilerlemen buluta yedeklenir ve verilerin kaybolmaz.</p>
+        <p data-i18n="guest_limit_sub">Beğendiysen ücretsiz kayıt ol — tüm etkinliklere tam erişim kazanırsın, istersen ilerlemeni buluta yedekleyebilirsin.</p>
         <button type="button" class="recovery-close-btn" onclick="guestExitToRegister()" data-i18n="guest_limit_btn">Ücretsiz Kayıt Ol</button>
         <button type="button" class="auth-forgot-link" onclick="closeGuestLimitModal()" data-i18n="guest_limit_later">Menüye dön</button>
     </div>

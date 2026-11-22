@@ -5205,9 +5205,10 @@ body.a11y-large-touch .pw-wrap input { min-height: 56px; }
 .auth-submit-btn:disabled { opacity: .6; cursor: default; transform: none; }
 .auth-error {
     min-height: 20px; margin-top: 10px;
-    color: #e74c3c; font-size: 0.88rem;
+    color: #c0392b; font-size: 0.88rem;
     font-weight: 600; text-align: center;
 }
+.auth-field input[aria-invalid="true"] { border-color: #c0392b; }
 .auth-forgot-link {
     width: 100%; margin-top: 10px; padding: 10px;
     background: none; border: none;

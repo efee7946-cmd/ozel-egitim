@@ -81,6 +81,7 @@ const STRINGS = {
     reg_step_user_title: 'Kullanıcı adı seçin',
     reg_step_user_sub: 'Girişte bu adı kullanacaksınız.',
     auth_kvkk_required: 'Devam etmek için Aydınlatma Metni\'ni okuduğunuzu işaretleyin',
+    auth_connection_error: 'Sunucuya ulaşılamadı. İnternet bağlantınızı kontrol edip tekrar deneyin.',
     AUTH_FIELDS_REQUIRED: 'Kullanıcı adı ve şifre gerekli',
     AUTH_USERNAME_TOO_SHORT: 'Kullanıcı adı en az 3 karakter olmalı',
     AUTH_PASSWORD_TOO_SHORT: 'Şifre en az 8 karakter olmalı',
@@ -130,7 +131,7 @@ const STRINGS = {
     help_faq_q3: '🔑 Şifremi unuttum, ne yapmalıyım?',
     help_faq_a3: 'Giriş ekranındaki "Şifremi unuttum" bağlantısına tıklayıp e-postanıza gelen kodla yeni şifre belirleyebilirsiniz.',
     help_faq_q4: '🔒 Verilerim güvende mi?',
-    help_faq_a4: 'Veriler önce cihazınızda saklanır, ardından hesabınıza bağlı olarak şifrelenmiş şekilde sunucuya yedeklenir. Verilerinizi Erişilebilirlik panelinden indirebilir veya kalıcı olarak silebilirsiniz.',
+    help_faq_a4: 'Veriler cihazınızda saklanır. Ayarlardan "Bulut yedeği"ni açarsanız hesabınıza bağlı olarak şifrelenmiş şekilde sunucuya da yedeklenir. Verilerinizi Erişilebilirlik panelinden indirebilir veya kalıcı olarak silebilirsiniz.',
     stars_earned: '+{n} ⭐ kazandın!',
     star_info_title: '⭐ Yıldızlar Nasıl Kazanılır?',
     star_info_therapy: 'Konuşma pratiğinde yardım almadan mikrofona konuşarak',
@@ -898,7 +899,7 @@ const STRINGS = {
     guest_banner_sub: 'Kayıt tamamen ücretsiz: tüm etkinliklere tam erişim kazanırsın, ilerlemen kaybolmaz.',
     guest_banner_btn: 'Ücretsiz Kayıt Ol',
     guest_limit_title: 'Deneme hakkın doldu 🌟',
-    guest_limit_sub: 'Beğendiysen ücretsiz kayıt ol — tüm etkinliklere tam erişim kazanırsın, ilerlemen buluta yedeklenir ve verilerin kaybolmaz.',
+    guest_limit_sub: 'Beğendiysen ücretsiz kayıt ol — tüm etkinliklere tam erişim kazanırsın, istersen ilerlemeni buluta yedekleyebilirsin.',
     guest_limit_btn: 'Ücretsiz Kayıt Ol',
     guest_limit_later: 'Menüye dön',
     therapy_complete_stat: '{name} bugün {n} soruya cevap verdi! 👏',
@@ -1054,6 +1055,7 @@ const STRINGS = {
     reg_step_user_title: 'Pick a username',
     reg_step_user_sub: 'You will use this name to sign in.',
     auth_kvkk_required: 'To continue, confirm that you have read the Privacy Notice',
+    auth_connection_error: 'Could not reach the server. Check your internet connection and try again.',
     AUTH_FIELDS_REQUIRED: 'Username and password are required',
     AUTH_USERNAME_TOO_SHORT: 'Username must be at least 3 characters',
     AUTH_PASSWORD_TOO_SHORT: 'Password must be at least 6 characters',
@@ -1102,7 +1104,7 @@ const STRINGS = {
     help_faq_q3: '🔑 I forgot my password, what do I do?',
     help_faq_a3: 'Tap "Forgot my password" on the login screen and set a new password with the code sent to your email.',
     help_faq_q4: '🔒 Is my data safe?',
-    help_faq_a4: 'Your data is stored on your device first, then backed up encrypted to the server tied to your account. You can export or permanently delete your data from the Accessibility panel.',
+    help_faq_a4: 'Your data is stored on your device. If you turn on "Cloud backup" in Settings, it is also backed up encrypted to the server tied to your account. You can export or permanently delete your data from the Accessibility panel.',
     stars_earned: 'You earned +{n} ⭐!',
     star_info_title: '⭐ How to Earn Stars?',
     star_info_therapy: 'Speak into the microphone without help during speech practice',
@@ -1870,7 +1872,7 @@ const STRINGS = {
     guest_banner_sub: 'Signing up is completely free: you get full access to all activities and your progress is saved.',
     guest_banner_btn: 'Sign Up Free',
     guest_limit_title: 'Your trial is used up 🌟',
-    guest_limit_sub: 'Liked it? Sign up for free — you get full access to all activities, your progress is backed up to the cloud and nothing gets lost.',
+    guest_limit_sub: 'Liked it? Sign up for free — you get full access to all activities, and you can back up your progress to the cloud if you like.',
     guest_limit_btn: 'Sign Up Free',
     guest_limit_later: 'Back to menu',
     therapy_complete_stat: '{name} answered {n} questions today! 👏',
@@ -2492,7 +2494,7 @@ window.addEventListener('offline', _updateOfflineBanner);
 function connectionErrorMsg() {
     return navigator.onLine === false
         ? t('offline_banner')
-        : (t('auth_connection_error') || t('AUTH_FIELDS_REQUIRED'));
+        : t('auth_connection_error');
 }
 
 // =============================================
@@ -6870,7 +6872,7 @@ function regStepError(step) {
 
 function regWizNext() {
     const err = regStepError(_regStep);
-    if (err) return showAuthError(t(err));
+    if (err) return showAuthError(t(err), regStepErrorField(_regStep));
     if (_regStep < REG_FORM_STEPS) regWizGo(_regStep + 1);
 }
 
@@ -6896,7 +6898,7 @@ function hideResetForm() {
 
 async function requestResetCode() {
     const identifier = document.getElementById('resetIdentifier').value.trim();
-    if (!identifier) return showAuthError(t('auth_fill_all'));
+    if (!identifier) return showAuthError(t('auth_fill_all'), 'resetIdentifier');
     const btn = document.getElementById('sendResetCodeBtn');
     btn.disabled = true; btn.textContent = t('auth_waiting');
     const res = await authApi('request_reset', { identifier });
@@ -7080,8 +7082,8 @@ async function handleResetPassword(e) {
     const newPassword  = document.getElementById('resetPassword').value;
     const newPassword2 = document.getElementById('resetPassword2').value;
     if (!identifier || !codeValue || !newPassword) return showAuthError(t('auth_fill_all'));
-    if (newPassword !== newPassword2) return showAuthError(t('auth_passwords_mismatch'));
-    if (newPassword.length < 8) return showAuthError(t('auth_password_short'));
+    if (newPassword !== newPassword2) return showAuthError(t('auth_passwords_mismatch'), 'resetPassword2');
+    if (newPassword.length < 8) return showAuthError(t('auth_password_short'), 'resetPassword');
 
     const btn = document.getElementById('resetBtn');
     btn.disabled = true; btn.textContent = t('auth_waiting');
@@ -7119,9 +7121,33 @@ function setAuthLoading(loading) {
     if (btn) { btn.disabled = loading; btn.textContent = loading ? t('auth_waiting') : (_authMode === 'login' ? t('login_btn') : t('register_btn')); }
 }
 
-function showAuthError(msg) {
+// fieldId verilirse o alan hatalı işaretlenir, hata metnine bağlanır ve odak oraya gider.
+function showAuthError(msg, fieldId) {
     const el = document.getElementById('authError');
     if (el) { el.textContent = msg; }
+    document.querySelectorAll('.auth-form [aria-invalid]').forEach(f => {
+        f.removeAttribute('aria-invalid');
+        f.removeAttribute('aria-describedby');
+    });
+    const field = msg && fieldId && document.getElementById(fieldId);
+    if (field) {
+        field.setAttribute('aria-invalid', 'true');
+        field.setAttribute('aria-describedby', 'authError');
+        field.focus();
+    }
+}
+document.addEventListener('input', e => {
+    if (e.target.getAttribute && e.target.getAttribute('aria-invalid')) {
+        e.target.removeAttribute('aria-invalid');
+        e.target.removeAttribute('aria-describedby');
+    }
+});
+
+// Adım doğrulamasındaki hatanın hangi alana ait olduğu.
+function regStepErrorField(step) {
+    if (step === 1) return 'regEmail';
+    const p1 = document.getElementById('regPassword').value;
+    return (p1 && p1.length >= 8) ? 'regPassword2' : 'regPassword';
 }
 
 function showToast(msg) {
@@ -7142,7 +7168,7 @@ async function handleLogin(e) {
     e.preventDefault();
     const username = document.getElementById('loginUsername').value.trim();
     const password = document.getElementById('loginPassword').value;
-    if (!username || !password) return showAuthError(t('auth_fill_all'));
+    if (!username || !password) return showAuthError(t('auth_fill_all'), username ? 'loginPassword' : 'loginUsername');
     setAuthLoading(true);
 
     const res = await authApi('login', { username, password });
@@ -7195,10 +7221,10 @@ async function handleRegister(e) {
     const regEmail    = document.getElementById('regEmail').value.trim();
     for (const step of [1, 2]) {
         const err = regStepError(step);
-        if (err) { regWizGo(step); return showAuthError(t(err)); }
+        if (err) { regWizGo(step); return showAuthError(t(err), regStepErrorField(step)); }
     }
-    if (!username) return showAuthError(t('auth_fill_all'));
-    if (!document.getElementById('kvkkConsent').checked) return showAuthError(t('auth_kvkk_required'));
+    if (!username) return showAuthError(t('auth_fill_all'), 'regUsername');
+    if (!document.getElementById('kvkkConsent').checked) return showAuthError(t('auth_kvkk_required'), 'kvkkConsent');
     setAuthLoading(true);
 
     const res = await authApi('register', { username, password, email: regEmail, kvkkAccepted: true });
