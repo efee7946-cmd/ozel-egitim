@@ -55,11 +55,12 @@
     <symbol id="i-arrow-left" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></symbol>
     <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
     <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol>
 </svg>
 <main class="ds">
     <h1>YıldızCan tasarım sistemi</h1>
     <p>Değişkenler <code>style.css</code> dosyasının başındaki <code>:root</code> bloğundadır. Yeni bir kural yazarken renk kodu, px boyutu ya da köşe değeri yazmak yerine buradaki değişkenleri kullanın. Bir değer burada yoksa önce buraya ekleyin.</p>
-    <p>İlk adımda giriş, kayıt, öğrenci sihirbazı ve ana ekran, sonraki adımlarda konuşma ekranı ve AAC panosu bu sisteme taşındı. Harita, nesne tanıma ve analiz ekranları sonraki adımlarda taşınacak; orada hâlâ eski renkler var. Giriş ekranı, ana ekranla aynı gökyüzü ve orman sahnesini kullanır.</p>
+    <p>İlk adımda giriş, kayıt, öğrenci sihirbazı ve ana ekran, sonraki adımlarda konuşma ekranı, AAC panosu ve konu haritası bu sisteme taşındı. Nesne tanıma, mağaza ve analiz ekranları sonraki adımlarda taşınacak; orada hâlâ eski renkler var. Giriş ekranı, ana ekranla aynı gökyüzü ve orman sahnesini kullanır.</p>
 
     <h2>Renk</h2>
     <p>Ana renk mor. Beyaz yazıyla en az 4.5:1 kontrast verir. Ana düğmeler ve bağlantılar bu renktedir; aynı ekranda ikinci bir "ana" renk kullanılmaz.</p>
@@ -80,7 +81,7 @@
     <h2>Etkinlik renkleri</h2>
     <p>Her etkinliğin kendi rengi var; çocuk etkinliği rengiyle de tanır. Beyaz yazı geçişin iki ucunda da en az 4.5:1 verir. Bu renkler yalnızca o etkinliğin kutusunda ve ekranında kullanılır.</p>
     <div class="ds-grid">
-        <div class="ds-swatch"><div class="ds-swatch-color" style="background:var(--tile-speech)">Konuşma</div><div class="ds-swatch-body"><b>--tile-speech</b><br>5.5 / 4.6:1</div></div>
+        <div class="ds-swatch"><div class="ds-swatch-color" style="background:var(--tile-speech)">Konuşma</div><div class="ds-swatch-body"><b>--tile-speech</b><br>5.5 / 4.6:1<br>Düz hali <code>--color-speech</code> #2f5fe0: mikrofon, haritada sıradaki konu</div></div>
         <div class="ds-swatch"><div class="ds-swatch-color" style="background:var(--tile-sequence)">Nesne Tanıma</div><div class="ds-swatch-body"><b>--tile-sequence</b><br>5.4 / 4.8:1</div></div>
         <div class="ds-swatch"><div class="ds-swatch-color" style="background:var(--tile-aac)">AAC</div><div class="ds-swatch-body"><b>--tile-aac</b><br>5.4 / 4.9:1<br>Ekran içi vurgu: <code>--color-aac</code> #0e7490, açık zemin <code>--color-aac-soft</code></div></div>
         <div class="ds-swatch"><div class="ds-swatch-color" style="background:var(--tile-schedule)">Görevler</div><div class="ds-swatch-body"><b>--tile-schedule</b><br>5.2 / 4.6:1</div></div>
@@ -232,6 +233,28 @@
         </div>
     </div>
 
+    <h3 style="margin-top:var(--space-6)">Konu haritası</h3>
+    <p>Harita bir oyun sahnesidir: gökyüzü ve orman resmi, sarı yol, ahşap tabelalar. Sahneye özel renkler <code>--map-*</code> değişkenleridir ve yalnızca haritada kullanılır. Tabela yazısı büyük harfle yazılmaz. Konu düğümünün üç hâli var; her hâl renk dışında bir işaretle de ayrılır: sıradaki konu mavi halka, nabız ve bayrak; tamamlanan sarı halka, onay ve yıldız; kilitli gri resim ve kilit. Ekran okuyucu hâli de söyler ("2. Kendini Tanıtma, kilitli").</p>
+    <div class="ds-box ds-demo" style="max-width:760px;background:url('map-assets/map-bg.jpg') center / cover">
+        <p style="background:rgba(255,255,255,.9);display:inline-block;padding:2px 8px;border-radius:8px"><b>Tabela, düzey ve düğümler</b> · <code>.map-sign-title</code>, <code>.map-level-chip</code>, <code>.map-node</code> + <code>-current</code> / <code>-done</code> / <code>-locked</code></p>
+        <div class="map-title-row" style="margin:var(--space-3) 0">
+            <div class="map-sign-title">Konu Haritası</div>
+            <button type="button" class="map-level-chip">Düzey: Tek Kelime</button>
+        </div>
+        <div class="map-trail" style="grid-template-columns:repeat(3,1fr)">
+            <button type="button" class="map-node map-node-current" aria-label="1. Selamlaşma, sıradaki konu"><span class="map-node-num">1</span><span class="map-node-circle"><img class="map-node-img" src="avatar.png" alt=""><span class="map-node-flag">🚩</span></span><span class="map-node-plate"><span class="map-node-label">Selamlaşma</span></span></button>
+            <button type="button" class="map-node map-node-done" aria-label="2. Kendini Tanıtma, tamamlandı, 3 yıldız"><span class="map-node-num">2</span><span class="map-node-circle"><img class="map-node-img" src="avatar.png" alt=""><span class="map-node-check"><svg class="ui-icon" aria-hidden="true"><use href="#i-check"/></svg></span></span><span class="map-node-plate"><span class="map-node-label">Kendini Tanıtma</span><span class="map-node-stars">⭐⭐⭐</span></span></button>
+            <button type="button" class="map-node map-node-locked" aria-disabled="true" aria-label="3. Duygular, kilitli"><span class="map-node-num">3</span><span class="map-node-circle"><img class="map-node-img" src="avatar.png" alt=""><span class="map-node-lock"><svg class="ui-icon" aria-hidden="true"><use href="#i-lock"/></svg></span></span><span class="map-node-plate"><span class="map-node-label">Duygular</span></span></button>
+        </div>
+        <div class="map-footer" style="margin-top:var(--space-3)">
+            <div class="map-progress-sign">
+                <span>İlerleme Durumun</span>
+                <div class="map-progress-track"><div class="map-progress-fill" style="width:30%"></div></div>
+                <b>3/10</b>
+            </div>
+        </div>
+    </div>
+
     <h2>Simgeler</h2>
     <p>Arayüz simgeleri tek tarzda çizgi SVG'lerdir (Lucide, ISC lisanslı; <code>vendor/icons/LICENSE.txt</code>). Her cihazda aynı görünürler. Rengi yazı renginden, boyutu yazı boyutundan alırlar: <code>&lt;svg class="ui-icon" aria-hidden="true"&gt;&lt;use href="#i-mic"/&gt;&lt;/svg&gt;</code>. Simgenin yanında yazı yoksa düğmeye <code>aria-label</code> verilir.</p>
     <p>Emoji yalnızca çocuğun gördüğü içerikte kalır: AAC kartları, avatar seçimi, kutlamalar.</p>
@@ -252,7 +275,8 @@
         <div class="ds-icon"><svg class="ui-icon" aria-hidden="true"><use href="#i-arrow-left"/></svg><b>i-arrow-left</b><span>Geri</span></div>
         <div class="ds-icon"><svg class="ui-icon" aria-hidden="true"><use href="#i-x"/></svg><b>i-x</b><span>Kapat / sil</span></div>
         <div class="ds-icon"><svg class="ui-icon" aria-hidden="true"><use href="#i-check"/></svg><b>i-check</b><span>Onayla</span></div>
-    </div>
+        <div class="ds-icon"><svg class="ui-icon" aria-hidden="true"><use href="#i-lock"/></svg><b>i-lock</b><span>Kilitli</span></div>
+</div>
 
     <h2>Kurallar</h2>
     <ul>

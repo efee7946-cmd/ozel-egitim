@@ -916,7 +916,7 @@ const STRINGS = {
     map_bubble: 'Her konuyu tamamla, yeni maceraların kilidini aç!',
     map_completed: 'Tamamlandı!',
     map_locked_toast: 'Önce "{label}" konusunu tamamla 🔒',
-    map_level_chip: '🎚️ Düzey: {level}',
+    map_level_chip: 'Düzey: {level}',
     map_level_modal_title: 'Hangi düzeyde çalışalım?',
     map_level_modal_sub: 'İstediğin zaman haritadan değiştirebilirsin.',
     map_finished_title: 'Şehir Kaşifi! 🏆',
@@ -1891,7 +1891,7 @@ const STRINGS = {
     map_bubble: 'Complete every topic to unlock new adventures!',
     map_completed: 'Completed!',
     map_locked_toast: 'Finish "{label}" first 🔒',
-    map_level_chip: '🎚️ Level: {level}',
+    map_level_chip: 'Level: {level}',
     map_level_modal_title: 'Which level should we practice at?',
     map_level_modal_sub: 'You can change it anytime from the map.',
     map_finished_title: 'City Explorer! 🏆',
@@ -4592,14 +4592,20 @@ function renderSpeechMap() {
         btn.style.gridColumn = String(col + 1);
         btn.dataset.topic = topic.key;
         if (status === 'locked') btn.setAttribute('aria-disabled', 'true');
-        btn.setAttribute('aria-label', `${i + 1}. ${topic.label}`);
+        // Ekran okuyucu düğümün durumunu da duysun: sıradaki / kilitli / tamamlandı
+        const statusText = status === 'locked'
+            ? (_lang === 'en' ? 'locked' : 'kilitli')
+            : status === 'done'
+                ? (_lang === 'en' ? `completed, ${stars} stars` : `tamamlandı, ${stars} yıldız`)
+                : (_lang === 'en' ? 'next topic' : 'sıradaki konu');
+        btn.setAttribute('aria-label', `${i + 1}. ${topic.label}, ${statusText}`);
         btn.onclick = () => onMapNodeTap(topic.key);
         btn.innerHTML = `
             <span class="map-node-num">${i + 1}</span>
             <span class="map-node-circle">
                 <img class="map-node-img" src="${_mapAssetState === 'ready' ? 'map-assets/node-' + topic.key + '.jpg' : 'avatar.png'}" alt="" onerror="this.onerror=null;this.src='avatar.png'">
-                ${status === 'locked' ? '<span class="map-node-lock">🔒</span>' : ''}
-                ${status === 'done' ? '<span class="map-node-check">✓</span>' : ''}
+                ${status === 'locked' ? '<span class="map-node-lock"><svg class="ui-icon" aria-hidden="true"><use href="#i-lock"/></svg></span>' : ''}
+                ${status === 'done' ? '<span class="map-node-check"><svg class="ui-icon" aria-hidden="true"><use href="#i-check"/></svg></span>' : ''}
                 ${status === 'current' ? '<span class="map-node-flag">🚩</span>' : ''}
             </span>
             <span class="map-node-plate">
