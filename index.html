@@ -242,21 +242,21 @@
 </div>
 
 <!-- ===================== İLK AÇILIŞ REHBERİ ===================== -->
-<div id="onboardingModal" class="onboarding-overlay" style="display:none">
+<div id="onboardingModal" class="onboarding-overlay" style="display:none" role="dialog" aria-modal="true" aria-labelledby="obTitle0">
     <div class="onboarding-card">
         <div class="onboarding-step" data-step="0">
             <div class="onboarding-icon">🎤</div>
-            <h3 data-i18n="ob_step1_title">Konuşma Pratiği ile başlayın</h3>
-            <p data-i18n="ob_step1_text">Bir konu yazın (örn. "alışveriş"), Yıldız Can o konuda sorular sorsun. Çocuk mikrofona konuşarak yanıt verir, anında teşvik alır.</p>
+            <h3 id="obTitle0" data-i18n="ob_step1_title">Konuşma Pratiği ile başlayın</h3>
+            <p data-i18n="ob_step1_text">Haritadan bir konu seçin, Yıldız Can o konuda sorular sorsun. Çocuk mikrofona konuşarak yanıt verir, anında teşvik alır.</p>
         </div>
         <div class="onboarding-step" data-step="1" style="display:none">
             <div class="onboarding-icon">🗣️</div>
-            <h3 data-i18n="ob_step2_title">Program ve AAC her zaman elinizde</h3>
+            <h3 id="obTitle1" data-i18n="ob_step2_title">Program ve AAC her zaman elinizde</h3>
             <p data-i18n="ob_step2_text">Günlük Program ile rutinleri görselleştirin, AAC panosuyla konuşamayan anlarda kartlara dokunarak iletişim kurun.</p>
         </div>
         <div class="onboarding-step" data-step="2" style="display:none">
             <div class="onboarding-icon">📊</div>
-            <h3 data-i18n="ob_step3_title">Gelişim kendiliğinden kaydedilir</h3>
+            <h3 id="obTitle2" data-i18n="ob_step3_title">Gelişim kendiliğinden kaydedilir</h3>
             <p data-i18n="ob_step3_text">Her seans otomatik kaydedilir. Analiz ekranında gelişim grafiğini görün, veli raporu ve BEP taslağı oluşturun.</p>
         </div>
         <div class="onboarding-dots" id="onboardingDots"></div>
@@ -315,10 +315,10 @@
             <div class="wiz-step active" data-step="1">
                 <div class="wiz-step-head">
                     <span class="wiz-step-icon">✏️</span>
-                    <h3 class="wiz-step-title" data-i18n="wiz_name_title">Öğrencinin adı ne?</h3>
+                    <h3 class="wiz-step-title" id="wizNameTitle" data-i18n="wiz_name_title">Öğrencinin adı ne?</h3>
                     <p class="wiz-step-sub" data-i18n="wiz_name_sub">Uygulama boyunca bu isimle hitap edeceğiz.</p>
                 </div>
-                <input type="text" id="loginNameInput" class="wiz-text-input"
+                <input type="text" id="loginNameInput" class="wiz-text-input" aria-labelledby="wizNameTitle"
                     data-i18n-placeholder="student_placeholder" placeholder="Öğrenci adı" maxlength="30"
                     autocomplete="off"
                     onkeydown="if(event.key==='Enter'){event.preventDefault();wizNext();}">
@@ -400,7 +400,7 @@
                 <p class="veli-notice"><span data-i18n="veli_notice_pre">Çocuğun adı ve çalışma kayıtları, istediğiniz hizmeti sunmak için işlenir. Ayrıntılar: </span><a href="#" onclick="openKvkkModal(event)" data-i18n="veli_consent_link">KVKK Aydınlatma Metni</a></p>
             </div>
 
-            <div class="auth-error login-profile-status" id="loginProfileStatus"></div>
+            <div class="auth-error login-profile-status" id="loginProfileStatus" role="alert"></div>
 
             <div class="wiz-nav">
                 <button type="button" class="wiz-back-btn" id="wizBackBtn" onclick="wizPrev()" data-i18n="wiz_back">← Geri</button>
@@ -689,11 +689,11 @@ document.addEventListener('DOMContentLoaded', function(){
         </div>
     </div>
 
-    <div id="mapLevelModal" class="recovery-modal-overlay" style="display:none">
+    <div id="mapLevelModal" class="recovery-modal-overlay" style="display:none" role="dialog" aria-modal="true" aria-labelledby="mapLevelTitle">
         <div class="recovery-modal-card map-level-card">
             <button type="button" class="recovery-modal-dismiss" onclick="closeMapLevelModal()" aria-label="Kapat">✕</button>
             <div class="recovery-modal-icon">🎚️</div>
-            <h3 data-i18n="map_level_modal_title">Hangi düzeyde çalışalım?</h3>
+            <h3 id="mapLevelTitle" data-i18n="map_level_modal_title">Hangi düzeyde çalışalım?</h3>
             <p data-i18n="map_level_modal_sub">İstediğin zaman haritadan değiştirebilirsin.</p>
             <div class="topic-level-options">
                 <button type="button" class="topic-level-btn" data-level="word" onclick="chooseMapLevel('word')">
@@ -861,7 +861,7 @@ document.addEventListener('DOMContentLoaded', function(){
     <div class="a11y-panel-inner">
         <div class="a11y-panel-head">
             <h3 data-i18n="a11y_title">⚙️ Ayarlar</h3>
-            <button type="button" class="a11y-close-btn" onclick="toggleA11yPanel()">✕</button>
+            <button type="button" class="a11y-close-btn" onclick="toggleA11yPanel()" aria-label="Kapat">✕</button>
         </div>
         <div class="a11y-panel-body">
             <div class="a11y-account-section" id="a11yAccountSection" style="display:none">
@@ -962,7 +962,7 @@ document.addEventListener('DOMContentLoaded', function(){
     <div class="a11y-panel-inner">
         <div class="a11y-panel-head">
             <h3 data-i18n="help_title">❓ Yardım</h3>
-            <button type="button" class="a11y-close-btn" onclick="toggleHelpPanel()">✕</button>
+            <button type="button" class="a11y-close-btn" onclick="toggleHelpPanel()" aria-label="Kapat">✕</button>
         </div>
         <div class="a11y-panel-body">
             <div class="help-section">

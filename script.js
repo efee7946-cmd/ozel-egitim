@@ -833,7 +833,7 @@ const STRINGS = {
     analysis_trend_col_date: 'Tarih',
     analysis_trend_col_pct: 'Bağımsız %',
     ob_step1_title: 'Konuşma Pratiği ile başlayın',
-    ob_step1_text: 'Bir konu yazın (örn. "alışveriş"), Yıldız Can o konuda sorular sorsun. Çocuk mikrofona konuşarak yanıt verir, anında teşvik alır.',
+    ob_step1_text: 'Haritadan bir konu seçin, Yıldız Can o konuda sorular sorsun. Çocuk mikrofona konuşarak yanıt verir, anında teşvik alır.',
     ob_step2_title: 'Günlük Görevler ve AAC her zaman elinizde',
     ob_step2_text: 'Günlük Görevler ile çocuğu her gün farklı hedeflere yönlendirin, AAC panosuyla konuşamayan anlarda kartlara dokunarak iletişim kurun.',
     ob_step3_title: 'Gelişim kendiliğinden kaydedilir',
@@ -1809,7 +1809,7 @@ const STRINGS = {
     analysis_trend_col_date: 'Date',
     analysis_trend_col_pct: 'Independent %',
     ob_step1_title: 'Start with Speech Practice',
-    ob_step1_text: 'Type a topic (e.g. "shopping") and Yıldız Can will ask questions about it. The child answers by speaking into the microphone and gets instant encouragement.',
+    ob_step1_text: 'Pick a topic on the map and Yıldız Can will ask questions about it. The child answers by speaking into the microphone and gets instant encouragement.',
     ob_step2_title: 'Daily Tasks and AAC always at hand',
     ob_step2_text: 'Daily Tasks guide the child toward a different goal every day, and use the AAC board to communicate by tapping cards when speaking is hard.',
     ob_step3_title: 'Progress is recorded automatically',
@@ -4667,11 +4667,15 @@ function onMapNodeTap(topicKey) {
 
 function openMapLevelModal() {
     renderMapLevelOptions();
-    document.getElementById('mapLevelModal').style.display = 'flex';
+    const modal = document.getElementById('mapLevelModal');
+    modal.style.display = 'flex';
+    dialogOpened(modal, closeMapLevelModal);
 }
 
 function closeMapLevelModal() {
-    document.getElementById('mapLevelModal').style.display = 'none';
+    const modal = document.getElementById('mapLevelModal');
+    modal.style.display = 'none';
+    dialogClosed(modal);
     _pendingMapTopicKey = null;
 }
 
@@ -4899,6 +4903,42 @@ async function processTherapySpeech(speech, source) {
 // =============================================
 // İLK AÇILIŞ REHBERİ
 // =============================================
+
+// Açılan pencereler: odağı içeri taşır, Tab'ı içeride tutar, Escape ile
+// kapatır, kapanınca odağı pencereyi açan öğeye geri verir.
+const _openDialogs = [];
+const _FOCUSABLE = 'button:not([disabled]), [href], input:not([disabled]):not([type="hidden"]), select, textarea, [tabindex]:not([tabindex="-1"])';
+function _dialogFocusables(el) {
+    return [...el.querySelectorAll(_FOCUSABLE)].filter(f => f.offsetParent !== null);
+}
+function dialogOpened(el, closeFn, focusEl) {
+    dialogClosed(el, true);
+    _openDialogs.push({ el, closeFn, back: document.activeElement });
+    setTimeout(() => {
+        const target = focusEl || _dialogFocusables(el)[0];
+        if (target) target.focus();
+    }, 0);
+}
+function dialogClosed(el, silent) {
+    const i = _openDialogs.findIndex(d => d.el === el);
+    if (i < 0) return;
+    const d = _openDialogs.splice(i, 1)[0];
+    if (!silent && d.back && d.back.focus && document.contains(d.back)) d.back.focus();
+}
+document.addEventListener('keydown', e => {
+    while (_openDialogs.length && _openDialogs[_openDialogs.length - 1].el.style.display === 'none') _openDialogs.pop();
+    const d = _openDialogs[_openDialogs.length - 1];
+    if (!d) return;
+    if (e.key === 'Escape') { e.preventDefault(); d.closeFn(); return; }
+    if (e.key !== 'Tab') return;
+    const items = _dialogFocusables(d.el);
+    if (!items.length) return;
+    const first = items[0], last = items[items.length - 1];
+    if (!d.el.contains(document.activeElement)) { e.preventDefault(); first.focus(); }
+    else if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+});
+
 let _onboardingStep = 0;
 const ONBOARDING_STEPS = 3;
 
@@ -4909,12 +4949,15 @@ function maybeShowOnboarding() {
     _onboardingStep = 0;
     _renderOnboardingStep();
     modal.style.display = 'flex';
+    dialogOpened(modal, finishOnboarding, document.getElementById('onboardingNextBtn'));
 }
 
 function _renderOnboardingStep() {
     document.querySelectorAll('#onboardingModal .onboarding-step').forEach(el => {
         el.style.display = Number(el.dataset.step) === _onboardingStep ? '' : 'none';
     });
+    const modal = document.getElementById('onboardingModal');
+    if (modal) modal.setAttribute('aria-labelledby', 'obTitle' + _onboardingStep);
     const dots = document.getElementById('onboardingDots');
     if (dots) {
         dots.innerHTML = Array.from({ length: ONBOARDING_STEPS }, (_, i) =>
@@ -4933,7 +4976,7 @@ function nextOnboardingStep() {
 function finishOnboarding() {
     localStorage.setItem('lms_onboarding_done', '1');
     const modal = document.getElementById('onboardingModal');
-    if (modal) modal.style.display = 'none';
+    if (modal) { modal.style.display = 'none'; dialogClosed(modal); }
 }
 
 let _introStep = 0;
@@ -6272,6 +6315,7 @@ function toggleA11yPanel() {
     if (!panel) return;
     const isOpen = panel.style.display !== 'none';
     panel.style.display = isOpen ? 'none' : 'flex';
+    if (isOpen) dialogClosed(panel); else dialogOpened(panel, toggleA11yPanel);
     if (!isOpen) updateA11yAccountSection();
     if (!isOpen) {
         const settings = loadA11ySettings();
@@ -6294,6 +6338,7 @@ function toggleHelpPanel() {
     if (!panel) return;
     const isOpen = panel.style.display !== 'none';
     panel.style.display = isOpen ? 'none' : 'flex';
+    if (isOpen) dialogClosed(panel); else dialogOpened(panel, toggleHelpPanel);
 }
 
 const PW_ICON_HIDDEN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 12S6.2 5.8 12 5.8 21.5 12 21.5 12 17.8 18.2 12 18.2 2.5 12 2.5 12Z"/><circle cx="12" cy="12" r="3.1"/><line x1="4.2" y1="19.8" x2="19.8" y2="4.2"/></svg>';
