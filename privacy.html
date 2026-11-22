@@ -25,7 +25,7 @@
   <li>Sesli konuşma verileri: mikrofon kaydı, metne çevrilmek için cihazın konuşma tanıma servisine (tarayıcıda ve Android’de genellikle Google, iOS’ta Apple) iletilir. YıldızCan ses kaydını kendi sunucusunda saklamaz; yalnızca ortaya çıkan metin kullanılır.</li>
   <li>Misafir modunda: deneme hakkının kötüye kullanılmasını önlemek için cihaz kimliğinin geri döndürülemez bir karma (hash) özeti — kimliğinizle ilişkilendirilmez; 1 yıl kullanılmazsa silinir</li>
 </ul>
-<p>Veriler önce cihazınızda (localStorage) saklanır; varsayılan olarak yalnızca cihazda kalır ve sunucuya gönderilmez. Veli, Ayarlar’daki “Bulut yedekleme” seçeneğini ayrı bir onayla açarsa veriler hesabına özel ve şifreli olarak yurt dışındaki sunucularda (Vercel, Aiven) yedeklenir ve cihazlar arasında eşitlenir. Bu seçenek kapatıldığında buluttaki kopya silinir. Sunucuda her durumda yalnızca hesap bilgileri (kullanıcı adı, şifre özeti, e-posta) tutulur. Misafir modunda öğrenci verileri yalnızca cihazda kalır. Öğrenci verilerinin işlenmesi için veli/yasal temsilcinin açık rızası zorunludur. Destek düzeyi ve tanı gibi sağlık verileri için ayrı ve isteğe bağlı bir onay alınır; bu onay verilmezse sağlık verisi kaydedilmez ve uygulama yine çalışır. Onaylar tarih ve metin sürümüyle birlikte kayıt altına alınır. Sağlık bilgileri, analiz ekranındaki “Sağlık bilgilerini sil” düğmesiyle istenildiği an silinebilir.</p>
+<p>Veriler önce cihazınızda (localStorage) saklanır; varsayılan olarak yalnızca cihazda kalır ve sunucuya gönderilmez. Veli, Ayarlar’daki “Bulut yedekleme” seçeneğini kendisi açarsa veriler hesabına özel ve şifreli olarak yurt dışındaki sunucularda (Vercel, Aiven) yedeklenir ve cihazlar arasında eşitlenir. Bu seçenek kapatıldığında buluttaki kopya silinir. Sunucuda her durumda yalnızca hesap bilgileri (kullanıcı adı, şifre özeti, e-posta) tutulur. Misafir modunda öğrenci verileri yalnızca cihazda kalır. Öğrenci verilerinin işlenmesi için veli/yasal temsilcinin açık rızası zorunludur. Destek düzeyi ve tanı gibi sağlık verileri için ayrı ve isteğe bağlı bir onay alınır; bu onay verilmezse sağlık verisi kaydedilmez ve uygulama yine çalışır. Onaylar tarih ve metin sürümüyle birlikte kayıt altına alınır. Sağlık bilgileri, analiz ekranındaki “Sağlık bilgilerini sil” düğmesiyle istenildiği an silinebilir.</p>
 
 <h2>2. Verilerin Kullanımı</h2>
 <p>Toplanan veriler yalnızca şu amaçlarla kullanılır:</p>
@@ -34,6 +34,14 @@
   <li>Pratik ilerleme raporları oluşturmak</li>
   <li>Hesap güvenliği ve deneme hakkının kötüye kullanımının önlenmesi</li>
 </ul>
+
+<h3>Hukuki sebepler</h3>
+<ul>
+  <li>Hesap bilgileri, öğrenci adı ve çalışma kayıtları: istediğiniz hizmetin sunulması için sözleşmenin kurulması ve ifası (KVKK md. 5/2-c)</li>
+  <li>E-posta doğrulaması, güvenlik kayıtları, misafir modundaki cihaz özeti: hizmetin güvenliği için meşru menfaat (md. 5/2-f)</li>
+  <li>Destek düzeyi ve tanı bilgileri (sağlık verisi): yalnızca ayrıca verdiğiniz açık rıza (md. 6); rıza verilmezse uygulama yine çalışır</li>
+</ul>
+<p>Veriler, uygulamadaki formlara girdiğiniz bilgiler ve uygulamanın kullanımı sırasında elektronik ortamda otomatik yollarla toplanır.</p>
 
 <h2>3. Veri Paylaşımı</h2>
 <p>Kişisel verileriniz üçüncü taraflara satılmaz, pazarlama veya reklam amacıyla paylaşılmaz. Yalnızca teknik işleme için şu hizmet sağlayıcılar kullanılır: Vercel (barındırma), Aiven (veritabanı), Gmail SMTP (e-posta gönderimi), Pexels (görsel içerik). Seslendirme (metin okuma) kendi sunucumuzda yerel olarak yapılır; bu amaçla hiçbir veri üçüncü tarafa aktarılmaz.</p>
@@ -45,7 +53,7 @@
 <p>Uygulama içindeki "Hesabı Sil" özelliği veya <a href="https://ozel-egitim.vercel.app/delete-account.html">hesap silme sayfası</a> ile hesabınızı ve tüm verilerinizi anında silebilirsiniz. E-posta ile iletilen silme talepleri en geç 30 gün içinde yerine getirilir. Kişisel bilgi içermeyen teknik hata kayıtları en fazla 30 gün saklanır ve otomatik silinir.</p>
 
 <h2>6. Çocukların Gizliliği</h2>
-<p>Uygulamamız özel eğitime ihtiyaç duyan çocuklar için tasarlanmıştır ve ebeveyn veya öğretmen gözetiminde kullanılması önerilir. Çocuklara ait veriler yalnızca yetişkin hesap sahibi tarafından, veli onayıyla girilir; yalnızca eğitim amacıyla işlenir, hiçbir koşulda reklam amacıyla kullanılmaz.</p>
+<p>Uygulamamız özel eğitime ihtiyaç duyan çocuklar için tasarlanmıştır ve ebeveyn veya öğretmen gözetiminde kullanılması önerilir. Çocuklara ait veriler yalnızca yetişkin hesap sahibi (veli veya yasal temsilci) tarafından girilir; yalnızca eğitim amacıyla işlenir, hiçbir koşulda reklam amacıyla kullanılmaz.</p>
 
 <h2>7. İletişim</h2>
 <p>Gizlilik politikamıza ilişkin sorularınız için: <a href="mailto:yildizsiniflari@gmail.com">yildizsiniflari@gmail.com</a></p>

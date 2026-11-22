@@ -24,7 +24,6 @@ test.describe('Veli kapısı, misafir modu ve ilk kullanım akışı', () => {
 
     await page.fill('#loginNameInput', 'Deneme Çocuk');
     for (let i = 0; i < 3; i++) await page.click('#wizNextBtn');
-    await page.check('#loginVeliConsent');
     await page.click('#loginSaveBtn');
 
     // P2: ilk öğrenci sonrası menü yerine doğrudan konu haritası açılmalı

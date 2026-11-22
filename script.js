@@ -24,7 +24,6 @@ const STRINGS = {
     guest_btn: 'Misafir olarak devam et',
     login_tab: 'Giriş',
     register_tab: 'Kayıt',
-    consent_label: 'Öğrenci verilerini işlemek için veli/yasal temsilci onayını aldım',
     auth_tagline: 'Özel eğitim yönetim platformu',
     auth_username_label: 'Kullanıcı Adı',
     auth_password_label: 'Şifre',
@@ -51,13 +50,15 @@ const STRINGS = {
     wiz_emoji_sub: 'Öğrencinin profilinde bu simge görünecek.',
     wiz_level_title: 'Destek düzeyi (isteğe bağlı)',
     wiz_level_sub: 'Destek düzeyi ve tanı sağlık verisidir. Vermek zorunlu değildir; vermezsen uygulama yine çalışır.',
-    health_consent_text: 'Veli olarak, destek düzeyi ve tanı bilgilerinin (sağlık verisi) içeriği uyarlamak için işlenmesine açık rıza veriyorum. Bu rızayı istediğim zaman geri alabilirim.',
+    health_consent_text: 'Destek düzeyi ve tanı bilgilerinin (sağlık verisi) içeriği uyarlamak amacıyla işlenmesine açık rıza veriyorum. Rızamı istediğim zaman geri alabilirim; geri alırsam bu bilgiler silinir.',
+    health_consent_title: 'Açık rıza metni (isteğe bağlı)',
+    health_notice_pre: 'Bu bilgilerin nasıl işlendiği şurada anlatılır: ',
     wiz_health_skipped: 'Sağlık bilgisi kaydedilmeyecek',
     wiz_cond_title: 'Tanı / eşlik eden durumlar',
     wiz_cond_sub: 'İstediğin kadar seç — bu adımı geçebilirsin.',
     wiz_cond_none: 'Seçim yapılmadı',
-    wiz_consent_title: 'Son bir onay',
-    wiz_consent_sub: 'Kaydetmeden önce velinin onayı gerekir.',
+    wiz_consent_title: 'Kaydetmeye hazır',
+    wiz_consent_sub: 'Bilgileri kontrol edip kaydedebilirsiniz.',
     wiz_back: '← Geri',
     wiz_next: 'Devam →',
     wiz_login_link: 'Zaten hesabım var, giriş yap',
@@ -68,7 +69,7 @@ const STRINGS = {
     auth_kvkk_link1: 'Aydınlatma Metni',
     auth_kvkk_sep: "'ni ve",
     auth_kvkk_link2: 'Gizlilik Politikası',
-    auth_kvkk_agree: "'nı okudum, kabul ediyorum.",
+    auth_kvkk_agree: "'nı okudum ve anladım.",
     auth_fill_all: 'Tüm alanları doldurun',
     auth_passwords_mismatch: 'Şifreler uyuşmuyor',
     auth_password_short: 'Şifre en az 8 karakter olmalı',
@@ -79,7 +80,7 @@ const STRINGS = {
     reg_step_pw_sub: 'Hesabınıza bu şifreyle gireceksiniz.',
     reg_step_user_title: 'Kullanıcı adı seçin',
     reg_step_user_sub: 'Girişte bu adı kullanacaksınız.',
-    auth_kvkk_required: 'Devam etmek için Aydınlatma Metni\'ni kabul etmelisiniz',
+    auth_kvkk_required: 'Devam etmek için Aydınlatma Metni\'ni okuduğunuzu işaretleyin',
     AUTH_FIELDS_REQUIRED: 'Kullanıcı adı ve şifre gerekli',
     AUTH_USERNAME_TOO_SHORT: 'Kullanıcı adı en az 3 karakter olmalı',
     AUTH_PASSWORD_TOO_SHORT: 'Şifre en az 8 karakter olmalı',
@@ -301,9 +302,8 @@ const STRINGS = {
     setup_note_label: 'Not',
     setup_create_btn: 'Oluştur',
     setup_add_new_divider: 'Yeni öğrenci ekle',
-    veli_consent_pre: 'Veli olarak ',
     veli_consent_link: 'KVKK Aydınlatma Metni',
-    veli_consent_post: "'ni okudum. Çocuğumun adının ve uygulamadaki çalışma kayıtlarının (eğitim verileri) işlenmesine açık rıza veriyorum.",
+    veli_notice_pre: 'Çocuğun adı ve çalışma kayıtları, istediğiniz hizmeti sunmak için işlenir. Ayrıntılar: ',
     guest_name_hint: 'Denemek için gerçek isim yerine takma ad yazabilirsiniz.',
     // Accessibility panel
     a11y_export_label: '📥 Verilerimi İndir',
@@ -330,8 +330,6 @@ const STRINGS = {
     confirm_delete_account_1: 'Hesabınız ve tüm verileriniz kalıcı olarak silinecek. Bu işlem geri alınamaz. Emin misiniz?',
     confirm_delete_account_2: 'Son kez onaylıyın: tüm öğrenci verileri, BEP kayıtları ve ilerleme bilgileri silinecek.',
     account_deleted_msg: 'Hesabınız silindi. İyi günler.',
-    kvkk_confirm_required: 'Kaydetmek için velinin eğitim verileri onayını işaretleyin.',
-    consent_required: 'Veli onayını işaretleyin.',
     student_name_required: 'Öğrenci adı zorunlu.',
     creating_student: 'Öğrenci oluşturuluyor...',
     update_name_required: 'Güncelleme için öğrenci adı zorunlu.',
@@ -810,8 +808,8 @@ const STRINGS = {
     sync_toggle_label: 'Bulut yedekleme',
     sync_toggle_hint: 'Kapalıyken veriler sadece bu cihazda kalır. Açarsan yurt dışındaki sunucuda şifreli yedeklenir ve diğer cihazlarla eşitlenir.',
     sync_on_title: 'Bulut yedekleme açılsın mı?',
-    sync_on_confirm: 'Çocuğunuzun adı, ilerlemesi ve (verdiyseniz) sağlık bilgileri şifrelenerek yurt dışındaki sunucularda (Vercel, Aiven) saklanacak. Böylece telefon değişse de veriler kaybolmaz. Bu onayı istediğiniz zaman kapatabilirsiniz; kapatınca buluttaki kopya silinir.',
-    sync_on_btn: 'Onaylıyorum, aç',
+    sync_on_confirm: 'Açarsanız çocuğunuzun adı, ilerlemesi ve (verdiyseniz) sağlık bilgileri şifrelenerek yurt dışındaki sunucularda (Vercel, Aiven) yedeklenir. Böylece telefon değişse de veriler kaybolmaz. İstediğiniz zaman kapatabilirsiniz; kapatınca buluttaki kopya silinir.',
+    sync_on_btn: 'Aç',
     sync_on_done: 'Bulut yedekleme açıldı',
     sync_off_confirm: 'Buluttaki kopya silinecek ve veriler sadece bu cihazda kalacak. Telefon değişirse veya uygulama silinirse veriler kaybolur. Önce "Verilerimi İndir" ile yedek almanızı öneririz.',
     sync_off_done: 'Bulut yedekleme kapatıldı, buluttaki kopya silindi',
@@ -999,7 +997,6 @@ const STRINGS = {
     guest_btn: 'Continue as guest',
     login_tab: 'Sign In',
     register_tab: 'Register',
-    consent_label: 'I have obtained parental/guardian consent to process student data',
     auth_tagline: 'Special education management platform',
     auth_username_label: 'Username',
     auth_password_label: 'Password',
@@ -1026,13 +1023,15 @@ const STRINGS = {
     wiz_emoji_sub: "This icon will appear on the student's profile.",
     wiz_level_title: 'Support level (optional)',
     wiz_level_sub: 'Support level and diagnosis are health data. Sharing them is optional; the app works without them.',
-    health_consent_text: 'As the parent/guardian, I give explicit consent to processing the support level and diagnosis (health data) to adapt the content. I can withdraw this consent at any time.',
+    health_consent_text: 'I give explicit consent to processing the support level and diagnosis (health data) to adapt the content. I can withdraw it at any time; if I do, this information is deleted.',
+    health_consent_title: 'Explicit consent (optional)',
+    health_notice_pre: 'How this information is processed is explained in the ',
     wiz_health_skipped: 'No health information will be saved',
     wiz_cond_title: 'Diagnosis / co-occurring conditions',
     wiz_cond_sub: 'Select as many as you like — you can skip this step.',
     wiz_cond_none: 'None selected',
-    wiz_consent_title: 'One last confirmation',
-    wiz_consent_sub: 'The parent’s consent is required before saving.',
+    wiz_consent_title: 'Ready to save',
+    wiz_consent_sub: 'Check the details and save.',
     wiz_back: '← Back',
     wiz_next: 'Continue →',
     wiz_login_link: 'I already have an account, log in',
@@ -1043,7 +1042,7 @@ const STRINGS = {
     auth_kvkk_link1: 'Privacy Notice',
     auth_kvkk_sep: ' and',
     auth_kvkk_link2: 'Privacy Policy',
-    auth_kvkk_agree: ' – I have read and agree.',
+    auth_kvkk_agree: ' – I have read and understood them.',
     auth_fill_all: 'Please fill in all fields',
     auth_passwords_mismatch: 'Passwords do not match',
     auth_password_short: 'Password must be at least 8 characters',
@@ -1054,7 +1053,7 @@ const STRINGS = {
     reg_step_pw_sub: 'You will sign in with this password.',
     reg_step_user_title: 'Pick a username',
     reg_step_user_sub: 'You will use this name to sign in.',
-    auth_kvkk_required: 'You must accept the Privacy Notice to continue',
+    auth_kvkk_required: 'To continue, confirm that you have read the Privacy Notice',
     AUTH_FIELDS_REQUIRED: 'Username and password are required',
     AUTH_USERNAME_TOO_SHORT: 'Username must be at least 3 characters',
     AUTH_PASSWORD_TOO_SHORT: 'Password must be at least 6 characters',
@@ -1275,9 +1274,8 @@ const STRINGS = {
     setup_note_label: 'Note',
     setup_create_btn: 'Create',
     setup_add_new_divider: 'Add new student',
-    veli_consent_pre: 'As the parent/guardian, I have read the ',
     veli_consent_link: 'Privacy Notice (KVKK)',
-    veli_consent_post: ". I give explicit consent to processing my child's name and practice records in the app (education data).",
+    veli_notice_pre: "The child's name and practice records are processed to provide the service you asked for. Details: ",
     guest_name_hint: 'You can use a nickname instead of a real name while trying the app.',
     // Accessibility panel
     a11y_export_label: '📥 Export My Data',
@@ -1304,8 +1302,6 @@ const STRINGS = {
     confirm_delete_account_1: 'Your account and all your data will be permanently deleted. This action cannot be undone. Are you sure?',
     confirm_delete_account_2: 'Final confirmation: all student data, IEP records, and progress information will be deleted.',
     account_deleted_msg: 'Your account has been deleted. Have a nice day.',
-    kvkk_confirm_required: "To save, tick the parent's consent for education data.",
-    consent_required: 'Please check the parental consent.',
     student_name_required: 'Student name is required.',
     creating_student: 'Creating student...',
     update_name_required: 'Student name is required to update.',
@@ -1784,8 +1780,8 @@ const STRINGS = {
     sync_toggle_label: 'Cloud backup',
     sync_toggle_hint: 'When off, data stays only on this device. When on, it is backed up encrypted on servers abroad and synced with your other devices.',
     sync_on_title: 'Turn on cloud backup?',
-    sync_on_confirm: "Your child's name, progress and (if given) health information will be stored encrypted on servers abroad (Vercel, Aiven), so nothing is lost if you change phones. You can turn this off at any time; the cloud copy is then deleted.",
-    sync_on_btn: 'I agree, turn on',
+    sync_on_confirm: "If you turn this on, your child's name, progress and (if given) health information are backed up encrypted on servers abroad (Vercel, Aiven), so nothing is lost if you change phones. You can turn it off at any time; the cloud copy is then deleted.",
+    sync_on_btn: 'Turn on',
     sync_on_done: 'Cloud backup is on',
     sync_off_confirm: 'The cloud copy will be deleted and data will stay only on this device. If you change phones or delete the app, the data is lost. We suggest saving a backup with "Export My Data" first.',
     sync_off_done: 'Cloud backup is off and the cloud copy was deleted',
@@ -3409,12 +3405,6 @@ async function createStudent() {
     const userId = await getCurrentUserId();
     if (!nameEl || !yearEl || !notesEl || !statusEl || !createBtn || !userId) return;
 
-    const veliConsent = document.getElementById('setupVeliConsent');
-    if (veliConsent && !veliConsent.checked) {
-        statusEl.textContent = t('consent_required');
-        return;
-    }
-
     const fullName = nameEl.value.trim();
     const birthYearRaw = yearEl.value.trim();
     const supportNotes = notesEl.value.trim();
@@ -3434,7 +3424,7 @@ async function createStudent() {
         support_notes: supportNotes,
         active: true,
         created_at: new Date().toISOString(),
-        consent_at: new Date().toISOString(),
+        notice_at: new Date().toISOString(),
     };
     const key = 'teacher_students_' + userId;
     const existing = await DB.get(key) || [];
@@ -7255,32 +7245,36 @@ function openKvkkModal(e) {
     document.getElementById('kvkkModalBody').innerHTML = isTr ? `
         <h4>Aydınlatma Metni</h4>
         <p><strong>Veri Sorumlusu:</strong> Efe Erman — İstanbul, Tuzla — yildizsiniflari@gmail.com</p>
-        <p><strong>Toplanan Veriler:</strong> Kullanıcı adı, e-posta adresi (şifre sıfırlama ve hesap doğrulama amaçlı), öğrenci adı, eğitim kademesi, destek ihtiyacı bilgileri, seans kayıtları, oturum bilgileri. Öğrenci verilerinin işlenmesi için veli/yasal temsilci onayı zorunludur.</p>
+        <p><strong>Toplanan Veriler:</strong> Kullanıcı adı, e-posta adresi (şifre sıfırlama ve hesap doğrulama amaçlı), öğrenci adı, eğitim kademesi, destek ihtiyacı bilgileri, seans kayıtları, oturum bilgileri. Öğrenci bilgileri veli veya yasal temsilci tarafından girilir.</p>
+        <p><strong>Toplama Yöntemi:</strong> Veriler, uygulamadaki formlara girdiğiniz bilgiler ve uygulamanın kullanımı sırasında elektronik ortamda otomatik yollarla toplanır.</p>
+        <p><strong>Hukuki Sebepler:</strong> Hesap bilgileri, öğrenci adı ve çalışma kayıtları, istediğiniz hizmetin sunulması için sözleşmenin kurulması ve ifası (KVKK md. 5/2-c) sebebiyle işlenir. E-posta doğrulaması, güvenlik kayıtları ve misafir modundaki cihaz özeti, hizmetin güvenliği için meşru menfaat (md. 5/2-f) sebebiyle işlenir. Destek düzeyi ve tanı bilgileri (sağlık verisi) yalnızca ayrıca verdiğiniz açık rızaya (md. 6) dayanılarak işlenir; rıza verilmezse uygulama yine çalışır. Bulut yedekleme, sizin açıp kapattığınız isteğe bağlı bir özelliktir.</p>
         <p><strong>İşleme Amacı:</strong> Özel eğitim süreçlerinin takibi, BEP taslağı hazırlama, cihaz üzerinde hazır metinlerle geri bildirim verilmesi.</p>
-        <p><strong>Onay Kaydı:</strong> Veli onayı öğrenci kaydıyla, Aydınlatma Metni kabulü hesap kaydıyla birlikte tarih bilgisi olarak saklanır.</p>
+        <p><strong>Kayıtlar:</strong> Aydınlatma Metni’nin okunduğu beyanı hesap kaydıyla, sağlık verisi açık rızası öğrenci profiliyle birlikte tarih bilgisi olarak saklanır.</p>
         <p><strong>Saklama Süresi:</strong> Hesap silinene kadar. Uygulama içi "Hesabı Sil" ile tüm veriler anında, e-posta ile iletilen silme talepleri en geç 30 gün içinde kalıcı olarak silinir. Kişisel bilgi içermeyen teknik hata kayıtları en fazla 30 gün saklanır.</p>
         <p><strong>Aktarılan Taraflar:</strong> Vercel (barındırma altyapısı), Aiven (veritabanı), Gmail SMTP (e-posta gönderimi), Pexels (görsel içerik). Seslendirme (metin okuma) kendi sunucumuzda yerel olarak yapılır; bu amaçla hiçbir veri üçüncü tarafa aktarılmaz. Bu hizmetler yalnızca teknik işleme amacıyla kullanılmakta olup kişisel verileriniz pazarlama amaçlı üçüncü taraflarla paylaşılmamaktadır.</p>
         <p><strong>Misafir Modu:</strong> Kayıt olmadan deneme yapıldığında öğrenci bilgileri yalnızca cihazınızda saklanır, sunucuya gönderilmez. Deneme hakkının kötüye kullanılmasını önlemek için cihaz kimliğinin geri döndürülemez bir karma (hash) özeti sunucuda tutulur; bu özet kimliğinizle ilişkilendirilmez. Konuşma pratiğindeki geri bildirimler cihazda, önceden hazırlanmış metinlerden seçilir; çocuğun yanıtları hiçbir sunucuya veya yapay zekâ hizmetine gönderilmez.</p>
         <p><strong>Haklarınız (KVKK Md. 11):</strong> Verilerinize erişim, düzeltme, silme, işlemeyi kısıtlama ve taşıma haklarına sahipsiniz. Talepleriniz için uygulama içi "Hesabı Sil" veya "Verilerimi İndir" özelliklerini kullanabilirsiniz.</p>
         <h4>Gizlilik Politikası</h4>
         <p>YıldızCan, 6698 sayılı Kişisel Verilerin Korunması Kanunu (KVKK) kapsamında kişisel verilerinizi korumayı taahhüt eder. Çocuklara ait veriler yalnızca eğitim amacıyla işlenir, hiçbir koşulda satılmaz veya reklam amacıyla kullanılmaz.</p>
-        <p>Veriler önce cihazınızdaki yerel depoya (localStorage) kaydedilir; varsayılan olarak yalnızca cihazda kalır ve sunucuya gönderilmez. Veli, Ayarlar’daki “Bulut yedekleme” seçeneğini ayrı bir onayla açarsa veriler hesabına özel ve şifreli olarak yurt dışındaki sunucularda (Vercel, Aiven) yedeklenir ve cihazlar arasında eşitlenir. Bu seçenek kapatıldığında buluttaki kopya silinir. Sunucuda her durumda yalnızca hesap bilgileri (kullanıcı adı, şifre özeti, e-posta) tutulur. Misafir modunda öğrenci verileri yalnızca cihazda kalır.</p>
+        <p>Veriler önce cihazınızdaki yerel depoya (localStorage) kaydedilir; varsayılan olarak yalnızca cihazda kalır ve sunucuya gönderilmez. Veli, Ayarlar’daki “Bulut yedekleme” seçeneğini kendisi açarsa veriler hesabına özel ve şifreli olarak yurt dışındaki sunucularda (Vercel, Aiven) yedeklenir ve cihazlar arasında eşitlenir. Bu seçenek kapatıldığında buluttaki kopya silinir. Sunucuda her durumda yalnızca hesap bilgileri (kullanıcı adı, şifre özeti, e-posta) tutulur. Misafir modunda öğrenci verileri yalnızca cihazda kalır.</p>
         <p>Sorularınız için: yildizsiniflari@gmail.com</p>
         <h4>Çerez / Yerel Depolama Politikası</h4>
         <p>Uygulama; oturum belirteci, kullanıcı tercihleri ve öğrenci verilerini cihazınızdaki localStorage'da saklar. Üçüncü taraf çerez kullanılmaz. Tarayıcı verilerini temizlediğinizde yerel veriler de silinir.</p>
     ` : `
         <h4>Privacy Notice</h4>
         <p><strong>Data Controller:</strong> Efe Erman — Istanbul, Tuzla — yildizsiniflari@gmail.com</p>
-        <p><strong>Data Collected:</strong> Username, email address (for password reset and account verification), student name, education level, support needs, practice session records, login session information. Parental/guardian consent is required to process student data.</p>
+        <p><strong>Data Collected:</strong> Username, email address (for password reset and account verification), student name, education level, support needs, practice session records, login session information. Student details are entered by the parent or legal guardian.</p>
+        <p><strong>Collection Method:</strong> Data is collected electronically through the forms you fill in and automatically while you use the app.</p>
+        <p><strong>Legal Grounds:</strong> Account details, the student name and practice records are processed to provide the service you asked for, as necessary for the contract (KVKK Art. 5/2-c). Email verification, security logs and the guest-mode device hash are processed for the security of the service on the basis of legitimate interest (Art. 5/2-f). Support level and diagnosis (health data) are processed only on the basis of the separate explicit consent you give (Art. 6); the app works without it. Cloud backup is an optional feature that you turn on or off.</p>
         <p><strong>Purpose:</strong> Tracking special education progress, IEP draft preparation, on-device feedback from pre-written texts.</p>
-        <p><strong>Consent Records:</strong> Parental consent is stored with the student record and Privacy Notice acceptance with the account record, each with a timestamp.</p>
+        <p><strong>Records:</strong> The statement that the Privacy Notice was read is stored with the account, and the explicit consent for health data with the student profile, each with a timestamp.</p>
         <p><strong>Retention:</strong> Until account deletion. In-app "Delete Account" removes all data immediately; deletion requests sent by email are fulfilled within 30 days. Technical error logs containing no personal information are kept for at most 30 days.</p>
         <p><strong>Third Parties:</strong> Vercel (hosting), Aiven (database), Gmail SMTP (email delivery), Pexels (images). Speech synthesis runs locally on our own server; no data is transferred to any third party for this purpose. These services are used for technical processing only — your data is never shared with third parties for marketing purposes.</p>
         <p><strong>Guest Mode:</strong> When trying the app without an account, student data stays on your device only and is not sent to the server. To prevent abuse of the free trial, an irreversible hash of your device identifier is kept on the server; it is never linked to your identity. Speech practice feedback is chosen on the device from pre-written texts; the child's answers are never sent to any server or AI service.</p>
         <p><strong>Your Rights:</strong> You have the right to access, correct, delete, restrict processing, and port your data. Use the in-app "Delete Account" or "Export My Data" features to exercise these rights.</p>
         <h4>Privacy Policy</h4>
         <p>YıldızCan is committed to protecting your personal data. Student data is processed solely for educational purposes and will never be sold or used for advertising.</p>
-        <p>Data is saved to your device's local storage (localStorage) first; by default it stays on the device and is not sent to the server. If the parent turns on “Cloud backup” in Settings with a separate consent, data is backed up encrypted, per account, on servers abroad (Vercel, Aiven) and synced across devices. Turning it off deletes the cloud copy. The server always keeps only account details (username, password hash, email). In guest mode student data stays on the device only.</p>
+        <p>Data is saved to your device's local storage (localStorage) first; by default it stays on the device and is not sent to the server. If the parent turns on “Cloud backup” in Settings, data is backed up encrypted, per account, on servers abroad (Vercel, Aiven) and synced across devices. Turning it off deletes the cloud copy. The server always keeps only account details (username, password hash, email). In guest mode student data stays on the device only.</p>
         <p>Questions: yildizsiniflari@gmail.com</p>
         <h4>Cookie / Local Storage Policy</h4>
         <p>The app stores session tokens, user preferences, and student data in your device's localStorage. No third-party cookies are used. Clearing your browser data will also remove local app data.</p>
@@ -7549,8 +7543,8 @@ function normalizeStudentRecord(student, index = 0) {
         name: String(student.name || student.full_name || '').trim(),
         emoji: student.emoji || '🌟',
         createdAt: student.createdAt || student.created_at || new Date().toISOString(),
-        consentAt: student.consentAt || student.consent_at || null,
-        consentVersion: student.consentVersion || null,
+        noticeAt: student.noticeAt || student.consentAt || student.consent_at || null,
+        noticeVersion: student.noticeVersion || student.consentVersion || null,
     };
 }
 
@@ -7602,7 +7596,6 @@ async function renderLoginStudents(students) {
     const backBtn = document.getElementById('loginBackBtn');
     const statusEl = document.getElementById('loginProfileStatus');
     const nameInput = document.getElementById('loginNameInput');
-    const consentEl = document.getElementById('loginVeliConsent');
     const student = _cachedLoginStudents[0] || null;
     const profile = await loadCurrentBepProfile();
 
@@ -7627,7 +7620,6 @@ async function renderLoginStudents(students) {
     if (backBtn) backBtn.style.display = student ? '' : 'none';
     if (statusEl) statusEl.textContent = '';
     if (nameInput) nameInput.value = student?.name || '';
-    if (consentEl) consentEl.checked = false;
     const guestHint = document.getElementById('guestNameHint');
     if (guestHint) guestHint.style.display = isGuestUser() ? '' : 'none';
     renderLoginEmojiPicker(student?.emoji || '🌟');
@@ -7651,7 +7643,7 @@ function selectLoginEmoji(emoji, btn) {
 }
 
 const WIZ_TOTAL_STEPS = 5;
-const CONSENT_VERSION = '2026-11';
+const CONSENT_VERSION = '2026-11-2';
 let _wizStep = 1;
 
 function wizHasHealthConsent() {
@@ -7763,11 +7755,6 @@ async function createStudentFromLogin() {
         nameEl.focus();
         return;
     }
-    const veliConsent = document.getElementById('loginVeliConsent');
-    if (veliConsent && !veliConsent.checked) {
-        if (statusEl) statusEl.textContent = t('kvkk_confirm_required');
-        return;
-    }
     const emoji = document.getElementById('loginStudentEmoji')?.value || '🌟';
     const students = await loadStudents();
     const existing = students[0] || null;
@@ -7776,8 +7763,8 @@ async function createStudentFromLogin() {
         name,
         emoji,
         createdAt: existing?.createdAt || new Date().toISOString(),
-        consentAt: new Date().toISOString(),
-        consentVersion: CONSENT_VERSION,
+        noticeAt: existing?.noticeAt || new Date().toISOString(),
+        noticeVersion: CONSENT_VERSION,
     };
     if (saveBtn) saveBtn.disabled = true;
     if (statusEl) statusEl.textContent = existing ? t('updating_student') : t('creating_student');

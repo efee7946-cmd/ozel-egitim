@@ -92,7 +92,7 @@ test.describe('Kayıt, giriş ve veri eşitleme akışları', () => {
 
     // KVKK kutusu işaretlenmeden JS tarafındaki koruma isteği engeller
     await page.evaluate(() => document.getElementById('registerForm').requestSubmit());
-    await expect(page.locator('#authError')).toContainText('kabul etmelisiniz');
+    await expect(page.locator('#authError')).toContainText('okuduğunuzu işaretleyin');
     await expect(page.locator('#emailVerifyModal')).toBeHidden();
     expect(registerBody).toBeNull();
 
@@ -119,7 +119,7 @@ test.describe('Kayıt, giriş ve veri eşitleme akışları', () => {
     expect(token).toBe('tok_reg_1');
   });
 
-  test('giriş + öğrenci oluşturma: onay şartı, consentAt kaydı, bulut varsayılan kapalı', async ({ page }) => {
+  test('giriş + öğrenci oluşturma: veli kutusu yok, bilgilendirme tarihi kaydı, bulut varsayılan kapalı', async ({ page }) => {
     const posts = [];
     const log = [];
     await mockAuthRoute(page, { username: 'demo' });
@@ -131,7 +131,6 @@ test.describe('Kayıt, giriş ve veri eşitleme akışları', () => {
     await page.evaluate(() => document.getElementById('loginForm').requestSubmit());
     await page.waitForSelector('#login-screen', { state: 'visible' });
 
-    // Veli onayı işaretlenmeden öğrenci oluşturulamaz
     // Sağlık verisi ayrı, isteğe bağlı onayla açılır; varsayılan seçim yoktur
     await page.fill('#loginNameInput', 'Sync Çocuk');
     for (let i = 0; i < 2; i++) await page.click('#wizNextBtn');
@@ -142,10 +141,8 @@ test.describe('Kayıt, giriş ve veri eşitleme akışları', () => {
     await page.click('#wizNextBtn');
     await page.click('label.wiz-cond-chip:has(input[value="osb"])');
     await page.click('#wizNextBtn');
-    await page.click('#loginSaveBtn');
-    await expect(page.locator('#loginProfileStatus')).toContainText('işaretleyin');
-
-    await page.check('#loginVeliConsent');
+    // Öğrenci verisi için ayrı rıza kutusu yok, kaydet doğrudan çalışır
+    await expect(page.locator('#loginVeliConsent')).toHaveCount(0);
     await page.click('#loginSaveBtn');
     await page.waitForSelector('#speechmap-screen', { state: 'visible', timeout: 8000 });
 
@@ -159,11 +156,11 @@ test.describe('Kayıt, giriş ve veri eşitleme akışları', () => {
     expect(sent).toEqual([]);
     expect(await page.evaluate(() => window.DB.syncEnabled())).toBe(false);
 
-    // Veli onayı tarih damgasıyla öğrenci kaydında saklanır
+    // Aydınlatma tarihi öğrenci kaydında saklanır
     const student = await page.evaluate(() => window.DB.getSync('students_demo')[0]);
     expect(student.name).toBe('Sync Çocuk');
-    expect(Date.parse(student.consentAt)).toBeGreaterThan(0);
-    expect(student.consentVersion).toBeTruthy();
+    expect(Date.parse(student.noticeAt)).toBeGreaterThan(0);
+    expect(student.noticeVersion).toBeTruthy();
     const bep = await page.evaluate(() => window.DB.getSync('bep_profile_demo'));
     expect(bep.category).toBe('ogreti');
     expect(bep.conditions).toEqual(['osb']);
@@ -185,7 +182,6 @@ test.describe('Kayıt, giriş ve veri eşitleme akışları', () => {
       && (req.postData() || '').includes('"key":"students_demo"'));
     await page.fill('#loginNameInput', 'Sync Çocuk');
     for (let i = 0; i < 3; i++) await page.click('#wizNextBtn');
-    await page.check('#loginVeliConsent');
     await page.click('#loginSaveBtn');
 
     const wire = (await studentsPost).postDataJSON();
@@ -228,7 +224,6 @@ test.describe('Kayıt, giriş ve veri eşitleme akışları', () => {
     await page.waitForSelector('#login-screen', { state: 'visible' });
     await page.fill('#loginNameInput', 'Yedek Çocuk');
     for (let i = 0; i < 3; i++) await page.click('#wizNextBtn');
-    await page.check('#loginVeliConsent');
     await page.click('#loginSaveBtn');
     await page.waitForSelector('#speechmap-screen', { state: 'visible', timeout: 8000 });
 
@@ -283,7 +278,6 @@ test.describe('Kayıt, giriş ve veri eşitleme akışları', () => {
     await page.fill('#loginNameInput', 'Offline Çocuk');
     for (let i = 0; i < 3; i++) await page.click('#wizNextBtn');
     await expect(page.locator('#wizStepCounter')).toHaveText('5 / 5');
-    await page.check('#loginVeliConsent');
     await page.click('#loginSaveBtn');
 
     // Bulut kapalı olsa da ilk pratik akışı açılır ve veri cihazda durur

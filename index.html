@@ -213,7 +213,7 @@
                         <input type="checkbox" id="kvkkConsent">
                         <span>
                             <a href="#" onclick="openKvkkModal(event)" data-i18n="auth_kvkk_link1">Aydınlatma Metni</a><span data-i18n="auth_kvkk_sep">'ni ve</span>
-                            <a href="#" onclick="openKvkkModal(event)" data-i18n="auth_kvkk_link2">Gizlilik Politikası</a><span data-i18n="auth_kvkk_agree">'nı okudum, kabul ediyorum.</span>
+                            <a href="#" onclick="openKvkkModal(event)" data-i18n="auth_kvkk_link2">Gizlilik Politikası</a><span data-i18n="auth_kvkk_agree">'nı okudum ve anladım.</span>
                         </span>
                     </label>
                 </div>
@@ -343,10 +343,14 @@
                     <h3 class="wiz-step-title" data-i18n="wiz_level_title">Destek düzeyi (isteğe bağlı)</h3>
                     <p class="wiz-step-sub" data-i18n="wiz_level_sub">Destek düzeyi ve tanı sağlık verisidir. Vermek zorunlu değildir; vermezsen uygulama yine çalışır.</p>
                 </div>
-                <label class="veli-consent-label wiz-consent wiz-health-consent">
-                    <input type="checkbox" id="loginHealthConsent" onchange="wizHealthConsentChanged()">
-                    <span data-i18n="health_consent_text">Veli olarak, destek düzeyi ve tanı bilgilerinin (sağlık verisi) içeriği uyarlamak için işlenmesine açık rıza veriyorum. Bu rızayı istediğim zaman geri alabilirim.</span>
-                </label>
+                <p class="veli-notice"><span data-i18n="health_notice_pre">Bu bilgilerin nasıl işlendiği şurada anlatılır: </span><a href="#" onclick="openKvkkModal(event)" data-i18n="veli_consent_link">KVKK Aydınlatma Metni</a></p>
+                <div class="health-consent-box">
+                    <strong class="health-consent-title" data-i18n="health_consent_title">Açık rıza metni (isteğe bağlı)</strong>
+                    <label class="veli-consent-label wiz-consent wiz-health-consent">
+                        <input type="checkbox" id="loginHealthConsent" onchange="wizHealthConsentChanged()">
+                        <span data-i18n="health_consent_text">Destek düzeyi ve tanı bilgilerinin (sağlık verisi) içeriği uyarlamak amacıyla işlenmesine açık rıza veriyorum. Rızamı istediğim zaman geri alabilirim; geri alırsam bu bilgiler silinir.</span>
+                    </label>
+                </div>
                 <div class="wiz-choice-group" id="wizHealthFields">
                     <label class="wiz-choice-card">
                         <input type="radio" name="loginLevel" value="ogreti">
@@ -393,10 +397,7 @@
                     <p class="wiz-step-sub" data-i18n="wiz_consent_sub">Kaydetmeden önce velinin onayı gerekir.</p>
                 </div>
                 <div class="wiz-summary" id="wizSummary"></div>
-                <label class="veli-consent-label wiz-consent">
-                    <input type="checkbox" id="loginVeliConsent">
-                    <span><span data-i18n="veli_consent_pre">Veli olarak </span><a href="#" onclick="openKvkkModal(event)" data-i18n="veli_consent_link">KVKK Aydınlatma Metni</a><span data-i18n="veli_consent_post">'ni okudum. Çocuğumun adının ve uygulamadaki çalışma kayıtlarının (eğitim verileri) işlenmesine açık rıza veriyorum.</span></span>
-                </label>
+                <p class="veli-notice"><span data-i18n="veli_notice_pre">Çocuğun adı ve çalışma kayıtları, istediğiniz hizmeti sunmak için işlenir. Ayrıntılar: </span><a href="#" onclick="openKvkkModal(event)" data-i18n="veli_consent_link">KVKK Aydınlatma Metni</a></p>
             </div>
 
             <div class="auth-error login-profile-status" id="loginProfileStatus"></div>
@@ -438,10 +439,7 @@
                     <label data-i18n="setup_note_label">Not</label>
                     <textarea id="studentNotesInput" rows="2" data-i18n-placeholder="student_notes_ph" placeholder="Destek notu, ilgi alanı..."></textarea>
                 </div>
-                <label class="veli-consent-label">
-                    <input type="checkbox" id="setupVeliConsent">
-                    <span><span data-i18n="veli_consent_pre">Veli olarak </span><a href="#" onclick="openKvkkModal(event)" data-i18n="veli_consent_link">KVKK Aydınlatma Metni</a><span data-i18n="veli_consent_post">'ni okudum. Çocuğumun adının ve uygulamadaki çalışma kayıtlarının (eğitim verileri) işlenmesine açık rıza veriyorum.</span></span>
-                </label>
+                <p class="veli-notice"><span data-i18n="veli_notice_pre">Çocuğun adı ve çalışma kayıtları, istediğiniz hizmeti sunmak için işlenir. Ayrıntılar: </span><a href="#" onclick="openKvkkModal(event)" data-i18n="veli_consent_link">KVKK Aydınlatma Metni</a></p>
                 <button type="button" class="btn-primary-gradient" id="createStudentBtn" onclick="createStudent()" data-i18n="setup_create_btn">
                     Oluştur
                 </button>
