@@ -45,6 +45,9 @@
     <symbol id="i-volume" viewBox="0 0 24 24"><path d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/><path d="M16 9a5 5 0 0 1 0 6"/><path d="M19.364 18.364a9 9 0 0 0 0-12.728"/></symbol>
     <symbol id="i-lightbulb" viewBox="0 0 24 24"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></symbol>
     <symbol id="i-grid" viewBox="0 0 24 24"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></symbol>
+    <symbol id="i-arrow-left" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
 </svg>
 
 
@@ -835,7 +838,7 @@ document.addEventListener('DOMContentLoaded', function(){
     <div class="aac-search-box">
         <div class="aac-search-head">
             <h3 data-i18n="star_info_title">⭐ Yıldızlar Nasıl Kazanılır?</h3>
-            <button type="button" class="aac-search-close" onclick="document.getElementById('star-info-modal').style.display='none'">✕</button>
+            <button type="button" class="aac-search-close" onclick="document.getElementById('star-info-modal').style.display='none'" aria-label="Kapat"><svg class="ui-icon" aria-hidden="true"><use href="#i-x"/></svg></button>
         </div>
         <div class="star-info-body">
             <div class="star-info-balance" id="starInfoBalance">⭐ 0</div>
@@ -1069,13 +1072,13 @@ document.addEventListener('DOMContentLoaded', function(){
 <div id="aac-screen">
     <div class="aac-board">
         <div class="aac-sentence-bar">
-            <button type="button" class="aac-home-btn" onclick="goToMenu()" aria-label="Menüye dön">←</button>
+            <button type="button" class="aac-home-btn" onclick="goToMenu()" aria-label="Menüye dön"><svg class="ui-icon" aria-hidden="true"><use href="#i-arrow-left"/></svg></button>
             <div id="aacSentenceWords" class="aac-sentence-words">
                 <span class="aac-sentence-placeholder" data-i18n="aac_sentence_placeholder">Kart seç, cümle oluştur...</span>
             </div>
             <div class="aac-sentence-actions">
-                <button type="button" class="aac-action-btn speak" id="aacSpeakBtn" onclick="speakAacSentence()" disabled>🔊</button>
-                <button type="button" class="aac-action-btn clear" onclick="clearAacSentence()">✕</button>
+                <button type="button" class="aac-action-btn speak" id="aacSpeakBtn" onclick="speakAacSentence()" aria-label="Cümleyi seslendir" disabled><svg class="ui-icon" aria-hidden="true"><use href="#i-volume"/></svg></button>
+                <button type="button" class="aac-action-btn clear" onclick="clearAacSentence()" aria-label="Cümleyi temizle"><svg class="ui-icon" aria-hidden="true"><use href="#i-x"/></svg></button>
             </div>
         </div>
         <div class="aac-cats" id="aacCats"></div>
@@ -1298,16 +1301,16 @@ document.addEventListener('DOMContentLoaded', function(){
 <div id="therapy-aac-modal" class="aac-search-overlay" style="display:none" onclick="if(event.target.id==='therapy-aac-modal')this.style.display='none'">
     <div class="aac-search-box th-aac-box">
         <div class="aac-search-head">
-            <h3 data-i18n="therapy_card_answer_btn">🗂️ Kartla Yanıtla</h3>
-            <button type="button" class="aac-search-close" onclick="document.getElementById('therapy-aac-modal').style.display='none'">✕</button>
+            <h3 data-i18n="therapy_card_answer_btn">Kartla Yanıtla</h3>
+            <button type="button" class="aac-search-close" onclick="document.getElementById('therapy-aac-modal').style.display='none'" aria-label="Kapat"><svg class="ui-icon" aria-hidden="true"><use href="#i-x"/></svg></button>
         </div>
         <div class="th-aac-tabs" id="thAacTabs"></div>
         <div class="th-aac-grid" id="thAacGrid"></div>
         <div class="th-aac-sentence-bar">
             <div id="thAacSentence" class="th-aac-sentence-words"></div>
             <div class="aac-sentence-actions">
-                <button type="button" class="aac-action-btn speak" id="thAacSpeakBtn" onclick="submitTherapyAacAnswer()" disabled>✓</button>
-                <button type="button" class="aac-action-btn clear" onclick="clearTherapyAacSentence()">✕</button>
+                <button type="button" class="aac-action-btn speak" id="thAacSpeakBtn" onclick="submitTherapyAacAnswer()" aria-label="Yanıtı gönder" disabled><svg class="ui-icon" aria-hidden="true"><use href="#i-check"/></svg></button>
+                <button type="button" class="aac-action-btn clear" onclick="clearTherapyAacSentence()" aria-label="Cümleyi temizle"><svg class="ui-icon" aria-hidden="true"><use href="#i-x"/></svg></button>
             </div>
         </div>
     </div>

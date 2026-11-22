@@ -18,14 +18,15 @@
   left: 0;
   z-index: 10;
   align-items: stretch;
-  background: linear-gradient(180deg, #eaf4fd 0%, #f2f8f1 55%, #eef5ea 100%);
+  background: var(--color-bg);
 }
 
+/* Renkler style.css'teki tasarım sistemi değişkenlerinden gelir (tasarim-sistemi.html) */
 :root {
-  --aac-card-bg:  #ffffff;
-  --aac-card-ink: #1f2937;
-  --aac-accent:   #6C63FF;
-  --aac-danger:   #e53e3e;
+  --aac-card-bg:  var(--color-surface);
+  --aac-card-ink: var(--color-ink);
+  --aac-accent:   var(--color-aac);
+  --aac-danger:   var(--color-danger);
 }
 
 .aac-board {
@@ -37,7 +38,6 @@
   box-sizing: border-box;
   margin: 0 auto;
   padding: 10px clamp(10px, 2vw, 24px) 14px;
-  font-family: 'Segoe UI', sans-serif;
   user-select: none;
   -webkit-user-select: none;
   overflow: hidden;
@@ -51,28 +51,27 @@
   align-items: center;
   gap: 10px;
   background: var(--aac-card-bg);
-  border-radius: 22px;
-  padding: 8px 10px;
-  box-shadow: 0 8px 24px rgba(29, 47, 86, 0.1);
+  border-radius: var(--radius-lg);
+  padding: var(--space-2);
+  box-shadow: var(--shadow-md);
   flex-shrink: 0;
 }
 
 .aac-home-btn {
   width: 48px;
   height: 48px;
-  border-radius: 16px;
+  border-radius: var(--radius-md);
   border: none;
-  background: #eef2f7;
-  color: #475569;
-  font-size: 1.3rem;
-  font-weight: 700;
+  background: var(--color-surface-2);
+  color: var(--color-ink);
+  font-size: var(--fs-lg);
   cursor: pointer;
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
 }
-.aac-home-btn:active { transform: scale(0.94); background: #e2e8f0; }
+.aac-home-btn:active { transform: scale(0.94); background: var(--color-border); }
 
 .aac-sentence-words {
   display: flex;
@@ -86,24 +85,30 @@
 }
 
 .aac-sentence-placeholder {
-  color: #94a3b8;
-  font-size: 0.95rem;
-  font-weight: 600;
+  color: var(--color-muted);
+  font-size: var(--fs-md);
+  font-weight: var(--fw-bold);
   white-space: nowrap;
 }
 
+/* Cümledeki kelime: dokununca cümleden çıkar */
 .aac-word-chip {
-  background: #eef2ff;
-  border: 1.5px solid #c7d2fe;
-  color: #3730a3;
-  border-radius: 999px;
-  padding: 8px 14px;
-  font-size: 0.95rem;
-  font-weight: 800;
+  background: var(--color-aac-soft);
+  border: 1.5px solid transparent;
+  color: var(--color-aac);
+  border-radius: var(--radius-full);
+  padding: var(--space-2) var(--space-3);
+  min-height: var(--tap-min);
+  font-size: var(--fs-md);
+  font-weight: var(--fw-heavy);
   white-space: nowrap;
   cursor: pointer;
   flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
 }
+.aac-word-chip .ui-icon { font-size: 0.9em; }
 .aac-word-chip:hover { border-color: var(--aac-danger); color: var(--aac-danger); }
 
 .aac-sentence-actions {
@@ -115,9 +120,9 @@
 .aac-action-btn {
   width: 48px;
   height: 48px;
-  border-radius: 16px;
+  border-radius: var(--radius-md);
   border: none;
-  font-size: 1.2rem;
+  font-size: var(--fs-lg);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -125,8 +130,8 @@
   transition: transform 0.12s;
 }
 .aac-action-btn:active { transform: scale(0.88); }
-.aac-action-btn.speak   { background: var(--aac-accent); color: #fff; box-shadow: 0 6px 16px rgba(108, 99, 255, 0.35); }
-.aac-action-btn.clear   { background: #eef2f7; color: #4b6079; }
+.aac-action-btn.speak   { background: var(--aac-accent); color: #fff; box-shadow: 0 6px 16px rgba(14, 116, 144, 0.35); }
+.aac-action-btn.clear   { background: var(--color-surface-2); color: var(--color-ink); }
 .aac-action-btn:disabled { opacity: 0.35; pointer-events: none; }
 
 /* ---- Kategori şeridi ---- */
@@ -158,8 +163,8 @@
   height: 64px;
   border-radius: 50%;
   background: var(--aac-card-bg);
-  border: 3px solid #e2e8f0;
-  box-shadow: 0 6px 14px rgba(29, 47, 86, 0.12);
+  border: 3px solid var(--color-border);
+  box-shadow: var(--shadow-sm);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -175,16 +180,16 @@
 .aac-cat-emoji { font-size: 1.9rem; line-height: 1; }
 
 .aac-cat-label {
-  font-size: 0.74rem;
-  font-weight: 800;
-  color: #64748b;
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-heavy);
+  color: var(--color-muted);
   text-align: center;
   line-height: 1.15;
 }
 
 .aac-cat-btn.active .aac-cat-visual {
   border-color: var(--aac-accent);
-  box-shadow: 0 0 0 4px rgba(108, 99, 255, 0.22), 0 6px 14px rgba(29, 47, 86, 0.14);
+  box-shadow: 0 0 0 4px rgba(14, 116, 144, 0.22), var(--shadow-sm);
   transform: scale(1.05);
 }
 .aac-cat-btn.active .aac-cat-label { color: var(--aac-accent); }
@@ -207,7 +212,7 @@
 .aac-card {
   background: var(--aac-card-bg);
   border: 2.5px solid transparent;
-  border-radius: 22px;
+  border-radius: var(--radius-lg);
   padding: 14px 10px 12px;
   min-height: 150px;
   display: flex;
@@ -216,7 +221,7 @@
   justify-content: center;
   gap: 10px;
   cursor: pointer;
-  box-shadow: 0 8px 20px rgba(29, 47, 86, 0.1);
+  box-shadow: var(--shadow-sm);
   transition: transform 0.12s, border-color 0.12s;
   font-family: inherit;
 }
@@ -235,15 +240,15 @@
   width: 84px;
   height: 84px;
   object-fit: cover;
-  border-radius: 16px;
+  border-radius: var(--radius-md);
 }
 .aac-card-emoji {
   font-size: 3rem;
   line-height: 1;
 }
 .aac-card-text {
-  font-size: 0.95rem;
-  font-weight: 800;
+  font-size: var(--fs-md);
+  font-weight: var(--fw-heavy);
   color: var(--aac-card-ink);
   text-align: center;
   line-height: 1.2;
@@ -251,14 +256,14 @@
 
 /* ---- Terapi: kartla yanıt modalı ---- */
 .aac-nav-btn {
-  border: 1.5px solid rgba(0, 0, 0, 0.1);
-  background: #fff;
-  color: #334155;
-  border-radius: 999px;
+  border: 1.5px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-ink);
+  border-radius: var(--radius-full);
   padding: 9px 14px;
   min-height: 44px;
-  font-size: 0.85rem;
-  font-weight: 800;
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-heavy);
   cursor: pointer;
   white-space: nowrap;
   flex-shrink: 0;
@@ -268,9 +273,10 @@
   border-color: var(--aac-accent);
   color: #fff;
 }
-.aac-nav-btn:not(.active):active { background: #e2e8f0; }
+.aac-nav-btn:not(.active):active { background: var(--color-surface-2); }
 
-.th-aac-box { max-width: 560px; width: 94%; }
+.th-aac-box { max-width: 560px; width: 94%; padding: 0 var(--space-4) var(--space-4); box-sizing: border-box; }
+.th-aac-box .aac-search-head { margin: 0 calc(-1 * var(--space-4)); }
 .th-aac-tabs {
   display: flex;
   gap: 6px;
@@ -291,17 +297,17 @@
   min-height: 92px;
   padding: 8px 6px;
   gap: 5px;
-  border-radius: 14px;
+  border-radius: var(--radius-md);
 }
 .th-aac-grid .aac-card-emoji { font-size: 1.7rem; }
 .th-aac-grid .aac-card-img { width: 44px; height: 44px; border-radius: 10px; }
-.th-aac-grid .aac-card-text { font-size: 0.72rem; }
+.th-aac-grid .aac-card-text { font-size: var(--fs-xs); }
 .th-aac-sentence-bar {
   display: flex;
   align-items: center;
   gap: 8px;
   padding-top: 10px;
-  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  border-top: 1px solid var(--color-border);
   min-height: 56px;
 }
 .th-aac-sentence-words {
@@ -326,10 +332,18 @@
   .aac-cat-visual { width: 54px; height: 54px; }
   .aac-cat-emoji { font-size: 1.6rem; }
   .aac-cat-btn { width: 72px; }
-  .aac-sentence-bar { border-radius: 18px; }
+  .aac-sentence-bar { border-radius: var(--radius-md); }
 }
 
 /* ---- Erişilebilirlik ---- */
+.aac-home-btn:focus-visible, .aac-action-btn:focus-visible, .aac-word-chip:focus-visible,
+.aac-card:focus-visible, .aac-nav-btn:focus-visible, .aac-search-close:focus-visible {
+  outline: 3px solid var(--color-aac);
+  outline-offset: 2px;
+}
+.aac-cat-btn:focus-visible { outline: none; }
+.aac-cat-btn:focus-visible .aac-cat-visual { outline: 3px solid var(--color-aac); outline-offset: 3px; }
+
 @media (prefers-reduced-motion: reduce) {
   .aac-card.tapped { animation: none; }
   .aac-card, .aac-cat-visual, .aac-action-btn { transition: none; }

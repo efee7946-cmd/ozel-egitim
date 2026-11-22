@@ -4298,7 +4298,7 @@ function _updateTherapyAacSentence() {
         return;
     }
     wrap.innerHTML = _thAacSentence.map((w, i) => `
-        <span class="aac-word-chip" onclick="removeTherapyAacWord(${i})">${escapeHtml(w.label)} ✕</span>
+        <button type="button" class="aac-word-chip" onclick="removeTherapyAacWord(${i})" aria-label="${escapeHtml(w.label)}: çıkar">${escapeHtml(w.label)} <svg class="ui-icon" aria-hidden="true"><use href="#i-x"/></svg></button>
     `).join('');
     if (btn) btn.disabled = false;
 }
@@ -5466,7 +5466,7 @@ function _aacUpdateSentenceBar() {
         return;
     }
     wrap.innerHTML = _aacSentence.map((w, i) => `
-        <span class="aac-word-chip" onclick="removeAacWord(${i})">${escapeHtml(w.label)} ✕</span>
+        <button type="button" class="aac-word-chip" onclick="removeAacWord(${i})" aria-label="${escapeHtml(w.label)}: çıkar">${escapeHtml(w.label)} <svg class="ui-icon" aria-hidden="true"><use href="#i-x"/></svg></button>
     `).join('');
     wrap.scrollLeft = wrap.scrollWidth;
     if (speakBtn) speakBtn.disabled = false;

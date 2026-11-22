@@ -1,4 +1,4 @@
-const CACHE_NAME = 'yildizcan-shell-v10';
+const CACHE_NAME = 'yildizcan-shell-v11';
 
 const PRECACHE = [
     '/',
