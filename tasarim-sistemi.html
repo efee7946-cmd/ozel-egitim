@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>YıldızCan tasarım sistemi</title>
+<!-- Geliştirici kataloğu: uygulamaya dahil değildir. Bileşenler uygulamanın
+     kendi style.css sınıflarıyla çizilir; burada görünen, uygulamada görünendir. -->
+<link rel="stylesheet" href="style.css">
+<style>
+    body { display: block; padding: var(--space-8) var(--space-4); user-select: text; -webkit-user-select: text; }
+    .ds { max-width: 960px; margin: 0 auto; }
+    .ds h1 { font-size: var(--fs-xl); margin: 0 0 var(--space-2); }
+    .ds h2 { font-size: var(--fs-lg); margin: var(--space-8) 0 var(--space-3); padding-top: var(--space-4); border-top: 1px solid var(--color-border); }
+    .ds p, .ds li { color: var(--color-muted); line-height: var(--lh-body); font-size: var(--fs-sm); }
+    .ds code { background: var(--color-surface-2); border-radius: 6px; padding: 1px 6px; font-size: var(--fs-xs); color: var(--color-ink); }
+    .ds-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: var(--space-3); }
+    .ds-swatch { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-md); overflow: hidden; }
+    .ds-swatch-color { height: 64px; display: flex; align-items: flex-end; padding: var(--space-2); color: #fff; font-weight: var(--fw-bold); font-size: var(--fs-sm); }
+    .ds-swatch-body { padding: var(--space-2) var(--space-3); font-size: var(--fs-xs); color: var(--color-muted); line-height: 1.5; }
+    .ds-swatch-body b { color: var(--color-ink); font-size: var(--fs-sm); }
+    .ds-row { display: flex; align-items: baseline; gap: var(--space-4); padding: var(--space-2) 0; border-bottom: 1px dashed var(--color-border); }
+    .ds-row code { min-width: 160px; }
+    .ds-box { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: var(--space-5); }
+    .ds-shape { width: 96px; height: 64px; background: var(--color-primary-soft); border: 2px solid var(--color-primary); display: flex; align-items: center; justify-content: center; font-size: var(--fs-xs); color: var(--color-ink); }
+    .ds-space { height: 16px; background: var(--color-primary); border-radius: 4px; }
+    .ds-shadow { width: 140px; height: 80px; background: #fff; border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; font-size: var(--fs-xs); }
+    .ds-flex { display: flex; gap: var(--space-4); flex-wrap: wrap; align-items: flex-start; }
+    .ds-demo { max-width: 380px; }
+    .ds-do { color: var(--color-success); font-weight: var(--fw-bold); }
+    .ds-dont { color: var(--color-danger); font-weight: var(--fw-bold); }
+</style>
+</head>
+<body>
+<main class="ds">
+    <h1>YıldızCan tasarım sistemi</h1>
+    <p>Değişkenler <code>style.css</code> dosyasının başındaki <code>:root</code> bloğundadır. Yeni bir kural yazarken renk kodu, px boyutu ya da köşe değeri yazmak yerine buradaki değişkenleri kullanın. Bir değer burada yoksa önce buraya ekleyin.</p>
+    <p>İlk adımda giriş, kayıt, öğrenci sihirbazı ve ana ekran bu sisteme taşındı. Konuşma, AAC, harita, nesne tanıma ve analiz ekranları sonraki adımlarda taşınacak; orada hâlâ eski renkler var.</p>
+
+    <h2>Renk</h2>
+    <p>Ana renk mor. Beyaz yazıyla en az 4.5:1 kontrast verir. Ana düğmeler ve bağlantılar bu renktedir; aynı ekranda ikinci bir "ana" renk kullanılmaz.</p>
+    <div class="ds-grid">
+        <div class="ds-swatch"><div class="ds-swatch-color" style="background:var(--color-primary)">Aa</div><div class="ds-swatch-body"><b>--color-primary</b><br>#5548d9 · beyaz yazıyla 6.3:1<br>Ana düğme, bağlantı, seçili öğe</div></div>
+        <div class="ds-swatch"><div class="ds-swatch-color" style="background:var(--color-primary-strong)">Aa</div><div class="ds-swatch-body"><b>--color-primary-strong</b><br>#4337b8<br>Üzerine gelme, basılı durum</div></div>
+        <div class="ds-swatch"><div class="ds-swatch-color" style="background:var(--color-primary-soft);color:var(--color-ink)">Aa</div><div class="ds-swatch-body"><b>--color-primary-soft</b><br>#efedff<br>Seçili kart zemini, vurgu kutusu</div></div>
+        <div class="ds-swatch"><div class="ds-swatch-color" style="background:var(--grad-primary)">Aa</div><div class="ds-swatch-body"><b>--grad-primary</b><br>#5548d9 → #7048c8<br>Ana düğme, giriş ekranı zemini</div></div>
+        <div class="ds-swatch"><div class="ds-swatch-color" style="background:var(--color-ink)">Aa</div><div class="ds-swatch-body"><b>--color-ink</b><br>#1d2746 · beyaz üzerinde 14.6:1<br>Başlık ve gövde metni</div></div>
+        <div class="ds-swatch"><div class="ds-swatch-color" style="background:var(--color-muted)">Aa</div><div class="ds-swatch-body"><b>--color-muted</b><br>#56657d · beyaz üzerinde 5.9:1<br>Yardımcı metin, alt başlık</div></div>
+        <div class="ds-swatch"><div class="ds-swatch-color" style="background:var(--color-surface-2);color:var(--color-ink)">Aa</div><div class="ds-swatch-body"><b>--color-surface-2</b><br>#f2f4fa<br>Sekme zemini, pasif alan</div></div>
+        <div class="ds-swatch"><div class="ds-swatch-color" style="background:var(--color-border);color:var(--color-ink)">Aa</div><div class="ds-swatch-body"><b>--color-border</b><br>#dfe5f0<br>Kenarlık, ayırıcı çizgi</div></div>
+        <div class="ds-swatch"><div class="ds-swatch-color" style="background:var(--color-danger)">Aa</div><div class="ds-swatch-body"><b>--color-danger</b><br>#c0392b · 5.4:1<br>Hata metni, hatalı alan kenarı</div></div>
+        <div class="ds-swatch"><div class="ds-swatch-color" style="background:var(--color-success)">Aa</div><div class="ds-swatch-body"><b>--color-success</b><br>#1d7a43 · 5.6:1<br>Başarı metni</div></div>
+        <div class="ds-swatch"><div class="ds-swatch-color" style="background:var(--color-warning);color:var(--color-ink)">Aa</div><div class="ds-swatch-body"><b>--color-warning</b><br>#f7b520<br>Yıldız, uyarı vurgusu. Üzerine beyaz yazı yazılmaz.</div></div>
+    </div>
+
+    <h2>Etkinlik renkleri</h2>
+    <p>Her etkinliğin kendi rengi var; çocuk etkinliği rengiyle de tanır. Beyaz yazı geçişin iki ucunda da en az 4.5:1 verir. Bu renkler yalnızca o etkinliğin kutusunda ve ekranında kullanılır.</p>
+    <div class="ds-grid">
+        <div class="ds-swatch"><div class="ds-swatch-color" style="background:var(--tile-speech)">Konuşma</div><div class="ds-swatch-body"><b>--tile-speech</b><br>5.5 / 4.6:1</div></div>
+        <div class="ds-swatch"><div class="ds-swatch-color" style="background:var(--tile-sequence)">Nesne Tanıma</div><div class="ds-swatch-body"><b>--tile-sequence</b><br>5.4 / 4.8:1</div></div>
+        <div class="ds-swatch"><div class="ds-swatch-color" style="background:var(--tile-aac)">AAC</div><div class="ds-swatch-body"><b>--tile-aac</b><br>5.4 / 4.9:1</div></div>
+        <div class="ds-swatch"><div class="ds-swatch-color" style="background:var(--tile-schedule)">Görevler</div><div class="ds-swatch-body"><b>--tile-schedule</b><br>5.2 / 4.6:1</div></div>
+        <div class="ds-swatch"><div class="ds-swatch-color" style="background:var(--tile-store)">Mağaza</div><div class="ds-swatch-body"><b>--tile-store</b><br>4.6 / 5.3:1</div></div>
+    </div>
+
+    <h2>Yazı</h2>
+    <p>Yazı tipi <b>Atkinson Hyperlegible Next</b>. Az gören okuyucular için tasarlandı; b/d, I/l/1 gibi harfler kolay ayrılır. Dosyası uygulamaya gömülü (<code>vendor/fonts</code>, SIL OFL 1.1), internetsiz de çalışır. Altı boyut var; aradaki değerler kullanılmaz.</p>
+    <div class="ds-box">
+        <div class="ds-row"><code>--fs-2xl · 36px</code><span style="font-size:var(--fs-2xl);font-weight:var(--fw-heavy)">Merhaba, Ada!</span></div>
+        <div class="ds-row"><code>--fs-xl · 28px</code><span style="font-size:var(--fs-xl);font-weight:var(--fw-heavy)">Ekran başlığı</span></div>
+        <div class="ds-row"><code>--fs-lg · 20px</code><span style="font-size:var(--fs-lg);font-weight:var(--fw-bold)">Kart ve adım başlığı</span></div>
+        <div class="ds-row"><code>--fs-md · 16px</code><span style="font-size:var(--fs-md)">Gövde metni ve düğme yazısı. Öğrencinin adı ne?</span></div>
+        <div class="ds-row"><code>--fs-sm · 14px</code><span style="font-size:var(--fs-sm);color:var(--color-muted)">Yardımcı metin, alan etiketi, sekme</span></div>
+        <div class="ds-row"><code>--fs-xs · 12px</code><span style="font-size:var(--fs-xs);color:var(--color-muted)">Dipnot, rozet, kutu alt yazısı. Daha küçüğü yok.</span></div>
+    </div>
+    <p>Kalınlık: <code>--fw-regular</code> 400 gövde, <code>--fw-bold</code> 700 düğme ve başlık, <code>--fw-heavy</code> 800 büyük başlık. Satır aralığı: gövdede <code>--lh-body</code> 1.5.</p>
+
+    <h2>Köşe</h2>
+    <div class="ds-flex">
+        <div><div class="ds-shape" style="border-radius:var(--radius-sm)">sm · 10px</div><p>Rozet, sekme</p></div>
+        <div><div class="ds-shape" style="border-radius:var(--radius-md)">md · 14px</div><p>Düğme, giriş kutusu</p></div>
+        <div><div class="ds-shape" style="border-radius:var(--radius-lg)">lg · 20px</div><p>Kart, kutu, pencere</p></div>
+        <div><div class="ds-shape" style="border-radius:var(--radius-xl)">xl · 28px</div><p>Büyük sahne kartı</p></div>
+        <div><div class="ds-shape" style="border-radius:var(--radius-full)">full</div><p>Hap düğme, avatar</p></div>
+    </div>
+
+    <h2>Boşluk</h2>
+    <p>Boşluklar 4'ün katlarıdır. Kart içi genelde <code>--space-5</code> ya da <code>--space-6</code>, öğeler arası <code>--space-3</code>.</p>
+    <div class="ds-box">
+        <div class="ds-row"><code>--space-1 · 4px</code><div class="ds-space" style="width:4px"></div></div>
+        <div class="ds-row"><code>--space-2 · 8px</code><div class="ds-space" style="width:8px"></div></div>
+        <div class="ds-row"><code>--space-3 · 12px</code><div class="ds-space" style="width:12px"></div></div>
+        <div class="ds-row"><code>--space-4 · 16px</code><div class="ds-space" style="width:16px"></div></div>
+        <div class="ds-row"><code>--space-5 · 20px</code><div class="ds-space" style="width:20px"></div></div>
+        <div class="ds-row"><code>--space-6 · 24px</code><div class="ds-space" style="width:24px"></div></div>
+        <div class="ds-row"><code>--space-8 · 32px</code><div class="ds-space" style="width:32px"></div></div>
+    </div>
+
+    <h2>Gölge</h2>
+    <div class="ds-flex">
+        <div class="ds-shadow" style="box-shadow:var(--shadow-sm)">--shadow-sm</div>
+        <div class="ds-shadow" style="box-shadow:var(--shadow-md)">--shadow-md</div>
+        <div class="ds-shadow" style="box-shadow:var(--shadow-lg)">--shadow-lg</div>
+    </div>
+
+    <h2>Bileşenler</h2>
+    <p>Aşağıdakiler uygulamanın gerçek sınıflarıyla çizildi. Dokunulabilir her öğe en az <code>--tap-min</code> (44px) yüksekliğindedir.</p>
+
+    <div class="ds-flex">
+        <div class="ds-box ds-demo" style="flex:1 1 340px">
+            <p><b>Ana düğme</b> · <code>.auth-submit-btn</code>. Ekranda bir tane olur.</p>
+            <button type="button" class="auth-submit-btn">Giriş Yap</button>
+            <p style="margin-top:var(--space-4)"><b>Sihirbaz gezinmesi</b> · <code>.wiz-nav</code>, <code>.wiz-back-btn</code>, <code>.wiz-next-btn</code></p>
+            <div class="wiz-nav" style="margin-top:0">
+                <button type="button" class="wiz-back-btn">← Geri</button>
+                <button type="button" class="wiz-next-btn">Devam →</button>
+            </div>
+            <p style="margin-top:var(--space-4)"><b>Metin düğmesi</b> · <code>.auth-forgot-link</code></p>
+            <button type="button" class="auth-forgot-link">Şifremi unuttum</button>
+        </div>
+
+        <div class="ds-box ds-demo" style="flex:1 1 340px">
+            <p><b>Sekmeler</b> · <code>.auth-tabs</code> + <code>role="tablist"</code></p>
+            <div class="auth-tabs" role="tablist">
+                <button type="button" class="auth-tab active" role="tab" aria-selected="true">Giriş</button>
+                <button type="button" class="auth-tab" role="tab" aria-selected="false" tabindex="-1">Kayıt</button>
+            </div>
+            <p><b>Metin alanı</b> · <code>.auth-field</code>. Etiket <code>for</code> ile alana bağlanır.</p>
+            <div class="auth-field">
+                <label for="dsUser">Kullanıcı adı</label>
+                <input id="dsUser" type="text" placeholder="ornek_ogretmen">
+            </div>
+            <p style="margin-top:var(--space-3)"><b>Hatalı alan</b> · <code>aria-invalid="true"</code> + <code>.auth-error</code> (<code>role="alert"</code>)</p>
+            <div class="auth-field">
+                <label for="dsMail">E-posta</label>
+                <input id="dsMail" type="email" aria-invalid="true" aria-describedby="dsErr" value="ornek@">
+            </div>
+            <div class="auth-error" id="dsErr" role="alert">Geçerli bir e-posta adresi girin</div>
+        </div>
+    </div>
+
+    <p style="margin-top:var(--space-6)"><b>Etkinlik kutusu</b> · <code>.menu-tile</code> + <code>.tile-*</code></p>
+    <div class="menu-tiles" style="max-width:680px">
+        <button type="button" class="menu-tile tile-primary"><span class="tile-icon">🎤</span><span class="tile-label">Konuşma Pratiği</span><span class="tile-desc">Sorulara sesli cevap ver</span></button>
+        <button type="button" class="menu-tile tile-sequence"><span class="tile-icon">🔍</span><span class="tile-label">Nesne Tanıma</span><span class="tile-desc">3D nesneleri tanı, söyle</span></button>
+        <button type="button" class="menu-tile tile-aac"><span class="tile-icon">🗣️</span><span class="tile-label">AAC</span><span class="tile-desc">Görsellerle iletişim kur</span></button>
+    </div>
+
+    <h2>Kurallar</h2>
+    <ul>
+        <li><span class="ds-do">Yap:</span> Renk, boyut, köşe ve boşluk için değişken kullan. Yeni bir değer gerekirse önce <code>:root</code>'a ve bu sayfaya ekle.</li>
+        <li><span class="ds-do">Yap:</span> Bir ekranda tek ana düğme olsun; diğerleri ikincil (<code>.wiz-back-btn</code>) ya da metin düğmesi olsun.</li>
+        <li><span class="ds-do">Yap:</span> Beyaz yazılı her zeminin iki ucunu da ölç: en az 4.5:1.</li>
+        <li><span class="ds-dont">Yapma:</span> 12px'ten küçük yazı, 44px'ten alçak dokunma alanı.</li>
+        <li><span class="ds-dont">Yapma:</span> Bilgiyi yalnızca renkle verme; seçili öğede kenarlık, işaret ya da <code>aria-pressed</code> da olsun.</li>
+        <li><span class="ds-dont">Yapma:</span> İkinci bir yazı tipi ekleme.</li>
+    </ul>
+</main>
+</body>
+</html>

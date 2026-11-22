@@ -1,4 +1,4 @@
-const CACHE_NAME = 'yildizcan-shell-v6';
+const CACHE_NAME = 'yildizcan-shell-v7';
 
 const PRECACHE = [
     '/',
@@ -13,6 +13,8 @@ const PRECACHE = [
     '/report-text.js',
     '/avatar3d.js',
     '/avatar.png',
+    '/vendor/fonts/atkinson-hyperlegible-next-latin.woff2',
+    '/vendor/fonts/atkinson-hyperlegible-next-latin-ext.woff2',
     '/vendor/confetti.browser.js',
     '/vendor/three/three.module.min.js'
 ];

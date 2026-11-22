@@ -25,7 +25,8 @@ test('konuşma pratiği cevapları cihazda üretilir, /api/chat çağrılmaz', a
   expect(out.first).toMatch(/Acıktım|Karnım aç/);
   expect(out.second).not.toBe(out.first);
   expect(out.third).toMatch(/sıradaki|yeni bir soru/);
-  expect(out.sad).toMatch(/Üzgün/);
+  // FEEL_NEG iki cevaptan birini rastgele seçer
+  expect(out.sad).toMatch(/Üzgün hissettiğini|söylediğin için teşekkürler/);
   expect(out.simple).toBe('Bugün nasılsın?');
   expect(chatCalls).toEqual([]);
 });
