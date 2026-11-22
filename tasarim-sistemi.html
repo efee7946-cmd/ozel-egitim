@@ -60,7 +60,7 @@
 <main class="ds">
     <h1>YıldızCan tasarım sistemi</h1>
     <p>Değişkenler <code>style.css</code> dosyasının başındaki <code>:root</code> bloğundadır. Yeni bir kural yazarken renk kodu, px boyutu ya da köşe değeri yazmak yerine buradaki değişkenleri kullanın. Bir değer burada yoksa önce buraya ekleyin.</p>
-    <p>İlk adımda giriş, kayıt, öğrenci sihirbazı ve ana ekran, sonraki adımlarda konuşma ekranı, AAC panosu, konu haritası ve nesne tanıma bu sisteme taşındı. Mağaza ve analiz ekranları sonraki adımlarda taşınacak; orada hâlâ eski renkler var. Giriş ekranı, ana ekranla aynı gökyüzü ve orman sahnesini kullanır.</p>
+    <p>İlk adımda giriş, kayıt, öğrenci sihirbazı ve ana ekran, sonraki adımlarda konuşma ekranı, AAC panosu, konu haritası, nesne tanıma ve mağaza bu sisteme taşındı. Analiz ekranları sonraki adımlarda taşınacak; orada hâlâ eski renkler var. Giriş ekranı, ana ekranla aynı gökyüzü ve orman sahnesini kullanır.</p>
 
     <h2>Renk</h2>
     <p>Ana renk mor. Beyaz yazıyla en az 4.5:1 kontrast verir. Ana düğmeler ve bağlantılar bu renktedir; aynı ekranda ikinci bir "ana" renk kullanılmaz.</p>
@@ -272,6 +272,26 @@
             <span class="object-feedback wrong" style="flex:1;text-align:left;animation:none">Tekrar dene!</span>
         </div>
         <div style="display:flex;justify-content:center;margin-top:var(--space-3)"><button type="button" class="object-skip-btn">Bilmiyorum, geç →</button></div>
+    </div>
+
+    <h3 style="margin-top:var(--space-6)">Mağaza</h3>
+    <p>Sekme ve düğmeler mağazanın pembesidir (<code>--color-store</code>). Sarı yalnızca yıldız içindir: bakiye ve fiyat (<code>--color-star-ink</code>). Sarı üstüne beyaz yazı yazılmaz. Yetmeyen yıldız kırmızıyla değil gri yazıyla söylenir; çocuk cezalandırılmış hissetmez.</p>
+    <div class="ds-box ds-demo" style="max-width:560px;background:var(--color-bg)">
+        <p><b>Sekmeler</b> · <code>.store-cat-tab</code> (seçili: <code>.active</code> + <code>aria-pressed="true"</code>) · <b>Bakiye</b> · <code>.store-balance</code></p>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:var(--space-3);flex-wrap:wrap">
+            <div class="store-cat-tabs" style="margin:0">
+                <button type="button" class="store-cat-tab active" aria-pressed="true">Şapkalar</button>
+                <button type="button" class="store-cat-tab" aria-pressed="false">Yüz</button>
+                <button type="button" class="store-cat-tab" aria-pressed="false">Boyun</button>
+            </div>
+            <div class="store-balance">⭐ 40</div>
+        </div>
+        <p style="margin-top:var(--space-4)"><b>Ürün kartı</b> · <code>.store-item-card</code> (satın alınabilir, <code>.equipped</code>, <code>.locked</code>)</p>
+        <div class="store-grid">
+            <div class="store-item-card"><span class="store-item-emoji">🧢</span><span class="store-item-label">Kep</span><span class="store-item-status price">⭐ 10</span><button type="button" class="store-item-btn primary">Satın Al</button></div>
+            <div class="store-item-card equipped"><span class="store-item-emoji">👒</span><span class="store-item-label">Güneş Şapkası</span><span class="store-item-status equipped">Kullanılıyor ✓</span><button type="button" class="store-item-btn">Çıkar</button></div>
+            <div class="store-item-card locked"><span class="store-item-emoji">👑</span><span class="store-item-label">Taç</span><span class="store-item-status price">⭐ 200</span><span class="store-item-need">160 yıldız daha lazım</span></div>
+        </div>
     </div>
 
     <h2>Simgeler</h2>

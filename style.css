@@ -73,6 +73,9 @@
     --map-progress:  linear-gradient(90deg, #4ade80, #22c55e);
 --tile-schedule: linear-gradient(140deg, #c2410c 0%, #cc4a0e 100%);
     --tile-store:    linear-gradient(140deg, #d6336c 0%, #c92a63 100%);
+    --color-store:      #c92a63;   /* mağaza vurgusu: seçili sekme, Satın Al / Giydir (beyaz yazı 5.1:1) */
+    --color-store-soft: #fdebf2;
+    --color-star-ink:   #7a5600;   /* yıldız fiyatı yazısı (beyazda 6.6:1); sarı yalnızca yıldız için */
 
     /* ---- Köşe ---- */
     --radius-sm: 10px;   /* küçük düğme, rozet, sekme */
@@ -3365,30 +3368,34 @@ video { width: 100%; height: 100%; object-fit: cover; }
 .star-info-list li {
     display: flex;
     align-items: flex-start;
-    gap: 10px;
-    font-size: 0.92rem;
-    font-weight: 600;
-    color: #2d3a5c;
-    background: #f8fafc;
-    border-radius: 12px;
-    padding: 10px 12px;
+    gap: var(--space-2);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+    color: var(--color-ink);
+    background: var(--color-surface-2);
+    border-radius: var(--radius-sm);
+    padding: var(--space-2) var(--space-3);
 }
 .star-info-purpose {
-    font-size: 0.88rem;
-    color: #6b7b93;
-    line-height: 1.5;
-    margin: 0 0 16px;
+    font-size: var(--fs-sm);
+    color: var(--color-muted);
+    line-height: var(--lh-body);
+    margin: 0 0 var(--space-4);
 }
 .star-info-store-btn {
     width: 100%;
     min-height: 48px;
     border: none;
-    border-radius: 14px;
-    background: linear-gradient(135deg, #fd79a8, #e84393);
+    border-radius: var(--radius-md);
+    background: var(--tile-store);
     color: #fff;
-    font-weight: 800;
-    font-size: 0.95rem;
+    font-weight: var(--fw-heavy);
+    font-size: var(--fs-md);
     cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
 }
 
 /* ========== NESNE TANIMA ========== */
@@ -3696,14 +3703,14 @@ video { width: 100%; height: 100%; object-fit: cover; }
     min-height: 100vh;
     width: 100%;
     flex-direction: column;
-    background: linear-gradient(180deg, #fff8ec 0%, #fff 60%);
+    background: var(--color-bg);
     position: relative;
 }
 .store-wrapper {
     width: 100%;
     max-width: 560px;
     margin: 0 auto;
-    padding: 64px 16px 40px;
+    padding: 64px var(--space-4) 40px;
     box-sizing: border-box;
     position: relative;
 }
@@ -3713,14 +3720,14 @@ video { width: 100%; height: 100%; object-fit: cover; }
     justify-content: space-between;
     margin-bottom: 14px;
 }
-.store-header h2 { margin: 0; font-size: 1.35rem; color: #2d3a5c; }
+.store-header h2 { margin: 0; font-size: var(--fs-lg); font-weight: var(--fw-heavy); color: var(--color-ink); }
 .store-balance {
     background: linear-gradient(135deg, #ffd700, #f7b520);
     color: #5c4400;
-    font-weight: 900;
-    font-size: 1rem;
-    padding: 8px 16px;
-    border-radius: 999px;
+    font-weight: var(--fw-heavy);
+    font-size: var(--fs-md);
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-full);
     box-shadow: 0 4px 12px rgba(247,181,32,0.35);
 }
 .store-mannequin-card {
@@ -3738,8 +3745,8 @@ video { width: 100%; height: 100%; object-fit: cover; }
     height: 100%;
     border-radius: 50%;
     object-fit: cover;
-    border: 5px solid #fff;
-    box-shadow: 0 10px 28px rgba(0,0,0,0.15);
+    border: 5px solid var(--color-surface);
+    box-shadow: var(--shadow-md);
 }
 .store-mannequin-item {
     position: absolute;
@@ -3762,16 +3769,18 @@ video { width: 100%; height: 100%; object-fit: cover; }
 }
 .store-cat-tab {
     flex-shrink: 0;
-    padding: 8px 16px;
-    border-radius: 999px;
-    border: 2px solid #ffe1a1;
-    background: #fff;
-    color: #8a6100;
-    font-weight: 700;
-    font-size: 0.85rem;
+    min-height: var(--tap-min);
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-full);
+    border: 2px solid var(--color-border);
+    background: var(--color-surface);
+    color: var(--color-ink);
+    font-weight: var(--fw-bold);
+    font-size: var(--fs-sm);
     cursor: pointer;
 }
-.store-cat-tab.active { background: #f7b520; border-color: #f7b520; color: #fff; }
+.store-cat-tab:hover { background: var(--color-store-soft); }
+.store-cat-tab.active { background: var(--color-store); border-color: var(--color-store); color: #fff; }
 
 .store-grid {
     display: grid;
@@ -3783,33 +3792,40 @@ video { width: 100%; height: 100%; object-fit: cover; }
     flex-direction: column;
     align-items: center;
     gap: 6px;
-    background: #fff;
-    border: 2.5px solid #ffe1a1;
-    border-radius: 18px;
-    padding: 16px 10px 14px;
+    background: var(--color-surface);
+    border: 2.5px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-4) var(--space-2) var(--space-3);
+    box-shadow: var(--shadow-sm);
 }
-.store-item-card.equipped { border-color: #10ac84; background: #f0fff8; }
+/* Giyilen: yeşil çerçeve + "Kullanılıyor ✓" yazısı */
+.store-item-card.equipped { border-color: var(--color-success); }
 .store-item-card.locked { opacity: 0.8; }
 .store-item-card.locked .store-item-emoji { filter: grayscale(0.7); opacity: 0.7; }
 .store-item-emoji { font-size: 2.4rem; }
-.store-item-label { font-size: 0.88rem; font-weight: 800; color: #2d3a5c; text-align: center; }
-.store-item-status { font-size: 0.75rem; font-weight: 700; color: #a08430; }
-.store-item-status.equipped { color: #10ac84; }
-.store-item-status.price { color: #d98c00; font-size: 0.9rem; }
-.store-item-need { font-size: 0.7rem; font-weight: 700; color: #b0433a; text-align: center; }
+.store-item-label { font-size: var(--fs-md); font-weight: var(--fw-heavy); color: var(--color-ink); text-align: center; }
+.store-item-status { font-size: var(--fs-xs); font-weight: var(--fw-bold); color: var(--color-muted); }
+.store-item-status.equipped { color: var(--color-success); }
+.store-item-status.price { color: var(--color-star-ink); font-size: var(--fs-sm); font-weight: var(--fw-heavy); }
+.store-item-need { font-size: var(--fs-xs); font-weight: var(--fw-bold); color: var(--color-muted); text-align: center; }
 .store-item-btn {
     width: 100%;
-    min-height: 38px;
-    border-radius: 12px;
-    border: none;
-    font-weight: 800;
-    font-size: 0.82rem;
+    min-height: var(--tap-min);
+    border-radius: var(--radius-md);
+    border: 2px solid var(--color-border);
+    font-weight: var(--fw-heavy);
+    font-size: var(--fs-sm);
     cursor: pointer;
-    background: #f0f2f8;
-    color: #4b6079;
+    background: var(--color-surface);
+    color: var(--color-ink);
 }
-.store-item-btn.primary { background: linear-gradient(135deg, #ffd700, #f7b520); color: #5c4400; }
-.store-item-btn.secondary { background: #fdecea; color: #c0392b; }
+.store-item-btn:hover { background: var(--color-surface-2); }
+.store-item-btn.primary { background: var(--color-store); border-color: var(--color-store); color: #fff; }
+.store-item-btn.primary:hover { background: #b02455; }
+.store-cat-tab:focus-visible, .store-item-btn:focus-visible, .star-info-store-btn:focus-visible {
+    outline: 3px solid var(--color-store);
+    outline-offset: 3px;
+}
 
 .welcome-title {
     font-size: 2rem;

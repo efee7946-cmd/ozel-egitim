@@ -142,7 +142,7 @@ const STRINGS = {
     star_info_schedule: 'Günlük görevleri tamamlayarak',
     star_info_purpose: "Kazandığın yıldızları Giyim Mağazası'nda ayı için şapka, gözlük ve daha fazla aksesuar satın almak için harcayabilirsin!",
     star_info_goto_store: 'Giyim Mağazasına Git',
-    store_title: '🏪 Giyim Mağazası',
+    store_title: 'Giyim Mağazası',
     store_cat_hat: 'Şapkalar',
     store_cat_face: 'Yüz',
     store_cat_neck: 'Boyun',
@@ -1117,7 +1117,7 @@ const STRINGS = {
     star_info_schedule: 'Complete daily tasks',
     star_info_purpose: "Spend the stars you earn in the Clothing Store to buy hats, glasses and more accessories for the bear!",
     star_info_goto_store: 'Go to Clothing Store',
-    store_title: '🏪 Clothing Store',
+    store_title: 'Clothing Store',
     store_cat_hat: 'Hats',
     store_cat_face: 'Face',
     store_cat_neck: 'Neck',
@@ -5594,7 +5594,7 @@ function _renderStoreTabs() {
     const el = document.getElementById('storeCatTabs');
     if (!el) return;
     el.innerHTML = STORE_CATS.map(c =>
-        `<button type="button" class="store-cat-tab${c === _storeCat ? ' active' : ''}" onclick="_setStoreCat('${c}')">${t('store_cat_' + c)}</button>`
+        `<button type="button" class="store-cat-tab${c === _storeCat ? ' active' : ''}" aria-pressed="${c === _storeCat}" onclick="_setStoreCat('${c}')">${t('store_cat_' + c)}</button>`
     ).join('');
 }
 
@@ -5632,7 +5632,7 @@ function _renderStoreGrid() {
             actionHtml = `<button type="button" class="store-item-btn secondary" onclick="unequipStoreItem()">${t('store_unequip_btn')}</button>`;
         } else if (owned) {
             statusHtml = `<span class="store-item-status">${t('store_owned_label')}</span>`;
-            actionHtml = `<button type="button" class="store-item-btn" onclick="equipStoreItem('${item.id}')">${t('store_equip_btn')}</button>`;
+            actionHtml = `<button type="button" class="store-item-btn primary" onclick="equipStoreItem('${item.id}')">${t('store_equip_btn')}</button>`;
         } else {
             statusHtml = `<span class="store-item-status price">⭐ ${item.cost}</span>`;
             actionHtml = affordable
