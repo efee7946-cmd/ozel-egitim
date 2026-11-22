@@ -47,11 +47,16 @@
     <symbol id="i-chart" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></symbol>
     <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></symbol>
     <symbol id="i-settings" viewBox="0 0 24 24"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></symbol>
+    <symbol id="i-arrow-right" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></symbol>
+    <symbol id="i-volume" viewBox="0 0 24 24"><path d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/><path d="M16 9a5 5 0 0 1 0 6"/><path d="M19.364 18.364a9 9 0 0 0 0-12.728"/></symbol>
+    <symbol id="i-rotate" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></symbol>
+    <symbol id="i-lightbulb" viewBox="0 0 24 24"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></symbol>
+    <symbol id="i-grid" viewBox="0 0 24 24"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></symbol>
 </svg>
 <main class="ds">
     <h1>YıldızCan tasarım sistemi</h1>
     <p>Değişkenler <code>style.css</code> dosyasının başındaki <code>:root</code> bloğundadır. Yeni bir kural yazarken renk kodu, px boyutu ya da köşe değeri yazmak yerine buradaki değişkenleri kullanın. Bir değer burada yoksa önce buraya ekleyin.</p>
-    <p>İlk adımda giriş, kayıt, öğrenci sihirbazı ve ana ekran bu sisteme taşındı. Konuşma, AAC, harita, nesne tanıma ve analiz ekranları sonraki adımlarda taşınacak; orada hâlâ eski renkler var. Giriş ekranı, ana ekranla aynı gökyüzü ve orman sahnesini kullanır.</p>
+    <p>İlk adımda giriş, kayıt, öğrenci sihirbazı ve ana ekran, ikinci adımda konuşma ekranı bu sisteme taşındı. AAC, harita, nesne tanıma ve analiz ekranları sonraki adımlarda taşınacak; orada hâlâ eski renkler var. Giriş ekranı, ana ekranla aynı gökyüzü ve orman sahnesini kullanır.</p>
 
     <h2>Renk</h2>
     <p>Ana renk mor. Beyaz yazıyla en az 4.5:1 kontrast verir. Ana düğmeler ve bağlantılar bu renktedir; aynı ekranda ikinci bir "ana" renk kullanılmaz.</p>
@@ -162,6 +167,40 @@
         <button type="button" class="menu-tile tile-aac"><span class="tile-icon"><svg class="ui-icon" aria-hidden="true"><use href="#i-message"/></svg></span><span class="tile-label">AAC</span><span class="tile-desc">Görsellerle iletişim kur</span></button>
     </div>
 
+    <h3 style="margin-top:var(--space-6)">Konuşma ekranı</h3>
+    <p>Soru koyu yazıyla, açık mor çerçevede durur. Mikrofon ekranın en büyük düğmesidir: boşta konuşma mavisi (<code>--tile-speech</code>), dinlerken kırmızı (<code>--color-danger</code>) ve nabız atar, soru okunurken gri ve soluktur. Cevaptan sonra "sonraki" düğmesi sarı nabızla (<code>.pulse-anim</code>) hatırlatır. Simgeli düğmelerin hepsinde <code>aria-label</code> vardır.</p>
+    <div class="ds-flex">
+        <div class="ds-box ds-demo" style="flex:1 1 340px">
+            <p><b>Soru çubuğu</b> · <code>.question-bar-wrap</code>, <code>.question-bar</code>, <code>.btn-reread</code></p>
+            <div class="question-bar-wrap">
+                <div class="question-bar">Bugün nasılsın?</div>
+                <button type="button" class="btn-reread" aria-label="Soruyu tekrar dinle"><svg class="ui-icon" aria-hidden="true"><use href="#i-volume"/></svg></button>
+            </div>
+            <p style="margin-top:var(--space-4)"><b>Mikrofon ve sonraki</b> · <code>.btn-mic</code> (boşta, <code>.listening</code>, <code>:disabled</code>), <code>.btn-next</code> (normal, <code>.pulse-anim</code>)</p>
+            <div class="btns" style="flex-wrap:wrap">
+                <button type="button" class="btn-mic" aria-label="Konuş"><svg class="ui-icon" aria-hidden="true"><use href="#i-mic"/></svg></button>
+                <button type="button" class="btn-mic listening" aria-label="Dinliyor" style="animation:none"><svg class="ui-icon" aria-hidden="true"><use href="#i-mic"/></svg></button>
+                <button type="button" class="btn-mic" aria-label="Konuş" disabled><svg class="ui-icon" aria-hidden="true"><use href="#i-mic"/></svg></button>
+                <button type="button" class="btn-next" aria-label="Sonraki soru"><svg class="ui-icon" aria-hidden="true"><use href="#i-arrow-right"/></svg></button>
+                <button type="button" class="btn-next pulse-anim" aria-label="Sonraki soru" style="animation:none"><svg class="ui-icon" aria-hidden="true"><use href="#i-arrow-right"/></svg></button>
+            </div>
+        </div>
+        <div class="ds-box ds-demo" style="flex:1 1 340px">
+            <p><b>Konuşma balonları</b> · <code>#chat-bubbles</code>, <code>.bubble.ai-bubble</code>, <code>.bubble.user-bubble</code></p>
+            <div id="chat-bubbles" style="max-height:none">
+                <div class="bubble ai-bubble">Merhaba! Bugün nasılsın?</div>
+                <div class="bubble user-bubble">İyiyim</div>
+                <div class="bubble ai-bubble">Ne güzel! Söylediğin için teşekkürler.</div>
+            </div>
+            <p style="margin-top:var(--space-4)"><b>Yardım düğmeleri</b> · <code>.ai-mode-btns</code>, <code>.ai-mode-btn</code>. Yazı <code>span[data-i18n]</code> içinde, simge dışında.</p>
+            <div class="ai-mode-btns">
+                <button type="button" class="ai-mode-btn"><svg class="ui-icon" aria-hidden="true"><use href="#i-rotate"/></svg><span>Tekrar Et</span></button>
+                <button type="button" class="ai-mode-btn"><svg class="ui-icon" aria-hidden="true"><use href="#i-lightbulb"/></svg><span>Daha Basit</span></button>
+                <button type="button" class="ai-mode-btn"><svg class="ui-icon" aria-hidden="true"><use href="#i-grid"/></svg><span>Kartla Yanıtla</span></button>
+            </div>
+        </div>
+    </div>
+
     <h2>Simgeler</h2>
     <p>Arayüz simgeleri tek tarzda çizgi SVG'lerdir (Lucide, ISC lisanslı; <code>vendor/icons/LICENSE.txt</code>). Her cihazda aynı görünürler. Rengi yazı renginden, boyutu yazı boyutundan alırlar: <code>&lt;svg class="ui-icon" aria-hidden="true"&gt;&lt;use href="#i-mic"/&gt;&lt;/svg&gt;</code>. Simgenin yanında yazı yoksa düğmeye <code>aria-label</code> verilir.</p>
     <p>Emoji yalnızca çocuğun gördüğü içerikte kalır: AAC kartları, avatar seçimi, kutlamalar.</p>
@@ -175,6 +214,11 @@
         <div class="ds-icon"><svg class="ui-icon" aria-hidden="true"><use href="#i-chart"/></svg><b>i-chart</b><span>Analiz</span></div>
         <div class="ds-icon"><svg class="ui-icon" aria-hidden="true"><use href="#i-help"/></svg><b>i-help</b><span>Yardım</span></div>
         <div class="ds-icon"><svg class="ui-icon" aria-hidden="true"><use href="#i-settings"/></svg><b>i-settings</b><span>Ayarlar</span></div>
+        <div class="ds-icon"><svg class="ui-icon" aria-hidden="true"><use href="#i-arrow-right"/></svg><b>i-arrow-right</b><span>Sonraki</span></div>
+        <div class="ds-icon"><svg class="ui-icon" aria-hidden="true"><use href="#i-volume"/></svg><b>i-volume</b><span>Tekrar dinle</span></div>
+        <div class="ds-icon"><svg class="ui-icon" aria-hidden="true"><use href="#i-rotate"/></svg><b>i-rotate</b><span>Tekrar et</span></div>
+        <div class="ds-icon"><svg class="ui-icon" aria-hidden="true"><use href="#i-lightbulb"/></svg><b>i-lightbulb</b><span>Daha basit</span></div>
+        <div class="ds-icon"><svg class="ui-icon" aria-hidden="true"><use href="#i-grid"/></svg><b>i-grid</b><span>Kartla yanıtla</span></div>
     </div>
 
     <h2>Kurallar</h2>
