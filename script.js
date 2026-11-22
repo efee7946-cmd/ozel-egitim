@@ -136,6 +136,8 @@ const STRINGS = {
     help_faq_q4: '🔒 Verilerim güvende mi?',
     help_faq_a4: 'Veriler cihazınızda saklanır. Ayarlardan "Bulut yedeği"ni açarsanız hesabınıza bağlı olarak şifrelenmiş şekilde sunucuya da yedeklenir. Verilerinizi Erişilebilirlik panelinden indirebilir veya kalıcı olarak silebilirsiniz.',
     stars_earned: '+{n} ⭐ kazandın!',
+    stars_aria: 'Yıldızların: {n}',
+    student_pill_aria: 'Öğrenci değiştir: {name}',
     star_info_title: '⭐ Yıldızlar Nasıl Kazanılır?',
     star_info_therapy: 'Konuşma pratiğinde yardım almadan mikrofona konuşarak',
     star_info_object: 'Nesne tanımayı hatasız veya az hatayla tamamlayarak',
@@ -185,6 +187,7 @@ const STRINGS = {
     sound_hint: '🔔 Ses duymuyorsan telefonunun yan sessiz anahtarını kontrol et.',
     offline_banner: '📡 İnternet bağlantın yok — giriş yapmak için bağlantı gerekiyor.',
     offline_toast: 'Çevrimdışı moddasın — internet isteyen özellikler kapalı, ilerlemen bağlantı gelince eşitlenir.',
+    offline_toast_local: 'Çevrimdışı moddasın — internet isteyen özellikler kapalı, verilerin bu cihazda saklanıyor.',
     offline_action: 'Bu etkinlik için internet bağlantısı gerekiyor 📡',
     press_back_again_exit: 'Çıkmak için tekrar geri tuşuna bas',
     a11y_delete: '🗑️ Hesabı Sil',
@@ -1111,6 +1114,8 @@ const STRINGS = {
     help_faq_q4: '🔒 Is my data safe?',
     help_faq_a4: 'Your data is stored on your device. If you turn on "Cloud backup" in Settings, it is also backed up encrypted to the server tied to your account. You can export or permanently delete your data from the Accessibility panel.',
     stars_earned: 'You earned +{n} ⭐!',
+    stars_aria: 'Your stars: {n}',
+    student_pill_aria: 'Change student: {name}',
     star_info_title: '⭐ How to Earn Stars?',
     star_info_therapy: 'Speak into the microphone without help during speech practice',
     star_info_object: 'Complete object recognition with no or few mistakes',
@@ -1160,6 +1165,7 @@ const STRINGS = {
     sound_hint: '🔔 If you can\'t hear anything, check your phone\'s silent switch.',
     offline_banner: '📡 No internet connection — you need to be online to sign in.',
     offline_toast: 'You\'re offline — online features are disabled and your progress will sync when you reconnect.',
+    offline_toast_local: "You're offline. Online features are disabled and your data is stored on this device.",
     offline_action: 'This activity needs an internet connection 📡',
     press_back_again_exit: 'Press back again to exit',
     a11y_delete: '🗑️ Delete Account',
@@ -2467,9 +2473,9 @@ function _updateBottomNav(screenId) {
         'analysis-screen': 'bnAnalysis',
         'object-screen': 'bnGames',
     };
-    nav.querySelectorAll('.bottom-nav-item').forEach(btn => btn.classList.remove('active'));
+    nav.querySelectorAll('.bottom-nav-item').forEach(btn => { btn.classList.remove('active'); btn.removeAttribute('aria-current'); });
     const activeId = map[screenId];
-    if (activeId) { const el = document.getElementById(activeId); if (el) el.classList.add('active'); }
+    if (activeId) { const el = document.getElementById(activeId); if (el) { el.classList.add('active'); el.setAttribute('aria-current', 'page'); } }
 }
 
 function _maybeToggleSoundHint(screenId) {
@@ -2897,9 +2903,15 @@ function updateMenuIdentity() {
     if (studentEl) {
         studentEl.textContent = activeStudentName || t('student_pill');
     }
+    setStudentPillLabel(activeStudentName);
     // Pill dot: green if student selected
     const dot = document.querySelector('.pill-dot');
     if (dot) dot.style.background = activeStudentName ? '#22c55e' : '#f59e0b';
+}
+
+function setStudentPillLabel(name) {
+    const pill = document.getElementById('topbarStudentPill');
+    if (pill) pill.setAttribute('aria-label', name ? t('student_pill_aria').replace('{name}', name) : t('student_pill'));
 }
 
 function openOnboarding() {
@@ -5565,6 +5577,8 @@ function updateStarBadge() {
     const s = getStarState();
     const badge = document.getElementById('welcomeStarBadge');
     if (badge) { badge.style.display = ''; badge.textContent = '⭐ ' + storeBalance(s); }
+    const wrap = document.getElementById('welcomeAvatarWrap');
+    if (wrap) wrap.setAttribute('aria-label', t('stars_aria').replace('{n}', storeBalance(s)));
     const acc = document.getElementById('welcomeAccessory');
     if (acc) {
         const a = CLOTHING_ITEMS.find(x => x.id === s.equipped);
@@ -6548,7 +6562,7 @@ async function checkAuthSession() {
                     return;
                 }
             }
-            if (res && res.fallback) setTimeout(() => showToast(t('offline_toast')), 800);
+            if (res && res.fallback) setTimeout(() => showToast(t(DB.syncEnabled() ? 'offline_toast' : 'offline_toast_local')), 800);
             await continueAuthenticatedEntry();
             hideSplash();
             return;
@@ -6796,6 +6810,7 @@ async function pullAllFromCloud() {
 function onAuthSuccessWithStudent(student) {
     const nameEl = document.getElementById('active-student-name');
     if (nameEl) nameEl.textContent = student.name;
+    setStudentPillLabel(student.name);
     const greetEl = document.getElementById('menu-greeting');
     if (greetEl) greetEl.textContent = t('menu_greeting_named').replace('{name}', student.name);
     document.body.classList.add('has-bottom-nav');
@@ -6841,7 +6856,7 @@ function renderLoginEmojiPicker(selectedEmoji = '🌟') {
     if (!picker || !hidden) return;
     hidden.value = selectedEmoji;
     picker.innerHTML = STUDENT_EMOJIS.map(e => `
-        <button type="button" class="emoji-pick-btn ${e === selectedEmoji ? 'selected' : ''}"
+        <button type="button" class="emoji-pick-btn ${e === selectedEmoji ? 'selected' : ''}" aria-pressed="${e === selectedEmoji}"
             onclick="selectLoginEmoji('${e}', this)">${e}</button>
     `).join('');
 }
@@ -6850,7 +6865,7 @@ function renderRegisterEmojiPicker() {
     const wrap = document.getElementById('regEmojiPicker');
     if (!wrap) return;
     wrap.innerHTML = STUDENT_EMOJIS.map(em => `
-        <button type="button" class="emoji-pick-btn${em === '🌟' ? ' selected' : ''}"
+        <button type="button" class="emoji-pick-btn${em === '🌟' ? ' selected' : ''}" aria-pressed="${em === '🌟'}"
             onclick="selectRegisterEmoji('${em}')">${em}</button>
     `).join('');
 }
@@ -6859,6 +6874,7 @@ function selectRegisterEmoji(em) {
     document.getElementById('regStudentEmoji').value = em;
     document.querySelectorAll('#regEmojiPicker .emoji-pick-btn').forEach(b => {
         b.classList.toggle('selected', b.textContent === em);
+        b.setAttribute('aria-pressed', String(b.textContent === em));
     });
 }
 
@@ -7708,7 +7724,6 @@ async function renderLoginStudents(students) {
 
     if (!student) {
         wrap.innerHTML = `<div class="login-empty">
-            <p>${t('login_no_students')}</p>
             <p>${t('no_students_yet')}</p>
         </div>`;
     } else {
@@ -7745,8 +7760,9 @@ async function renderLoginStudents(students) {
 function selectLoginEmoji(emoji, btn) {
     const hidden = document.getElementById('loginStudentEmoji');
     if (hidden) hidden.value = emoji;
-    document.querySelectorAll('#loginEmojiPicker .emoji-pick-btn').forEach(b => b.classList.remove('selected'));
+    document.querySelectorAll('#loginEmojiPicker .emoji-pick-btn').forEach(b => { b.classList.remove('selected'); b.setAttribute('aria-pressed', 'false'); });
     btn.classList.add('selected');
+    btn.setAttribute('aria-pressed', 'true');
 }
 
 const WIZ_TOTAL_STEPS = 5;
@@ -7765,6 +7781,7 @@ function wizHealthConsentChanged() {
         input.disabled = !on;
         if (!on) input.checked = false;
     });
+    wizRender();
 }
 
 function wizReset() {
@@ -7778,10 +7795,14 @@ function wizRender() {
     form.querySelectorAll('.wiz-step').forEach(step => {
         step.classList.toggle('active', Number(step.getAttribute('data-step')) === _wizStep);
     });
+    // Sağlık izni yoksa 4. adım atlanır; sayaç da 4 adım üzerinden sayar.
+    const skipHealth = !wizHasHealthConsent();
+    const shownTotal = skipHealth ? WIZ_TOTAL_STEPS - 1 : WIZ_TOTAL_STEPS;
+    const shownStep = skipHealth && _wizStep > 4 ? _wizStep - 1 : _wizStep;
     const bar = document.getElementById('wizProgressBar');
-    if (bar) bar.style.width = Math.round((_wizStep / WIZ_TOTAL_STEPS) * 100) + '%';
+    if (bar) bar.style.width = Math.round((shownStep / shownTotal) * 100) + '%';
     const counter = document.getElementById('wizStepCounter');
-    if (counter) counter.textContent = _wizStep + ' / ' + WIZ_TOTAL_STEPS;
+    if (counter) counter.textContent = shownStep + ' / ' + shownTotal;
 
     const isLast = _wizStep === WIZ_TOTAL_STEPS;
     const backBtn = document.getElementById('wizBackBtn');

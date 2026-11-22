@@ -277,7 +277,7 @@ test.describe('Kayıt, giriş ve veri eşitleme akışları', () => {
     // Sağlık onayı verilmezse tanı adımı atlanır ve sağlık verisi kaydedilmez
     await page.fill('#loginNameInput', 'Offline Çocuk');
     for (let i = 0; i < 3; i++) await page.click('#wizNextBtn');
-    await expect(page.locator('#wizStepCounter')).toHaveText('5 / 5');
+    await expect(page.locator('#wizStepCounter')).toHaveText('4 / 4'); // sağlık adımı atlanınca toplam 4
     await page.click('#loginSaveBtn');
 
     // Bulut kapalı olsa da ilk pratik akışı açılır ve veri cihazda durur
