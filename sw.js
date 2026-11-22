@@ -1,4 +1,4 @@
-const CACHE_NAME = 'yildizcan-shell-v2';
+const CACHE_NAME = 'yildizcan-shell-v3';
 
 const PRECACHE = [
     '/',
@@ -8,6 +8,9 @@ const PRECACHE = [
     '/script.js',
     '/db-client.js',
     '/aac-data.js',
+    '/reply-engine.js',
+    '/therapy-replies.js',
+    '/report-text.js',
     '/avatar3d.js',
     '/avatar.png',
     '/vendor/confetti.browser.js',

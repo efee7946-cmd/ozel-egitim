@@ -8,7 +8,7 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>YıldızCan | Yıldız Can AI</title>
+    <title>YıldızCan</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="aac.css">
     <script defer src="vendor/confetti.browser.js"></script>
@@ -24,6 +24,9 @@
     <!-- LMS veri katmanı (script.js'den önce yüklenmeli) -->
     <script defer src="db-client.js"></script>
     <script defer src="aac-data.js"></script>
+    <script defer src="reply-engine.js"></script>
+    <script defer src="therapy-replies.js"></script>
+    <script defer src="report-text.js"></script>
 </head>
 <body>
 
@@ -970,7 +973,7 @@ document.addEventListener('DOMContentLoaded', function(){
                     <span class="help-item-icon">🎤</span>
                     <div class="help-item-text">
                         <strong data-i18n="menu_therapy">Konuşma Pratiği</strong>
-                        <p data-i18n="help_therapy_desc">Yapay zeka çocuğa sorular sorar, çocuk sesli cevap verir; konuşma becerisi zamanla takip edilir.</p>
+                        <p data-i18n="help_therapy_desc">Yıldız Can çocuğa sorular sorar, çocuk sesli cevap verir; konuşma becerisi zamanla takip edilir.</p>
                     </div>
                 </div>
                 <div class="help-item">
@@ -1147,7 +1150,7 @@ document.addEventListener('DOMContentLoaded', function(){
             <h3 class="az-card-title" data-i18n="bep_periodic_title">Dönemsel BEP Taslağı</h3>
             <p class="az-card-sub" data-i18n="bep_periodic_sub">Seans verileri kullanılarak BEP'e aktarılabilecek bir taslak metin oluşturulur. Yetkili ekip tarafından gözden geçirilmesi gerekir.</p>
             <button class="bep-report-btn" id="bepReportBtn" onclick="generateBepReport()" data-i18n="bep_generate_ai_btn">
-                ⚡ Yapay Zeka BEP Taslağı Oluştur
+                ⚡ BEP Taslağı Oluştur
             </button>
             <div class="bep-report-output" id="bepReportOutput" style="display:none">
                 <div class="bep-report-header">📝 BEP Dönemsel Gelişim Taslağı</div>
@@ -1170,7 +1173,7 @@ document.addEventListener('DOMContentLoaded', function(){
             <button class="btn-print" onclick="window.print()" data-i18n="report_print">🖨️ Yazdır</button>
         </div>
 
-        <!-- Haftalık AI özeti + ev önerisi -->
+        <!-- Haftalık özet + ev önerisi -->
         <div id="weeklySummaryCard" class="weekly-card" style="display:none"></div>
 
         <!-- Özet kartları -->
@@ -1244,7 +1247,7 @@ document.addEventListener('DOMContentLoaded', function(){
             </div>
         </div>
 
-        <!-- AI Değerlendirmesi -->
+        <!-- Değerlendirme -->
         <div class="report-section ai-section">
             <h3 data-i18n="report_ai_eval">🤖 Yıldız Can'ın Değerlendirmesi</h3>
             <div id="aiEvaluation" class="ai-evaluation">

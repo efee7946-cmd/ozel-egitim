@@ -33,7 +33,7 @@ Tek tip hesap: bir yetişkin (öğretmen/terapist/veli ayrımı yok) kayıt olur
 Tüm anahtarlar `lms_` öneki ile başlar: `lms_students`, `lms_obj_results_<studentId>`, `lms_adaptive_<studentId>`, `lms_speechmap_<studentId>` (konu haritası: düzey + durak yıldızları), vb. (Eski sürümlerden kalan `lms_iep_`/`lms_skills_`/`lms_behavior_` anahtarları hesap silmede hâlâ temizlenir.)
 
 ## Dış API'ler
-- `GEMINI_KEY` — Google Gemini (konuşma pratiği geri bildirimi, veli raporu)
+- Yapay zekâ servisi yok. Konuşma pratiği cevapları cihazda hazır metinlerden seçilir (`reply-engine.js` + `therapy-replies.js`, test: `node --test scripts/reply-engine.test.mjs`). Haftalık özet, rapor değerlendirmesi ve BEP taslağı `report-text.js` ile kurallı üretilir. `/api/chat` ve admin `generate`/`analyze` 410 döner.
 - TTS için env yok — seslendirme **Piper** ile sunucuda yerel yapılır (`api/tts.js`, `tr_TR-dfki-medium` / `en_US-lessac-medium`). Bulut TTS servisi kullanılmaz; gizlilik politikası da bunu böyle beyan eder.
 - `PEXELS_KEY` — Pexels fotoğraf/video
 - `GMAIL_USER` + `GMAIL_APP_PASSWORD` — Gmail SMTP (şifre sıfırlama/doğrulama kodları)

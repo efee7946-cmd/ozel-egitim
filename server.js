@@ -18,7 +18,7 @@ app.use(express.json());
 const STATIC_FILES = [
     'index.html', 'error.html', 'privacy.html', 'gizlilik.html',
     'destek.html', 'delete-account.html',
-    'script.js', 'style.css', 'aac.css', 'aac-data.js', 'db-client.js',
+    'script.js', 'style.css', 'aac.css', 'aac-data.js', 'db-client.js', 'reply-engine.js', 'therapy-replies.js', 'report-text.js',
     'avatar3d.js', 'sw.js', 'avatar.png', 'bear_avatar.glb',
 ];
 const STATIC_DIRS = ['aac-assets', 'map-assets', 'models', 'store-assets', 'vendor'];
@@ -31,9 +31,7 @@ for (const dir of STATIC_DIRS) {
     app.use('/' + dir, express.static(path.join(__dirname, dir)));
 }
 
-app.post('/api/chat', (req, res) => {
-    res.json({ candidates: [{ content: { parts: [{ text: "Bu lokal test ortamı cevabıdır." }] } }] });
-});
+app.post('/api/chat', (_req, res) => res.status(410).json({ error: 'AI_DISABLED' }));
 
 app.post('/api/tts', async (req, res) => {
     const { text, lang } = req.body;

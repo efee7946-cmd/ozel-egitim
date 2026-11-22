@@ -1,6 +1,6 @@
 # Yıldız Sınıfı (YıldızCan)
 
-Özel eğitim öğretmenleri, terapistler ve veliler için geliştirilmiş; yapay zeka destekli konuşma pratiği, 3D nesne tanıma, AAC ve gelişim takibini tek çatı altında birleştiren Türkçe/İngilizce web, Android ve iOS uygulaması. Hedef kitle 4-8 yaş özel gereksinimli çocuklar.
+Özel eğitim öğretmenleri, terapistler ve veliler için geliştirilmiş; hazır cevaplı konuşma pratiği, 3D nesne tanıma, AAC ve gelişim takibini tek çatı altında birleştiren Türkçe/İngilizce web, Android ve iOS uygulaması. Hedef kitle 4-8 yaş özel gereksinimli çocuklar.
 
 ---
 
@@ -8,7 +8,7 @@
 
 - [Özellikler](#özellikler)
 - [Ekranlar ve Modüller](#ekranlar-ve-modüller)
-- [Yapay Zeka Entegrasyonları](#yapay-zeka-entegrasyonları)
+- [Cevap ve Ses Altyapısı](#cevap-ve-ses-altyapısı)
 - [Veri Katmanı](#veri-katmanı)
 - [Kimlik Doğrulama](#kimlik-doğrulama)
 - [API Uç Noktaları](#api-uç-noktaları)
@@ -25,16 +25,16 @@
 
 ## Özellikler
 
-- **Konuşma Pratiği** — Konu haritası üzerinde ilerleyen seanslar; Gemini AI soru üretimi ve geri bildirimi, Piper TTS ile seslendirme, Web Speech API ile mikrofon kaydı, Pexels bağlamsal video
+- **Konuşma Pratiği** — Konu haritası üzerinde ilerleyen seanslar; cihazda hazır cevaplarla geri bildirim, Piper TTS ile seslendirme, Web Speech API ile mikrofon kaydı, Pexels bağlamsal video
 - **Nesne Tanıma** — Blender'da üretilen 3D modeller (Three.js ile render), döndürülebilir nesneyi mikrofonla söyleyerek veya yazarak tanımlama; yapay zeka geri bildirimi yok, deterministik doğruluk kontrolü
 - **AAC (Destekleyici İletişim)** — Kategorilere ayrılmış sabit sembol kartlarıyla cümle oluşturma ve sesli çıktı; salt iletişim panosu (kart ekleme/düzenleme yoktur)
 - **Günlük Görevler** — Her gün tohum tabanlı (seeded random) rastgele belirlenen 2 görev (konuşma pratiği + nesne tanıma), tamamlanınca yıldız ödülü
 - **Giyim Mağazası** — Yıldız ekonomisi ile ayı karakterine şapka/yüz/boyun aksesuarı satın alma ve giydirme
-- **Analiz & Rapor** — "BEP Analizi" (kayıt sırasında alınan destek düzeyi/durum profili + metrikler + trend grafiği) ve "Veli Özeti" (haftalık kullanım özeti + Gemini AI değerlendirmesi) sekmeleri
+- **Analiz & Rapor** — "BEP Analizi" (kayıt sırasında alınan destek düzeyi/durum profili + metrikler + trend grafiği) ve "Veli Özeti" (haftalık kullanım özeti + veriden üretilen değerlendirme) sekmeleri
 - **Yardım Paneli** — Bölümlerin ne işe yaradığını anlatan kısa açıklamalar ve sık sorulan sorular
 - **Erişilebilirlik Paneli** — Büyük metin, yüksek kontrast, büyük dokunma hedefi, animasyon azaltma, sesli etiket; hesap yönetimi (e-posta ekleme, veri indirme, hesap silme)
 - **Çevrimdışı-Önce Mimari** — Her yazma önce localStorage'a gider, arka planda Aiven PostgreSQL'e senkronize edilir
-- **İki Dilli** — Türkçe/İngilizce; arayüz, AAC panoları, TTS sesleri ve Gemini prompt'ları iki dilde
+- **İki Dilli** — Türkçe/İngilizce; arayüz, AAC panoları, TTS sesleri ve hazır cevaplar iki dilde
 - **Android ve iOS** — Capacitor ile paketlenmiş; Android Play Store'da kapalı testte, iOS App Store'da yayında
 
 ---
@@ -64,7 +64,7 @@ Altı ana faaliyet karosu:
 
 ### Konuşma Pratiği
 
-**Düzey Seçimi** (`THERAPY_LEVELS`) — İlk girişte üç düzeyden biri seçilir; düzey, Gemini'nin ürettiği sorunun ve verdiği cevabın uzunluğunu belirler:
+**Düzey Seçimi** (`THERAPY_LEVELS`) — İlk girişte üç düzeyden biri seçilir; düzey, hazır cevabın uzunluğunu belirler:
 
 | Düzey | Anahtar | Örnek |
 |---|---|---|
@@ -80,7 +80,7 @@ Altı ana faaliyet karosu:
 2. Pexels API'den bağlamsal video yüklenir
 3. Soru Piper TTS ile seslendirilir; animasyonlu karakter dudak senkronizasyonu yapar
 4. Öğrenci Web Speech API ile yanıtını kaydeder
-5. Gemini AI gerçek zamanlı geri bildirim verir; "Daha Basit" moduyla soru sadeleştirilebilir, AAC kartlarıyla da cevap verilebilir
+5. Cihazdaki cevap motoru hemen geri bildirim verir; "Daha Basit" moduyla soru sadeleştirilebilir, AAC kartlarıyla da cevap verilebilir
 6. Seans verileri kaydedilir, rapor geçmişine eklenir; konu tamamlanınca haritada bir sonraki durak açılır
 
 ### Nesne Tanıma
@@ -113,7 +113,7 @@ Panolar iki dilde ayrı ayrı tanımlıdır (`ALL_BOARDS_TR` / `ALL_BOARDS_EN`, 
 İki sekme:
 
 1. **BEP Analizi** — Kayıt sırasında alınan destek düzeyi/durum profili, özet metrikler ve zaman içindeki ilerleme trend grafiği
-2. **Veli Özeti** — Otomatik seans özeti (süre, mikrofon kullanımı, yanıt sayısı, nesne tanıma doğruluğu) + Gemini AI değerlendirmesi (katılım/motivasyon gözlemleri, iletişim becerisi değerlendirmesi, aileye somut öneriler)
+2. **Veli Özeti** — Otomatik seans özeti (süre, mikrofon kullanımı, yanıt sayısı, nesne tanıma doğruluğu) + veriden üretilen değerlendirme (katılım/motivasyon gözlemleri, iletişim becerisi değerlendirmesi, aileye somut öneriler)
 
 ### Yardım Paneli
 
@@ -135,20 +135,17 @@ Aynı panelde hesap işlemleri de yer alır: e-posta ekleme/güncelleme, veriler
 
 ---
 
-## Yapay Zeka Entegrasyonları
+## Cevap ve Ses Altyapısı
 
-### Google Gemini
+### Hazır cevap motoru (yapay zekâ yok)
 
-| Parametre | Değer |
-|---|---|
-| Model | `gemini-3.1-flash-lite` |
-| Uç nokta | `/api/chat` |
-| Env değişkeni | `GEMINI_KEY` |
+Uygulama hiçbir yapay zekâ servisine bağlanmaz; çocuğun yanıtları cihazdan çıkmaz.
 
-**Kullanım alanları:**
-- Konuşma pratiğinde soru üretimi ve gerçek zamanlı yanıt değerlendirme
-- Soruyu basitleştirme ("Daha Basit" modu)
-- Veli Özeti raporu için AI değerlendirmesi
+- `reply-engine.js`: çocuğun cevabını soruya özel sözlüklerle eşleştirir (ekler, ses tanıma kaynaklı küçük yazım hataları, olumsuz cümle, küfür, "bilmiyorum" ve tanınmayan cevap ayrı ele alınır) ve uygun hazır cevabı seçer. Çocuğun tanınmayan sözü cevapta tekrarlanmaz.
+- `therapy-replies.js`: 111 sorunun tamamı için Türkçe ve İngilizce cevap grupları, örnek cevap ve "Daha Basit" metni. Bir yetişkinin okuyup onaylaması için yazılmıştır.
+- `report-text.js`: haftalık özet, rapor değerlendirmesi ve BEP taslağı, kullanım verilerinden kurallı olarak üretilir.
+- Test: `node --test scripts/reply-engine.test.mjs`
+- `/api/chat` ve yönetim panelindeki `generate`/`analyze` uçları kapatıldı (410 `AI_DISABLED`).
 
 ### Piper TTS
 
@@ -252,7 +249,7 @@ Okuma  →  sessionStorage/localStorage (önce)  →  /api/data (Aiven PostgreSQ
 |---|---|---|
 | `/api/auth` | POST | Kimlik doğrulama (register/login/verify/logout/şifre sıfırlama/e-posta doğrulama/hesap silme) |
 | `/api/data` | GET/POST/DELETE | Kullanıcı verisi (Aiven PostgreSQL, `app_data` tablosu) |
-| `/api/chat` | POST | Gemini AI yanıt üretimi |
+| `/api/chat` | POST | Kapatıldı (410) |
 | `/api/tts` | POST | Piper TTS ses sentezi (WAV) |
 | `/api/video` | GET | Pexels video arama (konuşma pratiği) |
 | `/api/photo` | GET | Pexels fotoğraf arama — **kullanılmıyor**, AAC özel kart özelliği kaldırıldığından çağıran kod yok |
@@ -297,9 +294,6 @@ Uygulama `http://localhost:3000` adresinde çalışır.
 `.env.local` dosyasını aşağıdaki değişkenlerle oluştur:
 
 ```env
-# Google AI Studio — https://aistudio.google.com/apikey
-GEMINI_KEY=your_gemini_api_key
-
 # Pexels — https://www.pexels.com/api
 PEXELS_KEY=your_pexels_api_key
 
@@ -382,7 +376,7 @@ ozel-egitim/
 │   ├── _mail.js                # Gmail SMTP e-posta gönderimi
 │   ├── auth.js                 # Kimlik doğrulama
 │   ├── data.js                 # Kullanıcı verisi erişim katmanı
-│   ├── chat.js                 # Gemini AI entegrasyonu
+│   ├── chat.js                 # Kapatıldı (410), eski sürümler için
 │   ├── tts.js                  # Piper TTS (yerel binary spawn, WAV)
 │   ├── video.js                # Pexels video arama
 │   ├── photo.js                # Pexels fotoğraf arama (kullanılmıyor)
@@ -413,7 +407,7 @@ Tarayıcı / WebView (Capacitor)
 Vercel Serverless Functions
   ├── /api/auth     → Aiven PostgreSQL (kullanıcı/oturum)
   ├── /api/data     → Aiven PostgreSQL (uygulama verisi)
-  ├── /api/chat     → Google Gemini API
+  ├── /api/chat     → 410 (kapatıldı)
   ├── /api/tts      → Piper (yerel binary spawn, dış servis yok)
   ├── /api/video    → Pexels API
   └── /api/log      → Aiven PostgreSQL (client_errors)

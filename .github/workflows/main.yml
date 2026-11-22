@@ -28,5 +28,8 @@ jobs:
     - name: Playwright kur
       run: npx playwright install --with-deps chromium
 
+    - name: Hazır cevap testleri
+      run: node --test scripts/reply-engine.test.mjs
+
     - name: Testleri çalıştır
       run: npx playwright test
