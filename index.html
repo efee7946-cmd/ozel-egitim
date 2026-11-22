@@ -881,8 +881,20 @@ document.addEventListener('DOMContentLoaded', function(){
                         <button type="button" class="a11y-email-cancel-btn" onclick="closeEmailEditor()" data-i18n="cancel">İptal</button>
                     </div>
                 </div>
+                <label class="a11y-setting-row a11y-sync-row">
+                    <span class="a11y-setting-label">
+                        <span class="a11y-setting-icon">☁️</span>
+                        <span>
+                            <strong data-i18n="sync_toggle_label">Bulut yedekleme</strong>
+                            <small data-i18n="sync_toggle_hint">Kapalıyken veriler sadece bu cihazda kalır. Açarsan yurt dışındaki sunucuda şifreli yedeklenir ve diğer cihazlarla eşitlenir.</small>
+                        </span>
+                    </span>
+                    <input type="checkbox" id="a11yCloudSync" class="a11y-toggle" onchange="toggleCloudSync(this)">
+                </label>
                 <div class="a11y-account-actions">
                     <button type="button" class="a11y-account-btn" onclick="exportMyData()"><span data-i18n="a11y_export">📥 Verilerimi İndir</span></button>
+                    <button type="button" class="a11y-account-btn" onclick="document.getElementById('a11yImportFile').click()"><span data-i18n="a11y_import">📤 Yedekten geri yükle</span></button>
+                    <input type="file" id="a11yImportFile" accept="application/json,.json" style="display:none" onchange="importMyData(this)">
                     <button type="button" class="a11y-account-btn" onclick="authLogout()"><span data-i18n="a11y_logout">🚪 Çıkış Yap</span></button>
                     <button type="button" class="a11y-account-btn a11y-danger-btn" onclick="deleteAccount()"><span data-i18n="a11y_delete">🗑️ Hesabı Sil</span></button>
                 </div>

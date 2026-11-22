@@ -34,6 +34,17 @@ export default async function handler(req, res) {
         const username = await sessionUsername(req);
         if (!username) return res.status(401).json({ error: 'AUTH_REQUIRED' });
 
+        if (req.method === 'GET' && req.query.probe === '1') {
+            const prefRows = await query('SELECT value FROM app_data WHERE user_key = $1', [`${username}:sync_pref`]);
+            let pref = null;
+            if (prefRows.length) { try { pref = JSON.parse(prefRows[0].value); } catch {} }
+            const dataRows = await query(
+                "SELECT 1 FROM app_data WHERE split_part(user_key, ':', 1) = $1 AND user_key <> $2 LIMIT 1",
+                [username, `${username}:sync_pref`]
+            );
+            return res.json({ pref, hasData: dataRows.length > 0 });
+        }
+
         if (req.method === 'GET') {
             const { key } = req.query;
             if (!key) return res.status(400).json({ error: 'key gerekli' });
@@ -62,6 +73,14 @@ export default async function handler(req, res) {
                 [`${username}:${key}`, v]
             );
             return res.json({ ok: true, updatedAt: rows[0].updated_at });
+        }
+
+        if (req.method === 'DELETE' && req.query.all === '1') {
+            await query(
+                "DELETE FROM app_data WHERE split_part(user_key, ':', 1) = $1 AND user_key <> $2",
+                [username, `${username}:sync_pref`]
+            );
+            return res.json({ ok: true });
         }
 
         if (req.method === 'DELETE') {

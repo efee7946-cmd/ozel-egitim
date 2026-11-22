@@ -52,7 +52,7 @@ hr { border: none; border-top: 1px solid #e8edf5; margin: 34px 0; }
     <p>YıldızCan, özel eğitim öğretmenleri, terapistler ve veliler için tasarlanmış bir araçtır; hesabı yetişkin kullanıcı açar ve yönetir. Çocuklara ait veriler (ad, eğitim düzeyi, etkinlik ilerlemesi) yalnızca veli/yasal temsilci onayıyla ve yalnızca eğitim amacıyla işlenir; hiçbir koşulda satılmaz, reklam veya pazarlama amacıyla kullanılmaz.</p>
 
     <h2>Veri Güvenliği ve Saklama</h2>
-    <p>Veriler önce cihazınızdaki yerel depoya (localStorage) kaydedilir; kayıtlı hesaplarda ayrıca hesabınıza özel olarak şifreli biçimde sunucu veritabanıyla eşitlenir. Tüm iletişim HTTPS üzerinden şifrelenir. Üçüncü taraf çerez veya reklam/izleme teknolojisi kullanılmaz.</p>
+    <p>Veriler önce cihazınızdaki yerel depoya (localStorage) kaydedilir; varsayılan olarak yalnızca cihazda kalır ve sunucuya gönderilmez. Veli, Ayarlar’daki “Bulut yedekleme” seçeneğini ayrı bir onayla açarsa veriler hesabına özel ve şifreli olarak yurt dışındaki sunucularda (Vercel, Aiven) yedeklenir ve cihazlar arasında eşitlenir. Bu seçenek kapatıldığında buluttaki kopya silinir. Sunucuda her durumda yalnızca hesap bilgileri (kullanıcı adı, şifre özeti, e-posta) tutulur. Tüm iletişim HTTPS üzerinden şifrelenir. Üçüncü taraf çerez veya reklam/izleme teknolojisi kullanılmaz.</p>
 
     <h2>İletişim</h2>
     <p>Her türlü soru ve talep için: <a href="mailto:yildizsiniflari@gmail.com">yildizsiniflari@gmail.com</a></p>
@@ -69,7 +69,7 @@ hr { border: none; border-top: 1px solid #e8edf5; margin: 34px 0; }
     <p><strong>Third Parties:</strong> Vercel (hosting), Aiven (database), Google Gemini (AI), Gmail SMTP (email delivery), Pexels (imagery). Speech synthesis runs locally on our own server; no data is transferred to any third party for this purpose. These services are used for technical processing only — personal data is never shared with third parties for marketing purposes and is never sold.</p>
     <p><strong>Children's Data:</strong> YıldızCan is a tool operated by adults (teachers, therapists, parents). Children's data is processed solely for educational purposes with parental consent, and is never used for advertising or tracking.</p>
     <p><strong>Your Rights:</strong> You may access, correct, delete, restrict processing of, and export your data at any time using the in-app "Delete Account" and "Export My Data" features, or by contacting us by email.</p>
-    <p><strong>Security:</strong> Data is stored locally on your device first and synced to our database over encrypted HTTPS, isolated per account. No third-party cookies, ads, or trackers are used.</p>
+    <p><strong>Security:</strong> Data is stored on your device and, by default, is not sent to our servers. If you turn on “Cloud backup” with a separate consent, it is backed up encrypted, per account, on servers abroad (Vercel, Aiven) over HTTPS; turning it off deletes the cloud copy. No third-party cookies, ads, or trackers are used.</p>
     </div>
 </div>
 </div>

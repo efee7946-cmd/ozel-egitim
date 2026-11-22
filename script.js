@@ -806,6 +806,25 @@ const STRINGS = {
     AUTH_EMAIL_TAKEN: 'Bu e-posta başka bir hesapta kayıtlı',
     sync_last: 'Son senkron: {time}',
     sync_never: 'Henüz senkron olmadı',
+    sync_device_only: 'Veriler sadece bu cihazda',
+    sync_toggle_label: 'Bulut yedekleme',
+    sync_toggle_hint: 'Kapalıyken veriler sadece bu cihazda kalır. Açarsan yurt dışındaki sunucuda şifreli yedeklenir ve diğer cihazlarla eşitlenir.',
+    sync_on_title: 'Bulut yedekleme açılsın mı?',
+    sync_on_confirm: 'Çocuğunuzun adı, ilerlemesi ve (verdiyseniz) sağlık bilgileri şifrelenerek yurt dışındaki sunucularda (Vercel, Aiven) saklanacak. Böylece telefon değişse de veriler kaybolmaz. Bu onayı istediğiniz zaman kapatabilirsiniz; kapatınca buluttaki kopya silinir.',
+    sync_on_btn: 'Onaylıyorum, aç',
+    sync_on_done: 'Bulut yedekleme açıldı',
+    sync_off_confirm: 'Buluttaki kopya silinecek ve veriler sadece bu cihazda kalacak. Telefon değişirse veya uygulama silinirse veriler kaybolur. Önce "Verilerimi İndir" ile yedek almanızı öneririz.',
+    sync_off_done: 'Bulut yedekleme kapatıldı, buluttaki kopya silindi',
+    sync_off_failed: 'Bulut yedekleme kapatıldı. Buluttaki kopya şu an silinemedi; internet gelince tekrar açıp kapatın.',
+    sync_legacy_title: 'Verileriniz nerede dursun?',
+    sync_legacy_msg: 'Şu ana kadar verileriniz yurt dışındaki sunucuda şifreli yedekleniyordu. Artık bunu siz seçiyorsunuz. "Sadece bu cihaz" derseniz buluttaki kopya silinir; telefon değişirse veriler kaybolur.',
+    sync_keep_btn: 'Bulutta kalsın',
+    sync_local_btn: 'Sadece bu cihaz',
+    a11y_import: '📤 Yedekten geri yükle',
+    import_invalid: 'Bu dosya bir YıldızCan yedeği değil',
+    import_other_account: 'Bu yedek başka bir hesaba ait',
+    import_confirm: 'Yedekteki veriler bu cihazdaki verilerin üzerine yazılacak. Devam edilsin mi?',
+    import_done: 'Yedek yüklendi ({n} kayıt)',
     analysis_trend_title: 'Bağımsız Konuşma Gelişimi',
     analysis_trend_sub: 'Her seansta yardımsız konuşma oranı. Çizgi yukarı gidiyorsa bağımsızlık artıyor demektir.',
     analysis_trend_table: 'Tablo görünümü',
@@ -1761,6 +1780,25 @@ const STRINGS = {
     AUTH_EMAIL_TAKEN: 'This email is registered to another account',
     sync_last: 'Last sync: {time}',
     sync_never: 'Not synced yet',
+    sync_device_only: 'Data stays on this device',
+    sync_toggle_label: 'Cloud backup',
+    sync_toggle_hint: 'When off, data stays only on this device. When on, it is backed up encrypted on servers abroad and synced with your other devices.',
+    sync_on_title: 'Turn on cloud backup?',
+    sync_on_confirm: "Your child's name, progress and (if given) health information will be stored encrypted on servers abroad (Vercel, Aiven), so nothing is lost if you change phones. You can turn this off at any time; the cloud copy is then deleted.",
+    sync_on_btn: 'I agree, turn on',
+    sync_on_done: 'Cloud backup is on',
+    sync_off_confirm: 'The cloud copy will be deleted and data will stay only on this device. If you change phones or delete the app, the data is lost. We suggest saving a backup with "Export My Data" first.',
+    sync_off_done: 'Cloud backup is off and the cloud copy was deleted',
+    sync_off_failed: 'Cloud backup is off. The cloud copy could not be deleted right now; turn it on and off again when you are online.',
+    sync_legacy_title: 'Where should your data live?',
+    sync_legacy_msg: 'Until now your data was backed up encrypted on servers abroad. Now you choose. If you pick "This device only", the cloud copy is deleted; data is lost if you change phones.',
+    sync_keep_btn: 'Keep in cloud',
+    sync_local_btn: 'This device only',
+    a11y_import: '📤 Restore from backup',
+    import_invalid: 'This file is not a YıldızCan backup',
+    import_other_account: 'This backup belongs to another account',
+    import_confirm: 'Data in the backup will overwrite the data on this device. Continue?',
+    import_done: 'Backup restored ({n} records)',
     analysis_trend_title: 'Independent Speech Progress',
     analysis_trend_sub: 'Unassisted speech rate per session. An upward line means growing independence.',
     analysis_trend_table: 'Table view',
@@ -2332,7 +2370,7 @@ function isTherapyInProgress() {
            !completeBox;
 }
 
-function showCustomConfirm(message) {
+function showCustomConfirm(message, opts = {}) {
     return new Promise((resolve) => {
         const overlay = document.getElementById('confirmModal');
         const textEl = document.getElementById('confirmModalText');
@@ -2343,10 +2381,10 @@ function showCustomConfirm(message) {
             resolve(confirm(message));
             return;
         }
-        titleEl.textContent = _lang === 'en' ? 'Are you sure?' : 'Emin misiniz?';
+        titleEl.textContent = opts.title || (_lang === 'en' ? 'Are you sure?' : 'Emin misiniz?');
         textEl.textContent = message;
-        cancelBtn.textContent = t('cancel');
-        okBtn.textContent = t('yes');
+        cancelBtn.textContent = opts.cancelText || t('cancel');
+        okBtn.textContent = opts.okText || t('yes');
         overlay.style.display = 'flex';
         const cleanUp = () => {
             overlay.style.display = 'none';
@@ -6774,7 +6812,75 @@ function onAuthSuccess() {
     syncUserDataFromCloud();
 }
 
+let _pendingLegacySyncChoice = false;
+
+async function applySyncPref() {
+    const userId = _authUser?.username;
+    _pendingLegacySyncChoice = false;
+    if (!userId || userId === 'guest') { DB.setSyncEnabled(false); return; }
+    const pref = await DB.resolveSyncPref(userId);
+    _pendingLegacySyncChoice = pref === 'legacy';
+    DB.setSyncEnabled(pref === 'on' || pref === 'legacy');
+}
+
 async function syncUserDataFromCloud() {
+    if (!DB.syncEnabled()) { updateA11yAccountSection(); return; }
+    await pullAllFromCloud();
+    updateA11yAccountSection();
+    if (_pendingLegacySyncChoice) {
+        _pendingLegacySyncChoice = false;
+        await askLegacySyncChoice();
+    }
+}
+
+async function askLegacySyncChoice() {
+    const userId = _authUser?.username;
+    if (!userId) return;
+    const keep = await showCustomConfirm(t('sync_legacy_msg'), {
+        title: t('sync_legacy_title'), okText: t('sync_keep_btn'), cancelText: t('sync_local_btn'),
+    });
+    if (keep) {
+        await DB.saveSyncPref(userId, 'on');
+    } else {
+        await turnCloudSyncOff(true);
+    }
+    updateA11yAccountSection();
+}
+
+async function turnCloudSyncOn() {
+    const userId = _authUser?.username;
+    if (!userId || userId === 'guest') return false;
+    const ok = await showCustomConfirm(t('sync_on_confirm'), {
+        title: t('sync_on_title'), okText: t('sync_on_btn'), cancelText: t('cancel'),
+    });
+    if (!ok) return false;
+    DB.setSyncEnabled(true);
+    await DB.saveSyncPref(userId, 'on');
+    await pullAllFromCloud();
+    await DB.pushAll();
+    showToast(t('sync_on_done'));
+    return true;
+}
+
+async function turnCloudSyncOff(skipConfirm = false) {
+    const userId = _authUser?.username;
+    if (!userId || userId === 'guest') return false;
+    if (!skipConfirm && !(await showCustomConfirm(t('sync_off_confirm')))) return false;
+    const purged = await DB.purgeCloud();
+    DB.setSyncEnabled(false);
+    await DB.saveSyncPref(userId, 'off');
+    showToast(purged ? t('sync_off_done') : t('sync_off_failed'));
+    return true;
+}
+
+async function toggleCloudSync(input) {
+    const want = !!input.checked;
+    const changed = want ? await turnCloudSyncOn() : await turnCloudSyncOff();
+    input.checked = changed ? want : !want;
+    updateA11yAccountSection();
+}
+
+async function pullAllFromCloud() {
     try {
         const userId = await getCurrentUserId();
         if (!userId || userId === 'guest') return;
@@ -6840,6 +6946,7 @@ function onAuthSuccessWithStudent(student) {
 }
 
 async function continueAuthenticatedEntry(preferredStudent = null) {
+    await applySyncPref();
     if (preferredStudent) {
         activeStudentId = preferredStudent.id;
         activeStudentName = preferredStudent.name;
@@ -7197,6 +7304,7 @@ async function handleResetPassword(e) {
     hideResetForm();
     showToast(t('auth_reset_success'));
 
+    await applySyncPref();
     const students = await loadStudents();
     if (students.length > 0) {
         const student = students[0];
@@ -7348,7 +7456,7 @@ function openKvkkModal(e) {
         <p><strong>Haklarınız (KVKK Md. 11):</strong> Verilerinize erişim, düzeltme, silme, işlemeyi kısıtlama ve taşıma haklarına sahipsiniz. Talepleriniz için uygulama içi "Hesabı Sil" veya "Verilerimi İndir" özelliklerini kullanabilirsiniz.</p>
         <h4>Gizlilik Politikası</h4>
         <p>YıldızCan, 6698 sayılı Kişisel Verilerin Korunması Kanunu (KVKK) kapsamında kişisel verilerinizi korumayı taahhüt eder. Çocuklara ait veriler yalnızca eğitim amacıyla işlenir, hiçbir koşulda satılmaz veya reklam amacıyla kullanılmaz.</p>
-        <p>Veriler önce cihazınızdaki yerel depoya (localStorage) kaydedilir; kayıtlı hesaplarda ayrıca hesabınıza özel olarak sunucu veritabanıyla eşitlenir. Misafir modunda öğrenci verileri yalnızca cihazda kalır.</p>
+        <p>Veriler önce cihazınızdaki yerel depoya (localStorage) kaydedilir; varsayılan olarak yalnızca cihazda kalır ve sunucuya gönderilmez. Veli, Ayarlar’daki “Bulut yedekleme” seçeneğini ayrı bir onayla açarsa veriler hesabına özel ve şifreli olarak yurt dışındaki sunucularda (Vercel, Aiven) yedeklenir ve cihazlar arasında eşitlenir. Bu seçenek kapatıldığında buluttaki kopya silinir. Sunucuda her durumda yalnızca hesap bilgileri (kullanıcı adı, şifre özeti, e-posta) tutulur. Misafir modunda öğrenci verileri yalnızca cihazda kalır.</p>
         <p>Sorularınız için: yildizsiniflari@gmail.com</p>
         <h4>Çerez / Yerel Depolama Politikası</h4>
         <p>Uygulama; oturum belirteci, kullanıcı tercihleri ve öğrenci verilerini cihazınızdaki localStorage'da saklar. Üçüncü taraf çerez kullanılmaz. Tarayıcı verilerini temizlediğinizde yerel veriler de silinir.</p>
@@ -7364,7 +7472,7 @@ function openKvkkModal(e) {
         <p><strong>Your Rights:</strong> You have the right to access, correct, delete, restrict processing, and port your data. Use the in-app "Delete Account" or "Export My Data" features to exercise these rights.</p>
         <h4>Privacy Policy</h4>
         <p>YıldızCan is committed to protecting your personal data. Student data is processed solely for educational purposes and will never be sold or used for advertising.</p>
-        <p>Data is saved to your device's local storage (localStorage) first; for registered accounts it is additionally synced to the server database, isolated per account. In guest mode student data stays on the device only.</p>
+        <p>Data is saved to your device's local storage (localStorage) first; by default it stays on the device and is not sent to the server. If the parent turns on “Cloud backup” in Settings with a separate consent, data is backed up encrypted, per account, on servers abroad (Vercel, Aiven) and synced across devices. Turning it off deletes the cloud copy. The server always keeps only account details (username, password hash, email). In guest mode student data stays on the device only.</p>
         <p>Questions: yildizsiniflari@gmail.com</p>
         <h4>Cookie / Local Storage Policy</h4>
         <p>The app stores session tokens, user preferences, and student data in your device's localStorage. No third-party cookies are used. Clearing your browser data will also remove local app data.</p>
@@ -7430,6 +7538,35 @@ async function exportMyData() {
     a.click();
     a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+async function importMyData(input) {
+    const file = input?.files?.[0];
+    if (!file || !_authUser) { if (input) input.value = ''; return; }
+    let data;
+    try { data = JSON.parse(await file.text()); } catch { data = null; }
+    if (input) input.value = '';
+    if (!data || typeof data !== 'object' || !data.kullanici) {
+        showToast(t('import_invalid'));
+        return;
+    }
+    if (data.kullanici.username && data.kullanici.username !== _authUser.username) {
+        showToast(t('import_other_account'));
+        return;
+    }
+    if (!(await showCustomConfirm(t('import_confirm')))) return;
+    const skip = new Set([authStorageKey(), authUserStorageKey(), authDataKeyStorageKey(), authEmailVerifiedStorageKey()]);
+    let count = 0;
+    for (const [fullKey, value] of Object.entries(data)) {
+        if (!fullKey.startsWith('lms_') || fullKey.startsWith('lms_s_')) continue;
+        const key = fullKey.slice(4);
+        if (!key || key.startsWith('_') || skip.has(key) || value === null || value === undefined) continue;
+        await DB.set(key, value);
+        count++;
+    }
+    showToast(t('import_done').replace('{n}', count));
+    const students = await loadStudents();
+    await continueAuthenticatedEntry(students[0] || null);
 }
 
 async function deleteAccount() {
@@ -7529,10 +7666,16 @@ updateA11yAccountSection = function updateA11yAccountSection() {
             const verifyText = _authUser.email
                 ? (_authUser.emailVerified ? t('email_verified_label') : t('email_unverified_label'))
                 : '';
+            const statusText = DB.syncEnabled() ? syncText : t('sync_device_only');
             userEl.innerHTML = `
-                <div>@${escapeHtml(_authUser.username)} • ${escapeHtml(syncText)}</div>
+                <div>@${escapeHtml(_authUser.username)} • ${escapeHtml(statusText)}</div>
                 <div class="a11y-account-meta">${escapeHtml(emailText)}${verifyText ? ` • ${escapeHtml(verifyText)}` : ''}</div>
             `;
+        }
+        const syncToggle = document.getElementById('a11yCloudSync');
+        if (syncToggle) {
+            syncToggle.checked = DB.syncEnabled();
+            syncToggle.disabled = _authUser.username === 'guest';
         }
         if (emailValueEl) emailValueEl.textContent = _authUser.email || t('email_missing_label');
         if (emailStatusEl) emailStatusEl.textContent = _authUser.email
@@ -7549,6 +7692,8 @@ window.openEmailEditor = openEmailEditor;
 window.closeEmailEditor = closeEmailEditor;
 window.saveEmailInline = saveEmailInline;
 window.exportMyData = exportMyData;
+window.importMyData = importMyData;
+window.toggleCloudSync = toggleCloudSync;
 window.deleteAccount = deleteAccount;
 
 // =============================================

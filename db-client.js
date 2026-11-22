@@ -9,6 +9,8 @@
 // sessionStorage: hızlı sync okuma için plaintext cache (sekme kapanınca silinir).
 // localStorage: şifreli kalıcı cache (offline destek).
 // /api/data üzerinden Aiven PostgreSQL ile cihazlar arası senkronizasyon.
+// Senkron varsayılan olarak KAPALI: veli ayarlardan açmadıkça hiçbir veri
+// sunucuya gitmez (KVKK m.9, yurt dışı aktarım). Tercih sync_pref anahtarında.
 
 const DB = (function () {
     const PFX = 'lms_';
@@ -19,6 +21,9 @@ const DB = (function () {
         ? 'https://ozel-egitim.vercel.app'
         : '';
     let _cloud = true;
+    let _syncOn = false;
+    const SYNC_PREF_KEY = 'sync_pref';
+    const SYNC_PREF_LOCAL = 'lms__syncpref:';
     let _cloudRetryTimer = null;
     let _lastSyncAt = null;
     let _encKey = null; // AES-GCM CryptoKey, bellekte, diske yazılmaz
@@ -323,7 +328,7 @@ const DB = (function () {
     // uyumluluk için düz nesne olarak da kabul edilir (bir sonraki yazımda
     // otomatik şifrelenir).
     async function cloudFetch(key) {
-        if (!_cloud || isLocalOnly(key)) return null;
+        if (!_syncOn || !_cloud || isLocalOnly(key)) return null;
         const token = _apiToken();
         if (!token) return null;
         try {
@@ -346,7 +351,7 @@ const DB = (function () {
         return r ? r.value : null;
     }
     async function cloudPut(key, val) {
-        if (!_cloud || isLocalOnly(key)) return;
+        if (!_syncOn || !_cloud || isLocalOnly(key)) return;
         const token = _apiToken();
         if (!token) return;
         const body = isSensitive(key) ? await _encrypt(val) : val;
@@ -361,7 +366,7 @@ const DB = (function () {
         }).catch(() => { _cloudDown(); });
     }
     async function cloudPutBatch(items) {
-        if (!_cloud || !Array.isArray(items) || !items.length) return;
+        if (!_syncOn || !_cloud || !Array.isArray(items) || !items.length) return;
         const token = _apiToken();
         if (!token) return;
 
@@ -395,7 +400,7 @@ const DB = (function () {
         }
     }
     function cloudDel(key) {
-        if (!_cloud || isLocalOnly(key)) return;
+        if (!_syncOn || !_cloud || isLocalOnly(key)) return;
         const token = _apiToken();
         if (!token) return;
         fetch(API_BASE + '/api/data?key=' + encodeURIComponent(key), {
@@ -490,13 +495,13 @@ const DB = (function () {
 
         /** LS'deki tüm lms_ verilerini cloud'a yükler */
         async pushAll() {
-            if (!_cloud) return;
+            if (!_syncOn || !_cloud) return;
             const items = [];
             for (let i = 0; i < localStorage.length; i++) {
                 const full = localStorage.key(i);
                 if (full && full.startsWith(PFX)) {
                     const k = full.slice(PFX.length);
-                    if (!k || isLocalOnly(k)) continue;
+                    if (!k || isLocalOnly(k) || k.startsWith('_')) continue;
                     if (isSensitive(k)) {
                         const ss = ssGet(k);
                         if (ss !== null) items.push({ key: k, value: ss });
@@ -513,6 +518,64 @@ const DB = (function () {
 
         isCloud() { return _cloud; },
 
+        syncEnabled() { return _syncOn; },
+
+        setSyncEnabled(on) { _syncOn = !!on; },
+
+        /**
+         * Bulut tercihini çözer: 'on' | 'off' | 'legacy' (tercih yok ama
+         * sunucuda eski veri var) | null (tercih yok, yeni kullanıcı).
+         */
+        async resolveSyncPref(username) {
+            if (!username) return null;
+            try {
+                const local = localStorage.getItem(SYNC_PREF_LOCAL + username);
+                if (local === 'on' || local === 'off') return local;
+            } catch {}
+            const token = _apiToken();
+            if (!token) return null;
+            try {
+                const r = await fetch(API_BASE + '/api/data?probe=1', {
+                    headers: { 'Authorization': 'Bearer ' + token },
+                    signal: AbortSignal.timeout(4000)
+                });
+                if (!r.ok) return null;
+                const d = await r.json();
+                if (d.pref === 'on' || d.pref === 'off') {
+                    try { localStorage.setItem(SYNC_PREF_LOCAL + username, d.pref); } catch {}
+                    return d.pref;
+                }
+                return d.hasData ? 'legacy' : null;
+            } catch { return null; }
+        },
+
+        async saveSyncPref(username, pref) {
+            if (!username || (pref !== 'on' && pref !== 'off')) return;
+            try { localStorage.setItem(SYNC_PREF_LOCAL + username, pref); } catch {}
+            const token = _apiToken();
+            if (!token) return;
+            await fetch(API_BASE + '/api/data', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                body: JSON.stringify({ key: SYNC_PREF_KEY, value: pref }),
+                signal: AbortSignal.timeout(6000),
+            }).catch(() => {});
+        },
+
+        /** Kullanıcının buluttaki tüm verisini siler (sync_pref hariç). */
+        async purgeCloud() {
+            const token = _apiToken();
+            if (!token) return false;
+            try {
+                const r = await fetch(API_BASE + '/api/data?all=1', {
+                    method: 'DELETE',
+                    headers: { 'Authorization': 'Bearer ' + token },
+                    signal: AbortSignal.timeout(8000)
+                });
+                return r.ok;
+            } catch { return false; }
+        },
+
         lastSyncAt() { return _lastSyncAt; },
 
         /**
@@ -528,7 +591,7 @@ const DB = (function () {
             if (!validKeys.length) return changed;
 
             const token = _apiToken();
-            if (!_cloud || !token) return changed;
+            if (!_syncOn || !_cloud || !token) return changed;
 
             try {
                 const r = await fetch(API_BASE + '/api/data/batch', {
