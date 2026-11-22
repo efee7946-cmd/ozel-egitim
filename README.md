@@ -445,4 +445,4 @@ GitHub Actions her `main` push ve pull request'te otomatik olarak çalıştırı
 
 ## Lisans
 
-ISC
+Tüm hakları saklıdır. Kod yalnızca incelenmek üzere herkese açıktır; izinsiz kopyalanamaz ve kullanılamaz. Ayrıntılar: [LICENSE](LICENSE).

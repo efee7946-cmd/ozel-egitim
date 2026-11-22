@@ -18,7 +18,8 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "UNLICENSED",
+  "private": true,
   "type": "module",
   "bugs": {
     "url": "https://github.com/efee7946-cmd/ozel-egitim/issues"
