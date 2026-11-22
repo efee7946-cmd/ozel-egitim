@@ -9,15 +9,14 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>YıldızCan | Yıldız Can AI</title>
-    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="aac.css">
-    <script defer src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script defer src="vendor/confetti.browser.js"></script>
     <script type="importmap">
     {
       "imports": {
-        "three": "https://cdn.jsdelivr.net/npm/three@0.163.0/build/three.module.js",
-        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.163.0/examples/jsm/"
+        "three": "./vendor/three/three.module.min.js",
+        "three/addons/": "./vendor/three/addons/"
       }
     }
     </script>
@@ -338,17 +337,21 @@
             <div class="wiz-step" data-step="3">
                 <div class="wiz-step-head">
                     <span class="wiz-step-icon">🎓</span>
-                    <h3 class="wiz-step-title" data-i18n="wiz_level_title">Eğitim kademesi</h3>
-                    <p class="wiz-step-sub" data-i18n="wiz_level_sub">İçerik zorluğunu buna göre ayarlıyoruz.</p>
+                    <h3 class="wiz-step-title" data-i18n="wiz_level_title">Destek düzeyi (isteğe bağlı)</h3>
+                    <p class="wiz-step-sub" data-i18n="wiz_level_sub">Destek düzeyi ve tanı sağlık verisidir. Vermek zorunlu değildir; vermezsen uygulama yine çalışır.</p>
                 </div>
-                <div class="wiz-choice-group">
+                <label class="veli-consent-label wiz-consent wiz-health-consent">
+                    <input type="checkbox" id="loginHealthConsent" onchange="wizHealthConsentChanged()">
+                    <span data-i18n="health_consent_text">Veli olarak, destek düzeyi ve tanı bilgilerinin (sağlık verisi) içeriği uyarlamak için işlenmesine açık rıza veriyorum. Bu rızayı istediğim zaman geri alabilirim.</span>
+                </label>
+                <div class="wiz-choice-group" id="wizHealthFields">
                     <label class="wiz-choice-card">
                         <input type="radio" name="loginLevel" value="ogreti">
                         <span class="wiz-choice-body"><span class="wiz-choice-title" data-i18n="auth_level_mild">Hafif – Öğretilebilir</span></span>
                         <span class="wiz-choice-mark"></span>
                     </label>
                     <label class="wiz-choice-card">
-                        <input type="radio" name="loginLevel" value="egit" checked>
+                        <input type="radio" name="loginLevel" value="egit">
                         <span class="wiz-choice-body"><span class="wiz-choice-title" data-i18n="auth_level_moderate">Orta – Eğitilebilir</span></span>
                         <span class="wiz-choice-mark"></span>
                     </label>
@@ -384,12 +387,12 @@
                 <div class="wiz-step-head">
                     <span class="wiz-step-icon">✅</span>
                     <h3 class="wiz-step-title" data-i18n="wiz_consent_title">Son bir onay</h3>
-                    <p class="wiz-step-sub" data-i18n="wiz_consent_sub">Bilgileri kaydetmeden önce veli onayını al.</p>
+                    <p class="wiz-step-sub" data-i18n="wiz_consent_sub">Kaydetmeden önce velinin onayı gerekir.</p>
                 </div>
                 <div class="wiz-summary" id="wizSummary"></div>
                 <label class="veli-consent-label wiz-consent">
                     <input type="checkbox" id="loginVeliConsent">
-                    <span><span data-i18n="veli_consent_pre">Bu öğrencinin velisi </span><a href="#" onclick="openKvkkModal(event)" data-i18n="veli_consent_link">KVKK Aydınlatma Metni</a><span data-i18n="veli_consent_post"> kapsamında bilgilendirildi ve rıza verdi.</span></span>
+                    <span><span data-i18n="veli_consent_pre">Veli olarak </span><a href="#" onclick="openKvkkModal(event)" data-i18n="veli_consent_link">KVKK Aydınlatma Metni</a><span data-i18n="veli_consent_post">'ni okudum. Çocuğumun adının ve uygulamadaki çalışma kayıtlarının (eğitim verileri) işlenmesine açık rıza veriyorum.</span></span>
                 </label>
             </div>
 
@@ -434,7 +437,7 @@
                 </div>
                 <label class="veli-consent-label">
                     <input type="checkbox" id="setupVeliConsent">
-                    <span><span data-i18n="veli_consent_pre">Bu öğrencinin velisi </span><a href="#" onclick="openKvkkModal(event)" data-i18n="veli_consent_link">KVKK Aydınlatma Metni</a><span data-i18n="veli_consent_post"> kapsamında bilgilendirildi ve rıza verdi.</span></span>
+                    <span><span data-i18n="veli_consent_pre">Veli olarak </span><a href="#" onclick="openKvkkModal(event)" data-i18n="veli_consent_link">KVKK Aydınlatma Metni</a><span data-i18n="veli_consent_post">'ni okudum. Çocuğumun adının ve uygulamadaki çalışma kayıtlarının (eğitim verileri) işlenmesine açık rıza veriyorum.</span></span>
                 </label>
                 <button type="button" class="btn-primary-gradient" id="createStudentBtn" onclick="createStudent()" data-i18n="setup_create_btn">
                     Oluştur

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'yildizcan-shell-v1';
+const CACHE_NAME = 'yildizcan-shell-v2';
 
 const PRECACHE = [
     '/',
@@ -9,7 +9,9 @@ const PRECACHE = [
     '/db-client.js',
     '/aac-data.js',
     '/avatar3d.js',
-    '/avatar.png'
+    '/avatar.png',
+    '/vendor/confetti.browser.js',
+    '/vendor/three/three.module.min.js'
 ];
 
 self.addEventListener('install', (event) => {
@@ -34,24 +36,7 @@ self.addEventListener('fetch', (event) => {
 
     if (url.pathname.startsWith('/api/')) return;
 
-    const isCdn = url.hostname === 'cdn.jsdelivr.net';
-    if (!isCdn && url.origin !== self.location.origin) return;
-
-    if (isCdn) {
-        event.respondWith(
-            caches.match(req).then((cached) => {
-                const fetched = fetch(req).then((res) => {
-                    if (res.ok) {
-                        const clone = res.clone();
-                        caches.open(CACHE_NAME).then((cache) => cache.put(req, clone));
-                    }
-                    return res;
-                }).catch(() => cached);
-                return cached || fetched;
-            })
-        );
-        return;
-    }
+    if (url.origin !== self.location.origin) return;
 
     event.respondWith(
         fetch(req).then((res) => {

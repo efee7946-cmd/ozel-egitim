@@ -49,13 +49,15 @@ const STRINGS = {
     wiz_name_sub: 'Uygulama boyunca bu isimle hitap edeceğiz.',
     wiz_emoji_title: 'Bir avatar seç',
     wiz_emoji_sub: 'Öğrencinin profilinde bu simge görünecek.',
-    wiz_level_title: 'Eğitim kademesi',
-    wiz_level_sub: 'İçerik zorluğunu buna göre ayarlıyoruz.',
+    wiz_level_title: 'Destek düzeyi (isteğe bağlı)',
+    wiz_level_sub: 'Destek düzeyi ve tanı sağlık verisidir. Vermek zorunlu değildir; vermezsen uygulama yine çalışır.',
+    health_consent_text: 'Veli olarak, destek düzeyi ve tanı bilgilerinin (sağlık verisi) içeriği uyarlamak için işlenmesine açık rıza veriyorum. Bu rızayı istediğim zaman geri alabilirim.',
+    wiz_health_skipped: 'Sağlık bilgisi kaydedilmeyecek',
     wiz_cond_title: 'Tanı / eşlik eden durumlar',
     wiz_cond_sub: 'İstediğin kadar seç — bu adımı geçebilirsin.',
     wiz_cond_none: 'Seçim yapılmadı',
     wiz_consent_title: 'Son bir onay',
-    wiz_consent_sub: 'Bilgileri kaydetmeden önce veli onayını al.',
+    wiz_consent_sub: 'Kaydetmeden önce velinin onayı gerekir.',
     wiz_back: '← Geri',
     wiz_next: 'Devam →',
     wiz_login_link: 'Zaten hesabım var, giriş yap',
@@ -299,9 +301,9 @@ const STRINGS = {
     setup_note_label: 'Not',
     setup_create_btn: 'Oluştur',
     setup_add_new_divider: 'Yeni öğrenci ekle',
-    veli_consent_pre: 'Bu öğrencinin velisi ',
+    veli_consent_pre: 'Veli olarak ',
     veli_consent_link: 'KVKK Aydınlatma Metni',
-    veli_consent_post: ' kapsamında bilgilendirildi ve rıza verdi.',
+    veli_consent_post: "'ni okudum. Çocuğumun adının ve uygulamadaki çalışma kayıtlarının (eğitim verileri) işlenmesine açık rıza veriyorum.",
     guest_name_hint: 'Denemek için gerçek isim yerine takma ad yazabilirsiniz.',
     // Accessibility panel
     a11y_export_label: '📥 Verilerimi İndir',
@@ -320,12 +322,15 @@ const STRINGS = {
     // Genel / dağınık string'ler
     menu_greeting_named: 'Merhaba, {name}! 🌟',
     profile_not_entered: 'Profil girilmemiş',
+    health_delete_btn: 'Sağlık bilgilerini sil',
+    health_delete_confirm: 'Destek düzeyi ve tanı bilgileri silinsin mi? Sağlık verisi rızanız da geri alınmış olur.',
+    health_deleted: 'Sağlık bilgileri silindi',
     update_info_btn: 'Bilgileri Güncelle',
     // Alert/Confirm/Status mesajları
     confirm_delete_account_1: 'Hesabınız ve tüm verileriniz kalıcı olarak silinecek. Bu işlem geri alınamaz. Emin misiniz?',
     confirm_delete_account_2: 'Son kez onaylıyın: tüm öğrenci verileri, BEP kayıtları ve ilerleme bilgileri silinecek.',
     account_deleted_msg: 'Hesabınız silindi. İyi günler.',
-    kvkk_confirm_required: 'Devam etmek için velinin KVKK kapsamında bilgilendirildiğini onaylayın.',
+    kvkk_confirm_required: 'Kaydetmek için velinin eğitim verileri onayını işaretleyin.',
     consent_required: 'Veli onayını işaretleyin.',
     student_name_required: 'Öğrenci adı zorunlu.',
     creating_student: 'Öğrenci oluşturuluyor...',
@@ -1000,13 +1005,15 @@ const STRINGS = {
     wiz_name_sub: "We'll use this name throughout the app.",
     wiz_emoji_title: 'Pick an avatar',
     wiz_emoji_sub: "This icon will appear on the student's profile.",
-    wiz_level_title: 'Education level',
-    wiz_level_sub: 'We adjust content difficulty accordingly.',
+    wiz_level_title: 'Support level (optional)',
+    wiz_level_sub: 'Support level and diagnosis are health data. Sharing them is optional; the app works without them.',
+    health_consent_text: 'As the parent/guardian, I give explicit consent to processing the support level and diagnosis (health data) to adapt the content. I can withdraw this consent at any time.',
+    wiz_health_skipped: 'No health information will be saved',
     wiz_cond_title: 'Diagnosis / co-occurring conditions',
     wiz_cond_sub: 'Select as many as you like — you can skip this step.',
     wiz_cond_none: 'None selected',
     wiz_consent_title: 'One last confirmation',
-    wiz_consent_sub: 'Get the parent’s consent before saving.',
+    wiz_consent_sub: 'The parent’s consent is required before saving.',
     wiz_back: '← Back',
     wiz_next: 'Continue →',
     wiz_login_link: 'I already have an account, log in',
@@ -1249,9 +1256,9 @@ const STRINGS = {
     setup_note_label: 'Note',
     setup_create_btn: 'Create',
     setup_add_new_divider: 'Add new student',
-    veli_consent_pre: "This student's parent/guardian has been informed via the ",
+    veli_consent_pre: 'As the parent/guardian, I have read the ',
     veli_consent_link: 'Privacy Notice (KVKK)',
-    veli_consent_post: ' and has given consent.',
+    veli_consent_post: ". I give explicit consent to processing my child's name and practice records in the app (education data).",
     guest_name_hint: 'You can use a nickname instead of a real name while trying the app.',
     // Accessibility panel
     a11y_export_label: '📥 Export My Data',
@@ -1270,12 +1277,15 @@ const STRINGS = {
     // General / misc strings
     menu_greeting_named: 'Hello, {name}! 🌟',
     profile_not_entered: 'Profile not entered',
+    health_delete_btn: 'Delete health information',
+    health_delete_confirm: 'Delete the support level and diagnosis? This also withdraws your consent for health data.',
+    health_deleted: 'Health information deleted',
     update_info_btn: 'Update Information',
     // Alert/Confirm/Status messages
     confirm_delete_account_1: 'Your account and all your data will be permanently deleted. This action cannot be undone. Are you sure?',
     confirm_delete_account_2: 'Final confirmation: all student data, IEP records, and progress information will be deleted.',
     account_deleted_msg: 'Your account has been deleted. Have a nice day.',
-    kvkk_confirm_required: 'To continue, please confirm that the parent has been informed under KVKK.',
+    kvkk_confirm_required: "To save, tick the parent's consent for education data.",
     consent_required: 'Please check the parental consent.',
     student_name_required: 'Student name is required.',
     creating_student: 'Creating student...',
@@ -1946,6 +1956,42 @@ function applyLang() {
 
 // =============================================
 
+const STUDENT_NAME_TOKENS = ['[AD]', '[NAME]'];
+
+function studentNameToken() {
+    return _lang === 'en' ? STUDENT_NAME_TOKENS[1] : STUDENT_NAME_TOKENS[0];
+}
+
+function studentNameParts() {
+    const joined = [activeStudentName, childName].filter(Boolean).join(' ');
+    const parts = joined.split(/\s+/).filter(p => p.length >= 2);
+    return [...new Set(parts)].sort((a, b) => b.length - a.length);
+}
+
+function caseInsensitiveLetter(ch) {
+    if ('iİıI'.includes(ch)) return '[iİıI]';
+    const escapeRe = c => c.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const lower = ch.toLocaleLowerCase('tr');
+    const upper = ch.toLocaleUpperCase('tr');
+    return lower === upper ? escapeRe(ch) : '[' + escapeRe(lower) + escapeRe(upper) + ']';
+}
+
+function maskStudentName(text) {
+    let out = String(text || '');
+    for (const part of studentNameParts()) {
+        const pattern = Array.from(part).map(caseInsensitiveLetter).join('');
+        out = out.replace(new RegExp('(^|[^\\p{L}])' + pattern + '(?=[^\\p{L}]|$)', 'gu'), '$1' + studentNameToken());
+    }
+    return out;
+}
+
+function unmaskStudentName(text) {
+    const firstName = (activeStudentName || childName || '').trim().split(/\s+/)[0];
+    let out = String(text || '');
+    for (const token of STUDENT_NAME_TOKENS) out = out.split(token).join(firstName || (_lang === 'en' ? 'your child' : 'çocuğunuz'));
+    return out;
+}
+
 function escapeHtml(str) {
     if (!str) return '';
     return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
@@ -2605,7 +2651,7 @@ function _weeklyLocalText(d) {
 }
 
 function _weeklyPrompt(d) {
-    const name = activeStudentName || (_lang === 'en' ? 'the child' : 'çocuk');
+    const name = activeStudentName ? studentNameToken() : (_lang === 'en' ? 'the child' : 'çocuk');
     const acc = (d.objItems + d.objErrors) > 0 ? Math.round((d.objItems / (d.objItems + d.objErrors)) * 100) : null;
     const objLine = d.objPlays ? `${d.objPlays}${_lang === 'en' ? ' plays, ' : ' kez, '}${acc !== null ? '%' + acc : '-'}` : '-';
     if (_lang === 'en') {
@@ -2696,7 +2742,7 @@ async function renderWeeklySummaryCard(force = false) {
                 signal: AbortSignal.timeout(20000)
             });
             const data = await r.json();
-            const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+            const text = unmaskStudentName(data?.candidates?.[0]?.content?.parts?.[0]?.text || '');
             if (text) {
                 const parsed = _parseWeekly(text);
                 if (parsed.summary) { summary = parsed.summary; tip = parsed.tip; aiOk = true; }
@@ -3850,7 +3896,7 @@ async function generateAIEvaluation(weekSessions, weekMinutes, weekMic, weekTurn
     }).join('\n') || 'Henüz oyun oynanmadı.';
 
     const therapySample = sessionData.therapyTurns.slice(0, 5).map(t =>
-        `Soru: "${t.question}" → Cevap: "${t.answer}"`).join('\n') || 'Terapi oturumu yok.';
+        `Soru: "${maskStudentName(t.question)}" → Cevap: "${maskStudentName(t.answer)}"`).join('\n') || 'Terapi oturumu yok.';
 
     const _adaptiveText = _buildAdaptiveContextText();
 
@@ -3904,7 +3950,7 @@ Kesinlikle emoji kullanma. Sıcak, profesyonel ve umut verici bir dil kullan.`;
             })
         });
         const data = await res.json();
-        const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+        const text = unmaskStudentName(data?.candidates?.[0]?.content?.parts?.[0]?.text || '');
         document.getElementById('aiEvalLoading').style.display = 'none';
         const evalEl = document.getElementById('aiEvalText');
         evalEl.textContent = text;
@@ -5124,7 +5170,7 @@ async function rec() {
 
 async function getGemmaResponse(text) {
     var url = API_BASE + "/api/chat";
-    chatHistory.push({ role: "user", parts: [{ text: text }] });
+    chatHistory.push({ role: "user", parts: [{ text: maskStudentName(text) }] });
     const currentCategory = getCurrentTherapyCategory();
     const currentLevel = getCurrentTherapyLevel();
     const currentGoal = currentObj && currentObj.goal ? currentObj.goal : (_lang === 'en' ? 'clear and concise communication' : 'kısa ve anlaşılır konuşma');
@@ -5187,7 +5233,7 @@ KATI ETKİLEŞİM VE DİL KURALLARI:
             return guestPraise();
         }
         chatHistory.push({ role: "model", parts: [{ text: reply }] });
-        return reply;
+        return unmaskStudentName(reply);
     } catch (e) {
         console.error('Gemini hata:', e);
         return guestPraise();
@@ -7551,6 +7597,7 @@ function normalizeStudentRecord(student, index = 0) {
         emoji: student.emoji || '🌟',
         createdAt: student.createdAt || student.created_at || new Date().toISOString(),
         consentAt: student.consentAt || student.consent_at || null,
+        consentVersion: student.consentVersion || null,
     };
 }
 
@@ -7631,12 +7678,15 @@ async function renderLoginStudents(students) {
     const guestHint = document.getElementById('guestNameHint');
     if (guestHint) guestHint.style.display = isGuestUser() ? '' : 'none';
     renderLoginEmojiPicker(student?.emoji || '🌟');
+    const healthEl = document.getElementById('loginHealthConsent');
+    if (healthEl) healthEl.checked = !!profile?.healthConsentAt;
     document.querySelectorAll('input[name="loginLevel"]').forEach(input => {
-        input.checked = input.value === (profile?.category || 'egit');
+        input.checked = !!profile?.healthConsentAt && input.value === profile.category;
     });
     document.querySelectorAll('.login-cond').forEach(input => {
-        input.checked = Array.isArray(profile?.conditions) && profile.conditions.includes(input.value);
+        input.checked = !!profile?.healthConsentAt && Array.isArray(profile.conditions) && profile.conditions.includes(input.value);
     });
+    wizHealthConsentChanged();
     wizReset();
 }
 
@@ -7648,7 +7698,22 @@ function selectLoginEmoji(emoji, btn) {
 }
 
 const WIZ_TOTAL_STEPS = 5;
+const CONSENT_VERSION = '2026-11';
 let _wizStep = 1;
+
+function wizHasHealthConsent() {
+    return !!document.getElementById('loginHealthConsent')?.checked;
+}
+
+function wizHealthConsentChanged() {
+    const on = wizHasHealthConsent();
+    const fields = document.getElementById('wizHealthFields');
+    if (fields) fields.classList.toggle('wiz-disabled', !on);
+    document.querySelectorAll('input[name="loginLevel"], .login-cond').forEach(input => {
+        input.disabled = !on;
+        if (!on) input.checked = false;
+    });
+}
 
 function wizReset() {
     _wizStep = 1;
@@ -7689,11 +7754,12 @@ function wizRenderSummary() {
     if (!box) return;
     const name = document.getElementById('loginNameInput')?.value.trim() || '—';
     const emoji = document.getElementById('loginStudentEmoji')?.value || '🌟';
+    const health = wizHasHealthConsent();
     const levelInput = document.querySelector('input[name="loginLevel"]:checked');
-    const levelLabel = levelInput ? (BEP_CATEGORY_LABELS[levelInput.value] || '—') : '—';
+    const levelLabel = !health ? t('wiz_health_skipped') : levelInput ? (BEP_CATEGORY_LABELS[levelInput.value] || '—') : '—';
     const conds = [...document.querySelectorAll('.login-cond:checked')]
         .map(c => BEP_CONDITION_LABELS[c.value] || c.value);
-    const condText = conds.length ? conds.join(', ') : t('wiz_cond_none');
+    const condText = !health ? '' : conds.length ? conds.join(', ') : t('wiz_cond_none');
     box.innerHTML = `
         <div class="wiz-summary-avatar">${escapeHtml(emoji)}</div>
         <div class="wiz-summary-rows">
@@ -7719,11 +7785,19 @@ function wizValidateStep(step) {
 
 function wizNext() {
     if (!wizValidateStep(_wizStep)) return;
-    if (_wizStep < WIZ_TOTAL_STEPS) { _wizStep++; wizRender(); }
+    if (_wizStep < WIZ_TOTAL_STEPS) {
+        _wizStep++;
+        if (_wizStep === 4 && !wizHasHealthConsent()) _wizStep++;
+        wizRender();
+    }
 }
 
 function wizPrev() {
-    if (_wizStep > 1) { _wizStep--; wizRender(); }
+    if (_wizStep > 1) {
+        _wizStep--;
+        if (_wizStep === 4 && !wizHasHealthConsent()) _wizStep--;
+        wizRender();
+    }
 }
 
 async function createStudentFromLogin() {
@@ -7750,16 +7824,21 @@ async function createStudentFromLogin() {
         emoji,
         createdAt: existing?.createdAt || new Date().toISOString(),
         consentAt: new Date().toISOString(),
+        consentVersion: CONSENT_VERSION,
     };
     if (saveBtn) saveBtn.disabled = true;
     if (statusEl) statusEl.textContent = existing ? t('updating_student') : t('creating_student');
     await saveStudents([student]);
     const bepKey = currentBepProfileKey();
     if (bepKey) {
-        await DB.set(bepKey, {
-            category: document.querySelector('input[name="loginLevel"]:checked')?.value || 'egit',
+        const health = wizHasHealthConsent();
+        const previous = await loadCurrentBepProfile();
+        await DB.set(bepKey, health ? {
+            category: document.querySelector('input[name="loginLevel"]:checked')?.value || null,
             conditions: [...document.querySelectorAll('.login-cond:checked')].map(c => c.value),
-        });
+            healthConsentAt: previous?.healthConsentAt || new Date().toISOString(),
+            consentVersion: CONSENT_VERSION,
+        } : { category: null, conditions: [] });
     }
     if (saveBtn) saveBtn.disabled = false;
     if (statusEl) statusEl.textContent = '';
@@ -7944,6 +8023,15 @@ function _renderAzTrend(history) {
     svg.addEventListener('pointerleave', hideTip);
 }
 
+async function deleteHealthInfo() {
+    if (!(await showCustomConfirm(t('health_delete_confirm')))) return;
+    const userId = await getCurrentUserId();
+    if (!userId) return;
+    await DB.set('bep_profile_' + userId, { category: null, conditions: [] });
+    _renderAzIdentityCard({});
+    showToast(t('health_deleted'));
+}
+
 function _renderAzIdentityCard(profile) {
     const nameEl = document.getElementById('azStudentName');
     const tagsEl = document.getElementById('azStudentTags');
@@ -7958,7 +8046,9 @@ function _renderAzIdentityCard(profile) {
         const condTags = (profile.conditions || [])
             .map(c => `<span class="az-tag az-tag-cond">${BEP_CONDITION_LABELS[c] || c}</span>`)
             .join('');
-        tagsEl.innerHTML = levelTag + condTags || `<span class="az-tag-empty">${t('profile_not_entered')}</span>`;
+        const hasHealth = !!(levelTag || condTags);
+        tagsEl.innerHTML = (levelTag + condTags || `<span class="az-tag-empty">${t('profile_not_entered')}</span>`)
+            + (hasHealth ? `<button type="button" class="az-health-delete" onclick="deleteHealthInfo()">${t('health_delete_btn')}</button>` : '');
     }
 
     if (metaEl) {
@@ -8125,13 +8215,13 @@ Taslağı "📝 BEP Dönemsel Gelişim Taslağı" başlığıyla başlat. Şu b�
             headers: { 'Content-Type': 'application/json', ...apiAuthHeaders() },
             body: JSON.stringify({
                 system_instruction: { parts: [{ text: systemPrompt }] },
-                contents: [{ role: 'user', parts: [{ text: userPrompt }] }]
+                contents: [{ role: 'user', parts: [{ text: maskStudentName(userPrompt) }] }]
             }),
             signal: AbortSignal.timeout(30000)
         });
 
         const data = await res.json();
-        const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text || t('bep_draft_failed');
+        const rawText = unmaskStudentName(data?.candidates?.[0]?.content?.parts?.[0]?.text || '') || t('bep_draft_failed');
         const disclaimer = t('bep_disclaimer_full') + '\n\n';
         textEl.value = disclaimer + rawText;
         output.style.display = 'flex';

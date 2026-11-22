@@ -7056,3 +7056,10 @@ body.has-bottom-nav #object-screen {
     border-radius: 14px;
 }
 .auth-wiz .auth-field + .auth-field { margin-top: 12px; }
+.wiz-health-consent { margin-bottom: 12px; }
+.wiz-disabled { opacity: 0.45; pointer-events: none; }
+.az-health-delete {
+    min-height: 44px; padding: 8px 14px; border-radius: 30px;
+    border: 1.5px solid #f5c6cb; background: #fff; color: #c0392b;
+    font-size: 0.8rem; font-weight: 700; cursor: pointer;
+}

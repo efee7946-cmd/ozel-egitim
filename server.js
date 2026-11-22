@@ -21,7 +21,7 @@ const STATIC_FILES = [
     'script.js', 'style.css', 'aac.css', 'aac-data.js', 'db-client.js',
     'avatar3d.js', 'sw.js', 'avatar.png', 'bear_avatar.glb',
 ];
-const STATIC_DIRS = ['aac-assets', 'map-assets', 'models', 'store-assets'];
+const STATIC_DIRS = ['aac-assets', 'map-assets', 'models', 'store-assets', 'vendor'];
 
 app.get('/', (_req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 for (const file of STATIC_FILES) {

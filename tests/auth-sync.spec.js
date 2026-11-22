@@ -128,10 +128,18 @@ test.describe('Kayıt, giriş ve veri eşitleme akışları', () => {
     await page.waitForSelector('#login-screen', { state: 'visible' });
 
     // Veli onayı işaretlenmeden öğrenci oluşturulamaz
+    // Sağlık verisi ayrı, isteğe bağlı onayla açılır; varsayılan seçim yoktur
     await page.fill('#loginNameInput', 'Sync Çocuk');
-    for (let i = 0; i < 4; i++) await page.click('#wizNextBtn');
+    for (let i = 0; i < 2; i++) await page.click('#wizNextBtn');
+    await expect(page.locator('input[name="loginLevel"]:checked')).toHaveCount(0);
+    await expect(page.locator('input[name="loginLevel"][value="ogreti"]')).toBeDisabled();
+    await page.check('#loginHealthConsent');
+    await page.click('label.wiz-choice-card:has(input[value="ogreti"])');
+    await page.click('#wizNextBtn');
+    await page.click('label.wiz-cond-chip:has(input[value="osb"])');
+    await page.click('#wizNextBtn');
     await page.click('#loginSaveBtn');
-    await expect(page.locator('#loginProfileStatus')).toContainText('onaylayın');
+    await expect(page.locator('#loginProfileStatus')).toContainText('işaretleyin');
 
     const studentsPost = page.waitForRequest(req =>
       req.method() === 'POST' && req.url().endsWith('/api/data')
@@ -152,6 +160,11 @@ test.describe('Kayıt, giriş ve veri eşitleme akışları', () => {
     const student = await page.evaluate(() => window.DB.getSync('students_demo')[0]);
     expect(student.name).toBe('Sync Çocuk');
     expect(Date.parse(student.consentAt)).toBeGreaterThan(0);
+    expect(student.consentVersion).toBeTruthy();
+    const bep = await page.evaluate(() => window.DB.getSync('bep_profile_demo'));
+    expect(bep.category).toBe('ogreti');
+    expect(bep.conditions).toEqual(['osb']);
+    expect(Date.parse(bep.healthConsentAt)).toBeGreaterThan(0);
   });
 
   test('çevrimdışı-önce: /api/data ulaşılamazken yazma yerelde tamamlanır, akış kırılmaz', async ({ page }) => {
@@ -166,13 +179,17 @@ test.describe('Kayıt, giriş ve veri eşitleme akışları', () => {
     await page.evaluate(() => document.getElementById('loginForm').requestSubmit());
     await page.waitForSelector('#login-screen', { state: 'visible' });
 
+    // Sağlık onayı verilmezse tanı adımı atlanır ve sağlık verisi kaydedilmez
     await page.fill('#loginNameInput', 'Offline Çocuk');
-    for (let i = 0; i < 4; i++) await page.click('#wizNextBtn');
+    for (let i = 0; i < 3; i++) await page.click('#wizNextBtn');
+    await expect(page.locator('#wizStepCounter')).toHaveText('5 / 5');
     await page.check('#loginVeliConsent');
     await page.click('#loginSaveBtn');
 
     // Bulut kapalı olsa da ilk pratik akışı açılır ve veri cihazda durur
     await page.waitForSelector('#speechmap-screen', { state: 'visible', timeout: 8000 });
+    const bep = await page.evaluate(() => window.DB.getSync('bep_profile_demo'));
+    expect(bep).toEqual({ category: null, conditions: [] });
     const stored = await page.evaluate(() => localStorage.getItem('lms_students_demo'));
     expect(stored.startsWith('ENC1:')).toBe(true);
     const student = await page.evaluate(() => window.DB.getSync('students_demo')[0]);

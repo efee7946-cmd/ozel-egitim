@@ -169,6 +169,8 @@ async function ensureGuestTable() {
         created_at    TIMESTAMPTZ DEFAULT now(),
         last_seen     TIMESTAMPTZ DEFAULT now()
     )`);
+    // Saklama süresi: 1 yıl kullanılmayan misafir cihaz kaydı silinir (KVKK m.7).
+    await query(`DELETE FROM guest_devices WHERE last_seen < now() - interval '1 year'`).catch(() => {});
     _guestTableEnsured = true;
 }
 

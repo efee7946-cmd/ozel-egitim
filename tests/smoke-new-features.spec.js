@@ -23,7 +23,7 @@ test.describe('Veli kapısı, misafir modu ve ilk kullanım akışı', () => {
     await page.waitForSelector('#login-screen', { state: 'visible' });
 
     await page.fill('#loginNameInput', 'Deneme Çocuk');
-    for (let i = 0; i < 4; i++) await page.click('#wizNextBtn');
+    for (let i = 0; i < 3; i++) await page.click('#wizNextBtn');
     await page.check('#loginVeliConsent');
     await page.click('#loginSaveBtn');
 

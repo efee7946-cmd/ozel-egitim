@@ -23,9 +23,9 @@
   <li>Öğrenci adı, eğitim kademesi ve destek ihtiyacı bilgileri</li>
   <li>Pratik seans kayıtları ve performans verileri</li>
   <li>Sesli konuşma verileri: mikrofon kaydı, metne çevrilmek için cihazın konuşma tanıma servisine (tarayıcıda ve Android’de genellikle Google, iOS’ta Apple) iletilir. YıldızCan ses kaydını kendi sunucusunda saklamaz; yalnızca ortaya çıkan metin kullanılır.</li>
-  <li>Misafir modunda: deneme hakkının kötüye kullanılmasını önlemek için cihaz kimliğinin geri döndürülemez bir karma (hash) özeti — kimliğinizle ilişkilendirilmez</li>
+  <li>Misafir modunda: deneme hakkının kötüye kullanılmasını önlemek için cihaz kimliğinin geri döndürülemez bir karma (hash) özeti — kimliğinizle ilişkilendirilmez; 1 yıl kullanılmazsa silinir</li>
 </ul>
-<p>Veriler önce cihazınızda (localStorage) saklanır; kayıtlı hesaplarda ayrıca hesabınıza özel olarak sunucu veritabanıyla eşitlenir. Misafir modunda öğrenci verileri yalnızca cihazda kalır. Öğrenci verilerinin işlenmesi için veli/yasal temsilci onayı zorunludur; bu onay tarih bilgisiyle birlikte kayıt altına alınır.</p>
+<p>Veriler önce cihazınızda (localStorage) saklanır; kayıtlı hesaplarda ayrıca hesabınıza özel olarak sunucu veritabanıyla eşitlenir. Misafir modunda öğrenci verileri yalnızca cihazda kalır. Öğrenci verilerinin işlenmesi için veli/yasal temsilcinin açık rızası zorunludur. Destek düzeyi ve tanı gibi sağlık verileri için ayrı ve isteğe bağlı bir onay alınır; bu onay verilmezse sağlık verisi kaydedilmez ve uygulama yine çalışır. Onaylar tarih ve metin sürümüyle birlikte kayıt altına alınır. Sağlık bilgileri, analiz ekranındaki “Sağlık bilgilerini sil” düğmesiyle istenildiği an silinebilir.</p>
 
 <h2>2. Verilerin Kullanımı</h2>
 <p>Toplanan veriler yalnızca şu amaçlarla kullanılır:</p>

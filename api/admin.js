@@ -99,13 +99,22 @@ async function getStudents(username) {
     return Array.isArray(norm) ? norm : [];
 }
 
-function studentDto(username, s) {
+// KVKK veri minimizasyonu: ad varsayılan olarak baş harflere indirgenir, destek notları gizlenir.
+// Tam veri yalnızca reveal=1 ile ve tekil öğrenci isteğinde döner; bu istek loglanır.
+function maskName(name) {
+    const parts = String(name || '').trim().split(/\s+/).filter(Boolean);
+    return parts.length ? parts.map(p => Array.from(p)[0].toLocaleUpperCase('tr') + '.').join(' ') : null;
+}
+
+function studentDto(username, s, reveal = false) {
+    const fullName = s.full_name ?? s.name ?? null;
     return {
         username,
         id: s.id,
-        fullName: s.full_name ?? s.name ?? null,
+        fullName: reveal ? fullName : maskName(fullName),
+        nameMasked: !reveal,
         birthYear: s.birth_year ?? null,
-        supportNotes: s.support_notes ?? null,
+        supportNotes: reveal ? (s.support_notes ?? null) : null,
         createdAt: s.created_at ?? s.createdAt ?? null,
         updatedAt: s.updated_at ?? null,
     };
@@ -414,7 +423,8 @@ export default async function handler(req, res) {
     if (!requireAdmin(req)) return res.status(401).json({ error: 'Yetkisiz' });
 
     const { resource, user, id } = req.query;
-    console.log('[admin]', clientIp(req), req.method, resource || '-', user || '-', id || '-');
+    const reveal = req.query.reveal === '1' && resource === 'student';
+    console.log('[admin]', clientIp(req), req.method, resource || '-', user || '-', id || '-', reveal ? 'REVEAL' : '');
     res.setHeader('Cache-Control', 'no-store');
 
     try {
@@ -476,7 +486,7 @@ export default async function handler(req, res) {
             const s = (await getStudents(user)).find(x => x.id === id);
             if (!s) return res.status(404).json({ error: 'NOT_FOUND' });
             const objResults = await readPlain(user, 'obj_results_' + id);
-            return res.json({ student: studentDto(user, s), summary: summarize(objResults) });
+            return res.json({ student: studentDto(user, s, reveal), summary: summarize(objResults) });
         }
 
         if (resource === 'sessions') {
