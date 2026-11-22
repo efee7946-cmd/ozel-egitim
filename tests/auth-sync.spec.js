@@ -72,7 +72,7 @@ test.describe('Kayıt, giriş ve veri eşitleme akışları', () => {
     // Adımlar sırayla: kayıt butonu son adıma kadar görünmez
     await expect(page.locator('#registerBtn')).toBeHidden();
     await page.click('#regNextBtn');
-    await expect(page.locator('#authError')).toContainText('doldurun');
+    await expect(page.locator('#authError')).toContainText('E-posta adresinizi');
 
     await page.fill('#regEmail', 'test@example.com');
     await page.click('#regNextBtn');

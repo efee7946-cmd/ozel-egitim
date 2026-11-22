@@ -107,15 +107,15 @@
         <p class="auth-tagline" data-i18n="auth_tagline">Özel eğitim yönetim platformu</p>
 
         <!-- Sekmeler -->
-        <div class="auth-tabs">
-            <button type="button" class="auth-tab active" id="tabLogin"
+        <div class="auth-tabs" role="tablist" onkeydown="authTabKey(event)">
+            <button type="button" class="auth-tab active" id="tabLogin" role="tab" aria-selected="true" aria-controls="loginForm"
                 onclick="switchAuthTab('login')" data-i18n="login_tab">Giriş Yap</button>
-            <button type="button" class="auth-tab" id="tabRegister"
+            <button type="button" class="auth-tab" id="tabRegister" role="tab" aria-selected="false" aria-controls="registerForm" tabindex="-1"
                 onclick="switchAuthTab('register')" data-i18n="register_tab">Kayıt Ol</button>
         </div>
 
         <!-- Giriş formu -->
-        <form id="loginForm" class="auth-form" onsubmit="handleLogin(event)">
+        <form id="loginForm" class="auth-form" role="tabpanel" aria-labelledby="tabLogin" novalidate onsubmit="handleLogin(event)">
             <div class="auth-field">
                 <label for="loginUsername" data-i18n="auth_username_label">Kullanıcı Adı</label>
                 <input type="text" id="loginUsername" autocomplete="username"
@@ -160,7 +160,7 @@
         </form>
 
         <!-- Kayıt formu (gizli) -->
-        <form id="registerForm" class="auth-form auth-wiz" style="display:none" onsubmit="handleRegister(event)">
+        <form id="registerForm" class="auth-form auth-wiz" role="tabpanel" aria-labelledby="tabRegister" style="display:none" onsubmit="handleRegister(event)">
             <div class="wiz-topbar">
                 <div class="wiz-progress"><div class="wiz-progress-bar" id="regProgressBar"></div></div>
                 <span class="wiz-step-counter" id="regStepCounter">1 / 4</span>
@@ -170,7 +170,7 @@
                 <div class="wiz-step-head">
                     <span class="wiz-step-icon">📧</span>
                     <h3 class="wiz-step-title" data-i18n="reg_step_email_title">E-posta adresiniz</h3>
-                    <p class="wiz-step-sub" data-i18n="reg_step_email_sub">Doğrulama kodunu ve şifre sıfırlama bağlantılarını buraya göndereceğiz.</p>
+                    <p class="wiz-step-sub" data-i18n="reg_step_email_sub">Doğrulama kodunu ve şifre sıfırlama kodlarını buraya göndereceğiz.</p>
                 </div>
                 <div class="auth-field">
                     <label for="regEmail" data-i18n="auth_email_label">E-posta</label>
@@ -205,7 +205,7 @@
                 </div>
                 <div class="auth-field">
                     <label for="regUsername" data-i18n="auth_username_label">Kullanıcı Adı</label>
-                    <input type="text" id="regUsername" autocomplete="username"
+                    <input type="text" id="regUsername" autocomplete="username" maxlength="30" autocapitalize="none" spellcheck="false"
                         placeholder="ornek: ahmet_ogretmen (harf, rakam, _)" data-i18n-placeholder="reg_username_placeholder">
                 </div>
                 <div class="kvkk-consent-row">

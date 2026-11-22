@@ -216,6 +216,8 @@ export default async function handler(req, res) {
             const u = username.trim().toLowerCase();
             if (u.length < 3)
                 return res.status(400).json({ error: 'AUTH_USERNAME_TOO_SHORT' });
+            if (u.length > 30)
+                return res.status(400).json({ error: 'AUTH_USERNAME_TOO_LONG' });
             if (password.length < 8)
                 return res.status(400).json({ error: 'AUTH_PASSWORD_TOO_SHORT' });
             if (!/^[a-z0-9][a-z0-9_]*$/.test(u))

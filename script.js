@@ -75,7 +75,10 @@ const STRINGS = {
     auth_password_short: 'Şifre en az 8 karakter olmalı',
     auth_email_invalid: 'Geçerli bir e-posta adresi girin',
     reg_step_email_title: 'E-posta adresiniz',
-    reg_step_email_sub: 'Doğrulama kodunu ve şifre sıfırlama bağlantılarını buraya göndereceğiz.',
+    reg_step_email_sub: 'Doğrulama kodunu ve şifre sıfırlama kodlarını buraya göndereceğiz.',
+    auth_email_required: 'E-posta adresinizi yazın',
+    auth_username_required: 'Bir kullanıcı adı yazın',
+    AUTH_USERNAME_TOO_LONG: 'Kullanıcı adı en fazla 30 karakter olabilir',
     reg_step_pw_title: 'Bir şifre belirleyin',
     reg_step_pw_sub: 'Hesabınıza bu şifreyle gireceksiniz.',
     reg_step_user_title: 'Kullanıcı adı seçin',
@@ -86,7 +89,7 @@ const STRINGS = {
     AUTH_USERNAME_TOO_SHORT: 'Kullanıcı adı en az 3 karakter olmalı',
     AUTH_PASSWORD_TOO_SHORT: 'Şifre en az 8 karakter olmalı',
     AUTH_PASSWORD_PWNED: 'Bu şifre daha önce bir veri ihlalinde açığa çıkmış. Lütfen farklı bir şifre seç.',
-    AUTH_USERNAME_INVALID_CHARS: 'Sadece harf, rakam ve alt çizgi kullanabilirsin, ilk karakter alt çizgi olamaz',
+    AUTH_USERNAME_INVALID_CHARS: 'Türkçe harf (ç, ğ, ı, ö, ş, ü) ve boşluk kullanılamaz. Harf, rakam ve _ kullanın; ilk karakter _ olamaz.',
     AUTH_USERNAME_TAKEN: 'Bu kullanıcı adı zaten alınmış',
     AUTH_INVALID_CREDENTIALS: 'Kullanıcı adı veya şifre yanlış',
     AUTH_TOO_MANY_ATTEMPTS: 'Çok fazla hatalı deneme yapıldı. 15 dakika sonra tekrar deneyin veya şifrenizi sıfırlayın',
@@ -1049,7 +1052,10 @@ const STRINGS = {
     auth_password_short: 'Password must be at least 8 characters',
     auth_email_invalid: 'Enter a valid email address',
     reg_step_email_title: 'Your email address',
-    reg_step_email_sub: 'We will send the verification code and password reset links here.',
+    reg_step_email_sub: 'We will send the verification code and password reset codes here.',
+    auth_email_required: 'Enter your email address',
+    auth_username_required: 'Enter a username',
+    AUTH_USERNAME_TOO_LONG: 'Username can be at most 30 characters',
     reg_step_pw_title: 'Choose a password',
     reg_step_pw_sub: 'You will sign in with this password.',
     reg_step_user_title: 'Pick a username',
@@ -1058,7 +1064,7 @@ const STRINGS = {
     auth_connection_error: 'Could not reach the server. Check your internet connection and try again.',
     AUTH_FIELDS_REQUIRED: 'Username and password are required',
     AUTH_USERNAME_TOO_SHORT: 'Username must be at least 3 characters',
-    AUTH_PASSWORD_TOO_SHORT: 'Password must be at least 6 characters',
+    AUTH_PASSWORD_TOO_SHORT: 'Password must be at least 8 characters',
     AUTH_USERNAME_INVALID_CHARS: 'Only letters, numbers and underscores are allowed, and it cannot start with an underscore',
     AUTH_USERNAME_TAKEN: 'This username is already taken',
     AUTH_INVALID_CREDENTIALS: 'Incorrect username or password',
@@ -6804,13 +6810,26 @@ function selectRegisterEmoji(em) {
     });
 }
 
+// Sekmeler arasında sol/sağ okla geçiş (ARIA sekme düzeni).
+function authTabKey(e) {
+    if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+    e.preventDefault();
+    const next = _authMode === 'login' ? 'register' : 'login';
+    switchAuthTab(next);
+    document.getElementById(next === 'login' ? 'tabLogin' : 'tabRegister').focus();
+}
+
 function switchAuthTab(mode) {
     _authMode = mode;
     document.getElementById('loginForm').style.display    = mode === 'login'    ? '' : 'none';
     document.getElementById('registerForm').style.display = mode === 'register' ? '' : 'none';
     document.getElementById('resetForm').style.display    = 'none';
-    document.getElementById('tabLogin').classList.toggle('active',    mode === 'login');
-    document.getElementById('tabRegister').classList.toggle('active', mode === 'register');
+    [['tabLogin', 'login'], ['tabRegister', 'register']].forEach(([id, m]) => {
+        const tab = document.getElementById(id);
+        tab.classList.toggle('active', mode === m);
+        tab.setAttribute('aria-selected', mode === m ? 'true' : 'false');
+        tab.tabIndex = mode === m ? 0 : -1;
+    });
     document.getElementById('authError').textContent = '';
     if (mode === 'register') { renderRegisterEmojiPicker(); regWizReset(); }
 }
@@ -6857,7 +6876,7 @@ function regWizGo(step) {
 function regStepError(step) {
     if (step === 1) {
         const email = document.getElementById('regEmail').value.trim();
-        if (!email) return 'auth_fill_all';
+        if (!email) return 'auth_email_required';
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return 'auth_email_invalid';
     }
     if (step === 2) {
@@ -6866,6 +6885,14 @@ function regStepError(step) {
         if (!password || !password2) return 'auth_fill_all';
         if (password.length < 8) return 'auth_password_short';
         if (password !== password2) return 'auth_passwords_mismatch';
+    }
+    if (step === 3) {
+        // api/auth.js ile aynı kurallar; sunucuya gitmeden yakalanır.
+        const u = document.getElementById('regUsername').value.trim().toLowerCase();
+        if (!u) return 'auth_username_required';
+        if (u.length < 3) return 'AUTH_USERNAME_TOO_SHORT';
+        if (u.length > 30) return 'AUTH_USERNAME_TOO_LONG';
+        if (!/^[a-z0-9][a-z0-9_]*$/.test(u)) return 'AUTH_USERNAME_INVALID_CHARS';
     }
     return '';
 }
@@ -7146,6 +7173,7 @@ document.addEventListener('input', e => {
 // Adım doğrulamasındaki hatanın hangi alana ait olduğu.
 function regStepErrorField(step) {
     if (step === 1) return 'regEmail';
+    if (step === 3) return 'regUsername';
     const p1 = document.getElementById('regPassword').value;
     return (p1 && p1.length >= 8) ? 'regPassword2' : 'regPassword';
 }
@@ -7223,7 +7251,8 @@ async function handleRegister(e) {
         const err = regStepError(step);
         if (err) { regWizGo(step); return showAuthError(t(err), regStepErrorField(step)); }
     }
-    if (!username) return showAuthError(t('auth_fill_all'), 'regUsername');
+    const userErr = regStepError(3);
+    if (userErr) return showAuthError(t(userErr), 'regUsername');
     if (!document.getElementById('kvkkConsent').checked) return showAuthError(t('auth_kvkk_required'), 'kvkkConsent');
     setAuthLoading(true);
 
