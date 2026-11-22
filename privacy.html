@@ -22,7 +22,7 @@
   <li>Hesap bilgileri: kullanıcı adı ve e-posta adresi (şifre sıfırlama ve hesap doğrulama amaçlı)</li>
   <li>Öğrenci adı, eğitim kademesi ve destek ihtiyacı bilgileri</li>
   <li>Pratik seans kayıtları ve performans verileri</li>
-  <li>Sesli konuşma verileri (cihazda metne çevrilir, yalnızca anlık işlem için kullanılır, ses kaydı saklanmaz)</li>
+  <li>Sesli konuşma verileri: mikrofon kaydı, metne çevrilmek için cihazın konuşma tanıma servisine (tarayıcıda ve Android’de genellikle Google, iOS’ta Apple) iletilir. YıldızCan ses kaydını kendi sunucusunda saklamaz; yalnızca ortaya çıkan metin kullanılır.</li>
   <li>Misafir modunda: deneme hakkının kötüye kullanılmasını önlemek için cihaz kimliğinin geri döndürülemez bir karma (hash) özeti — kimliğinizle ilişkilendirilmez</li>
 </ul>
 <p>Veriler önce cihazınızda (localStorage) saklanır; kayıtlı hesaplarda ayrıca hesabınıza özel olarak sunucu veritabanıyla eşitlenir. Misafir modunda öğrenci verileri yalnızca cihazda kalır. Öğrenci verilerinin işlenmesi için veli/yasal temsilci onayı zorunludur; bu onay tarih bilgisiyle birlikte kayıt altına alınır.</p>

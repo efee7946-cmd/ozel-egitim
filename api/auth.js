@@ -546,6 +546,9 @@ export default async function handler(req, res) {
             // split_part kullanılıyor çünkü LIKE'ta '_' joker karakter ve
             // kullanıcı adları '_' içerebiliyor.
             await query("DELETE FROM app_data WHERE split_part(user_key, ':', 1) = $1", [uname]);
+            // AI cevap denetim kaydı kullanıcı adıyla tutulur; 30 günü beklemeden silinir.
+            // Tablo henüz oluşmamışsa (hiç sohbet yapılmamış) hata yok sayılır.
+            await query('DELETE FROM ai_replies WHERE actor = $1', [uname]).catch(() => {});
             await query('DELETE FROM sessions WHERE username = $1', [uname]);
             await query('DELETE FROM users WHERE username = $1', [uname]);
             return res.json({ ok: true });
