@@ -6,7 +6,7 @@
 import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 import { query } from './_db.js';
-import { hashToken, resolveToken, guestByToken } from './_auth.js';
+import { hashToken, resolveToken, guestByToken, isReservedUsername } from './_auth.js';
 import { sendMail, resetCodeEmailHtml, verifyCodeEmailHtml } from './_mail.js';
 import { checkRateLimit } from './_rateLimit.js';
 import { isPasswordPwned } from './_pwned.js';
@@ -98,6 +98,51 @@ async function emailInUse(userEmail, exceptUsername) {
     return rows.some(r => r.username !== exceptUsername);
 }
 
+const CODE_MAX_ATTEMPTS = 5;
+const CODE_COLUMNS = {
+    reset: { hash: 'reset_hash', expires: 'reset_expires', attempts: 'reset_attempts' },
+    verify: { hash: 'verify_hash', expires: 'verify_expires', attempts: 'verify_attempts' },
+};
+
+// Geçerli bir kod varsa deneme hakkını atomik olarak düşer ve hash'i döner;
+// hak kalmadıysa ya da kod yoksa/süresi geçtiyse null.
+async function claimCodeAttempt(kind, username) {
+    const c = CODE_COLUMNS[kind];
+    const rows = await query(
+        `UPDATE users SET ${c.attempts} = COALESCE(${c.attempts}, 0) + 1
+         WHERE username = $1 AND ${c.hash} IS NOT NULL AND ${c.expires} > now()
+           AND COALESCE(${c.attempts}, 0) < $2
+         RETURNING ${c.hash} AS hash`,
+        [username, CODE_MAX_ATTEMPTS]
+    );
+    return rows[0] || null;
+}
+
+const LOGIN_MAX_FAILS = 5;
+
+// Giriş denemesini bcrypt'ten önce atomik olarak sayar. Kilitliyse ya da
+// pencere dolduysa (paralel istekler dahil) null döner ve hesabı kilitler.
+async function claimLoginAttempt(username) {
+    const rows = await query(
+        `UPDATE users SET failed_logins = COALESCE(failed_logins, 0) + 1
+         WHERE username = $1 AND (lock_until IS NULL OR lock_until <= now())
+           AND COALESCE(failed_logins, 0) < $2
+         RETURNING failed_logins`,
+        [username, LOGIN_MAX_FAILS]
+    );
+    if (rows.length) return rows[0].failed_logins;
+    await lockLogin(username);
+    return null;
+}
+
+async function lockLogin(username) {
+    await query(
+        `UPDATE users SET failed_logins = 0, lock_until = now() + interval '15 minutes'
+         WHERE username = $1 AND (lock_until IS NULL OR lock_until <= now())`,
+        [username]
+    );
+}
+
 function generateSixDigitCode() {
     return String(crypto.randomInt(100000, 1000000));
 }
@@ -171,7 +216,7 @@ export default async function handler(req, res) {
                 return res.status(400).json({ error: 'AUTH_USERNAME_TOO_SHORT' });
             if (password.length < 8)
                 return res.status(400).json({ error: 'AUTH_PASSWORD_TOO_SHORT' });
-            if (!/^[a-z0-9_]+$/.test(u))
+            if (!/^[a-z0-9][a-z0-9_]*$/.test(u))
                 return res.status(400).json({ error: 'AUTH_USERNAME_INVALID_CHARS' });
             if (await isPasswordPwned(password))
                 return res.status(400).json({ error: 'AUTH_PASSWORD_PWNED' });
@@ -239,24 +284,22 @@ export default async function handler(req, res) {
 
             // bcrypt öncesi SHA-256 hesaplar 2026-07-15'te bırakıldı; kalan
             // kayıtlar e-posta ile şifre sıfırlayarak bcrypt'e geçer.
+            const attempt = await claimLoginAttempt(u);
+            if (attempt === null)
+                return res.status(429).json({ error: 'AUTH_TOO_MANY_ATTEMPTS' });
+
             const valid = user.hash.startsWith('$2')
                 && await bcrypt.compare(password, user.hash);
 
             if (!valid) {
-                const fails = (user.failed_logins || 0) + 1;
-                if (fails >= 5) {
-                    await query(
-                        `UPDATE users SET failed_logins = 0, lock_until = now() + interval '15 minutes' WHERE username = $1`,
-                        [u]
-                    );
+                if (attempt >= LOGIN_MAX_FAILS) {
+                    await lockLogin(u);
                     return res.status(429).json({ error: 'AUTH_TOO_MANY_ATTEMPTS' });
                 }
-                await query('UPDATE users SET failed_logins = $1 WHERE username = $2', [fails, u]);
                 return res.status(401).json({ error: 'AUTH_INVALID_CREDENTIALS' });
             }
 
-            if (user.failed_logins || user.lock_until)
-                await query('UPDATE users SET failed_logins = 0, lock_until = NULL WHERE username = $1', [u]);
+            await query('UPDATE users SET failed_logins = 0, lock_until = NULL WHERE username = $1', [u]);
 
             const tok = crypto.randomBytes(32).toString('hex');
             const dataKey = await unwrapDataKey(u, user.data_key);
@@ -312,6 +355,8 @@ export default async function handler(req, res) {
         if (action === 'reset_with_email_code') {
             const { code, newPassword } = req.body || {};
             const ident = identifier || username;
+            if (!(await checkRateLimit('reset_code_ip:' + getClientIp(req), 30)))
+                return res.status(429).json({ error: 'AUTH_RATE_LIMITED' });
             if (!ident || !code || !newPassword)
                 return res.status(400).json({ error: 'AUTH_FIELDS_REQUIRED' });
             if (newPassword.length < 8)
@@ -320,14 +365,14 @@ export default async function handler(req, res) {
             const user = await findUserByIdentifier(ident);
             if (!user || !user.reset_hash || !user.reset_expires || new Date(user.reset_expires) < new Date())
                 return res.status(401).json({ error: 'AUTH_RESET_CODE_INVALID' });
-            if ((user.reset_attempts || 0) >= 5)
-                return res.status(429).json({ error: 'AUTH_RESET_CODE_INVALID' });
 
-            const valid = await bcrypt.compare(String(code).trim(), user.reset_hash);
-            if (!valid) {
-                await query('UPDATE users SET reset_attempts = reset_attempts + 1 WHERE username = $1', [user.username]);
-                return res.status(401).json({ error: 'AUTH_RESET_CODE_INVALID' });
-            }
+            // Deneme hakkı bcrypt'ten ÖNCE tek sorguda alınır: oku-karşılaştır-artır
+            // sırasında paralel istekler aynı sayacı görüp 5 sınırını aşamasın.
+            const claim = await claimCodeAttempt('reset', user.username);
+            if (!claim) return res.status(429).json({ error: 'AUTH_RESET_CODE_INVALID' });
+
+            const valid = await bcrypt.compare(String(code).trim(), claim.hash);
+            if (!valid) return res.status(401).json({ error: 'AUTH_RESET_CODE_INVALID' });
             if (await isPasswordPwned(newPassword))
                 return res.status(400).json({ error: 'AUTH_PASSWORD_PWNED' });
 
@@ -408,14 +453,12 @@ export default async function handler(req, res) {
             const user = users[0];
             if (!user || !user.verify_hash || !user.verify_expires || new Date(user.verify_expires) < new Date())
                 return res.status(401).json({ error: 'AUTH_VERIFY_CODE_INVALID' });
-            if ((user.verify_attempts || 0) >= 5)
-                return res.status(429).json({ error: 'AUTH_VERIFY_CODE_INVALID' });
 
-            const valid = await bcrypt.compare(String(code).trim(), user.verify_hash);
-            if (!valid) {
-                await query('UPDATE users SET verify_attempts = verify_attempts + 1 WHERE username = $1', [user.username]);
-                return res.status(401).json({ error: 'AUTH_VERIFY_CODE_INVALID' });
-            }
+            const claim = await claimCodeAttempt('verify', user.username);
+            if (!claim) return res.status(429).json({ error: 'AUTH_VERIFY_CODE_INVALID' });
+
+            const valid = await bcrypt.compare(String(code).trim(), claim.hash);
+            if (!valid) return res.status(401).json({ error: 'AUTH_VERIFY_CODE_INVALID' });
             await query(
                 'UPDATE users SET email_verified = true, verify_hash = NULL, verify_expires = NULL, verify_attempts = 0 WHERE username = $1',
                 [user.username]
@@ -498,6 +541,7 @@ export default async function handler(req, res) {
             const rows = await sessionRows(token);
             if (!rows.length) return res.status(401).json({ error: 'Geçersiz oturum' });
             const { username: uname } = rows[0];
+            if (isReservedUsername(uname)) return res.status(403).json({ error: 'AUTH_RESERVED_USERNAME' });
             // KVKK silme hakkı: hesapla birlikte tüm LMS verileri de gitmeli.
             // split_part kullanılıyor çünkü LIKE'ta '_' joker karakter ve
             // kullanıcı adları '_' içerebiliyor.

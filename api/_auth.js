@@ -8,6 +8,12 @@
 import crypto from 'crypto';
 import { query } from './_db.js';
 
+// '__' önekli user_key'ler sisteme ait (ör. '__global:content_questions').
+// Böyle bir kullanıcı adı veri uçlarına erişirse tüm kullanıcılara inen içeriği yazabilir.
+export function isReservedUsername(username) {
+    return String(username || '').startsWith('__');
+}
+
 export function hashToken(token) {
     return crypto.createHash('sha256').update(String(token)).digest('hex');
 }
@@ -35,7 +41,8 @@ export async function sessionUsername(req) {
          WHERE s.token = $1 AND s.expires_at > now() AND u.email_verified = true`,
         [stored]
     );
-    return rows.length ? rows[0].username : null;
+    if (!rows.length || isReservedUsername(rows[0].username)) return null;
+    return rows[0].username;
 }
 
 // Misafir cihaz kaydı: token guest_devices tablosunda hash'iyle durur.
