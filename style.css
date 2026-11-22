@@ -3398,18 +3398,18 @@ video { width: 100%; height: 100%; object-fit: cover; }
     max-width: 100%;
     box-sizing: border-box;
     position: relative;
-    background: linear-gradient(180deg, #f1ecff 0%, #faf8ff 45%, #fff 75%);
+    background: var(--color-bg);
 }
 .object-wrapper {
     width: 100%;
     max-width: 480px;
     margin: 0 auto;
-    padding: 64px 16px 40px;
+    padding: 64px var(--space-4) 40px;
     box-sizing: border-box;
     position: relative;
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: var(--space-4);
 }
 .object-header {
     display: flex;
@@ -3418,25 +3418,24 @@ video { width: 100%; height: 100%; object-fit: cover; }
 }
 .object-header h2 {
     margin: 0;
-    font-size: 1.3rem;
-    font-weight: 800;
-    color: #2d2a5c;
-    letter-spacing: -0.01em;
+    font-size: var(--fs-lg);
+    font-weight: var(--fw-heavy);
+    color: var(--color-ink);
 }
+/* Kaçıncı nesne: açık zeminde koyu mor yazı */
 .object-progress-badge {
-    background: linear-gradient(135deg, #6C63FF, #a29bfe);
-    color: #fff;
-    font-weight: 800;
-    font-size: 0.8rem;
-    padding: 6px 14px;
-    border-radius: 999px;
-    box-shadow: 0 4px 12px rgba(108,99,255,0.35);
+    background: var(--color-primary-soft);
+    color: var(--color-primary);
+    font-weight: var(--fw-heavy);
+    font-size: var(--fs-sm);
+    padding: 6px var(--space-3);
+    border-radius: var(--radius-full);
 }
 .object-canvas-card {
     position: relative;
-    background: radial-gradient(circle at 50% 38%, #f6f3ff 0%, #ffffff 68%);
-    border-radius: 26px;
-    box-shadow: 0 10px 32px rgba(108,99,255,0.18), inset 0 0 0 1px rgba(108,99,255,0.07);
+    background: var(--color-surface);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-md);
     height: 280px;
     overflow: hidden;
 }
@@ -3446,53 +3445,54 @@ video { width: 100%; height: 100%; object-fit: cover; }
     bottom: 12px; left: 50%;
     transform: translateX(-50%);
     text-align: center;
-    font-size: 0.74rem;
-    font-weight: 600;
-    color: #6C63FF;
-    background: rgba(255,255,255,0.85);
-    backdrop-filter: blur(4px);
-    padding: 5px 12px;
-    border-radius: 999px;
-    box-shadow: 0 2px 10px rgba(108,99,255,0.15);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+    color: var(--color-muted);
+    background: var(--color-surface-2);
+    padding: 5px var(--space-3);
+    border-radius: var(--radius-full);
     pointer-events: none;
     white-space: nowrap;
 }
+/* Soru: konuşma ekranındaki soru çubuğuyla aynı görünüm */
 .object-prompt {
     text-align: center;
-    font-size: 1rem;
-    font-weight: 700;
-    color: #2d2a5c;
+    font-size: var(--fs-lg);
+    font-weight: var(--fw-heavy);
+    line-height: var(--lh-tight);
+    color: var(--color-ink);
     margin: 0;
-    background: #f5f2ff;
-    border-radius: 16px;
-    padding: 12px 16px;
+    background: var(--color-surface);
+    border: 2px solid var(--color-primary-soft);
+    border-radius: var(--radius-lg);
+    padding: var(--space-3) var(--space-4);
 }
 .object-feedback {
     min-height: 26px;
     text-align: center;
-    font-weight: 800;
-    font-size: 0.95rem;
+    font-weight: var(--fw-heavy);
+    font-size: var(--fs-md);
     transition: color 0.15s ease;
 }
-.object-feedback.correct { color: #22a06b; }
-.object-feedback.wrong { color: #e74c3c; animation: sortShake 0.4s ease; }
-.object-feedback.skip { color: #6b7b93; }
+.object-feedback.correct { color: var(--color-success); }
+.object-feedback.wrong { color: var(--color-danger); animation: sortShake 0.4s ease; }
+.object-feedback.skip { color: var(--color-muted); }
 .object-skip-btn {
     align-self: center;
-    background: #f5f2ff;
-    border: 2px solid #e6defe;
-    border-radius: 999px;
-    color: #6C63FF;
-    font-size: 0.85rem;
-    font-weight: 700;
+    background: var(--color-surface);
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius-full);
+    color: var(--color-ink);
+    min-height: var(--tap-min);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
     text-decoration: none;
     cursor: pointer;
     padding: 10px 22px;
     transition: transform 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
 }
 .object-skip-btn:hover {
-    background: #ece5ff;
-    box-shadow: 0 4px 14px rgba(108,99,255,0.2);
+    background: var(--color-surface-2);
 }
 .object-skip-btn:active { transform: scale(0.96); }
 .object-answer-row {
@@ -3500,49 +3500,68 @@ video { width: 100%; height: 100%; object-fit: cover; }
     align-items: center;
     gap: 8px;
 }
+/* Mikrofon her ekranda aynı: boşta konuşma mavisi, dinlerken kırmızı ve nabız, kapalıyken gri */
 .object-mic-btn {
     flex-shrink: 0;
-    width: 52px; height: 52px;
-    border-radius: 50%;
+    width: 56px; height: 56px;
+    border-radius: var(--radius-full);
     border: none;
-    background: linear-gradient(135deg, #6C63FF, #8e7cf7);
+    background: var(--tile-speech);
     color: #fff;
-    font-size: 1.3rem;
+    font-size: 1.6rem;
     cursor: pointer;
-    box-shadow: 0 6px 18px rgba(108,99,255,0.38);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 6px 18px rgba(47, 95, 224, 0.35);
     transition: transform 0.15s ease;
 }
 .object-mic-btn:hover { transform: translateY(-1px); }
-.object-mic-btn.listening { animation: basketReadyPulse 1s ease-in-out infinite; }
-.object-mic-btn:disabled { opacity: 0.6; cursor: default; }
+.object-mic-btn:disabled { background: var(--color-border); color: var(--color-muted); box-shadow: none; opacity: 0.7; cursor: default; }
+.object-mic-btn.listening,
+.object-mic-btn.listening:disabled {
+    background: var(--color-danger);
+    color: #fff;
+    opacity: 1;
+    box-shadow: 0 6px 18px rgba(192, 57, 43, 0.4);
+    animation: mic-listen-pulse 1.2s ease-in-out infinite;
+}
 .object-text-input {
     flex: 1;
     min-width: 0;
     box-sizing: border-box;
     min-height: 48px;
-    border: 2px solid #e6defe;
-    border-radius: 14px;
-    padding: 0 14px;
-    font-size: 0.92rem;
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    color: var(--color-ink);
+    padding: 0 var(--space-3);
+    font-size: var(--fs-md);
     transition: border-color 0.15s ease;
 }
+.object-text-input::placeholder { color: var(--color-muted); }
 .object-text-input:focus {
     outline: none;
-    border-color: #a29bfe;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px var(--color-primary-soft);
 }
 .object-submit-btn {
     flex-shrink: 0;
     min-height: 48px;
-    padding: 0 20px;
-    border-radius: 14px;
+    padding: 0 var(--space-5);
+    border-radius: var(--radius-md);
     border: none;
-    background: linear-gradient(135deg, #6C63FF, #8e7cf7);
+    background: var(--grad-primary);
     color: #fff;
-    font-weight: 700;
-    font-size: 0.88rem;
+    font-weight: var(--fw-heavy);
+    font-size: var(--fs-md);
     cursor: pointer;
-    box-shadow: 0 6px 16px rgba(108,99,255,0.32);
+    box-shadow: var(--shadow-sm);
     transition: transform 0.15s ease;
+}
+.object-mic-btn:focus-visible, .object-submit-btn:focus-visible, .object-skip-btn:focus-visible {
+    outline: 3px solid var(--color-primary);
+    outline-offset: 3px;
 }
 .object-submit-btn:hover { transform: translateY(-1px); }
 .therapy-complete {
@@ -3637,8 +3656,8 @@ video { width: 100%; height: 100%; object-fit: cover; }
 
 .object-complete { text-align: center; padding: 40px 16px 20px; }
 .object-complete-icon { font-size: 5rem; margin-bottom: 14px; }
-.object-complete h2 { font-size: 1.7rem; color: #2d3a5c; margin-bottom: 8px; }
-.object-complete p { color: #6b7b93; font-size: 1rem; margin-bottom: 20px; }
+.object-complete h2 { font-size: var(--fs-xl); color: var(--color-ink); margin-bottom: var(--space-2); }
+.object-complete p { color: var(--color-muted); font-size: var(--fs-md); margin-bottom: var(--space-5); }
 .object-complete-btns { display: flex; flex-direction: column; gap: 10px; align-items: center; }
 
 @media (max-width: 768px) {

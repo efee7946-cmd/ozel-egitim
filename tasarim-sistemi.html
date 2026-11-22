@@ -60,7 +60,7 @@
 <main class="ds">
     <h1>YıldızCan tasarım sistemi</h1>
     <p>Değişkenler <code>style.css</code> dosyasının başındaki <code>:root</code> bloğundadır. Yeni bir kural yazarken renk kodu, px boyutu ya da köşe değeri yazmak yerine buradaki değişkenleri kullanın. Bir değer burada yoksa önce buraya ekleyin.</p>
-    <p>İlk adımda giriş, kayıt, öğrenci sihirbazı ve ana ekran, sonraki adımlarda konuşma ekranı, AAC panosu ve konu haritası bu sisteme taşındı. Nesne tanıma, mağaza ve analiz ekranları sonraki adımlarda taşınacak; orada hâlâ eski renkler var. Giriş ekranı, ana ekranla aynı gökyüzü ve orman sahnesini kullanır.</p>
+    <p>İlk adımda giriş, kayıt, öğrenci sihirbazı ve ana ekran, sonraki adımlarda konuşma ekranı, AAC panosu, konu haritası ve nesne tanıma bu sisteme taşındı. Mağaza ve analiz ekranları sonraki adımlarda taşınacak; orada hâlâ eski renkler var. Giriş ekranı, ana ekranla aynı gökyüzü ve orman sahnesini kullanır.</p>
 
     <h2>Renk</h2>
     <p>Ana renk mor. Beyaz yazıyla en az 4.5:1 kontrast verir. Ana düğmeler ve bağlantılar bu renktedir; aynı ekranda ikinci bir "ana" renk kullanılmaz.</p>
@@ -253,6 +253,25 @@
                 <b>3/10</b>
             </div>
         </div>
+    </div>
+
+    <h3 style="margin-top:var(--space-6)">Nesne tanıma</h3>
+    <p>Soru konuşma ekranındaki soru çubuğu gibi görünür. Mikrofon her ekranda aynıdır: boşta konuşma mavisi, dinlerken kırmızı ve nabız. Geri bildirim <code>role="status"</code> ile ekran okuyucuya da okunur; doğru <code>--color-success</code>, yanlış <code>--color-danger</code>.</p>
+    <div class="ds-box ds-demo" style="max-width:480px;background:var(--color-bg)">
+        <p><b>Cevap satırı</b> · <code>.object-answer-row</code>, <code>.object-mic-btn</code> (boşta, <code>.listening</code>), <code>.object-text-input</code>, <code>.object-submit-btn</code></p>
+        <p class="object-prompt">Bu ne? Mikrofona söyle ya da yaz</p>
+        <div class="object-feedback correct" style="margin:var(--space-2) 0">Harika, doğru bildin!</div>
+        <div class="object-answer-row">
+            <button type="button" class="object-mic-btn" aria-label="Konuş"><svg class="ui-icon" aria-hidden="true"><use href="#i-mic"/></svg></button>
+            <label for="dsObj" class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Cevabın</label>
+            <input id="dsObj" type="text" class="object-text-input" placeholder="Cevabını yaz...">
+            <button type="button" class="object-submit-btn">Gönder</button>
+        </div>
+        <div class="object-answer-row" style="margin-top:var(--space-3)">
+            <button type="button" class="object-mic-btn listening" aria-label="Dinliyor" style="animation:none"><svg class="ui-icon" aria-hidden="true"><use href="#i-mic"/></svg></button>
+            <span class="object-feedback wrong" style="flex:1;text-align:left;animation:none">Tekrar dene!</span>
+        </div>
+        <div style="display:flex;justify-content:center;margin-top:var(--space-3)"><button type="button" class="object-skip-btn">Bilmiyorum, geç →</button></div>
     </div>
 
     <h2>Simgeler</h2>

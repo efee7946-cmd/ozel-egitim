@@ -785,19 +785,19 @@ document.addEventListener('DOMContentLoaded', function(){
     <div class="object-wrapper">
         <button class="btn-back" onclick="goToMenu()"><span data-i18n="back_menu">← Menü</span></button>
         <div class="object-header">
-            <h2 data-i18n="object_title">🔍 Nesne Tanıma</h2>
+            <h2 data-i18n="object_title">Nesne Tanıma</h2>
             <span class="object-progress-badge" id="objProgress">1 / 3</span>
         </div>
         <div class="object-canvas-card">
             <canvas id="objectCanvas"></canvas>
             <div class="object-fallback" id="objFallback" style="display:none;align-items:center;justify-content:center;height:100%;font-size:4rem;"></div>
-            <div class="object-hint" data-i18n="object_rotate_hint">👆 Döndürmek için sürükle</div>
+            <div class="object-hint" data-i18n="object_rotate_hint">Döndürmek için sürükle</div>
         </div>
         <p class="object-prompt" data-i18n="object_prompt">Bu ne? Mikrofona söyle ya da yaz</p>
-        <div class="object-feedback" id="objFeedback"></div>
+        <div class="object-feedback" id="objFeedback" role="status" aria-live="polite"></div>
         <div class="object-answer-row">
-            <button type="button" class="object-mic-btn" id="objMicBtn" onclick="objRecMic()" aria-label="Mikrofon">🎙️</button>
-            <input type="text" id="objTextInput" class="object-text-input"
+            <button type="button" class="object-mic-btn" id="objMicBtn" onclick="objRecMic()" aria-label="Konuş"><svg class="ui-icon" aria-hidden="true"><use href="#i-mic"/></svg></button>
+            <input type="text" id="objTextInput" class="object-text-input" aria-label="Cevabın"
                 data-i18n-placeholder="object_type_ph" placeholder="Cevabını yaz..." maxlength="40"
                 onkeydown="if(event.key==='Enter') objSubmitText()">
             <button type="button" class="object-submit-btn" onclick="objSubmitText()" data-i18n="object_submit_btn">Gönder</button>
@@ -808,7 +808,7 @@ document.addEventListener('DOMContentLoaded', function(){
             <h2 data-i18n="object_complete_title">Hepsini Bildin!</h2>
             <p data-i18n="object_complete_sub">Nesne tanımada harikaydın!</p>
             <div class="object-complete-btns">
-                <button type="button" class="btn-primary-gradient" onclick="goToObjectRecognition()" data-i18n="object_play_again">🔁 Tekrar Oyna</button>
+                <button type="button" class="btn-primary-gradient" onclick="goToObjectRecognition()" data-i18n="object_play_again">Tekrar Oyna</button>
                 <button type="button" class="menu-ghost-btn" onclick="goToMenu()" data-i18n="object_back_to_menu">← Menüye Dön</button>
             </div>
         </div>
